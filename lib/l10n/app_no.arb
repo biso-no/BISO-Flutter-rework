@@ -1,0 +1,64 @@
+{
+  "@@locale": "no",
+  "appName": "BISO",
+  
+  "welcomeToBiso": "Velkommen til BISO",
+  
+  "email": "E-post",
+  "enterEmail": "Skriv inn e-postadressen din",
+  "enterValidEmail": "Vennligst skriv inn en gyldig e-postadresse",
+  "emailMustBeBiDomain": "E-post må være fra @bi.no eller @biso.no domene",
+  
+  "continueButton": "Fortsett",
+  "back": "Tilbake",
+  "cancel": "Avbryt",
+  "save": "Lagre",
+  "login": "Logg inn",
+  "logout": "Logg ut",
+  
+  "verifyOtp": "Bekreft kode",
+  "otpSentTo": "Vi har sendt en 6-sifret kode til {email}",
+  "enterOtpCode": "Skriv inn 6-sifret kode",
+  "invalidOtpCode": "Ugyldig kode. Vennligst prøv igjen.",
+  "resendCode": "Send kode på nytt",
+  
+  "home": "Hjem",
+  "explore": "Utforsk",
+  "chat": "Chat",
+  "profile": "Profil",
+  
+  "events": "Arrangementer",
+  "marketplace": "Markedsplass",
+  "jobs": "Jobber",
+  "volunteer": "Frivillig",
+  "expenses": "Utgifter",
+  "clubsAndUnits": "Klubber og enheter",
+  "bisoShop": "BISO Butikk",
+  
+  "campus": "Campus",
+  "oslo": "Oslo",
+  "bergen": "Bergen",
+  "trondheim": "Trondheim",
+  "stavanger": "Stavanger",
+  "selectCampus": "Velg campus",
+  
+  "personalInfo": "Personlig informasjon",
+  "name": "Navn",
+  "phone": "Telefon",
+  "address": "Adresse",
+  "city": "By",
+  "zipCode": "Postnummer",
+  
+  "settings": "Innstillinger",
+  "notifications": "Varsler",
+  "language": "Språk",
+  "english": "Engelsk",
+  "norwegian": "Norsk",
+  
+  "error": "Feil",
+  "success": "Suksess",
+  "loading": "Laster...",
+  "retry": "Prøv igjen",
+  "noInternetConnection": "Ingen internettforbindelse",
+  "somethingWentWrong": "Noe gikk galt"
+}

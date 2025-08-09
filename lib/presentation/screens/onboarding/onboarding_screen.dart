@@ -1,0 +1,641 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../data/models/campus_model.dart';
+import '../../../generated/l10n/app_localizations.dart';
+import '../../../providers/auth/auth_provider.dart';
+
+class OnboardingScreen extends ConsumerStatefulWidget {
+  const OnboardingScreen({super.key});
+
+  @override
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
+  final PageController _pageController = PageController();
+  int _currentStep = 0;
+
+  // Form data
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _zipController = TextEditingController();
+  
+  String? _selectedCampusId;
+  List<String> _selectedDepartments = [];
+
+  final List<CampusModel> _campuses = const [
+    CampusModel(
+      id: AppConstants.osloId,
+      name: 'Oslo',
+      description: 'Main campus in Norway\'s capital',
+      location: 'Oslo, Norway',
+      imageUrl: '',
+      heroImageUrl: '',
+      stats: CampusStats(),
+    ),
+    CampusModel(
+      id: AppConstants.bergenId,
+      name: 'Bergen',
+      description: 'Beautiful coastal campus',
+      location: 'Bergen, Norway',
+      imageUrl: '',
+      heroImageUrl: '',
+      stats: CampusStats(),
+    ),
+    CampusModel(
+      id: AppConstants.trondheimId,
+      name: 'Trondheim',
+      description: 'Historic university city campus',
+      location: 'Trondheim, Norway',
+      imageUrl: '',
+      heroImageUrl: '',
+      stats: CampusStats(),
+    ),
+    CampusModel(
+      id: AppConstants.stavangerId,
+      name: 'Stavanger',
+      description: 'Energy sector hub campus',
+      location: 'Stavanger, Norway',
+      imageUrl: '',
+      heroImageUrl: '',
+      stats: CampusStats(),
+    ),
+  ];
+
+  final List<String> _availableDepartments = [
+    'Business Administration',
+    'Economics',
+    'Marketing',
+    'Finance',
+    'International Business',
+    'Technology Management',
+    'HR Management',
+    'Strategy & Leadership',
+  ];
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _nameController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    _cityController.dispose();
+    _zipController.dispose();
+    super.dispose();
+  }
+
+  void _nextStep() {
+    if (_currentStep < 3) {
+      setState(() => _currentStep++);
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _previousStep() {
+    if (_currentStep > 0) {
+      setState(() => _currentStep--);
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  Future<void> _completeOnboarding() async {
+    try {
+      await ref.read(authStateProvider.notifier).createProfile(
+        name: _nameController.text,
+        phone: _phoneController.text.isNotEmpty ? _phoneController.text : null,
+        address: _addressController.text.isNotEmpty ? _addressController.text : null,
+        city: _cityController.text.isNotEmpty ? _cityController.text : null,
+        zipCode: _zipController.text.isNotEmpty ? _zipController.text : null,
+        campusId: _selectedCampusId,
+        departments: _selectedDepartments,
+      );
+
+      if (mounted) {
+        context.go('/home');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authState = ref.watch(authStateProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: _currentStep > 0
+            ? IconButton(
+                onPressed: _previousStep,
+                icon: const Icon(Icons.arrow_back),
+              )
+            : null,
+        title: Text('${_currentStep + 1} / 4'),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          // Progress indicator
+          LinearProgressIndicator(
+            value: (_currentStep + 1) / 4,
+            backgroundColor: AppColors.gray200,
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.defaultBlue),
+          ),
+          
+          // Content
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (index) => setState(() => _currentStep = index),
+              children: [
+                _PersonalInfoStep(
+                  nameController: _nameController,
+                  phoneController: _phoneController,
+                  addressController: _addressController,
+                  cityController: _cityController,
+                  zipController: _zipController,
+                  onNext: _nextStep,
+                ),
+                _CampusSelectionStep(
+                  campuses: _campuses,
+                  selectedCampusId: _selectedCampusId,
+                  onCampusSelected: (campusId) {
+                    setState(() => _selectedCampusId = campusId);
+                  },
+                  onNext: _nextStep,
+                ),
+                _DepartmentSelectionStep(
+                  departments: _availableDepartments,
+                  selectedDepartments: _selectedDepartments,
+                  onDepartmentsChanged: (departments) {
+                    setState(() => _selectedDepartments = departments);
+                  },
+                  onNext: _nextStep,
+                ),
+                _NotificationPreferencesStep(
+                  onComplete: _completeOnboarding,
+                  isLoading: authState.isLoading,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PersonalInfoStep extends StatefulWidget {
+  final TextEditingController nameController;
+  final TextEditingController phoneController;
+  final TextEditingController addressController;
+  final TextEditingController cityController;
+  final TextEditingController zipController;
+  final VoidCallback onNext;
+
+  const _PersonalInfoStep({
+    required this.nameController,
+    required this.phoneController,
+    required this.addressController,
+    required this.cityController,
+    required this.zipController,
+    required this.onNext,
+  });
+
+  @override
+  State<_PersonalInfoStep> createState() => _PersonalInfoStepState();
+}
+
+class _PersonalInfoStepState extends State<_PersonalInfoStep> {
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              l10n.personalInfo,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                color: AppColors.strongBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Tell us a bit about yourself',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+            ),
+            
+            const SizedBox(height: 32),
+
+            TextFormField(
+              controller: widget.nameController,
+              decoration: InputDecoration(
+                labelText: l10n.name,
+                prefixIcon: const Icon(Icons.person_outlined),
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Name is required';
+                }
+                return null;
+              },
+              textInputAction: TextInputAction.next,
+            ),
+
+            const SizedBox(height: 16),
+
+            TextFormField(
+              controller: widget.phoneController,
+              decoration: InputDecoration(
+                labelText: l10n.phone,
+                prefixIcon: const Icon(Icons.phone_outlined),
+                hintText: '+47 123 45 678',
+              ),
+              keyboardType: TextInputType.phone,
+              textInputAction: TextInputAction.next,
+            ),
+
+            const SizedBox(height: 16),
+
+            TextFormField(
+              controller: widget.addressController,
+              decoration: InputDecoration(
+                labelText: l10n.address,
+                prefixIcon: const Icon(Icons.home_outlined),
+              ),
+              textInputAction: TextInputAction.next,
+            ),
+
+            const SizedBox(height: 16),
+
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: widget.cityController,
+                    decoration: InputDecoration(
+                      labelText: l10n.city,
+                      prefixIcon: const Icon(Icons.location_city_outlined),
+                    ),
+                    textInputAction: TextInputAction.next,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: TextFormField(
+                    controller: widget.zipController,
+                    decoration: InputDecoration(
+                      labelText: l10n.zipCode,
+                      prefixIcon: const Icon(Icons.local_post_office_outlined),
+                    ),
+                    keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.done,
+                  ),
+                ),
+              ],
+            ),
+
+            const Spacer(),
+
+            ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  widget.onNext();
+                }
+              },
+              child: Text(l10n.continueButton),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CampusSelectionStep extends StatelessWidget {
+  final List<CampusModel> campuses;
+  final String? selectedCampusId;
+  final Function(String) onCampusSelected;
+  final VoidCallback onNext;
+
+  const _CampusSelectionStep({
+    required this.campuses,
+    required this.selectedCampusId,
+    required this.onCampusSelected,
+    required this.onNext,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            l10n.selectCampus,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              color: AppColors.strongBlue,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Choose your BI campus location',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: AppColors.onSurfaceVariant,
+            ),
+          ),
+          
+          const SizedBox(height: 32),
+
+          Expanded(
+            child: ListView.separated(
+              itemCount: campuses.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final campus = campuses[index];
+                final isSelected = selectedCampusId == campus.id;
+
+                return Card(
+                  color: isSelected ? AppColors.subtleBlue : null,
+                  child: InkWell(
+                    onTap: () => onCampusSelected(campus.id),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: isSelected 
+                                  ? AppColors.defaultBlue 
+                                  : AppColors.defaultBlue.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.location_city,
+                              color: isSelected ? Colors.white : AppColors.defaultBlue,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  campus.name,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  campus.description,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (isSelected)
+                            const Icon(
+                              Icons.check_circle,
+                              color: AppColors.defaultBlue,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          ElevatedButton(
+            onPressed: selectedCampusId != null ? onNext : null,
+            child: Text(l10n.continueButton),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DepartmentSelectionStep extends StatelessWidget {
+  final List<String> departments;
+  final List<String> selectedDepartments;
+  final Function(List<String>) onDepartmentsChanged;
+  final VoidCallback onNext;
+
+  const _DepartmentSelectionStep({
+    required this.departments,
+    required this.selectedDepartments,
+    required this.onDepartmentsChanged,
+    required this.onNext,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Select Interests',
+            style: theme.textTheme.headlineMedium?.copyWith(
+              color: AppColors.strongBlue,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Choose departments or areas you\'re interested in',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: AppColors.onSurfaceVariant,
+            ),
+          ),
+          
+          const SizedBox(height: 32),
+
+          Expanded(
+            child: ListView.builder(
+              itemCount: departments.length,
+              itemBuilder: (context, index) {
+                final department = departments[index];
+                final isSelected = selectedDepartments.contains(department);
+
+                return CheckboxListTile(
+                  title: Text(department),
+                  value: isSelected,
+                  onChanged: (bool? selected) {
+                    List<String> updated = List.from(selectedDepartments);
+                    if (selected == true) {
+                      updated.add(department);
+                    } else {
+                      updated.remove(department);
+                    }
+                    onDepartmentsChanged(updated);
+                  },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          ElevatedButton(
+            onPressed: onNext,
+            child: Text(l10n.continueButton),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NotificationPreferencesStep extends StatefulWidget {
+  final VoidCallback onComplete;
+  final bool isLoading;
+
+  const _NotificationPreferencesStep({
+    required this.onComplete,
+    required this.isLoading,
+  });
+
+  @override
+  State<_NotificationPreferencesStep> createState() => _NotificationPreferencesStepState();
+}
+
+class _NotificationPreferencesStepState extends State<_NotificationPreferencesStep> {
+  final Map<String, bool> _preferences = {
+    'events': true,
+    'products': true,
+    'jobs': true,
+    'expenses': false,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            l10n.notifications,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              color: AppColors.strongBlue,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Choose what notifications you want to receive',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: AppColors.onSurfaceVariant,
+            ),
+          ),
+          
+          const SizedBox(height: 32),
+
+          Card(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: Text(l10n.events),
+                  subtitle: const Text('Get notified about new campus events'),
+                  value: _preferences['events']!,
+                  onChanged: (value) => setState(() => _preferences['events'] = value),
+                ),
+                const Divider(height: 1),
+                SwitchListTile(
+                  title: Text(l10n.marketplace),
+                  subtitle: const Text('New items in the marketplace'),
+                  value: _preferences['products']!,
+                  onChanged: (value) => setState(() => _preferences['products'] = value),
+                ),
+                const Divider(height: 1),
+                SwitchListTile(
+                  title: Text(l10n.jobs),
+                  subtitle: const Text('Volunteer and job opportunities'),
+                  value: _preferences['jobs']!,
+                  onChanged: (value) => setState(() => _preferences['jobs'] = value),
+                ),
+                const Divider(height: 1),
+                SwitchListTile(
+                  title: Text(l10n.expenses),
+                  subtitle: const Text('Expense reimbursement updates'),
+                  value: _preferences['expenses']!,
+                  onChanged: (value) => setState(() => _preferences['expenses'] = value),
+                ),
+              ],
+            ),
+          ),
+
+          const Spacer(),
+
+          ElevatedButton(
+            onPressed: widget.isLoading ? null : widget.onComplete,
+            child: widget.isLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Text('Complete Setup'),
+          ),
+        ],
+      ),
+    );
+  }
+}

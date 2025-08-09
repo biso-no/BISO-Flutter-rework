@@ -1,0 +1,1028 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+
+import '../../../core/constants/app_colors.dart';
+import '../../../data/models/expense_model.dart';
+import '../../../generated/l10n/app_localizations.dart';
+import '../expense/create_expense_screen.dart';
+
+// Mock data provider for expenses
+final expensesProvider = StateProvider<List<ExpenseModel>>((ref) {
+  return [
+    ExpenseModel(
+      id: '1',
+      userId: 'user1',
+      userName: 'John Doe',
+      userEmail: 'john.doe@bi.no',
+      amount: 2500.0,
+      description: 'Taxi to event venue and back',
+      category: 'travel',
+      departmentId: 'marketing',
+      departmentName: 'Marketing Committee',
+      eventId: 'event1',
+      eventName: 'BI Career Fair 2024',
+      bankAccount: '12345678901',
+      accountHolderName: 'John Doe',
+      attachments: ['receipt1.jpg', 'receipt2.pdf'],
+      status: 'under_review',
+      expenseDate: DateTime.now().subtract(const Duration(days: 2)),
+      createdAt: DateTime.now().subtract(const Duration(days: 2)),
+    ),
+    ExpenseModel(
+      id: '2',
+      userId: 'user1',
+      userName: 'John Doe',
+      userEmail: 'john.doe@bi.no',
+      amount: 450.0,
+      description: 'Office supplies for workshop',
+      category: 'supplies',
+      departmentId: 'student_services',
+      departmentName: 'Student Services',
+      bankAccount: '12345678901',
+      accountHolderName: 'John Doe',
+      attachments: ['supplies_receipt.jpg'],
+      status: 'approved',
+      expenseDate: DateTime.now().subtract(const Duration(days: 5)),
+      createdAt: DateTime.now().subtract(const Duration(days: 5)),
+      approvedAt: DateTime.now().subtract(const Duration(days: 1)),
+      approverName: 'Admin User',
+    ),
+    ExpenseModel(
+      id: '3',
+      userId: 'user1',
+      userName: 'John Doe',
+      userEmail: 'john.doe@bi.no',
+      amount: 1200.0,
+      description: 'Catering for orientation week',
+      category: 'food',
+      departmentId: 'student_union',
+      departmentName: 'Student Union',
+      bankAccount: '12345678901',
+      accountHolderName: 'John Doe',
+      isPrepayment: true,
+      attachments: ['catering_quote.pdf'],
+      status: 'draft',
+      expenseDate: DateTime.now().add(const Duration(days: 10)),
+      createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+    ),
+  ];
+});
+
+class ExpensesScreen extends ConsumerStatefulWidget {
+  const ExpensesScreen({super.key});
+
+  @override
+  ConsumerState<ExpensesScreen> createState() => _ExpensesScreenState();
+}
+
+class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
+  String _selectedStatus = 'all';
+
+  final List<String> _statusFilters = [
+    'all',
+    'draft',
+    'submitted',
+    'under_review',
+    'approved',
+    'rejected',
+    'paid',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final expenses = ref.watch(expensesProvider);
+
+    final filteredExpenses = _selectedStatus == 'all'
+        ? expenses
+        : expenses.where((expense) => expense.status == _selectedStatus).toList();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.expenses),
+        leading: IconButton(
+          onPressed: () {
+            // Navigate back to home screen (explore tab)
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.search),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'history') {
+                // TODO: Show expense history
+              } else if (value == 'guidelines') {
+                // TODO: Show expense guidelines
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'history',
+                child: Row(
+                  children: [
+                    Icon(Icons.history),
+                    SizedBox(width: 12),
+                    Text('View History'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'guidelines',
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline),
+                    SizedBox(width: 12),
+                    Text('Guidelines'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Status Filter
+          Container(
+            height: 60,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _statusFilters.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                final status = _statusFilters[index];
+                final isSelected = _selectedStatus == status;
+
+                return FilterChip(
+                  label: Text(_getStatusDisplayName(status)),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedStatus = status;
+                    });
+                  },
+                  backgroundColor: Colors.transparent,
+                  selectedColor: AppColors.subtleBlue,
+                  checkmarkColor: AppColors.defaultBlue,
+                  labelStyle: TextStyle(
+                    color: isSelected ? AppColors.defaultBlue : AppColors.onSurfaceVariant,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                  side: BorderSide(
+                    color: isSelected ? AppColors.defaultBlue : AppColors.outline,
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const Divider(height: 1),
+
+          // Summary Cards Row
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _SummaryCard(
+                    title: 'Pending',
+                    amount: _calculateTotalByStatus(expenses, ['submitted', 'under_review']),
+                    color: AppColors.orange9,
+                    icon: Icons.pending,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _SummaryCard(
+                    title: 'Approved',
+                    amount: _calculateTotalByStatus(expenses, ['approved']),
+                    color: AppColors.success,
+                    icon: Icons.check_circle,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Expenses List
+          Expanded(
+            child: filteredExpenses.isEmpty
+                ? _EmptyState(
+                    icon: Icons.receipt_long,
+                    title: 'No expenses found',
+                    subtitle: 'No expenses match your current filter',
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: filteredExpenses.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final expense = filteredExpenses[index];
+                      return _ExpenseCard(
+                        expense: expense,
+                        onTap: () => _showExpenseDetails(context, expense),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _startNewExpense(context),
+        icon: const Icon(Icons.add),
+        label: const Text('New Expense'),
+        backgroundColor: AppColors.orange9,
+      ),
+    );
+  }
+
+  String _getStatusDisplayName(String status) {
+    switch (status) {
+      case 'all': return 'All';
+      case 'draft': return 'Draft';
+      case 'submitted': return 'Submitted';
+      case 'under_review': return 'Review';
+      case 'approved': return 'Approved';
+      case 'rejected': return 'Rejected';
+      case 'paid': return 'Paid';
+      default: return status;
+    }
+  }
+
+  double _calculateTotalByStatus(List<ExpenseModel> expenses, List<String> statuses) {
+    return expenses
+        .where((expense) => statuses.contains(expense.status))
+        .fold(0.0, (sum, expense) => sum + expense.amount);
+  }
+
+  void _showExpenseDetails(BuildContext context, ExpenseModel expense) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (context, scrollController) => _ExpenseDetailSheet(
+          expense: expense,
+          scrollController: scrollController,
+        ),
+      ),
+    );
+  }
+
+  void _startNewExpense(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CreateExpenseScreen(),
+      ),
+    );
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  final String title;
+  final double amount;
+  final Color color;
+  final IconData icon;
+
+  const _SummaryCard({
+    required this.title,
+    required this.amount,
+    required this.color,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'NOK ${amount.toStringAsFixed(0)}',
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExpenseCard extends StatelessWidget {
+  final ExpenseModel expense;
+  final VoidCallback onTap;
+
+  const _ExpenseCard({
+    required this.expense,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  // Category Icon
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: _getCategoryColor(expense.category).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      _getCategoryIcon(expense.category),
+                      color: _getCategoryColor(expense.category),
+                      size: 20,
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  // Expense Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          expense.description,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          expense.departmentName,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Amount and Status
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        expense.formattedAmount,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.defaultBlue,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(expense.status).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          expense.displayStatus,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: _getStatusColor(expense.status),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today,
+                    size: 14,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    DateFormat('MMM dd, yyyy').format(expense.expenseDate),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Icon(
+                    Icons.attach_file,
+                    size: 14,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${expense.attachments.length} files',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                  if (expense.isPrepayment) ...[
+                    const SizedBox(width: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.accentBlue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Prepayment',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: AppColors.accentBlue,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'event': return AppColors.accentBlue;
+      case 'travel': return AppColors.green9;
+      case 'supplies': return AppColors.purple9;
+      case 'food': return AppColors.orange9;
+      case 'other': return AppColors.onSurfaceVariant;
+      default: return AppColors.onSurfaceVariant;
+    }
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'event': return Icons.event;
+      case 'travel': return Icons.directions_car;
+      case 'supplies': return Icons.shopping_cart;
+      case 'food': return Icons.restaurant;
+      case 'other': return Icons.receipt;
+      default: return Icons.receipt;
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'draft': return AppColors.onSurfaceVariant;
+      case 'submitted': return AppColors.accentBlue;
+      case 'under_review': return AppColors.orange9;
+      case 'approved': return AppColors.success;
+      case 'rejected': return AppColors.error;
+      case 'paid': return AppColors.success;
+      default: return AppColors.onSurfaceVariant;
+    }
+  }
+}
+
+class _ExpenseDetailSheet extends StatelessWidget {
+  final ExpenseModel expense;
+  final ScrollController scrollController;
+
+  const _ExpenseDetailSheet({
+    required this.expense,
+    required this.scrollController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // Handle
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.gray300,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+
+          Expanded(
+            child: ListView(
+              controller: scrollController,
+              padding: const EdgeInsets.all(24),
+              children: [
+                // Header
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            expense.description,
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            expense.departmentName,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: AppColors.defaultBlue,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(expense.status).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        expense.displayStatus,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: _getStatusColor(expense.status),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // Amount Card
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.subtleBlue,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Amount',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: AppColors.defaultBlue,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              expense.formattedAmount,
+                              style: theme.textTheme.headlineMedium?.copyWith(
+                                color: AppColors.defaultBlue,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (expense.isPrepayment)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.defaultBlue.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'Prepayment Request',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: AppColors.defaultBlue,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Details Section
+                _DetailSection(
+                  title: 'Expense Details',
+                  children: [
+                    _DetailItem(
+                      icon: Icons.calendar_today,
+                      label: 'Date',
+                      value: DateFormat('MMMM dd, yyyy').format(expense.expenseDate),
+                    ),
+                    _DetailItem(
+                      icon: Icons.category,
+                      label: 'Category',
+                      value: expense.displayCategory,
+                    ),
+                    if (expense.eventName != null)
+                      _DetailItem(
+                        icon: Icons.event,
+                        label: 'Related Event',
+                        value: expense.eventName!,
+                      ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Payment Details
+                _DetailSection(
+                  title: 'Payment Information',
+                  children: [
+                    _DetailItem(
+                      icon: Icons.account_balance,
+                      label: 'Bank Account',
+                      value: _formatBankAccount(expense.bankAccount),
+                    ),
+                    _DetailItem(
+                      icon: Icons.person,
+                      label: 'Account Holder',
+                      value: expense.accountHolderName,
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Attachments
+                if (expense.attachments.isNotEmpty) ...[
+                  _DetailSection(
+                    title: 'Receipts & Documents',
+                    children: expense.attachments.map((attachment) {
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: AppColors.gray200,
+                          child: Icon(
+                            _getFileIcon(attachment),
+                            color: AppColors.onSurfaceVariant,
+                            size: 20,
+                          ),
+                        ),
+                        title: Text(attachment),
+                        trailing: IconButton(
+                          onPressed: () {
+                            // TODO: Open/download file
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Opening $attachment - Coming Soon')),
+                            );
+                          },
+                          icon: const Icon(Icons.open_in_new),
+                        ),
+                        contentPadding: EdgeInsets.zero,
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                // Timeline/Status History
+                if (expense.approvedAt != null || expense.rejectionReason != null) ...[
+                  _DetailSection(
+                    title: 'Status History',
+                    children: [
+                      _TimelineItem(
+                        icon: Icons.create,
+                        title: 'Created',
+                        subtitle: DateFormat('MMM dd, yyyy • HH:mm').format(expense.createdAt!),
+                        isCompleted: true,
+                      ),
+                      if (expense.approvedAt != null)
+                        _TimelineItem(
+                          icon: Icons.check_circle,
+                          title: 'Approved',
+                          subtitle: 'By ${expense.approverName} • ${DateFormat('MMM dd, yyyy • HH:mm').format(expense.approvedAt!)}',
+                          isCompleted: true,
+                        ),
+                      if (expense.rejectionReason != null)
+                        _TimelineItem(
+                          icon: Icons.cancel,
+                          title: 'Rejected',
+                          subtitle: expense.rejectionReason!,
+                          isCompleted: true,
+                          isError: true,
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                ],
+
+                // Action Buttons
+                if (expense.canEdit) ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            // TODO: Navigate to edit expense
+                          },
+                          icon: const Icon(Icons.edit),
+                          label: const Text('Edit'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: expense.canSubmit ? () {
+                            // TODO: Submit expense
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Expense submitted!')),
+                            );
+                          } : null,
+                          icon: const Icon(Icons.send),
+                          label: const Text('Submit'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'draft': return AppColors.onSurfaceVariant;
+      case 'submitted': return AppColors.accentBlue;
+      case 'under_review': return AppColors.orange9;
+      case 'approved': return AppColors.success;
+      case 'rejected': return AppColors.error;
+      case 'paid': return AppColors.success;
+      default: return AppColors.onSurfaceVariant;
+    }
+  }
+
+  String _formatBankAccount(String account) {
+    if (account.length == 11) {
+      return '${account.substring(0, 4)} ${account.substring(4, 6)} ${account.substring(6)}';
+    }
+    return account;
+  }
+
+  IconData _getFileIcon(String filename) {
+    if (filename.toLowerCase().endsWith('.pdf')) {
+      return Icons.picture_as_pdf;
+    } else if (filename.toLowerCase().contains('.jpg') || 
+               filename.toLowerCase().contains('.png') ||
+               filename.toLowerCase().contains('.jpeg')) {
+      return Icons.image;
+    }
+    return Icons.attach_file;
+  }
+}
+
+class _DetailSection extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+
+  const _DetailSection({
+    required this.title,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ...children,
+      ],
+    );
+  }
+}
+
+class _DetailItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _DetailItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: AppColors.onSurfaceVariant),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TimelineItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool isCompleted;
+  final bool isError;
+
+  const _TimelineItem({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.isCompleted = false,
+    this.isError = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = isError ? AppColors.error : isCompleted ? AppColors.success : AppColors.onSurfaceVariant;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 16),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  const _EmptyState({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 64,
+              color: AppColors.onSurfaceVariant,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: theme.textTheme.titleLarge,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
