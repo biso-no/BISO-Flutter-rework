@@ -28,42 +28,46 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: _darkColorScheme,
       fontFamily: 'Inter',
-      scaffoldBackgroundColor: AppColors.gray900,
+      scaffoldBackgroundColor: AppColors.backgroundDark, // Premium dark background
       appBarTheme: _appBarTheme.copyWith(
-        backgroundColor: AppColors.gray900,
-        foregroundColor: AppColors.white,
+        backgroundColor: AppColors.backgroundDark,
+        foregroundColor: AppColors.onBackgroundDark,
         systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
       elevatedButtonTheme: _elevatedButtonTheme,
       textButtonTheme: _textButtonTheme,
       outlinedButtonTheme: _outlinedButtonTheme,
       inputDecorationTheme: _inputDecorationTheme.copyWith(
-        fillColor: AppColors.gray800,
+        fillColor: AppColors.surfaceDark,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.gray700),
+          borderSide: const BorderSide(color: AppColors.outlineDark),
         ),
       ),
       cardTheme: _cardThemeData.copyWith(
-        color: AppColors.gray800,
+        color: AppColors.surfaceDark,
+        shadowColor: AppColors.shadowHeavy,
+        elevation: 2,
       ),
       bottomNavigationBarTheme: _bottomNavigationBarThemeData.copyWith(
-        backgroundColor: AppColors.gray900,
+        backgroundColor: AppColors.backgroundDark,
+        selectedItemColor: AppColors.crystalBlue,
+        unselectedItemColor: AppColors.mist,
       ),
       textTheme: _textTheme.apply(
-        bodyColor: AppColors.white,
-        displayColor: AppColors.white,
+        bodyColor: AppColors.onBackgroundDark,
+        displayColor: AppColors.onBackgroundDark,
       ),
     );
   }
 
   static const ColorScheme _lightColorScheme = ColorScheme(
     brightness: Brightness.light,
-    primary: AppColors.defaultBlue,
+    primary: AppColors.crystalBlue,          // Your brand light blue
     onPrimary: AppColors.white,
-    secondary: AppColors.defaultGold,
-    onSecondary: AppColors.strongBlue,
-    tertiary: AppColors.accentBlue,
+    secondary: AppColors.warmGold,           // Sophisticated gold
+    onSecondary: AppColors.richNavy,         // Your brand navy
+    tertiary: AppColors.emeraldGreen,        // Premium accent
     onTertiary: AppColors.white,
     error: AppColors.error,
     onError: AppColors.white,
@@ -73,36 +77,36 @@ class AppTheme {
     onSurfaceVariant: AppColors.onSurfaceVariant,
     outline: AppColors.outline,
     outlineVariant: AppColors.outlineVariant,
-    shadow: AppColors.black,
-    scrim: AppColors.black,
-    inverseSurface: AppColors.gray800,
-    onInverseSurface: AppColors.gray100,
-    inversePrimary: AppColors.accentBlue,
-    surfaceTint: AppColors.defaultBlue,
+    shadow: AppColors.shadowMedium,
+    scrim: AppColors.overlayHeavy,
+    inverseSurface: AppColors.smokeGray,
+    onInverseSurface: AppColors.cloud,
+    inversePrimary: AppColors.skyBlue,
+    surfaceTint: AppColors.crystalBlue,
   );
 
   static const ColorScheme _darkColorScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: AppColors.accentBlue,
-    onPrimary: AppColors.white,
-    secondary: AppColors.accentGold,
-    onSecondary: AppColors.black,
-    tertiary: AppColors.subtleBlue,
-    onTertiary: AppColors.strongBlue,
+    primary: AppColors.crystalBlue,          // Consistent brand blue
+    onPrimary: AppColors.charcoalBlack,
+    secondary: AppColors.sunGold,            // Bright gold for dark theme
+    onSecondary: AppColors.charcoalBlack,
+    tertiary: AppColors.emeraldGreen,
+    onTertiary: AppColors.charcoalBlack,
     error: AppColors.error,
     onError: AppColors.white,
-    surface: AppColors.gray800,
-    onSurface: AppColors.white,
-    surfaceContainerHighest: AppColors.gray700,
-    onSurfaceVariant: AppColors.gray300,
-    outline: AppColors.gray600,
-    outlineVariant: AppColors.gray700,
-    shadow: AppColors.black,
-    scrim: AppColors.black,
-    inverseSurface: AppColors.gray100,
-    onInverseSurface: AppColors.gray800,
-    inversePrimary: AppColors.defaultBlue,
-    surfaceTint: AppColors.accentBlue,
+    surface: AppColors.surfaceDark,
+    onSurface: AppColors.onSurfaceDark,
+    surfaceContainerHighest: AppColors.stoneGray,
+    onSurfaceVariant: AppColors.mist,
+    outline: AppColors.outlineDark,
+    outlineVariant: AppColors.outlineVariantDark,
+    shadow: AppColors.shadowHeavy,
+    scrim: AppColors.overlayHeavy,
+    inverseSurface: AppColors.cloud,
+    onInverseSurface: AppColors.charcoalBlack,
+    inversePrimary: AppColors.richNavy,
+    surfaceTint: AppColors.crystalBlue,
   );
 
   static const AppBarTheme _appBarTheme = AppBarTheme(
@@ -122,9 +126,10 @@ class AppTheme {
   static final ElevatedButtonThemeData _elevatedButtonTheme = 
       ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: AppColors.defaultBlue,
+      backgroundColor: AppColors.crystalBlue,  // Premium brand blue
       foregroundColor: AppColors.white,
       elevation: 0,
+      shadowColor: AppColors.shadowMedium,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -139,7 +144,7 @@ class AppTheme {
 
   static final TextButtonThemeData _textButtonTheme = TextButtonThemeData(
     style: TextButton.styleFrom(
-      foregroundColor: AppColors.defaultBlue,
+      foregroundColor: AppColors.crystalBlue,  // Consistent brand blue
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       textStyle: const TextStyle(
         fontSize: 16,
@@ -155,8 +160,8 @@ class AppTheme {
   static final OutlinedButtonThemeData _outlinedButtonTheme = 
       OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
-      foregroundColor: AppColors.defaultBlue,
-      side: const BorderSide(color: AppColors.defaultBlue, width: 1.5),
+      foregroundColor: AppColors.crystalBlue,
+      side: const BorderSide(color: AppColors.crystalBlue, width: 1.5),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -183,7 +188,7 @@ class AppTheme {
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.defaultBlue, width: 2),
+      borderSide: const BorderSide(color: AppColors.crystalBlue, width: 2),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
@@ -207,11 +212,12 @@ class AppTheme {
   );
 
   static final CardThemeData _cardThemeData = CardThemeData(
-    elevation: 0,
+    elevation: 2,                            // Subtle elevation for depth
+    shadowColor: AppColors.shadowLight,      // Premium shadow
     color: AppColors.white,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-      side: const BorderSide(color: AppColors.outlineVariant),
+      borderRadius: BorderRadius.circular(16), // More premium radius
+      side: const BorderSide(color: AppColors.outlineVariant, width: 0.5),
     ),
     margin: EdgeInsets.zero,
   );
@@ -219,16 +225,16 @@ class AppTheme {
   static const BottomNavigationBarThemeData _bottomNavigationBarThemeData = 
       BottomNavigationBarThemeData(
     backgroundColor: AppColors.white,
-    selectedItemColor: AppColors.defaultBlue,
+    selectedItemColor: AppColors.crystalBlue,
     unselectedItemColor: AppColors.onSurfaceVariant,
     type: BottomNavigationBarType.fixed,
-    elevation: 8,
+    elevation: 12,                          // More pronounced elevation
   );
 
   static const TabBarThemeData _tabBarThemeData = TabBarThemeData(
-    labelColor: AppColors.defaultBlue,
+    labelColor: AppColors.crystalBlue,
     unselectedLabelColor: AppColors.onSurfaceVariant,
-    indicatorColor: AppColors.defaultBlue,
+    indicatorColor: AppColors.crystalBlue,
     indicatorSize: TabBarIndicatorSize.tab,
     labelStyle: TextStyle(
       fontSize: 14,

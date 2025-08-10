@@ -7,6 +7,9 @@ import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
 import '../../../presentation/widgets/campus_switcher.dart';
+import '../../../presentation/widgets/premium/wonderous_story_card.dart';
+import '../../../presentation/widgets/premium/wonderous_campus_hero.dart';
+import '../../../presentation/widgets/premium/wonderous_bottom_nav.dart';
 import '../explore/explore_screen.dart';
 import '../chat/chat_list_screen.dart';
 import '../auth/login_screen.dart';
@@ -55,31 +58,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     
     return Scaffold(
       body: pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
+      bottomNavigationBar: WonderousBottomNavBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
-        selectedItemColor: AppColors.defaultBlue,
-        unselectedItemColor: AppColors.onSurfaceVariant,
         items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home_outlined),
-            activeIcon: const Icon(Icons.home),
+          WonderousNavItem(
+            icon: Icons.home_outlined,
+            activeIcon: Icons.home,
             label: l10n.home,
           ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.explore_outlined),
-            activeIcon: const Icon(Icons.explore),
+          WonderousNavItem(
+            icon: Icons.explore_outlined,
+            activeIcon: Icons.explore,
             label: l10n.explore,
           ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.chat_outlined),
-            activeIcon: const Icon(Icons.chat),
+          WonderousNavItem(
+            icon: Icons.chat_outlined,
+            activeIcon: Icons.chat,
             label: l10n.chat,
           ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person_outlined),
-            activeIcon: const Icon(Icons.person),
+          WonderousNavItem(
+            icon: Icons.person_outlined,
+            activeIcon: Icons.person,
             label: l10n.profile,
           ),
         ],
@@ -100,246 +100,102 @@ class _HomePage extends ConsumerWidget {
     final campus = ref.watch(filterCampusProvider);
     final authState = ref.watch(authStateProvider);
 
-    // Use a fallback approach for campus background images
-    final campusBackgroundImage = _getCampusBackgroundImage(campus.id);
-
-    
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // Campus Hero Section
-          SliverAppBar(
-            expandedHeight: 300,
-            floating: false,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      _getCampusColor(campus.id),
-                      _getCampusColor(campus.id).withValues(alpha: 0.8),
-                    ],
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    // Background pattern
-                    Positioned.fill(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              _getCampusColor(campus.id),
-                              _getCampusColor(campus.id).withValues(alpha: 0.8),
-                            ],
-                          ),
-                        ),
-                        child: ClipRRect(
-                          child: Image.asset(
-                            campusBackgroundImage,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              // Fallback to gradient background if image fails to load
-                              return Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      _getCampusColor(campus.id),
-                                      _getCampusColor(campus.id).withValues(alpha: 0.6),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Content
-                    Positioned(
-                      bottom: 40,
-                      left: 20,
-                      right: 20,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Welcome to',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.9),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'BISO ${campus.name}',
-                            style: theme.textTheme.displaySmall?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            campus.description,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.9),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              // Campus switcher in top right
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: CampusSwitcher(onCampusChanged: () {
-                  // Refresh campus-specific content
-                }),
-              ),
-            ],
+          // Premium Campus Hero Section (Wonderous-inspired)
+          WonderousCampusHero(
+            campus: campus,
+            expandedHeight: 350,
+            onCampusTap: () {
+              // Show campus switcher
+            },
+            trailing: CampusSwitcher(onCampusChanged: () {
+              // Refresh campus-specific content
+            }),
           ),
 
-          // Campus stats and weather
-          SliverToBoxAdapter(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      // Weather
-                      if (campus.weather != null) ...[
-                        Column(
-                          children: [
-                            Text(
-                              campus.weather!.icon,
-                              style: const TextStyle(fontSize: 32),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${campus.weather!.temperature.toStringAsFixed(0)}°',
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              campus.weather!.condition,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: AppColors.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 24),
-                        Container(
-                          width: 1,
-                          height: 60,
-                          color: AppColors.outline,
-                        ),
-                        const SizedBox(width: 24),
-                      ],
-                      // Stats
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _StatColumn(
-                              icon: Icons.people,
-                              value: '${(campus.stats.studentCount / 1000).toStringAsFixed(1)}k',
-                              label: 'Students',
-                            ),
-                            _StatColumn(
-                              icon: Icons.event,
-                              value: campus.stats.activeEvents.toString(),
-                              label: 'Events',
-                            ),
-                            _StatColumn(
-                              icon: Icons.work,
-                              value: campus.stats.availableJobs.toString(),
-                              label: 'Jobs',
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // Quick Actions
+          // Quick Actions with Wonderous styling
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Explore Campus',
-                    style: theme.textTheme.headlineSmall?.copyWith(
+                    style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: AppColors.charcoalBlack,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _CategoryCard(
-                          icon: Icons.event,
-                          label: l10n.events,
-                          color: AppColors.accentBlue,
-                          onTap: () => context.go('/explore/events'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _CategoryCard(
-                          icon: Icons.shopping_bag,
-                          label: l10n.marketplace,
-                          color: AppColors.green9,
-                          onTap: () => context.go('/explore/products'),
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 8),
+                  Text(
+                    'Discover events, marketplace, and opportunities at ${campus.name}',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: AppColors.stoneGray,
+                      height: 1.4,
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
+                  const SizedBox(height: 24),
+                  
+                  // Premium action cards in grid
+                  GridView.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 1.2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     children: [
-                      Expanded(
-                        child: _CategoryCard(
-                          icon: Icons.work,
-                          label: l10n.jobs,
-                          color: AppColors.purple9,
-                          onTap: () => context.go('/explore/volunteer'),
-                        ),
+                      WonderousStoryCard(
+                        title: l10n.events,
+                        subtitle: 'Discover happenings',
+                        icon: Icons.event,
+                        gradientColors: AppColors.eventGradient,
+                        onTap: () => context.go('/explore/events'),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _CategoryCard(
-                          icon: Icons.receipt,
-                          label: l10n.expenses,
-                          color: AppColors.orange9,
-                          requiresAuth: true,
-                          onTap: () {
-                            if (!authState.isAuthenticated) {
-                              _showAuthPrompt(context, 'Expenses');
-                            } else {
-                              context.go('/explore/expenses');
-                            }
-                          },
-                        ),
+                      WonderousStoryCard(
+                        title: l10n.marketplace,
+                        subtitle: 'Buy & sell items',
+                        icon: Icons.shopping_bag,
+                        gradientColors: AppColors.marketplaceGradient,
+                        onTap: () => context.go('/explore/products'),
+                      ),
+                      WonderousStoryCard(
+                        title: l10n.jobs,
+                        subtitle: 'Find opportunities',
+                        icon: Icons.work,
+                        gradientColors: AppColors.jobsGradient,
+                        onTap: () => context.go('/explore/volunteer'),
+                      ),
+                      WonderousStoryCard(
+                        title: l10n.expenses,
+                        subtitle: 'Manage reimbursements',
+                        icon: Icons.receipt_long,
+                        gradientColors: AppColors.expenseGradient,
+                        trailing: !authState.isAuthenticated
+                            ? Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.3),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Icon(
+                                  Icons.lock,
+                                  size: 12,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : null,
+                        onTap: () {
+                          if (!authState.isAuthenticated) {
+                            _showAuthPrompt(context, 'Expenses');
+                          } else {
+                            context.go('/explore/expenses');
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -348,68 +204,91 @@ class _HomePage extends ConsumerWidget {
             ),
           ),
 
-          // Recent Events Section
+          // Latest Content with Premium Story Cards
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Latest from ${campus.name}',
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Latest from ${campus.name}',
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.charcoalBlack,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Stay updated with campus activities',
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: AppColors.stoneGray,
+                            ),
+                          ),
+                        ],
                         ),
                       ),
                       TextButton(
                         onPressed: () => navigateToTab(1),
-                        child: const Text('View All'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.crystalBlue,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('View All'),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              size: 14,
+                              color: AppColors.crystalBlue,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 24),
+                  
+                  // Premium story cards for latest content
+                  WonderousEventCard(
+                    title: 'New Student Welcome',
+                    venue: 'Main Auditorium',
+                    date: DateTime.now(),
+                    organizer: 'BISO ${campus.name}',
+                    onTap: () => context.go('/explore/events'),
+                  ),
+                  
                   const SizedBox(height: 16),
                   
-                  // Sample events
-                  Card(
-                    child: ListTile(
-                      leading: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppColors.subtleBlue,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(Icons.event, color: AppColors.defaultBlue),
-                      ),
-                      title: const Text('New Student Welcome'),
-                      subtitle: const Text('Today • 14:00 • Main Auditorium'),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                      onTap: () {},
-                    ),
+                  WonderousProductCard(
+                    title: 'MacBook Pro 2021',
+                    price: '12,500 NOK',
+                    seller: 'Student Marketplace',
+                    onTap: () => context.go('/explore/products'),
                   ),
                   
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 16),
                   
-                  Card(
-                    child: ListTile(
-                      leading: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppColors.green9.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(Icons.shopping_bag, color: AppColors.green9),
-                      ),
-                      title: const Text('MacBook Pro 2021'),
-                      subtitle: const Text('12,500 NOK • Posted 2 hours ago'),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                      onTap: () {},
-                    ),
+                  WonderousJobCard(
+                    title: 'Event Photography',
+                    department: 'Marketing Team',
+                    requirements: 'Photography experience preferred',
+                    onTap: () => context.go('/explore/volunteer'),
                   ),
+                  
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
@@ -423,7 +302,7 @@ class _HomePage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Sign In Required'),
+        title: const Text('Sign In Required'),
         content: Text('You need to sign in to access $feature functionality.'),
         actions: [
           TextButton(
@@ -442,155 +321,6 @@ class _HomePage extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-
-  String _getCampusBackgroundImage(String campusId) {
-    // For debugging, let's try a hardcoded path first
-    // Commented out debug print to avoid production warnings
-    // print('Getting background image for campus: $campusId');
-    
-    // Map campus IDs to their corresponding image assets
-    switch (campusId.toLowerCase()) {
-      case 'oslo':
-        return 'assets/images/campus/oslo.png';
-      case 'bergen':
-        return 'assets/images/campus/bergen.png';
-      case 'trondheim':
-        return 'assets/images/campus/trondheim.png';
-      case 'stavanger':
-        return 'assets/images/campus/stavanger.png';
-      default:
-        // Return a default image or the first available one
-        return 'assets/images/campus/oslo.png';
-    }
-  }
-
-  Color _getCampusColor(String campusId) {
-    switch (campusId) {
-      case 'oslo':
-        return AppColors.defaultBlue;
-      case 'bergen':
-        return AppColors.green9;
-      case 'trondheim':
-        return AppColors.purple9;
-      case 'stavanger':
-        return AppColors.orange9;
-      default:
-        return AppColors.gray400;
-    }
-  }
-}
-
-class _CategoryCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-  final bool requiresAuth;
-
-  const _CategoryCard({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-    this.requiresAuth = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(icon, color: color, size: 24),
-                  ),
-                  if (requiresAuth)
-                    Positioned(
-                      top: -4,
-                      right: -4,
-                      child: Container(
-                        width: 16,
-                        height: 16,
-                        decoration: const BoxDecoration(
-                          color: AppColors.orange9,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.lock,
-                          size: 10,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: theme.textTheme.bodySmall,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StatColumn extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-
-  const _StatColumn({
-    required this.icon,
-    required this.value,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Column(
-      children: [
-        Icon(
-          icon,
-          color: AppColors.onSurfaceVariant,
-          size: 20,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: AppColors.onSurfaceVariant,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -628,13 +358,13 @@ class _AuthRequiredPage extends StatelessWidget {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: AppColors.subtleBlue,
+                  color: AppColors.iceBlue,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Icon(
                   icon,
                   size: 40,
-                  color: AppColors.defaultBlue,
+                  color: AppColors.crystalBlue,
                 ),
               ),
               
@@ -670,7 +400,7 @@ class _AuthRequiredPage extends StatelessWidget {
                 icon: const Icon(Icons.login),
                 label: const Text('Sign In'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.defaultBlue,
+                  backgroundColor: AppColors.crystalBlue,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
                     vertical: 16,

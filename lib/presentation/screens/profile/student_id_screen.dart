@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/constants/app_colors.dart';
-import '../../../data/models/student_id_model.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
-import '../../../data/services/oauth_service.dart';
 
 // Student ID is now managed directly in user profile via AuthProvider
 // No separate provider needed
