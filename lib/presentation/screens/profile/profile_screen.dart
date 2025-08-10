@@ -7,6 +7,9 @@ import '../../../data/models/user_model.dart';
 import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
+import '../../../providers/membership/membership_provider.dart';
+import '../../widgets/membership_status_widget.dart';
+import '../../widgets/membership_purchase_modal.dart';
 import 'edit_profile_screen.dart';
 import 'student_id_screen.dart';
 import 'settings_screen.dart';
@@ -19,9 +22,27 @@ class ProfileScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final authState = ref.watch(authStateProvider);
+    final user = authState.user;
     final selectedCampus = ref.watch(selectedCampusProvider);
 
-    if (!authState.isAuthenticated || authState.user == null) {
+    // Show loading while initializing user data
+    if (authState.isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: Text(l10n.profile)),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Loading your profile...'),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (!authState.isAuthenticated) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.profile)),
         body: Center(
@@ -49,7 +70,7 @@ class ProfileScreen extends ConsumerWidget {
       );
     }
 
-    final user = authState.user!;
+    final profile = user;
 
     return Scaffold(
       body: CustomScrollView(
@@ -86,11 +107,11 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                         child: CircleAvatar(
                           radius: 38,
-                          backgroundImage: user.avatarUrl != null 
-                              ? NetworkImage(user.avatarUrl!)
+                          backgroundImage: user?.avatarUrl != null 
+                              ? NetworkImage(user!.avatarUrl!)
                               : null,
                           backgroundColor: Colors.white,
-                          child: user.avatarUrl == null
+                          child: user?.avatarUrl == null
                               ? Icon(
                                   Icons.person,
                                   size: 40,
@@ -101,7 +122,7 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                       // Name
                       Text(
-                        user.name,
+                        user?.name ?? 'Unknown User',
                         style: theme.textTheme.headlineSmall?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -142,7 +163,7 @@ class ProfileScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Profile Completion Banner (if profile is incomplete)
-                  if (!_isProfileComplete(user)) ...[
+                  if (authState.needsOnboarding) ...[
                     Card(
                       color: AppColors.accentGold.withValues(alpha: 0.1),
                       child: Padding(
@@ -228,6 +249,11 @@ class ProfileScreen extends ConsumerWidget {
 
                   const SizedBox(height: 24),
 
+                  // Membership Section
+                  _buildMembershipSection(ref, authState, selectedCampus),
+
+                  const SizedBox(height: 24),
+
                   // Profile Information Section
                   _ProfileSection(
                     title: 'Profile Information',
@@ -235,19 +261,19 @@ class ProfileScreen extends ConsumerWidget {
                       _ProfileInfoTile(
                         icon: Icons.email_outlined,
                         label: 'Email',
-                        value: user.email,
+                        value: user?.email ?? '',
                       ),
-                      if (user.phone != null)
+                      if (profile?.phone != null)
                         _ProfileInfoTile(
                           icon: Icons.phone_outlined,
                           label: 'Phone',
-                          value: user.phone!,
+                          value: profile!.phone!,
                         ),
-                      if (user.address != null)
+                      if (profile?.address != null)
                         _ProfileInfoTile(
                           icon: Icons.home_outlined,
                           label: 'Address',
-                          value: _formatAddress(user),
+                          value: _formatAddress(profile!),
                         ),
                     ],
                   ),
@@ -271,11 +297,11 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      if (user.departments.isNotEmpty)
+                      if (profile?.departments.isNotEmpty == true)
                         _ProfileInfoTile(
                           icon: Icons.interests_outlined,
                           label: 'Interests',
-                          value: user.departments.join(', '),
+                          value: profile!.departments.join(', '),
                         ),
                     ],
                   ),
@@ -353,11 +379,123 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  bool _isProfileComplete(UserModel user) {
-    // A complete profile should have campus information at minimum
-    // You can adjust these requirements based on business needs
-    return user.campusId != null && user.campusId!.isNotEmpty;
+  Widget _buildMembershipSection(WidgetRef ref, AuthState authState, campus) {
+    print('User data: ${authState.user}');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Builder(
+          builder: (context) => Text(
+            'BISO Membership',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.strongBlue,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Builder(
+          builder: (context) => MembershipStatusWidget(
+            membership: null, // TODO: implement membership check
+            isVerified: false, // TODO: implement membership check
+            campusColor: _getCampusColor(campus.id),
+            onBuyMembership: () => _showMembershipPurchaseModal(context, ref, authState, campus),
+          ),
+        ),
+      ],
+    );
   }
+
+  void _showMembershipPurchaseModal(BuildContext context, WidgetRef ref, AuthState authState, campus) async {
+    // Check if user has student ID first
+    if (!authState.hasStudentId) {
+      // Show dialog to register student ID first
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Student ID Required'),
+          content: const Text(
+            'You need to register your student ID before purchasing a membership. Would you like to register now?'
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const StudentIdScreen(),
+                  ),
+                );
+              },
+              child: const Text('Register Student ID'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // Load available memberships and show purchase modal
+    try {
+      final membershipOptions = await ref.read(membershipProvider.notifier).getAvailableMemberships();
+      
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => MembershipPurchaseModal(
+            studentId: authState.studentNumber!,
+            campusColor: _getCampusColor(campus.id),
+            membershipOptions: membershipOptions,
+            onPurchase: (option, paymentMethod, phoneNumber) async {
+              try {
+                await ref.read(membershipProvider.notifier).purchaseMembership(
+                  membershipId: option.membershipId,
+                  membershipName: option.displayName,
+                  amount: option.priceNok,
+                  paymentMethod: paymentMethod,
+                  phoneNumber: phoneNumber,
+                );
+                
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Membership purchase initiated! Complete payment to activate.'),
+                      backgroundColor: AppColors.green9,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Purchase failed: ${e.toString()}'),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load membership options: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
 
   String _formatAddress(UserModel user) {
     final parts = [
@@ -398,6 +536,8 @@ class ProfileScreen extends ConsumerWidget {
             onPressed: () async {
               Navigator.pop(context);
               await ref.read(authStateProvider.notifier).signOut();
+              // Clear all user data when signing out
+              // User data is now cleared by AuthProvider internally
               if (context.mounted) {
                 context.go('/home');
               }

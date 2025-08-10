@@ -5,7 +5,9 @@
       "Bash(flutter pub add:*)",
       "Bash(flutter analyze:*)",
       "Bash(flutter build:*)",
-      "Bash(flutter doctor:*)"
+      "Bash(flutter doctor:*)",
+      "WebFetch(domain:developer.vippsmobilepay.com)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

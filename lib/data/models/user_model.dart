@@ -9,6 +9,7 @@ class UserModel extends Equatable {
   final String? city;
   final String? zipCode;
   final String? campusId;
+  final String? studentId;
   final List<String> departments;
   final String? avatarUrl;
   final DateTime? createdAt;
@@ -23,6 +24,7 @@ class UserModel extends Equatable {
     this.city,
     this.zipCode,
     this.campusId,
+    this.studentId,
     this.departments = const [],
     this.avatarUrl,
     this.createdAt,
@@ -30,6 +32,9 @@ class UserModel extends Equatable {
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
+    print('🔍 UserModel.fromMap - Raw map keys: ${map.keys.toList()}');
+    print('🔍 UserModel.fromMap - department_ids type: ${map['department_ids'].runtimeType}, value: ${map['department_ids']}');
+    
     return UserModel(
       id: map['\$id'] ?? '',
       name: map['name'] ?? '',
@@ -39,11 +44,24 @@ class UserModel extends Equatable {
       city: map['city'],
       zipCode: map['zip'],
       campusId: map['campus_id'],
-      departments: List<String>.from(map['departments'] ?? []),
+      studentId: map['student_id'], // Use the direct string field, not the relationship
+      departments: _parseDepartmentIds(map['department_ids']), // Use department_ids string array
       avatarUrl: map['avatar'],
       createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
       updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
     );
+  }
+
+  // Helper method to safely parse department IDs
+  static List<String> _parseDepartmentIds(dynamic departmentIds) {
+    if (departmentIds == null) return <String>[];
+    if (departmentIds is List) {
+      return departmentIds.map((e) => e?.toString() ?? '').where((e) => e.isNotEmpty).toList();
+    }
+    if (departmentIds is String) {
+      return [departmentIds];
+    }
+    return <String>[];
   }
 
   Map<String, dynamic> toMap() {
@@ -55,6 +73,7 @@ class UserModel extends Equatable {
       'city': city,
       'zip': zipCode,
       'campus_id': campusId,
+      'student_id': studentId,
       'departments': departments,
       'avatar': avatarUrl,
     };
@@ -69,6 +88,7 @@ class UserModel extends Equatable {
     String? city,
     String? zipCode,
     String? campusId,
+    String? studentId,
     List<String>? departments,
     String? avatarUrl,
     DateTime? createdAt,
@@ -83,6 +103,7 @@ class UserModel extends Equatable {
       city: city ?? this.city,
       zipCode: zipCode ?? this.zipCode,
       campusId: campusId ?? this.campusId,
+      studentId: studentId ?? this.studentId,
       departments: departments ?? this.departments,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       createdAt: createdAt ?? this.createdAt,
@@ -100,6 +121,7 @@ class UserModel extends Equatable {
         city,
         zipCode,
         campusId,
+        studentId,
         departments,
         avatarUrl,
         createdAt,

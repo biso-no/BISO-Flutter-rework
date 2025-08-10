@@ -19,25 +19,25 @@ class StudentIdModel extends Equatable {
 
   factory StudentIdModel.fromMap(Map<String, dynamic> map) {
     return StudentIdModel(
-      id: map['id'] as String,
-      userId: map['userId'] as String,
-      studentNumber: map['studentNumber'] as String,
-      isVerified: map['isVerified'] as bool? ?? false,
-      createdAt: DateTime.parse(map['createdAt'] as String),
-      verifiedAt: map['verifiedAt'] != null 
-          ? DateTime.parse(map['verifiedAt'] as String)
-          : null,
+      id: map['\$id'] ?? map['id'] ?? '',
+      userId: map['user_id'] ?? map['userId'] ?? '',
+      studentNumber: map['student_number'] ?? map['studentNumber'] ?? '',
+      isVerified: map['verified'] ?? map['isVerified'] ?? false,
+      createdAt: map['\$createdAt'] != null 
+          ? DateTime.parse(map['\$createdAt']) 
+          : (map['createdAt'] != null ? DateTime.parse(map['createdAt']) : DateTime.now()),
+      verifiedAt: map['verified_at'] != null 
+          ? DateTime.parse(map['verified_at'])
+          : (map['verifiedAt'] != null ? DateTime.parse(map['verifiedAt']) : null),
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'userId': userId,
-      'studentNumber': studentNumber,
-      'isVerified': isVerified,
-      'createdAt': createdAt.toIso8601String(),
-      'verifiedAt': verifiedAt?.toIso8601String(),
+      'user_id': userId,
+      'student_number': studentNumber,
+      'verified': isVerified,
+      'verified_at': verifiedAt?.toIso8601String(),
     };
   }
 

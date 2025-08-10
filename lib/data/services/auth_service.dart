@@ -4,10 +4,9 @@ import '../models/user_model.dart';
 import 'appwrite_service.dart';
 
 class AuthService {
-  final AppwriteService _appwrite = AppwriteService();
-
-  Account get _account => _appwrite.account;
-  Databases get _databases => _appwrite.databases;
+  // Using simplified global Appwrite instances
+  Account get _account => account;
+  Databases get _databases => databases;
 
   Future<String> sendOtp(String email) async {
     try {
@@ -91,6 +90,9 @@ class AuthService {
           databaseId: AppConstants.databaseId,
           collectionId: 'user',
           documentId: accountUser.$id,
+          queries: [
+            Query.select(['name', 'email', 'phone', 'address', 'city', 'zip', 'campus_id', 'avatar'])
+          ]
         );
         return UserModel.fromMap(doc.data);
       } catch (e) {

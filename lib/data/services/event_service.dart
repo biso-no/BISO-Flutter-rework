@@ -7,9 +7,9 @@ import '../models/event_model.dart';
 import 'appwrite_service.dart';
 
 class EventService {
-  final AppwriteService _appwrite = AppwriteService();
   
-  Databases get _databases => _appwrite.databases;
+  
+  Databases get _databases => databases;
 
   // Get events from WordPress API (external events)
   Future<List<EventModel>> getWordPressEvents({

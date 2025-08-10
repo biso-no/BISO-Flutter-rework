@@ -6,13 +6,13 @@ import '../models/chat_model.dart';
 import 'appwrite_service.dart';
 
 class ChatService {
-  final AppwriteService _appwrite = AppwriteService();
   RealtimeSubscription? _subscription;
   final StreamController<List<ChatModel>> _chatsController = StreamController<List<ChatModel>>.broadcast();
   final StreamController<List<ChatMessageModel>> _messagesController = StreamController<List<ChatMessageModel>>.broadcast();
   
-  Databases get _databases => _appwrite.databases;
-  Realtime get _realtime => _appwrite.realtime;
+  // Using simplified global Appwrite instances
+  Databases get _databases => databases;
+  Realtime get _realtime => realtime;
 
   Stream<List<ChatModel>> get chatsStream => _chatsController.stream;
   Stream<List<ChatMessageModel>> get messagesStream => _messagesController.stream;

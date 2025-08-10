@@ -5,7 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/theme/app_theme.dart';
-import 'data/services/appwrite_service.dart';
+// Appwrite services are now globally initialized
 import 'generated/l10n/app_localizations.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/otp_verification_screen.dart';
@@ -20,9 +20,6 @@ import 'providers/auth/auth_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Appwrite
-  await AppwriteService().initialize();
   
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
@@ -42,6 +39,12 @@ class BisoApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watch auth state and initialize user data when authenticated
+    ref.watch(authStateProvider);
+    
+    // Auth state listener is now handled internally by AuthProvider
+    // No need for external orchestration
+
     return MaterialApp.router(
       title: 'BISO',
       debugShowCheckedModeBanner: false,

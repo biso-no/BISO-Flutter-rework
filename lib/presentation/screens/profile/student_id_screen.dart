@@ -6,141 +6,11 @@ import '../../../core/constants/app_colors.dart';
 import '../../../data/models/student_id_model.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
+import '../../../data/services/oauth_service.dart';
 
-// Provider for student ID state
-final studentIdProvider = StateNotifierProvider<StudentIdNotifier, StudentIdState>((ref) {
-  return StudentIdNotifier();
-});
+// Student ID is now managed directly in user profile via AuthProvider
+// No separate provider needed
 
-class StudentIdState {
-  final StudentIdModel? studentId;
-  final bool isLoading;
-  final String? error;
-  final bool isVerified;
-
-  const StudentIdState({
-    this.studentId,
-    this.isLoading = false,
-    this.error,
-    this.isVerified = false,
-  });
-
-  StudentIdState copyWith({
-    StudentIdModel? studentId,
-    bool? isLoading,
-    String? error,
-    bool? isVerified,
-  }) {
-    return StudentIdState(
-      studentId: studentId ?? this.studentId,
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
-      isVerified: isVerified ?? this.isVerified,
-    );
-  }
-}
-
-class StudentIdNotifier extends StateNotifier<StudentIdState> {
-  StudentIdNotifier() : super(const StudentIdState());
-
-  Future<void> loadStudentId(String userId) async {
-    state = state.copyWith(isLoading: true, error: null);
-    
-    try {
-      // TODO: Implement Appwrite integration
-      // For now, simulate loading
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // Mock data - replace with actual Appwrite call
-      final mockStudentId = StudentIdModel(
-        id: 'student_1',
-        userId: userId,
-        studentNumber: 's123456',
-        isVerified: false,
-        createdAt: DateTime.now(),
-      );
-      
-      state = state.copyWith(
-        studentId: mockStudentId,
-        isLoading: false,
-        isVerified: mockStudentId.isVerified,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
-  }
-
-  Future<void> addStudentId(String studentNumber) async {
-    state = state.copyWith(isLoading: true, error: null);
-    
-    try {
-      // TODO: Implement Appwrite integration
-      await Future.delayed(const Duration(seconds: 2));
-      
-      final newStudentId = StudentIdModel(
-        id: 'student_${DateTime.now().millisecondsSinceEpoch}',
-        userId: 'current_user',
-        studentNumber: studentNumber,
-        isVerified: false,
-        createdAt: DateTime.now(),
-      );
-      
-      state = state.copyWith(
-        studentId: newStudentId,
-        isLoading: false,
-        isVerified: false,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
-  }
-
-  Future<void> requestVerification() async {
-    if (state.studentId == null) return;
-    
-    state = state.copyWith(isLoading: true, error: null);
-    
-    try {
-      // TODO: Implement verification request
-      await Future.delayed(const Duration(seconds: 1));
-      
-      state = state.copyWith(isLoading: false);
-      
-      // Show success message - this would normally be handled by UI
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
-  }
-
-  Future<void> removeStudentId() async {
-    state = state.copyWith(isLoading: true, error: null);
-    
-    try {
-      // TODO: Implement removal
-      await Future.delayed(const Duration(seconds: 1));
-      
-      state = state.copyWith(
-        studentId: null,
-        isLoading: false,
-        isVerified: false,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
-  }
-}
 
 class StudentIdScreen extends ConsumerStatefulWidget {
   const StudentIdScreen({super.key});
@@ -160,7 +30,7 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = ref.read(authStateProvider).user;
       if (user != null) {
-        ref.read(studentIdProvider.notifier).loadStudentId(user.id);
+        // Student ID is loaded as part of user profile
       }
     });
   }
@@ -174,9 +44,10 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final studentIdState = ref.watch(studentIdProvider);
-    final selectedCampus = ref.watch(selectedCampusProvider);
     final authState = ref.watch(authStateProvider);
+    final hasStudentId = authState.hasStudentId;
+    final studentNumber = authState.studentNumber;
+    final selectedCampus = ref.watch(selectedCampusProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -231,29 +102,30 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
 
             const SizedBox(height: 24),
 
-            if (studentIdState.isLoading)
+            if (authState.isLoading)
               const Center(child: CircularProgressIndicator())
-            else if (studentIdState.error != null)
+            else if (authState.error != null)
               _ErrorCard(
-                error: studentIdState.error!,
+                error: authState.error!,
                 onRetry: () {
                   final user = authState.user;
                   if (user != null) {
-                    ref.read(studentIdProvider.notifier).loadStudentId(user.id);
+                    // Student ID is loaded as part of user profile
                   }
                 },
               )
-            else if (studentIdState.studentId == null)
+            else if (!hasStudentId)
               _AddStudentIdForm(
                 formKey: _formKey,
                 controller: _studentNumberController,
                 onSubmit: () => _addStudentId(),
+                onOAuthRegistration: () => _registerStudentIdOAuth(),
                 campusColor: _getCampusColor(selectedCampus.id),
               )
             else
               _StudentIdCard(
-                studentId: studentIdState.studentId!,
-                isVerified: studentIdState.isVerified,
+                studentNumber: studentNumber!,
+                isVerified: false, // TODO: implement verification
                 campusName: selectedCampus.name,
                 campusColor: _getCampusColor(selectedCampus.id),
                 onRequestVerification: () => _requestVerification(),
@@ -287,12 +159,12 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
 
   void _addStudentId() {
     if (_formKey.currentState!.validate()) {
-      ref.read(studentIdProvider.notifier).addStudentId(_studentNumberController.text.trim());
+      // TODO: Implement student ID update in AuthProvider
     }
   }
 
   void _requestVerification() {
-    ref.read(studentIdProvider.notifier).requestVerification();
+    // TODO: Implement student ID verification
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Verification request submitted! You will receive an email with next steps.'),
@@ -315,7 +187,7 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              ref.read(studentIdProvider.notifier).removeStudentId();
+              // TODO: Implement student ID removal
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Remove'),
@@ -324,18 +196,27 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
       ),
     );
   }
+
+  void _registerStudentIdOAuth() {
+    final user = ref.read(authStateProvider).user;
+    if (user != null) {
+      // TODO: Implement OAuth student ID registration
+    }
+  }
 }
 
 class _AddStudentIdForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController controller;
   final VoidCallback onSubmit;
+  final VoidCallback onOAuthRegistration;
   final Color campusColor;
 
   const _AddStudentIdForm({
     required this.formKey,
     required this.controller,
     required this.onSubmit,
+    required this.onOAuthRegistration,
     required this.campusColor,
   });
 
@@ -396,6 +277,75 @@ class _AddStudentIdForm extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
           ),
+
+          const SizedBox(height: 16),
+
+          // Divider with "OR"
+          Row(
+            children: [
+              const Expanded(child: Divider()),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.gray300),
+                ),
+                child: Text(
+                  'OR',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const Expanded(child: Divider()),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // OAuth Registration Button
+          OutlinedButton.icon(
+            onPressed: onOAuthRegistration,
+            icon: const Icon(Icons.login),
+            label: const Text('Register with BI Account'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: campusColor,
+              side: BorderSide(color: campusColor),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: campusColor.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: campusColor.withValues(alpha: 0.2)),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  color: campusColor,
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Register automatically using your BI student account (@bi.no)',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -403,7 +353,7 @@ class _AddStudentIdForm extends StatelessWidget {
 }
 
 class _StudentIdCard extends StatelessWidget {
-  final StudentIdModel studentId;
+  final String studentNumber;
   final bool isVerified;
   final String campusName;
   final Color campusColor;
@@ -411,7 +361,7 @@ class _StudentIdCard extends StatelessWidget {
   final VoidCallback onRemove;
 
   const _StudentIdCard({
-    required this.studentId,
+    required this.studentNumber,
     required this.isVerified,
     required this.campusName,
     required this.campusColor,
@@ -449,7 +399,7 @@ class _StudentIdCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        studentId.studentNumber,
+                        studentNumber,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
