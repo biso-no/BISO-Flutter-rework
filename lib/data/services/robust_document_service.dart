@@ -25,7 +25,7 @@ class RobustDocumentService {
     if (_cachedJwt != null && 
         _jwtExpiration != null && 
         now.isBefore(_jwtExpiration!)) {
-      print('🛡️ RobustDocumentService: Using cached JWT (expires at ${_jwtExpiration})');
+      print('🛡️ RobustDocumentService: Using cached JWT (expires at $_jwtExpiration)');
       return _cachedJwt;
     }
     
@@ -35,7 +35,7 @@ class RobustDocumentService {
       final jwt = await account.createJWT();
       _cachedJwt = jwt.jwt;
       _jwtExpiration = now.add(_jwtDuration);
-      print('🛡️ RobustDocumentService: New JWT cached until ${_jwtExpiration}');
+      print('🛡️ RobustDocumentService: New JWT cached until $_jwtExpiration');
       return _cachedJwt;
     } catch (e) {
       print('🛡️ RobustDocumentService: Failed to create JWT: $e');

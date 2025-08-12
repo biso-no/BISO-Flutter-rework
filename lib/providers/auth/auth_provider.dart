@@ -134,7 +134,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         );
       } else {
         print('🔐 AuthProvider: Error loading profile: $e');
-        throw e;
+        rethrow;
       }
     }
   }

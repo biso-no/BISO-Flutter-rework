@@ -17,6 +17,9 @@ import 'presentation/screens/explore/jobs_screen.dart';
 import 'presentation/screens/explore/expenses_screen.dart';
 import 'presentation/screens/chat/chat_list_screen.dart';
 import 'providers/auth/auth_provider.dart';
+import 'presentation/screens/events/large_event_screen.dart';
+import 'data/models/large_event_model.dart';
+import 'data/services/large_event_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -124,5 +127,76 @@ final _router = GoRouter(
         name: 'chat',
         builder: (context, state) => const ChatListScreen(),
       ),
+      GoRoute(
+        path: '/events/large/:slug',
+        name: 'large-event',
+        builder: (context, state) {
+          final extra = state.extra;
+          if (extra is LargeEventModel) {
+            return LargeEventScreen(event: extra);
+          }
+          // Deep link fallback: fetch by slug
+          final slug = state.pathParameters['slug'] ?? '';
+          return _LargeEventLoader(slug: slug);
+        },
+      ),
   ],
 );
+
+class _LargeEventLoader extends StatefulWidget {
+  final String slug;
+  const _LargeEventLoader({required this.slug});
+  @override
+  State<_LargeEventLoader> createState() => _LargeEventLoaderState();
+}
+
+class _LargeEventLoaderState extends State<_LargeEventLoader> {
+  LargeEventModel? _event;
+  Object? _error;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final service = LargeEventService();
+      final result = await service.fetchEventBySlug(widget.slug);
+      if (!mounted) return;
+      if (result != null) {
+        setState(() {
+          _event = result;
+          _loading = false;
+        });
+      } else {
+        setState(() {
+          _error = 'Event not found';
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e;
+        _loading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (_error != null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Event')),
+        body: Center(child: Text('Failed to load: $_error')),
+      );
+    }
+    return LargeEventScreen(event: _event!);
+  }
+}

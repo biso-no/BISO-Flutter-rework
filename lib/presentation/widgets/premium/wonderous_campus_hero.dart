@@ -77,26 +77,61 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
       expandedHeight: widget.expandedHeight,
       floating: false,
       pinned: true,
-      backgroundColor: gradientColors.first,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Stack(
-          children: [
-            // Campus image as background (like Wonderous)
-            _buildCampusBackground(),
-            
-            // Sophisticated gradient overlay
-            _buildGradientOverlay(gradientColors),
-            
-            // Geometric pattern overlay
-            _buildGeometricPattern(),
-            
-            // Content overlay
-            _buildContentOverlay(theme),
-            
-            // Floating stats
-            _buildFloatingStats(theme),
-          ],
-        ),
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      flexibleSpace: LayoutBuilder(
+        builder: (context, constraints) {
+          final double topPadding = MediaQuery.of(context).padding.top;
+          final double maxExtent = widget.expandedHeight;
+          final double minExtent = kToolbarHeight + topPadding;
+          final double currentExtent = constraints.biggest.height;
+          final double t = ((maxExtent - currentExtent) / (maxExtent - minExtent))
+              .clamp(0.0, 1.0);
+
+          return Stack(
+            children: [
+              // Campus image as background (like Wonderous)
+              _buildCampusBackground(),
+
+              // Sophisticated gradient overlay
+              _buildGradientOverlay(gradientColors),
+
+              // Geometric pattern overlay
+              _buildGeometricPattern(),
+
+              // Content overlay
+              _buildContentOverlay(theme),
+
+              // Floating stats
+              _buildFloatingStats(theme),
+
+              // Top app bar background that transitions from transparent -> white as it collapses
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: IgnorePointer(
+                  ignoring: true,
+                  child: Container(
+                    height: topPadding + kToolbarHeight,
+                    decoration: BoxDecoration(
+                      color: Color.lerp(Colors.transparent, Colors.white, t),
+                      boxShadow: t > 0.01
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.06 * t),
+                                blurRadius: 12 * t,
+                                offset: const Offset(0, 4),
+                              )
+                            ]
+                          : null,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
       actions: [
         if (widget.trailing != null)

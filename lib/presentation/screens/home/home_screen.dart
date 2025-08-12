@@ -9,6 +9,8 @@ import '../../../providers/campus/campus_provider.dart';
 import '../../../presentation/widgets/campus_switcher.dart';
 import '../../../presentation/widgets/premium/wonderous_story_card.dart';
 import '../../../presentation/widgets/premium/wonderous_campus_hero.dart';
+import '../../../presentation/widgets/premium/large_event_hero.dart';
+import '../../../providers/large_event/large_event_provider.dart';
 import '../../../presentation/widgets/premium/wonderous_bottom_nav.dart';
 import '../explore/explore_screen.dart';
 import '../chat/chat_list_screen.dart';
@@ -100,20 +102,25 @@ class _HomePage extends ConsumerWidget {
     final campus = ref.watch(filterCampusProvider);
     final authState = ref.watch(authStateProvider);
 
+    final featuredEvent = ref.watch(featuredLargeEventProvider);
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // Premium Campus Hero Section (Wonderous-inspired)
-          WonderousCampusHero(
-            campus: campus,
-            expandedHeight: 350,
-            onCampusTap: () {
-              // Show campus switcher
-            },
-            trailing: CampusSwitcher(onCampusChanged: () {
-              // Refresh campus-specific content
-            }),
-          ),
+          // Override hero with Large Event if active for campus
+          if (featuredEvent != null)
+            LargeEventHero(event: featuredEvent, expandedHeight: 350)
+          else
+            WonderousCampusHero(
+              campus: campus,
+              expandedHeight: 350,
+              onCampusTap: () {
+                // Show campus switcher
+              },
+              trailing: CampusSwitcher(onCampusChanged: () {
+                // Refresh campus-specific content
+              }),
+            ),
 
           // Quick Actions with Wonderous styling
           SliverToBoxAdapter(

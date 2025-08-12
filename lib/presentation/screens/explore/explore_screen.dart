@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../generated/l10n/app_localizations.dart';
+import '../../../providers/large_event/large_event_provider.dart';
+import '../../../data/models/large_event_model.dart';
 
 class ExploreScreen extends StatelessWidget {
   const ExploreScreen({super.key});
@@ -27,6 +31,14 @@ class ExploreScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Featured Large Event banner
+            Consumer(builder: (context, ref, _) {
+              final LargeEventModel? event = ref.watch(featuredLargeEventProvider);
+              if (event == null) return const SizedBox.shrink();
+              return _LargeEventBanner(event: event);
+            }),
+
+            const SizedBox(height: 16),
             Text(
               'Categories',
               style: theme.textTheme.headlineSmall?.copyWith(
@@ -84,7 +96,10 @@ class ExploreScreen extends StatelessWidget {
                   title: 'AI Assistant',
                   subtitle: 'Get help & information',
                   color: AppColors.defaultGold,
-                  onTap: () {},
+                  //Navigate to this URL https://www.bi.no/om-bi/kontakt-oss/
+                  onTap: () {
+                    launchUrl(Uri.parse('https://www.bi.no/om-bi/kontakt-oss/'));
+                  },
                 ),
               ],
             ),
@@ -111,7 +126,9 @@ class ExploreScreen extends StatelessWidget {
                     title: const Text('Academic Calendar'),
                     subtitle: const Text('View important dates'),
                     trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () {},
+                    onTap: () {
+                      launchUrl(Uri.parse('https://www.bi.no/en/study-at-bi/international-students/practical-info/academic-calendar/'));
+                    },
                   ),
                   const Divider(height: 1),
                   ListTile(
@@ -122,7 +139,9 @@ class ExploreScreen extends StatelessWidget {
                     title: const Text('Library Services'),
                     subtitle: const Text('Book rooms & resources'),
                     trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () {},
+                    onTap: () {
+                      launchUrl(Uri.parse('https://www.bi.no/en/research/library'));
+                    },
                   ),
                   const Divider(height: 1),
                   ListTile(
@@ -253,6 +272,60 @@ class _CategoryCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LargeEventBanner extends StatelessWidget {
+  final LargeEventModel event;
+  const _LargeEventBanner({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    final gradient = event.gradientColors;
+    return GestureDetector(
+      onTap: () => context.push('/events/large/${event.slug}', extra: event),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: gradient,
+          ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    event.name,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: event.textColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    event.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: event.textColor.withOpacity(0.9),
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Icon(Icons.chevron_right, color: Colors.white),
+          ],
         ),
       ),
     );
