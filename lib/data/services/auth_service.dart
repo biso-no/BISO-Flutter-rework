@@ -148,6 +148,7 @@ class AuthService {
     String? zipCode,
     String? campusId,
     List<String>? departments,
+    String? bankAccount,
   }) async {
     try {
       final accountUser = await _account.get();
@@ -161,6 +162,7 @@ class AuthService {
         'zip': zipCode,
         'campus_id': campusId,
         'departments': departments ?? [],
+        'bank_account': bankAccount,
       };
 
       final doc = await _databases.createDocument(
@@ -187,6 +189,7 @@ class AuthService {
     String? campusId,
     List<String>? departments,
     dynamic avatarFile, // XFile or File
+    String? bankAccount,
   }) async {
     try {
       // Get current user first
@@ -216,6 +219,7 @@ class AuthService {
         'campus_id': campusId ?? currentUser.campusId,
         'departments': departments ?? currentUser.departments,
         'avatar': avatarUrl,
+        'bank_account': bankAccount ?? currentUser.bankAccount,
       };
 
       final doc = await _databases.updateDocument(

@@ -11,6 +11,12 @@ import '../../../presentation/widgets/premium/wonderous_story_card.dart';
 import '../../../presentation/widgets/premium/wonderous_campus_hero.dart';
 import '../../../presentation/widgets/premium/large_event_hero.dart';
 import '../../../providers/large_event/large_event_provider.dart';
+import '../../../data/services/event_service.dart';
+import '../../../data/services/job_service.dart';
+import '../../../data/services/product_service.dart';
+import '../../../data/models/event_model.dart';
+import '../../../data/models/job_model.dart';
+import '../../../data/models/product_model.dart';
 import '../../../presentation/widgets/premium/wonderous_bottom_nav.dart';
 import '../explore/explore_screen.dart';
 import '../chat/chat_list_screen.dart';
@@ -95,6 +101,26 @@ class _HomePage extends ConsumerWidget {
   
   const _HomePage({required this.navigateToTab});
 
+  // Local data providers
+  static final _eventServiceProvider = Provider<EventService>((ref) => EventService());
+  static final _productServiceProvider = Provider<ProductService>((ref) => ProductService());
+  static final _jobServiceProvider = Provider<JobService>((ref) => JobService());
+
+  static final _latestEventsProvider = FutureProvider.family<List<EventModel>, String>((ref, campusId) async {
+    final service = ref.watch(_eventServiceProvider);
+    return service.getAllEvents(campusId: campusId, limit: 10);
+  });
+
+  static final _latestProductsProvider = FutureProvider.family<List<ProductModel>, String>((ref, campusId) async {
+    final service = ref.watch(_productServiceProvider);
+    return service.getLatestProducts(campusId: campusId, limit: 10);
+  });
+
+  static final _latestJobsProvider = FutureProvider.family<List<JobModel>, String>((ref, campusId) async {
+    final service = ref.watch(_jobServiceProvider);
+    return service.getLatestJobs(campusId: campusId, limit: 10);
+  });
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
@@ -103,6 +129,11 @@ class _HomePage extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
 
     final featuredEvent = ref.watch(featuredLargeEventProvider);
+    final campusId = campus.id;
+
+    final eventsAsync = ref.watch(_latestEventsProvider(campusId));
+    final productsAsync = ref.watch(_latestProductsProvider(campusId));
+    final jobsAsync = ref.watch(_latestJobsProvider(campusId));
 
     return Scaffold(
       body: CustomScrollView(
@@ -122,6 +153,7 @@ class _HomePage extends ConsumerWidget {
               }),
             ),
 
+   /*
           // Quick Actions with Wonderous styling
           SliverToBoxAdapter(
             child: Padding(
@@ -145,7 +177,7 @@ class _HomePage extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+               
                   // Premium action cards in grid
                   GridView.count(
                     crossAxisCount: 2,
@@ -206,97 +238,112 @@ class _HomePage extends ConsumerWidget {
                       ),
                     ],
                   ),
+                  
                 ],
+              ),
+            ),
+          ),*/
+
+          // Latest Content - dynamic horizontal carousels
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              child: _SectionHeader(
+                title: 'Latest events at ${campus.name}',
+                onViewAll: () => context.go('/explore/events'),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 260,
+              child: eventsAsync.when(
+                data: (items) => _HorizontalList(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final e = items[index];
+                    return SizedBox(
+                      width: 280,
+                      child: WonderousEventCard(
+                        title: e.title,
+                        venue: e.venue,
+                        date: e.startDate,
+                        organizer: e.organizerName,
+                        onTap: () => context.go('/explore/events'),
+                      ),
+                    );
+                  },
+                ),
+                loading: () => const _LoadingRow(),
+                error: (err, st) => _ErrorRow(onRetry: () => ref.invalidate(_latestEventsProvider(campusId))),
               ),
             ),
           ),
 
-          // Latest Content with Premium Story Cards
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Latest from ${campus.name}',
-                            style: theme.textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.charcoalBlack,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Stay updated with campus activities',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: AppColors.stoneGray,
-                            ),
-                          ),
-                        ],
-                        ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: _SectionHeader(
+                title: 'Fresh in marketplace',
+                onViewAll: () => context.go('/explore/products'),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 160,
+              child: productsAsync.when(
+                data: (items) => _HorizontalList(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final p = items[index];
+                    return SizedBox(
+                      width: 240,
+                      child: WonderousProductCard(
+                        title: p.name,
+                        price: p.formattedPrice,
+                        seller: p.sellerName,
+                        onTap: () => context.go('/explore/products'),
                       ),
-                      TextButton(
-                        onPressed: () => navigateToTab(1),
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppColors.crystalBlue,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text('View All'),
-                            const SizedBox(width: 4),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              size: 14,
-                              color: AppColors.crystalBlue,
-                            ),
-                          ],
-                        ),
+                    );
+                  },
+                ),
+                loading: () => const _LoadingRow(),
+                error: (err, st) => _ErrorRow(onRetry: () => ref.invalidate(_latestProductsProvider(campusId))),
+              ),
+            ),
+          ),
+
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: _SectionHeader(
+                title: 'Volunteer with BISO',
+                onViewAll: () => context.go('/explore/volunteer'),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 160,
+              child: jobsAsync.when(
+                data: (items) => _HorizontalList(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final j = items[index];
+                    return SizedBox(
+                      width: 240,
+                      child: WonderousJobCard(
+                        title: j.title,
+                        department: j.department,
+                        requirements: j.skills.isNotEmpty ? j.skills.take(2).join(', ') : null,
+                        onTap: () => context.go('/explore/volunteer'),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // Premium story cards for latest content
-                  WonderousEventCard(
-                    title: 'New Student Welcome',
-                    venue: 'Main Auditorium',
-                    date: DateTime.now(),
-                    organizer: 'BISO ${campus.name}',
-                    onTap: () => context.go('/explore/events'),
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  WonderousProductCard(
-                    title: 'MacBook Pro 2021',
-                    price: '12,500 NOK',
-                    seller: 'Student Marketplace',
-                    onTap: () => context.go('/explore/products'),
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  WonderousJobCard(
-                    title: 'Event Photography',
-                    department: 'Marketing Team',
-                    requirements: 'Photography experience preferred',
-                    onTap: () => context.go('/explore/volunteer'),
-                  ),
-                  
-                  const SizedBox(height: 32),
-                ],
+                    );
+                  },
+                ),
+                loading: () => const _LoadingRow(),
+                error: (err, st) => _ErrorRow(onRetry: () => ref.invalidate(_latestJobsProvider(campusId))),
               ),
             ),
           ),
@@ -326,6 +373,132 @@ class _HomePage extends ConsumerWidget {
             },
             child: const Text('Sign In'),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback onViewAll;
+
+  const _SectionHeader({required this.title, required this.onViewAll});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.charcoalBlack,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        TextButton(
+          onPressed: onViewAll,
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.crystalBlue,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Text('View all'),
+              SizedBox(width: 4),
+              Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.crystalBlue),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HorizontalList extends StatelessWidget {
+  final int itemCount;
+  final Widget Function(BuildContext, int) itemBuilder;
+
+  const _HorizontalList({required this.itemCount, required this.itemBuilder});
+
+  @override
+  Widget build(BuildContext context) {
+    if (itemCount == 0) {
+      return const _EmptyRow();
+    }
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      scrollDirection: Axis.horizontal,
+      itemCount: itemCount,
+      separatorBuilder: (_, __) => const SizedBox(width: 12),
+      itemBuilder: itemBuilder,
+    );
+  }
+}
+
+class _LoadingRow extends StatelessWidget {
+  const _LoadingRow();
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      scrollDirection: Axis.horizontal,
+      itemCount: 3,
+      separatorBuilder: (_, __) => const SizedBox(width: 12),
+      itemBuilder: (_, __) => Container(
+        width: 240,
+        decoration: BoxDecoration(
+          color: AppColors.gray100,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Center(child: CircularProgressIndicator()),
+      ),
+    );
+  }
+}
+
+class _EmptyRow extends StatelessWidget {
+  const _EmptyRow();
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Text(
+        'Nothing here yet. Check back soon.',
+        style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
+      ),
+    );
+  }
+}
+
+class _ErrorRow extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _ErrorRow({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: AppColors.error),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Failed to load. Try again.',
+              style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
+            ),
+          ),
+          TextButton(onPressed: onRetry, child: const Text('Retry')),
         ],
       ),
     );

@@ -5,8 +5,16 @@ import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:printing/printing.dart';
+import 'dart:ui' as ui;
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../providers/auth/auth_provider.dart';
+import '../../../data/services/expense_service.dart';
+import '../../../core/utils/favorites_storage.dart';
 
 class CreateExpenseScreen extends ConsumerStatefulWidget {
   final String? eventId;
@@ -30,39 +38,134 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _overallDescriptionController = TextEditingController();
   final _bankAccountController = TextEditingController();
   final _accountHolderController = TextEditingController();
   
-  String _selectedCategory = 'other';
   String? _selectedDepartmentId;
   String _selectedDepartmentName = '';
   bool _isPrepayment = false;
   DateTime _expenseDate = DateTime.now();
   final List<File> _attachedFiles = [];
+  final List<_ReceiptDraft> _receiptDrafts = [];
+  bool _useAi = false;
+  bool _isAnalyzing = false;
+  String? _selectedCampusId;
+  String? _selectedCampusName;
+  List<Map<String, String>> _campuses = [];
+  List<Map<String, String>> _departments = [];
+  final ExpenseService _expenseService = ExpenseService();
+  List<String> _favoriteDepartmentIds = [];
   
-  final List<String> _categories = [
-    'event',
-    'travel', 
-    'supplies',
-    'food',
-    'other',
-  ];
+  // categories removed per new flow
   
-  final List<Map<String, String>> _departments = [
-    {'id': 'marketing', 'name': 'Marketing Committee'},
-    {'id': 'student_services', 'name': 'Student Services'},
-    {'id': 'student_union', 'name': 'Student Union'},
-    {'id': 'it_services', 'name': 'IT Services'},
-    {'id': 'career_center', 'name': 'Career Center'},
-    {'id': 'events_team', 'name': 'Events Team'},
-  ];
-
   @override
   void initState() {
     super.initState();
-    if (widget.eventId != null) {
-      _selectedCategory = 'event';
+    // No categories in the new flow
+    // Prefill from profile if available
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final user = ref.read(currentUserProvider);
+      // Load campuses (id + name)
+      try {
+        _campuses = await _expenseService.listCampuses();
+      } catch (_) {}
+      _favoriteDepartmentIds = await FavoritesStorage.getFavoriteDepartmentIds();
+    if (user != null) {
+      _accountHolderController.text = user.name;
+      _selectedCampusId = user.campusId;
+        _selectedCampusName = _campuses.firstWhere(
+          (c) => c['id'] == _selectedCampusId,
+          orElse: () => {'id': '', 'name': ''},
+        )['name'];
+      await _loadDepartments();
     }
+      _maybePromptForMissingProfile();
+    });
+  }
+
+  Widget _buildDepartmentTile(Map<String, String> dept, bool isSelected) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      color: isSelected ? AppColors.subtleBlue : null,
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _selectedDepartmentId = dept['id'];
+            _selectedDepartmentName = dept['name']!;
+          });
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: isSelected 
+                      ? AppColors.defaultBlue 
+                      : AppColors.gray200,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.business,
+                  color: isSelected ? Colors.white : AppColors.onSurfaceVariant,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  dept['name']!,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: isSelected ? AppColors.defaultBlue : null,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () async {
+                  final wasFav = _favoriteDepartmentIds.contains(dept['id']);
+                  final favored = await FavoritesStorage.toggleFavoriteDepartment(dept['id']!);
+                  final updated = await FavoritesStorage.getFavoriteDepartmentIds();
+                  setState(() => _favoriteDepartmentIds = updated);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(favored ? 'Added to favorites' : 'Removed from favorites')),
+                    );
+                  }
+                },
+                icon: Icon(
+                  _favoriteDepartmentIds.contains(dept['id']) ? Icons.star_rounded : Icons.star_border_rounded,
+                  color: _favoriteDepartmentIds.contains(dept['id']) ? AppColors.orange9 : AppColors.onSurfaceVariant,
+                ),
+              ),
+              if (isSelected)
+                const Icon(
+                  Icons.check_circle,
+                  color: AppColors.defaultBlue,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _maybePromptForMissingProfile() {
+    final user = ref.read(currentUserProvider);
+    if (user == null) return;
+    final missing = <String>[];
+    // Only soft prompt for missing bank account; campus can be overridden per expense
+    if ((user.bankAccount ?? '').isEmpty) missing.add('Bank account');
+    if (missing.isEmpty) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Please complete your profile: ${missing.join(', ')}'),
+      ),
+    );
   }
 
   @override
@@ -72,6 +175,8 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
     _descriptionController.dispose();
     _bankAccountController.dispose();
     _accountHolderController.dispose();
+    // Payment/profile text controllers removed as we use profile directly
+    _overallDescriptionController.dispose();
     super.dispose();
   }
 
@@ -101,14 +206,13 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
     switch (_currentStep) {
       case 0: // Basic Info
         return _formKey.currentState?.validate() ?? false;
-      case 1: // Department
-        return _selectedDepartmentId != null;
-      case 2: // Attachments
-        return _attachedFiles.isNotEmpty || _isPrepayment;
-      case 3: // Payment Details
-        return _bankAccountController.text.isNotEmpty && 
-               _accountHolderController.text.isNotEmpty;
-      case 4: // Review
+      case 0: // Campus & Department
+        return _selectedCampusId != null && _selectedDepartmentId != null;
+      case 1: // Attachments
+        return _attachedFiles.isNotEmpty;
+      case 2: // Details (event + description)
+        return true;
+      case 3: // Review
         return true;
       default:
         return true;
@@ -116,14 +220,88 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
   }
 
   Future<void> _submitExpense() async {
-    // TODO: Create expense with Appwrite
-    // For now, just show success message
-    if (mounted) {
-      Navigator.pop(context);
+    try {
+      setState(() {});
+      final user = ref.read(currentUserProvider);
+      if (user == null) throw Exception('Not authenticated');
+
+      // Ensure profile exists and has bank account and campus
+      await _ensureProfileExistsAndUpToDate();
+
+      // Upload attachments and create attachment documents
+      final List<String> attachmentDocIds = [];
+      for (int i = 0; i < _attachedFiles.length; i++) {
+        final file = _attachedFiles[i];
+        final url = await _expenseService.uploadAttachmentFile(file);
+        double amount = 0;
+        String description = '';
+        DateTime date = _expenseDate;
+        String type = file.path.split('.').last.toLowerCase();
+        if (_useAi && i < _receiptDrafts.length) {
+          final draft = _receiptDrafts[i];
+          amount = draft.amount ?? 0;
+          description = draft.description ?? '';
+          date = draft.date ?? _expenseDate;
+        }
+        final doc = await _expenseService.createAttachmentDocument(
+          date: date,
+          url: url,
+          amount: amount,
+          description: description,
+          type: type,
+        );
+        attachmentDocIds.add(doc['\$id'] as String);
+      }
+
+      // Determine total and description
+      double total;
+      String description;
+      if (_useAi && _receiptDrafts.isNotEmpty) {
+        total = _receiptDrafts.fold(0, (p, e) => p + (e.amount ?? 0));
+        final descs = _receiptDrafts.map((e) => e.description ?? '').where((e) => e.isNotEmpty).toList();
+        if (descs.isNotEmpty) {
+          description = await _expenseService.summarizeExpenseDescriptions(descs);
+        } else {
+          description = _descriptionController.text.trim();
+        }
+      } else {
+        total = double.tryParse(_amountController.text) ?? 0;
+        description = _descriptionController.text.trim();
+      }
+
+      final sanitizedBank = _bankAccountController.text.replaceAll(' ', '');
+
+      final data = <String, dynamic>{
+        'campus': _selectedCampusId ?? '',
+        'department': _selectedDepartmentName,
+        'departmentRel': _selectedDepartmentId,
+        'bank_account': sanitizedBank,
+        'description': description,
+        'expenseAttachments': attachmentDocIds,
+        'total': _isPrepayment ? 0 : total,
+        'prepayment_amount': _isPrepayment ? total : null,
+        'status': 'pending',
+        'user': user.id,
+        'userId': user.id,
+        'eventName': widget.eventName,
+      };
+
+      await _expenseService.createExpenseDocument(data: data);
+
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Expense submitted'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Expense created successfully!'),
-          backgroundColor: AppColors.success,
+        SnackBar(
+          content: Text('Failed to submit: $e'),
+          backgroundColor: AppColors.error,
         ),
       );
     }
@@ -150,36 +328,12 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
       ),
       body: Column(
         children: [
-          // Progress Indicator
-          LinearProgressIndicator(
-            value: (_currentStep + 1) / 5,
-            backgroundColor: AppColors.gray200,
-            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.orange9),
-          ),
-          
-          // Step Indicator
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Step ${_currentStep + 1} of 5',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '• ${_getStepTitle()}',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.orange9,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
+          _PremiumHeader(
+            step: _currentStep,
+            totalSteps: 4,
+            onBack: _currentStep > 0 ? _previousStep : null,
+            onClose: () => Navigator.pop(context),
+            title: _getStepTitle(),
           ),
           
           // Content
@@ -191,10 +345,9 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (index) => setState(() => _currentStep = index),
                 children: [
-                  _buildBasicInfoStep(),
                   _buildDepartmentSelectionStep(),
                   _buildAttachmentsStep(),
-                  _buildPaymentDetailsStep(),
+                  _buildDetailsStep(),
                   _buildReviewStep(),
                 ],
               ),
@@ -207,168 +360,59 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
 
   String _getStepTitle() {
     switch (_currentStep) {
-      case 0: return 'Basic Information';
-      case 1: return 'Department';
-      case 2: return 'Receipts';
-      case 3: return 'Payment Details';
-      case 4: return 'Review & Submit';
+      case 0: return 'Campus & Department';
+      case 1: return 'Receipts';
+      case 2: return 'Details & Summary';
+      case 3: return 'Review & Submit';
       default: return '';
     }
   }
 
-  Widget _buildBasicInfoStep() {
+  Widget _buildDetailsStep() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Tell us about your expense',
+            'Add context (optional)',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 12),
+          CheckboxListTile(
+            value: widget.eventName != null,
+            onChanged: (_) {},
+            title: const Text('Relates to an event'),
+            subtitle: widget.eventName != null ? Text(widget.eventName!) : const Text('No event selected'),
+            controlAffinity: ListTileControlAffinity.leading,
+          ),
+
+          const SizedBox(height: 16),
+          if (_useAi)
+            TextFormField(
+              controller: _overallDescriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Overall description (AI-generated, editable)',
+              ),
+              maxLines: 4,
+            )
+          else
+            TextFormField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Overall description',
+                hintText: 'Describe briefly what the expense is for',
+              ),
+              maxLines: 4,
+            ),
+
           const SizedBox(height: 24),
-
-          // Amount
-          TextFormField(
-            controller: _amountController,
-            decoration: const InputDecoration(
-              labelText: 'Amount (NOK)',
-              prefixIcon: Icon(Icons.attach_money),
-              hintText: '0.00',
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-            ],
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Amount is required';
-              }
-              final amount = double.tryParse(value);
-              if (amount == null || amount <= 0) {
-                return 'Please enter a valid amount';
-              }
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 16),
-
-          // Description
-          TextFormField(
-            controller: _descriptionController,
-            decoration: const InputDecoration(
-              labelText: 'Description',
-              prefixIcon: Icon(Icons.description),
-              hintText: 'What was this expense for?',
-            ),
-            maxLines: 3,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Description is required';
-              }
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 16),
-
-          // Category
-          DropdownButtonFormField<String>(
-            value: _selectedCategory,
-            decoration: const InputDecoration(
-              labelText: 'Category',
-              prefixIcon: Icon(Icons.category),
-            ),
-            items: _categories.map((category) {
-              return DropdownMenuItem(
-                value: category,
-                child: Text(_getCategoryDisplayName(category)),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() => _selectedCategory = value!);
-            },
-          ),
-
-          const SizedBox(height: 16),
-
-          // Expense Date
-          ListTile(
-            leading: const Icon(Icons.calendar_today),
-            title: const Text('Expense Date'),
-            subtitle: Text(_formatDate(_expenseDate)),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () async {
-              final date = await showDatePicker(
-                context: context,
-                initialDate: _expenseDate,
-                firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                lastDate: DateTime.now().add(const Duration(days: 365)),
-              );
-              if (date != null) {
-                setState(() => _expenseDate = date);
-              }
-            },
-            contentPadding: EdgeInsets.zero,
-          ),
-
-          const SizedBox(height: 16),
-
-          // Prepayment Toggle
-          SwitchListTile(
-            title: const Text('Prepayment Request'),
-            subtitle: const Text('Request advance payment for future expense'),
-            value: _isPrepayment,
-            onChanged: (value) => setState(() => _isPrepayment = value),
-            contentPadding: EdgeInsets.zero,
-          ),
-
-          if (widget.eventName != null) ...[
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.subtleBlue,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.event, color: AppColors.defaultBlue),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Related Event',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.defaultBlue,
-                          ),
-                        ),
-                        Text(
-                          widget.eventName!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.defaultBlue,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-
-          const SizedBox(height: 32),
-
-          ElevatedButton(
+          PrimaryButton(
+            enabled: true,
+            label: 'Continue',
             onPressed: _nextStep,
-            child: const Text('Continue'),
           ),
         ],
       ),
@@ -376,85 +420,74 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
   }
 
   Widget _buildDepartmentSelectionStep() {
+    final favoritesList = _departments.where((d) => _favoriteDepartmentIds.contains(d['id'])).toList();
+    final othersList = _departments.where((d) => !_favoriteDepartmentIds.contains(d['id'])).toList();
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Which department should approve this?',
+            'Campus and department',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Select the department responsible for this expense',
+            'Choose your campus and the department responsible for this expense',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppColors.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 24),
 
-          ...(_departments.map<Widget>((dept) {
+          // Campus selector (from database)
+          DropdownButtonFormField<String>(
+            value: _selectedCampusId,
+            decoration: const InputDecoration(
+              labelText: 'Campus',
+              prefixIcon: Icon(Icons.location_city),
+            ),
+            items: _campuses.map((c) => DropdownMenuItem(
+              value: c['id'],
+              child: Text(c['name']!),
+            )).toList(),
+            onChanged: (value) async {
+              setState(() {
+                _selectedCampusId = value;
+                _selectedCampusName = _campuses.firstWhere((c) => c['id'] == value)['name'];
+                _selectedDepartmentId = null;
+                _selectedDepartmentName = '';
+              });
+              await _loadDepartments();
+            },
+          ),
+          const SizedBox(height: 16),
+
+          if (favoritesList.isNotEmpty) ...[
+            Text('Favorites', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 8),
+            ...favoritesList.map<Widget>((dept) {
+              final isSelected = _selectedDepartmentId == dept['id'];
+              return _buildDepartmentTile(dept, isSelected);
+            }),
+            const SizedBox(height: 16),
+            Text('All departments', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 8),
+          ],
+
+          ...(othersList.map<Widget>((dept) {
             final isSelected = _selectedDepartmentId == dept['id'];
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              color: isSelected ? AppColors.subtleBlue : null,
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _selectedDepartmentId = dept['id'];
-                    _selectedDepartmentName = dept['name']!;
-                  });
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: isSelected 
-                              ? AppColors.defaultBlue 
-                              : AppColors.gray200,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.business,
-                          color: isSelected ? Colors.white : AppColors.onSurfaceVariant,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          dept['name']!,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: isSelected ? AppColors.defaultBlue : null,
-                          ),
-                        ),
-                      ),
-                      if (isSelected)
-                        const Icon(
-                          Icons.check_circle,
-                          color: AppColors.defaultBlue,
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return _buildDepartmentTile(dept, isSelected);
           }).toList()),
 
           const SizedBox(height: 24),
 
-          ElevatedButton(
-            onPressed: _selectedDepartmentId != null ? _nextStep : null,
-            child: const Text('Continue'),
+          PrimaryButton(
+            enabled: _selectedCampusId != null && _selectedDepartmentId != null,
+            label: 'Continue',
+            onPressed: _nextStep,
           ),
         ],
       ),
@@ -483,6 +516,24 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
             ),
           ),
           const SizedBox(height: 24),
+
+          // AI toggle
+          SwitchListTile(
+            title: const Text('Use AI to extract details'),
+            subtitle: const Text('Auto-fill date, amount and description from receipts'),
+            value: _useAi,
+            onChanged: (value) async {
+              setState(() => _useAi = value);
+              if (value) {
+                await _analyzeAllIfNeeded();
+              }
+            },
+            contentPadding: EdgeInsets.zero,
+          ),
+          if (_isAnalyzing) ...[
+            const SizedBox(height: 8),
+            const LinearProgressIndicator(),
+          ],
 
           // Upload Buttons
           Row(
@@ -530,25 +581,60 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
               final file = entry.value;
               return Card(
                 margin: const EdgeInsets.only(bottom: 8),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: AppColors.gray200,
-                    child: Icon(
-                      _getFileIcon(file.path),
-                      color: AppColors.onSurfaceVariant,
-                    ),
-                  ),
-                  title: Text(
-                    file.path.split('/').last,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(_getFileSizeText(file)),
-                  trailing: IconButton(
-                    onPressed: () {
-                      setState(() => _attachedFiles.removeAt(index));
-                    },
-                    icon: const Icon(Icons.delete, color: AppColors.error),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: AppColors.gray200,
+                            child: Icon(
+                              _getFileIcon(file.path),
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              file.path.split('/').last,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _attachedFiles.removeAt(index);
+                                if (index < _receiptDrafts.length) {
+                                  _receiptDrafts.removeAt(index);
+                                }
+                              });
+                            },
+                            icon: const Icon(Icons.delete, color: AppColors.error),
+                          ),
+                        ],
+                      ),
+                      if (_useAi) ...[
+                        const SizedBox(height: 8),
+                        _AiFieldsEditor(
+                          draft: index < _receiptDrafts.length ? _receiptDrafts[index] : _ReceiptDraft(),
+                          onChanged: (d) {
+                            if (index >= _receiptDrafts.length) {
+                              _receiptDrafts.add(d);
+                            } else {
+                              _receiptDrafts[index] = d;
+                            }
+                            setState(() {});
+                          },
+                          onRetry: () => _analyzeSingle(index),
+                        ),
+                      ] else ...[
+                        const SizedBox(height: 4),
+                        Text(_getFileSizeText(file), style: Theme.of(context).textTheme.bodySmall),
+                      ],
+                    ],
                   ),
                 ),
               );
@@ -589,15 +675,17 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
             const SizedBox(height: 24),
           ],
 
-          ElevatedButton(
-            onPressed: (_attachedFiles.isNotEmpty || _isPrepayment) ? _nextStep : null,
-            child: const Text('Continue'),
+          PrimaryButton(
+            enabled: _attachedFiles.isNotEmpty,
+            label: 'Continue',
+            onPressed: _nextStep,
           ),
         ],
       ),
     );
   }
 
+  // Legacy payment step kept for potential future use; not referenced in new flow
   Widget _buildPaymentDetailsStep() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -618,6 +706,9 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
             ),
           ),
           const SizedBox(height: 24),
+
+          // Profile-sourced contact details; no manual entry in this step
+          const SizedBox(height: 8),
 
           // Bank Account
           TextFormField(
@@ -704,9 +795,10 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
 
           const SizedBox(height: 32),
 
-          ElevatedButton(
+          PrimaryButton(
+            enabled: true,
+            label: 'Continue to Review',
             onPressed: _nextStep,
-            child: const Text('Continue to Review'),
           ),
         ],
       ),
@@ -714,7 +806,9 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
   }
 
   Widget _buildReviewStep() {
-    final amount = double.tryParse(_amountController.text) ?? 0.0;
+    final amount = _useAi
+        ? _receiptDrafts.fold(0.0, (p, e) => p + (e.amount ?? 0.0))
+        : (double.tryParse(_amountController.text) ?? 0.0);
     
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -786,9 +880,16 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
           _ReviewSection(
             title: 'Expense Details',
             children: [
-              _ReviewItem(label: 'Description', value: _descriptionController.text),
-              _ReviewItem(label: 'Category', value: _getCategoryDisplayName(_selectedCategory)),
-              _ReviewItem(label: 'Date', value: _formatDate(_expenseDate)),
+              TextFormField(
+                controller: _useAi ? _overallDescriptionController : _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Overall description',
+                  hintText: 'What was this expense for? (you can edit)'
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 8),
+              _ReviewItem(label: 'Campus', value: _selectedCampusName ?? ''),
               _ReviewItem(label: 'Department', value: _selectedDepartmentName),
               if (widget.eventName != null)
                 _ReviewItem(label: 'Event', value: widget.eventName!),
@@ -797,19 +898,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
 
           const SizedBox(height: 16),
 
-          _ReviewSection(
-            title: 'Payment Information',
-            children: [
-              _ReviewItem(
-                label: 'Bank Account', 
-                value: _bankAccountController.text,
-              ),
-              _ReviewItem(
-                label: 'Account Holder', 
-                value: _accountHolderController.text,
-              ),
-            ],
-          ),
+          // Payment info is implicitly from profile; no manual entry step required
 
           const SizedBox(height: 16),
 
@@ -820,6 +909,11 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
                 label: 'Files', 
                 value: '${_attachedFiles.length} file(s) attached',
               ),
+              if (_useAi)
+                ..._receiptDrafts.asMap().entries.map((e) => _ReviewItem(
+                  label: '• ${e.value.date != null ? _formatDate(e.value.date!) : 'Date'}',
+                  value: 'NOK ${(e.value.amount ?? 0).toStringAsFixed(2)} — ${e.value.description ?? ''}',
+                )),
             ],
           ),
 
@@ -849,19 +943,15 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
     );
   }
 
-  String _getCategoryDisplayName(String category) {
-    switch (category) {
-      case 'event': return 'Event Expenses';
-      case 'travel': return 'Travel';
-      case 'supplies': return 'Supplies';
-      case 'food': return 'Food & Beverages';
-      case 'other': return 'Other';
-      default: return category;
-    }
-  }
-
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _formatBankForInput(String digits) {
+    final d = digits.replaceAll(' ', '');
+    if (d.length <= 4) return d;
+    if (d.length <= 6) return '${d.substring(0, 4)} ${d.substring(4)}';
+    return '${d.substring(0, 4)} ${d.substring(4, 6)} ${d.substring(6)}';
   }
 
   IconData _getFileIcon(String path) {
@@ -889,6 +979,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
       setState(() {
         _attachedFiles.add(File(image.path));
       });
+      if (_useAi) await _analyzeSingle(_attachedFiles.length - 1);
     }
   }
 
@@ -899,6 +990,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
       setState(() {
         _attachedFiles.add(File(image.path));
       });
+      if (_useAi) await _analyzeSingle(_attachedFiles.length - 1);
     }
   }
 
@@ -914,6 +1006,179 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
       setState(() {
         _attachedFiles.add(file);
       });
+      if (_useAi) await _analyzeSingle(_attachedFiles.length - 1);
+    }
+  }
+
+  Future<void> _loadDepartments() async {
+    if (_selectedCampusId == null) return;
+    try {
+      final list = await _expenseService.listDepartmentsForCampus(_selectedCampusId!);
+      setState(() {
+        _departments = list
+            .map((e) => {
+                  'id': (e['Id'] ?? '').toString(),
+                  'name': (e['Name'] ?? '').toString(),
+                })
+            .where((e) => e['id']!.isNotEmpty && e['name']!.isNotEmpty)
+            .toList();
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _analyzeAllIfNeeded() async {
+    if (!_useAi) return;
+    for (int i = 0; i < _attachedFiles.length; i++) {
+      if (i >= _receiptDrafts.length || _receiptDrafts[i].isEmpty) {
+        await _analyzeSingle(i);
+      }
+    }
+    await _refreshOverallSummary();
+  }
+
+  Future<void> _analyzeSingle(int index) async {
+    if (!_useAi) return;
+    if (index < 0 || index >= _attachedFiles.length) return;
+    try {
+      setState(() => _isAnalyzing = true);
+      final file = _attachedFiles[index];
+      final text = await _extractText(file);
+      if (text.trim().isEmpty) {
+        setState(() => _isAnalyzing = false);
+        return;
+      }
+      final result = await _expenseService.analyzeReceiptText(text);
+      final parsed = _ReceiptDraft(
+        amount: _safeDouble(result['amount']),
+        description: (result['description'] ?? '').toString(),
+        date: _safeDate(result['date']),
+      );
+      if (index >= _receiptDrafts.length) {
+        _receiptDrafts.add(parsed);
+      } else {
+        _receiptDrafts[index] = parsed;
+      }
+      setState(() => _isAnalyzing = false);
+      await _refreshOverallSummary();
+    } catch (_) {
+      setState(() => _isAnalyzing = false);
+    }
+  }
+
+  Future<void> _refreshOverallSummary() async {
+    if (!_useAi) return;
+    final descs = _receiptDrafts.map((e) => e.description ?? '').where((e) => e.isNotEmpty).toList();
+    if (descs.isEmpty) return;
+    final summary = await _expenseService.summarizeExpenseDescriptions(descs);
+    if (summary.trim().isNotEmpty) {
+      setState(() {
+        _overallDescriptionController.text = summary.trim();
+      });
+    }
+  }
+
+  Future<void> _ensureProfileExistsAndUpToDate() async {
+    final user = ref.read(currentUserProvider);
+    if (user == null) return;
+    final hasProfile = ref.read(hasProfileProvider);
+    final name = _accountHolderController.text.trim().isEmpty ? user.name : _accountHolderController.text.trim();
+    final phone = user.phone;
+    final address = user.address;
+    final city = user.city;
+    final zip = user.zipCode;
+    final campusId = _selectedCampusId ?? user.campusId;
+    final bank = _bankAccountController.text.replaceAll(' ', '');
+    try {
+      if (hasProfile) {
+        await ref.read(authServiceProvider).updateUserProfile(
+          name: name,
+          phone: phone,
+          address: address,
+          city: city,
+          zipCode: zip,
+          campusId: campusId,
+          bankAccount: bank,
+        );
+      } else {
+        await ref.read(authServiceProvider).createUserProfile(
+          name: name,
+          phone: phone,
+          address: address,
+          city: city,
+          zipCode: zip,
+          campusId: campusId,
+          departments: const [],
+          bankAccount: bank,
+        );
+      }
+      await ref.read(authStateProvider.notifier).refreshProfile();
+    } catch (_) {}
+  }
+
+  Future<String> _extractText(File file) async {
+    final lower = file.path.toLowerCase();
+    final recognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    try {
+      if (lower.endsWith('.pdf')) {
+        // 1) Try text layer first (fast, if selectable text exists)
+        try {
+          final bytes = await file.readAsBytes();
+          final document = PdfDocument(inputBytes: bytes);
+          final textExtractor = PdfTextExtractor(document);
+          final extracted = textExtractor.extractText();
+          document.dispose();
+          if (extracted.trim().isNotEmpty) return extracted;
+        } catch (_) {}
+        // 2) Deep OCR fallback: rasterize first pages and run ML Kit
+        try {
+          final bytes = await file.readAsBytes();
+          final buffer = StringBuffer();
+          int processed = 0;
+          await for (final page in Printing.raster(bytes, dpi: 170)) {
+            if (processed >= 3) break; // safety cap
+            final uiImage = await page.toImage();
+            final byteData = await uiImage.toByteData(format: ui.ImageByteFormat.png);
+            if (byteData != null) {
+              final tmp = File('${file.path}.p$processed.png');
+              await tmp.writeAsBytes(byteData.buffer.asUint8List(), flush: true);
+              try {
+                final inputImage = InputImage.fromFile(tmp);
+                final text = await recognizer.processImage(inputImage);
+                if (text.text.isNotEmpty) buffer.writeln(text.text);
+              } finally {
+                if (await tmp.exists()) await tmp.delete();
+              }
+            }
+            processed++;
+          }
+          return buffer.toString();
+        } catch (_) {
+          return '';
+        }
+      } else {
+        final inputImage = InputImage.fromFile(file);
+        final text = await recognizer.processImage(inputImage);
+        return text.text;
+      }
+    } catch (_) {
+      return '';
+    } finally {
+      await recognizer.close();
+    }
+  }
+
+  double? _safeDouble(dynamic v) {
+    if (v == null) return null;
+    if (v is num) return v.toDouble();
+    return double.tryParse(v.toString());
+  }
+
+  DateTime? _safeDate(dynamic v) {
+    if (v == null) return null;
+    try {
+      return DateTime.parse(v.toString());
+    } catch (_) {
+      return null;
     }
   }
 }
@@ -1016,5 +1281,219 @@ class _BankAccountFormatter extends TextInputFormatter {
         selection: TextSelection.collapsed(offset: text.length + 2),
       );
     }
+  }
+}
+
+class _ReceiptDraft {
+  final double? amount;
+  final String? description;
+  final DateTime? date;
+
+  _ReceiptDraft({this.amount, this.description, this.date});
+
+  bool get isEmpty => (amount == null || amount == 0) && (description == null || description!.isEmpty) && date == null;
+}
+
+class _AiFieldsEditor extends StatelessWidget {
+  final _ReceiptDraft draft;
+  final void Function(_ReceiptDraft) onChanged;
+  final Future<void> Function() onRetry;
+
+  const _AiFieldsEditor({required this.draft, required this.onChanged, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final amountController = TextEditingController(text: draft.amount?.toStringAsFixed(2) ?? '');
+    final descriptionController = TextEditingController(text: draft.description ?? '');
+    final dateText = draft.date != null ? '${draft.date!.day}/${draft.date!.month}/${draft.date!.year}' : '';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: amountController,
+                decoration: const InputDecoration(labelText: 'Amount (NOK)'),
+                keyboardType: TextInputType.number,
+                onChanged: (v) => onChanged(_ReceiptDraft(
+                  amount: double.tryParse(v),
+                  description: descriptionController.text,
+                  date: draft.date,
+                )),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: InkWell(
+                onTap: () async {
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: draft.date ?? now,
+                    firstDate: now.subtract(const Duration(days: 365 * 3)),
+                    lastDate: now,
+                  );
+                  if (picked != null) {
+                    onChanged(_ReceiptDraft(
+                      amount: double.tryParse(amountController.text),
+                      description: descriptionController.text,
+                      date: picked,
+                    ));
+                  }
+                },
+                child: InputDecorator(
+                  decoration: const InputDecoration(labelText: 'Date'),
+                  child: Text(dateText.isEmpty ? 'Select' : dateText),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: descriptionController,
+          decoration: const InputDecoration(labelText: 'Description'),
+          onChanged: (v) => onChanged(_ReceiptDraft(
+            amount: double.tryParse(amountController.text),
+            description: v,
+            date: draft.date,
+          )),
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Re-run AI'),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class _PrimaryButtonPainter extends CustomPainter {
+  final Color color;
+  _PrimaryButtonPainter(this.color);
+  @override
+  void paint(Canvas canvas, Size size) {
+    final r = RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(14));
+    final paint = Paint()
+      ..shader = LinearGradient(
+        colors: [color.withOpacity(0.95), color.withOpacity(0.85)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(r.outerRect)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
+    canvas.drawRRect(r, paint);
+  }
+  @override
+  bool shouldRepaint(covariant _PrimaryButtonPainter oldDelegate) => oldDelegate.color != color;
+}
+
+class PrimaryButton extends StatelessWidget {
+  final bool enabled;
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  const PrimaryButton({super.key, this.enabled = true, required this.label, this.onPressed, this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    final Color base = enabled ? AppColors.defaultBlue : AppColors.gray200;
+    return GestureDetector(
+      onTap: enabled ? onPressed : null,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: enabled ? 1 : 0.6,
+        child: CustomPaint(
+          painter: _PrimaryButtonPainter(base),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (icon != null) ...[
+                  Icon(icon, color: Colors.white),
+                  const SizedBox(width: 8),
+                ],
+                Text(
+                  label,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PremiumHeader extends StatelessWidget {
+  final int step;
+  final int totalSteps;
+  final VoidCallback? onBack;
+  final VoidCallback onClose;
+  final String title;
+  const _PremiumHeader({
+    super.key,
+    required this.step,
+    required this.totalSteps,
+    required this.onBack,
+    required this.onClose,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = (step + 1) / totalSteps;
+    return Container(
+      padding: const EdgeInsets.only(top: 48, left: 16, right: 16, bottom: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.subtleBlue, Colors.white],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              if (onBack != null)
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                  onPressed: onBack,
+                ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.close_rounded),
+                onPressed: onClose,
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 6,
+              backgroundColor: AppColors.gray200,
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.defaultBlue),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

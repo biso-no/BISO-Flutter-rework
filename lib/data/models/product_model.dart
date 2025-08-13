@@ -12,6 +12,7 @@ class ProductModel extends Equatable {
   final String campusId;
   final String category;
   final List<String> images;
+  final List<String> imageFileIds;
   final String condition; // 'new', 'like_new', 'good', 'fair', 'poor'
   final String status; // 'available', 'sold', 'reserved', 'inactive'
   final bool isNegotiable;
@@ -35,6 +36,7 @@ class ProductModel extends Equatable {
     required this.campusId,
     required this.category,
     this.images = const [],
+    this.imageFileIds = const [],
     this.condition = 'good',
     this.status = 'available',
     this.isNegotiable = false,
@@ -60,6 +62,7 @@ class ProductModel extends Equatable {
       campusId: map['campus_id'] ?? '',
       category: map['category'] ?? '',
       images: List<String>.from(map['images'] ?? []),
+      imageFileIds: List<String>.from(map['image_file_ids'] ?? []),
       condition: map['condition'] ?? 'good',
       status: map['status'] ?? 'available',
       isNegotiable: map['is_negotiable'] ?? false,
@@ -85,6 +88,7 @@ class ProductModel extends Equatable {
       'campus_id': campusId,
       'category': category,
       'images': images,
+      'image_file_ids': imageFileIds,
       'condition': condition,
       'status': status,
       'is_negotiable': isNegotiable,
@@ -108,6 +112,7 @@ class ProductModel extends Equatable {
     String? campusId,
     String? category,
     List<String>? images,
+    List<String>? imageFileIds,
     String? condition,
     String? status,
     bool? isNegotiable,
@@ -131,6 +136,7 @@ class ProductModel extends Equatable {
       campusId: campusId ?? this.campusId,
       category: category ?? this.category,
       images: images ?? this.images,
+      imageFileIds: imageFileIds ?? this.imageFileIds,
       condition: condition ?? this.condition,
       status: status ?? this.status,
       isNegotiable: isNegotiable ?? this.isNegotiable,
@@ -162,7 +168,7 @@ class ProductModel extends Equatable {
   @override
   List<Object?> get props => [
     id, name, description, price, currency, sellerId, sellerName,
-    sellerAvatar, campusId, category, images, condition, status,
+    sellerAvatar, campusId, category, images, imageFileIds, condition, status,
     isNegotiable, contactMethod, contactInfo, metadata, viewCount,
     favoriteCount, createdAt, updatedAt,
   ];

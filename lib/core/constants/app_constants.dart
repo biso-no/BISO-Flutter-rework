@@ -6,9 +6,22 @@ class AppConstants {
   static const String appwriteProjectId = 'biso';
   static const String databaseId = 'app';
   static const String appwriteWebsocket = 'wss://appwrite.biso.no/v1/realtime';
+  // Storage Buckets
+  static const String productsBucketId = 'products';
+  static const String expensesBucketId = 'expenses';
+  
+  // Collections
+  static const String expensesCollectionId = 'expense';
+  static const String expenseAttachmentsCollectionId = 'expense_attachments';
+  static const String campusesCollectionId = 'campus';
+  static const String departmentsCollectionId = 'departments';
+  static const String usersCollectionId = 'user';
   
   // AI Service
   static const String aiApiUrl = 'https://68233095312e736521e7.appwrite.biso.no/';
+  // Appwrite Functions (IDs)
+  static const String fnParseReceiptId = 'fn_parse_receipt';
+  static const String fnSummarizeExpenseId = 'fn_summarize_expense';
   
   // External APIs
   static const String wordPressEventsApi = 'https://biso.no/wp-json/biso/v1/events';

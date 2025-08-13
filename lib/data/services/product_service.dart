@@ -1,0 +1,223 @@
+import 'package:appwrite/appwrite.dart';
+
+import '../../core/constants/app_constants.dart';
+import '../models/product_model.dart';
+import 'appwrite_service.dart';
+import 'robust_document_service.dart';
+
+class ProductService {
+  static const String collectionId = 'products';
+  static const String favoritesCollectionId = 'product_favorites';
+
+  Future<List<ProductModel>> getLatestProducts({
+    String? campusId,
+    String? status = 'available',
+    int limit = 10,
+  }) async {
+    final List<String> queries = [
+      Query.orderDesc('\$createdAt'),
+      Query.limit(limit),
+    ];
+
+    if (campusId != null) {
+      queries.add(Query.equal('campus_id', campusId));
+    }
+    if (status != null) {
+      queries.add(Query.equal('status', status));
+    }
+
+    final results = await RobustDocumentService.listDocumentsRobust(
+      databaseId: AppConstants.databaseId,
+      collectionId: collectionId,
+      queries: queries,
+    );
+    return results.map(ProductModel.fromMap).toList(growable: false);
+  }
+
+  Future<List<ProductModel>> listProducts({
+    String? campusId,
+    String? category,
+    String? status,
+    String? search,
+    int limit = AppConstants.defaultPageSize,
+    int offset = 0,
+  }) async {
+    final List<String> queries = [
+      Query.limit(limit),
+      Query.offset(offset),
+      Query.orderDesc('\$createdAt'),
+    ];
+    if (campusId != null) queries.add(Query.equal('campus_id', campusId));
+    if (category != null && category != 'all') queries.add(Query.equal('category', category));
+    if (status != null) queries.add(Query.equal('status', status));
+    if (search != null && search.trim().isNotEmpty) {
+      queries.add(Query.search('name', search.trim()));
+    }
+
+    final results = await RobustDocumentService.listDocumentsRobust(
+      databaseId: AppConstants.databaseId,
+      collectionId: collectionId,
+      queries: queries,
+    );
+    return results.map(ProductModel.fromMap).toList(growable: false);
+  }
+
+  Future<ProductModel?> getProductById(String id) async {
+    final doc = await RobustDocumentService.getDocumentRobust(
+      databaseId: AppConstants.databaseId,
+      collectionId: collectionId,
+      documentId: id,
+    );
+    return ProductModel.fromMap(doc);
+  }
+
+  Future<ProductModel> createProduct({
+    required ProductModel product,
+    List<String> imagePaths = const [],
+  }) async {
+    final List<String> imageUrls = [];
+    final List<String> fileIds = [];
+    for (final path in imagePaths) {
+      final fileId = await _uploadImage(path);
+      final url = _publicFileUrl(AppConstants.productsBucketId, fileId);
+      imageUrls.add(url);
+      fileIds.add(fileId);
+    }
+
+    final data = product.copyWith(images: imageUrls, imageFileIds: fileIds).toMap();
+    final doc = await databases.createDocument(
+      databaseId: AppConstants.databaseId,
+      collectionId: collectionId,
+      documentId: ID.unique(),
+      data: data,
+    );
+    final map = Map<String, dynamic>.from(doc.data);
+    map['\$id'] = doc.$id;
+    return ProductModel.fromMap(map);
+  }
+
+  Future<ProductModel> updateProduct(ProductModel product) async {
+    final doc = await databases.updateDocument(
+      databaseId: AppConstants.databaseId,
+      collectionId: collectionId,
+      documentId: product.id,
+      data: product.toMap(),
+    );
+    final map = Map<String, dynamic>.from(doc.data);
+    map['\$id'] = doc.$id;
+    return ProductModel.fromMap(map);
+  }
+
+  Future<void> markStatus({
+    required String productId,
+    required String status, // 'available' | 'sold' | 'reserved' | 'inactive'
+  }) async {
+    await databases.updateDocument(
+      databaseId: AppConstants.databaseId,
+      collectionId: collectionId,
+      documentId: productId,
+      data: {'status': status},
+    );
+  }
+
+  Future<void> incrementViewCount(String productId) async {
+    try {
+      final current = await RobustDocumentService.getDocumentRobust(
+        databaseId: AppConstants.databaseId,
+        collectionId: collectionId,
+        documentId: productId,
+      );
+      final count = (current['view_count'] ?? 0) as int;
+      await databases.updateDocument(
+        databaseId: AppConstants.databaseId,
+        collectionId: collectionId,
+        documentId: productId,
+        data: {'view_count': count + 1},
+      );
+    } catch (_) {
+      // best effort
+    }
+  }
+
+  Future<bool> isFavorited({required String userId, required String productId}) async {
+    final res = await databases.listDocuments(
+      databaseId: AppConstants.databaseId,
+      collectionId: favoritesCollectionId,
+      queries: [
+        Query.equal('user_id', userId),
+        Query.equal('product_id', productId),
+        Query.limit(1),
+      ],
+    );
+    return res.total > 0;
+  }
+
+  Future<bool> toggleFavorite({required String userId, required String productId}) async {
+    final res = await databases.listDocuments(
+      databaseId: AppConstants.databaseId,
+      collectionId: favoritesCollectionId,
+      queries: [
+        Query.equal('user_id', userId),
+        Query.equal('product_id', productId),
+        Query.limit(1),
+      ],
+    );
+    if (res.documents.isEmpty) {
+      await databases.createDocument(
+        databaseId: AppConstants.databaseId,
+        collectionId: favoritesCollectionId,
+        documentId: ID.unique(),
+        data: {
+          'user_id': userId,
+          'product_id': productId,
+        },
+      );
+      await _bumpFavoriteCount(productId, 1);
+      return true;
+    } else {
+      await databases.deleteDocument(
+        databaseId: AppConstants.databaseId,
+        collectionId: favoritesCollectionId,
+        documentId: res.documents.first.$id,
+      );
+      await _bumpFavoriteCount(productId, -1);
+      return false;
+    }
+  }
+
+  Future<void> _bumpFavoriteCount(String productId, int delta) async {
+    try {
+      final current = await RobustDocumentService.getDocumentRobust(
+        databaseId: AppConstants.databaseId,
+        collectionId: collectionId,
+        documentId: productId,
+      );
+      final count = (current['favorite_count'] ?? 0) as int;
+      final int newCount = count + delta;
+      final int safeCount = newCount < 0 ? 0 : newCount;
+      await databases.updateDocument(
+        databaseId: AppConstants.databaseId,
+        collectionId: collectionId,
+        documentId: productId,
+        data: {'favorite_count': safeCount},
+      );
+    } catch (_) {}
+  }
+
+  Future<String> _uploadImage(String filePath) async {
+    final file = await storage.createFile(
+      bucketId: AppConstants.productsBucketId,
+      fileId: ID.unique(),
+      file: InputFile.fromPath(path: filePath),
+    );
+    return file.$id;
+  }
+
+  String _publicFileUrl(String bucketId, String fileId) {
+    final endpoint = client.endPoint;
+    final projectId = client.config['project'];
+    return '$endpoint/storage/buckets/$bucketId/files/$fileId/view?project=$projectId';
+  }
+}
+
+

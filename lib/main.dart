@@ -12,7 +12,9 @@ import 'presentation/screens/auth/otp_verification_screen.dart';
 import 'presentation/screens/onboarding/onboarding_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
 import 'presentation/screens/explore/events_screen.dart';
-import 'presentation/screens/explore/marketplace_screen.dart';
+// marketplace screen imported as alias below
+import 'presentation/screens/explore/marketplace_screen.dart' as market;
+import 'presentation/screens/explore/sell_product_screen.dart';
 import 'presentation/screens/explore/jobs_screen.dart';
 import 'presentation/screens/explore/expenses_screen.dart';
 import 'presentation/screens/chat/chat_list_screen.dart';
@@ -103,7 +105,12 @@ final _router = GoRouter(
       GoRoute(
         path: '/explore/products',
         name: 'products', 
-        builder: (context, state) => const MarketplaceScreen(),
+        builder: (context, state) => const market.MarketplaceScreen(),
+      ),
+      GoRoute(
+        path: '/explore/products/new',
+        name: 'product-new',
+        builder: (context, state) => const SellProductScreen(),
       ),
       GoRoute(
         path: '/explore/units',

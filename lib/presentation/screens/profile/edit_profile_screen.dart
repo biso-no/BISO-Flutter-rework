@@ -7,8 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/auth/auth_provider.dart';
-import '../../../providers/campus/campus_provider.dart';
-import '../../../data/models/campus_model.dart';
+import '../../../data/services/expense_service.dart';
+import '../../../core/utils/favorites_storage.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -30,18 +30,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   XFile? _selectedImage;
   bool _isLoading = false;
 
-  final List<String> _availableDepartments = [
-    'Business Administration',
-    'Economics',
-    'Marketing',
-    'Finance',
-    'International Business',
-    'Technology Management',
-    'HR Management',
-    'Strategy & Leadership',
-    'Accounting',
-    'Innovation & Entrepreneurship',
-  ];
+  // Fetched from Appwrite
+  final ExpenseService _expenseService = ExpenseService();
+  List<Map<String, String>> _campuses = [];// [{id,name}]
+  List<Map<String, String>> _departments = [];// [{id (Id), name (Name)}]
 
   @override
   void initState() {
@@ -59,6 +51,38 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       _zipController.text = user.zipCode ?? '';
       _selectedDepartments = List.from(user.departments);
       _selectedCampusId = user.campusId;
+    }
+    _loadCampusesAndDeps();
+  }
+
+  Future<void> _loadCampusesAndDeps() async {
+    try {
+      final campuses = await _expenseService.listCampuses();
+      setState(() => _campuses = campuses);
+    } catch (_) {}
+    if (_selectedCampusId != null && _selectedCampusId!.isNotEmpty) {
+      await _loadDepartments(_selectedCampusId!);
+    }
+  }
+
+  Future<void> _loadDepartments(String campusId) async {
+    try {
+      final docs = await _expenseService.listDepartmentsForCampus(campusId);
+      setState(() {
+        _departments = docs.map((e) => {
+          'id': (e['Id'] ?? '').toString(),
+          'name': (e['Name'] ?? '').toString(),
+        }).where((e) => e['id']!.isNotEmpty && e['name']!.isNotEmpty).toList();
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _toggleFavorite(String deptId) async {
+    final favored = await FavoritesStorage.toggleFavoriteDepartment(deptId);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(favored ? 'Added to favorites' : 'Removed from favorites')),
+      );
     }
   }
 
@@ -143,9 +167,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final authState = ref.watch(authStateProvider);
-    final allCampuses = ref.watch(allCampusesProvider);
-    final profileCampus = ref.watch(profileCampusProvider);
-    final selectedCampus = profileCampus ?? CampusData.defaultCampus;
 
     return Scaffold(
       appBar: AppBar(
@@ -180,7 +201,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: _getCampusColor(selectedCampus.id),
+                          color: AppColors.defaultBlue,
                           width: 3,
                         ),
                       ),
@@ -192,13 +213,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                 ? NetworkImage(authState.user!.avatarUrl!)
                                 : null),
                         backgroundColor: AppColors.gray200,
-                        child: (_selectedImage == null && authState.user?.avatarUrl == null)
-                            ? Icon(
-                                Icons.person,
-                                size: 50,
-                                color: _getCampusColor(selectedCampus.id),
-                              )
-                            : null,
+                          child: (_selectedImage == null && authState.user?.avatarUrl == null)
+                              ? const Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: AppColors.defaultBlue,
+                                )
+                              : null,
                       ),
                     ),
                     Positioned(
@@ -210,7 +231,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: _getCampusColor(selectedCampus.id),
+                             color: AppColors.defaultBlue,
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 2),
                           ),
@@ -339,7 +360,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
               const SizedBox(height: 24),
 
-              // Interests/Departments
+              // Interests/Departments (from DB)
               Text(
                 'Interests & Departments',
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -350,38 +371,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
               const SizedBox(height: 16),
 
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Column(
-                    children: [
-                      ...List.generate(_availableDepartments.length, (index) {
-                        final department = _availableDepartments[index];
-                        final isSelected = _selectedDepartments.contains(department);
-
-                        return CheckboxListTile(
-                          title: Text(department),
-                          value: isSelected,
-                          onChanged: (bool? selected) {
-                            setState(() {
-                              if (selected == true) {
-                                _selectedDepartments.add(department);
-                              } else {
-                                _selectedDepartments.remove(department);
-                              }
-                            });
-                          },
-                          activeColor: _getCampusColor(selectedCampus.id),
-                        );
-                      }),
-                    ],
-                  ),
-                ),
+              _DepartmentPicker(
+                departments: _departments,
+                initiallySelectedIds: _selectedDepartments,
+                onSelectionChanged: (ids) => setState(() => _selectedDepartments = ids),
+                onToggleFavorite: _toggleFavorite,
               ),
 
               const SizedBox(height: 32),
 
-              // Campus Information
+              // Campus Information (from DB)
               Text(
                 'Campus Information',
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -405,16 +404,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      ...allCampuses.map((campus) {
-                        final isSelected = _selectedCampusId == campus.id;
+                      ..._campuses.map((campus) {
+                        final isSelected = _selectedCampusId == campus['id'];
                         
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: InkWell(
                             onTap: () {
                               setState(() {
-                                _selectedCampusId = campus.id;
+                                _selectedCampusId = campus['id'];
+                                _selectedDepartments.clear();
+                                _departments.clear();
                               });
+                              _loadDepartments(_selectedCampusId!);
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
@@ -422,14 +424,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: isSelected
-                                      ? _getCampusColor(campus.id)
-                                      : AppColors.outline,
+                                  color: isSelected ? AppColors.defaultBlue : AppColors.outline,
                                   width: isSelected ? 2 : 1,
                                 ),
-                                color: isSelected
-                                    ? _getCampusColor(campus.id).withValues(alpha: 0.1)
-                                    : null,
+                                color: isSelected ? AppColors.defaultBlue.withValues(alpha: 0.1) : null,
                               ),
                               child: Row(
                                 children: [
@@ -437,7 +435,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
-                                      color: _getCampusColor(campus.id),
+                                      color: AppColors.defaultBlue,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: const Icon(
@@ -452,17 +450,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'BI ${campus.name}',
+                                          campus['name']!,
                                           style: theme.textTheme.titleMedium?.copyWith(
                                             fontWeight: isSelected
                                                 ? FontWeight.bold
                                                 : FontWeight.normal,
-                                          ),
-                                        ),
-                                        Text(
-                                          campus.description,
-                                          style: theme.textTheme.bodySmall?.copyWith(
-                                            color: AppColors.onSurfaceVariant,
                                           ),
                                         ),
                                       ],
@@ -471,7 +463,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                   if (isSelected)
                                     Icon(
                                       Icons.check_circle,
-                                      color: _getCampusColor(campus.id),
+                                      color: AppColors.defaultBlue,
                                       size: 24,
                                     ),
                                 ],
@@ -506,5 +498,157 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       default:
         return AppColors.gray400;
     }
+  }
+}
+
+class _DepartmentPicker extends StatefulWidget {
+  final List<Map<String, String>> departments;
+  final List<String> initiallySelectedIds;
+  final ValueChanged<List<String>> onSelectionChanged;
+  final Future<void> Function(String) onToggleFavorite;
+
+  const _DepartmentPicker({
+    required this.departments,
+    required this.initiallySelectedIds,
+    required this.onSelectionChanged,
+    required this.onToggleFavorite,
+  });
+
+  @override
+  State<_DepartmentPicker> createState() => _DepartmentPickerState();
+}
+
+class _DepartmentPickerState extends State<_DepartmentPicker> {
+  late List<String> _selected;
+  List<String> _favorites = [];
+  String _search = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = List.of(widget.initiallySelectedIds);
+    _loadFavs();
+  }
+
+  Future<void> _loadFavs() async {
+    final ids = await FavoritesStorage.getFavoriteDepartmentIds();
+    if (mounted) setState(() => _favorites = ids);
+  }
+
+  void _toggleSelect(String id) {
+    setState(() {
+      if (_selected.contains(id)) {
+        _selected.remove(id);
+      } else {
+        _selected.add(id);
+      }
+    });
+    widget.onSelectionChanged(_selected);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final lower = _search.trim().toLowerCase();
+    final filtered = lower.isEmpty
+        ? widget.departments
+        : widget.departments.where((d) => d['name']!.toLowerCase().contains(lower) || d['id']!.toLowerCase().contains(lower)).toList();
+
+    final favoriteItems = filtered.where((d) => _favorites.contains(d['id'])).toList();
+    final otherItems = filtered.where((d) => !_favorites.contains(d['id'])).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Search field (custom minimal)
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.gray50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.outline),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            children: [
+              const Icon(Icons.search_rounded, color: AppColors.onSurfaceVariant),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  decoration: const InputDecoration.collapsed(hintText: 'Search departments by name or ID'),
+                  onChanged: (v) => setState(() => _search = v),
+                ),
+              ),
+              if (_search.isNotEmpty)
+                InkWell(
+                  onTap: () => setState(() => _search = ''),
+                  child: const Icon(Icons.close_rounded, size: 18),
+                )
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        if (favoriteItems.isNotEmpty) ...[
+          Text('Favorites', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          _buildWrap(theme, favoriteItems),
+          const SizedBox(height: 16),
+        ],
+
+        Text('All departments', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+        const SizedBox(height: 8),
+        _buildWrap(theme, otherItems),
+      ],
+    );
+  }
+
+  Widget _buildWrap(ThemeData theme, List<Map<String, String>> items) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: items.map((dept) {
+        final id = dept['id']!;
+        final name = dept['name']!;
+        final selected = _selected.contains(id);
+        final favored = _favorites.contains(id);
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.defaultBlue.withValues(alpha: 0.12) : AppColors.gray50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: selected ? AppColors.defaultBlue : AppColors.outline),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  await widget.onToggleFavorite(id);
+                  _loadFavs();
+                },
+                child: Icon(
+                  favored ? Icons.star_rounded : Icons.star_border_rounded,
+                  size: 18,
+                  color: favored ? AppColors.orange9 : AppColors.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: 6),
+              GestureDetector(
+                onTap: () => _toggleSelect(id),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (selected) const Icon(Icons.check_rounded, size: 16, color: AppColors.defaultBlue),
+                    if (selected) const SizedBox(width: 6),
+                    Text(name, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
   }
 }

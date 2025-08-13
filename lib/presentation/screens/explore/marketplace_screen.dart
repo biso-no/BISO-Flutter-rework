@@ -1,18 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../generated/l10n/app_localizations.dart';
+import '../../../data/models/product_model.dart';
+import '../../../data/services/product_service.dart';
+import '../../../providers/campus/campus_provider.dart';
+import '../../../providers/auth/auth_provider.dart';
 
-class MarketplaceScreen extends StatefulWidget {
+final _productServiceProvider = Provider<ProductService>((ref) => ProductService());
+
+final productsProvider = FutureProvider.autoDispose.family<List<ProductModel>, _ProductQuery>((ref, query) async {
+  final service = ref.watch(_productServiceProvider);
+  return service.listProducts(
+    campusId: query.campusId,
+    category: query.category,
+    status: query.status,
+    search: query.search,
+    limit: 50,
+  );
+});
+
+class MarketplaceScreen extends ConsumerStatefulWidget {
   const MarketplaceScreen({super.key});
 
   @override
-  State<MarketplaceScreen> createState() => _MarketplaceScreenState();
+  ConsumerState<MarketplaceScreen> createState() => _MarketplaceScreenState();
 }
 
-class _MarketplaceScreenState extends State<MarketplaceScreen> {
+class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   String _selectedCategory = 'all';
+  String? _search;
 
   final List<String> _categories = [
     'all',
@@ -24,115 +43,151 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     'other',
   ];
 
-  // Mock data for demonstration
-  final List<Map<String, dynamic>> _mockProducts = [
-    {
-      'id': '1',
-      'name': 'Marketing Textbook',
-      'price': 450.0,
-      'seller': 'Anna K.',
-      'condition': 'Good',
-      'category': 'books',
-      'image': null,
-    },
-    {
-      'id': '2',
-      'name': 'MacBook Pro 13"',
-      'price': 12000.0,
-      'seller': 'Erik S.',
-      'condition': 'Like New',
-      'category': 'electronics',
-      'image': null,
-    },
-    {
-      'id': '3',
-      'name': 'Desk Lamp',
-      'price': 150.0,
-      'seller': 'Maria L.',
-      'condition': 'Good',
-      'category': 'furniture',
-      'image': null,
-    },
-    {
-      'id': '4',
-      'name': 'Business Suit',
-      'price': 800.0,
-      'seller': 'John D.',
-      'condition': 'Like New',
-      'category': 'clothes',
-      'image': null,
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final campus = ref.watch(filterCampusProvider);
+    final auth = ref.watch(authStateProvider);
 
-    final filteredProducts = _selectedCategory == 'all'
-        ? _mockProducts
-        : _mockProducts.where((p) => p['category'] == _selectedCategory).toList();
+    final query = _ProductQuery(
+      campusId: campus.id,
+      category: _selectedCategory,
+      status: 'available',
+      search: _search,
+    );
+    final productsAsync = ref.watch(productsProvider(query));
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(l10n.marketplace),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.white,
         leading: IconButton(
-          onPressed: () {
-            // Navigate back to home screen (explore tab)
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/home');
-            }
-          },
-          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.canPop() ? context.pop() : context.go('/home'),
+          icon: const Icon(Icons.arrow_back, color: AppColors.charcoalBlack),
         ),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search),
+            onPressed: () async {
+              final textController = TextEditingController(text: _search ?? '');
+              await showModalBottomSheet(
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                builder: (_) => Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Search marketplace', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: textController,
+                        decoration: InputDecoration(
+                          hintText: 'Try "MacBook", "Textbook", "Lamp"',
+                          prefixIcon: const Icon(Icons.search),
+                          filled: true,
+                          fillColor: AppColors.gray50,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(color: AppColors.outlineVariant),
+                          ),
+                        ),
+                        textInputAction: TextInputAction.search,
+                        onSubmitted: (_) => Navigator.pop(context),
+                      ),
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: FilledButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Apply'),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              );
+              setState(() => _search = textController.text.trim().isEmpty ? null : textController.text.trim());
+            },
+            icon: const Icon(Icons.search, color: AppColors.charcoalBlack),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.favorite_border),
-          ),
+          if (auth.isAuthenticated)
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.favorite_border, color: AppColors.charcoalBlack),
+            ),
         ],
       ),
       body: Column(
         children: [
-          // Category Filter
-          Container(
-            height: 60,
-            padding: const EdgeInsets.symmetric(vertical: 8),
+          // Search hint row
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.gray50,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.outlineVariant),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  const Icon(Icons.search, color: AppColors.onSurfaceVariant),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _search == null || _search!.isEmpty ? 'Search marketplace' : 'Results for "$_search"',
+                      style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
+                    ),
+                  ),
+                  if (_search != null)
+                    TextButton(
+                      onPressed: () => setState(() => _search = null),
+                      child: const Text('Clear'),
+                    )
+                ],
+              ),
+            ),
+          ),
+
+          // Category Filter – premium pill row
+          SizedBox(
+            height: 56,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _categories.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                final category = _categories[index];
-                final isSelected = _selectedCategory == category;
-
-                return FilterChip(
-                  label: Text(_getCategoryDisplayName(category)),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedCategory = category;
-                    });
-                  },
-                  backgroundColor: Colors.transparent,
-                  selectedColor: AppColors.subtleBlue,
-                  checkmarkColor: AppColors.defaultBlue,
-                  labelStyle: TextStyle(
-                    color: isSelected ? AppColors.defaultBlue : AppColors.onSurfaceVariant,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                  side: BorderSide(
-                    color: isSelected ? AppColors.defaultBlue : AppColors.outline,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              itemBuilder: (_, i) {
+                final cat = _categories[i];
+                final selected = cat == _selectedCategory;
+                return GestureDetector(
+                  onTap: () => setState(() => _selectedCategory = cat),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: selected ? AppColors.subtleBlue : Colors.white,
+                      border: Border.all(color: selected ? AppColors.defaultBlue : AppColors.outlineVariant),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Text(
+                      _getCategoryDisplayName(cat),
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: selected ? AppColors.defaultBlue : AppColors.charcoalBlack,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 );
               },
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemCount: _categories.length,
             ),
           ),
 
@@ -140,55 +195,56 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
 
           // Products Grid
           Expanded(
-            child: filteredProducts.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.shopping_bag_outlined,
-                          size: 64,
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No items found',
-                          style: theme.textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Try changing your filter or check back later',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: AppColors.onSurfaceVariant,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+            child: productsAsync.when(
+              data: (products) => products.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.shopping_bag_outlined, size: 64, color: AppColors.onSurfaceVariant),
+                          const SizedBox(height: 16),
+                          Text('No items found', style: theme.textTheme.titleLarge),
+                          const SizedBox(height: 8),
+                          Text('Try changing your filter or check back later', style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant), textAlign: TextAlign.center),
+                        ],
+                      ),
+                    )
+                  : GridView.builder(
+                      padding: const EdgeInsets.all(16),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 14,
+                        mainAxisSpacing: 14,
+                        childAspectRatio: 0.72,
+                      ),
+                      itemCount: products.length,
+                      itemBuilder: (context, index) => _PremiumProductCard(product: products[index]),
                     ),
-                  )
-                : GridView.builder(
-                    padding: const EdgeInsets.all(16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.75,
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, st) => Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.error_outline, color: AppColors.error, size: 48),
+                    const SizedBox(height: 8),
+                    Text('Failed to load', style: theme.textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    Text(e.toString(), style: theme.textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant), textAlign: TextAlign.center),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: () => ref.invalidate(productsProvider(query)),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Try again'),
                     ),
-                    itemCount: filteredProducts.length,
-                    itemBuilder: (context, index) {
-                      final product = filteredProducts[index];
-                      return _ProductCard(product: product);
-                    },
-                  ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Sell Item - Coming Soon')),
-          );
-        },
+        onPressed: () => context.go('/explore/products/new'),
         icon: const Icon(Icons.add),
         label: const Text('Sell Item'),
         backgroundColor: AppColors.green9,
@@ -210,107 +266,122 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   }
 }
 
-class _ProductCard extends StatelessWidget {
-  final Map<String, dynamic> product;
+class _PremiumProductCard extends StatelessWidget {
+  final ProductModel product;
 
-  const _ProductCard({required this.product});
+  const _PremiumProductCard({required this.product});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Card(
-      child: InkWell(
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('View ${product['name']} - Coming Soon')),
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
+    return InkWell(
+      onTap: () {},
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(color: AppColors.shadowLight, blurRadius: 16, offset: Offset(0, 10)),
+          ],
+          border: Border.all(color: AppColors.gray100),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product Image
-            Expanded(
-              flex: 3,
-              child: Container(
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: AppColors.gray100,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                ),
-                child: product['image'] != null
-                    ? ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                        child: Image.network(
-                          product['image'],
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Icon(
-                        _getCategoryIcon(product['category']),
-                        size: 48,
-                        color: AppColors.onSurfaceVariant,
+            // Image with overlay badges
+            AspectRatio(
+              aspectRatio: 1,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                      child: product.images.isNotEmpty
+                          ? Image.network(
+                              product.images.first,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(color: AppColors.gray100, child: const Icon(Icons.image_outlined)),
+                            )
+                          : Container(
+                              color: AppColors.gray100,
+                              child: Icon(_getCategoryIcon(product.category), size: 48, color: AppColors.onSurfaceVariant),
+                            ),
+                    ),
+                  ),
+                  // Price pill
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(999),
                       ),
+                      child: Text(
+                        'NOK ${product.price.toStringAsFixed(0)}',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                  // Favorite icon placeholder
+                  Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        shape: BoxShape.circle,
+                        boxShadow: const [BoxShadow(color: AppColors.shadowLight, blurRadius: 12)],
+                      ),
+                      child: const Icon(Icons.favorite_border, color: AppColors.defaultBlue, size: 20),
+                    ),
+                  ),
+                ],
               ),
             ),
-
-            // Product Details
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      product['name'],
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                    const Spacer(),
-
-                    Text(
-                      'NOK ${product['price'].toStringAsFixed(0)}',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: AppColors.defaultBlue,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          product['seller'],
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.onSurfaceVariant,
-                          ),
+            // Info
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name,
+                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          product.sellerName,
+                          style: theme.textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: _getConditionColor(product['condition']).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            product['condition'],
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: _getConditionColor(product['condition']),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: _getConditionColor(product.condition).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(999),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                        child: Text(
+                          product.displayCondition,
+                          style: theme.textTheme.labelSmall?.copyWith(color: _getConditionColor(product.condition), fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
@@ -332,12 +403,33 @@ class _ProductCard extends StatelessWidget {
 
   Color _getConditionColor(String condition) {
     switch (condition) {
-      case 'New': return AppColors.success;
-      case 'Like New': return AppColors.accentBlue;
-      case 'Good': return AppColors.defaultGold;
-      case 'Fair': return AppColors.orange9;
-      case 'Poor': return AppColors.error;
+      case 'new': return AppColors.success;
+      case 'like_new': return AppColors.accentBlue;
+      case 'good': return AppColors.defaultGold;
+      case 'fair': return AppColors.orange9;
+      case 'poor': return AppColors.error;
       default: return AppColors.onSurfaceVariant;
     }
   }
+}
+
+class _ProductQuery {
+  final String campusId;
+  final String? category;
+  final String? status;
+  final String? search;
+  const _ProductQuery({required this.campusId, this.category, this.status, this.search});
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is _ProductQuery &&
+        other.campusId == campusId &&
+        other.category == category &&
+        other.status == status &&
+        other.search == search;
+  }
+
+  @override
+  int get hashCode => Object.hash(campusId, category, status, search);
 }

@@ -12,6 +12,7 @@ class UserModel extends Equatable {
   final String? studentId;
   final List<String> departments;
   final String? avatarUrl;
+  final String? bankAccount;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -27,6 +28,7 @@ class UserModel extends Equatable {
     this.studentId,
     this.departments = const [],
     this.avatarUrl,
+    this.bankAccount,
     this.createdAt,
     this.updatedAt,
   });
@@ -47,6 +49,7 @@ class UserModel extends Equatable {
       studentId: map['student_id'], // Use the direct string field, not the relationship
       departments: _parseDepartmentIds(map['department_ids']), // Use department_ids string array
       avatarUrl: map['avatar'],
+      bankAccount: map['bank_account'],
       createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
       updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
     );
@@ -76,6 +79,7 @@ class UserModel extends Equatable {
       'student_id': studentId,
       'departments': departments,
       'avatar': avatarUrl,
+      'bank_account': bankAccount,
     };
   }
 
@@ -91,6 +95,7 @@ class UserModel extends Equatable {
     String? studentId,
     List<String>? departments,
     String? avatarUrl,
+    String? bankAccount,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -106,6 +111,7 @@ class UserModel extends Equatable {
       studentId: studentId ?? this.studentId,
       departments: departments ?? this.departments,
       avatarUrl: avatarUrl ?? this.avatarUrl,
+      bankAccount: bankAccount ?? this.bankAccount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -124,6 +130,7 @@ class UserModel extends Equatable {
         studentId,
         departments,
         avatarUrl,
+        bankAccount,
         createdAt,
         updatedAt,
       ];
