@@ -33,12 +33,19 @@ dependencies:
   google_mlkit_text_recognition: ^0.15.0
   syncfusion_flutter_pdf: ^30.2.5
   printing: ^5.13.4
+  eventflux: ^2.2.1
+  flutter_client_sse:
+    git:
+      url: https://github.com/pratikbaid3/flutter_client_sse
+      path: .
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   build_runner: ^2.6.0
+
+  
 
 
 flutter:

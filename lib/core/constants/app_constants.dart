@@ -17,8 +17,9 @@ class AppConstants {
   static const String departmentsCollectionId = 'departments';
   static const String usersCollectionId = 'user';
   
-  // AI Service
-  static const String aiApiUrl = 'https://68233095312e736521e7.appwrite.biso.no/';
+  // AI Service  
+  static const String aiApiUrl = 'https://ai.biso.no';
+  static const String aiChatEndpoint = '/api/chat';
   // Appwrite Functions (IDs)
   static const String fnParseReceiptId = 'fn_parse_receipt';
   static const String fnSummarizeExpenseId = 'fn_summarize_expense';

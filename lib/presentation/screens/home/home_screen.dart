@@ -22,6 +22,7 @@ import '../explore/explore_screen.dart';
 import '../chat/chat_list_screen.dart';
 import '../auth/login_screen.dart';
 import '../profile/profile_screen.dart';
+import '../../widgets/ai_chat/ai_assistant_fab.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -66,6 +67,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     
     return Scaffold(
       body: pages[_selectedIndex],
+      floatingActionButton: const AiAssistantFab(),
       bottomNavigationBar: WonderousBottomNavBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),

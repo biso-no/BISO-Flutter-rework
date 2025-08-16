@@ -18,6 +18,7 @@ import 'presentation/screens/explore/sell_product_screen.dart';
 import 'presentation/screens/explore/jobs_screen.dart';
 import 'presentation/screens/explore/expenses_screen.dart';
 import 'presentation/screens/chat/chat_list_screen.dart';
+import 'presentation/screens/ai_chat/ai_chat_screen.dart';
 import 'providers/auth/auth_provider.dart';
 import 'presentation/screens/events/large_event_screen.dart';
 import 'data/models/large_event_model.dart';
@@ -135,6 +136,11 @@ final _router = GoRouter(
         path: '/chat',
         name: 'chat',
         builder: (context, state) => const ChatListScreen(),
+      ),
+      GoRoute(
+        path: '/ai-chat',
+        name: 'ai-chat',
+        builder: (context, state) => const AiChatScreen(),
       ),
       GoRoute(
         path: '/events/large/:slug',
