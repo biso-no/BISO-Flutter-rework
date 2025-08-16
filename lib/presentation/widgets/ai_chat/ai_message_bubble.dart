@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../data/models/ai_chat_models.dart';
 import '../../../core/constants/app_colors.dart';
-import 'tool_output_widget.dart';
 import 'markdown_text.dart';
 
 class AiMessageBubble extends StatefulWidget {
@@ -78,11 +77,12 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildMessageBubble(theme, isDark),
+                  // Tool results at the top in compact format
                   if (widget.message.toolParts.isNotEmpty) ...[
+                    _buildCompactToolSummary(theme, isDark),
                     const SizedBox(height: 8),
-                    ..._buildToolOutputs(theme, isDark),
                   ],
+                  _buildMessageBubble(theme, isDark),
                   // Add sources section if we have SharePoint results
                   if (_hasSharePointSources()) ...[
                     const SizedBox(height: 12),
@@ -235,21 +235,166 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
     );
   }
 
-  List<Widget> _buildToolOutputs(ThemeData theme, bool isDark) {
-    print('🔧 [AI_BUBBLE] Building tool outputs for message ${widget.message.id}');
+  Widget _buildCompactToolSummary(ThemeData theme, bool isDark) {
+    print('🔧 [AI_BUBBLE] Building compact tool summary for message ${widget.message.id}');
     print('🔧 [AI_BUBBLE] Tool parts count: ${widget.message.toolParts.length}');
     
-    return widget.message.toolParts.map((toolPart) {
-      print('🔧 [AI_BUBBLE] Rendering tool: ${toolPart.toolName} (${toolPart.state})');
+    final completedTools = widget.message.toolParts
+        .where((tool) => tool.state == ToolPartState.outputAvailable)
+        .toList();
+    
+    final runningTools = widget.message.toolParts
+        .where((tool) => tool.state == ToolPartState.inputStreaming || 
+                        tool.state == ToolPartState.inputAvailable)
+        .toList();
+    
+    if (completedTools.isEmpty && runningTools.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.crystalBlue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.crystalBlue.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.auto_awesome_rounded,
+                size: 16,
+                color: AppColors.crystalBlue,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Used Tools',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.crystalBlue,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              // Show completed tools
+              ...completedTools.map((tool) => _buildToolChip(theme, tool, true)),
+              // Show running tools
+              ...runningTools.map((tool) => _buildToolChip(theme, tool, false)),
+            ],
+          ),
+          // Show SharePoint search summary if available
+          if (completedTools.any((t) => t.toolName == 'searchSharePoint'))
+            _buildSharePointSummary(theme, completedTools.firstWhere((t) => t.toolName == 'searchSharePoint')),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToolChip(ThemeData theme, ToolPart tool, bool isCompleted) {
+    final color = isCompleted ? AppColors.emeraldGreen : AppColors.crystalBlue;
+    final icon = isCompleted ? Icons.check_circle_rounded : Icons.hourglass_empty_rounded;
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 12,
+            color: color,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            _getToolDisplayName(tool.toolName),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w500,
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSharePointSummary(ThemeData theme, ToolPart sharePointTool) {
+    final result = sharePointTool.result;
+    if (result == null) return const SizedBox.shrink();
+    
+    try {
+      final response = SharePointSearchResponse.fromJson(result as Map<String, dynamic>);
+      if (response.results.isEmpty) return const SizedBox.shrink();
+      
       return Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: ToolOutputWidget(
-          toolPart: toolPart,
-          isDark: isDark,
+        padding: const EdgeInsets.only(top: 8),
+        child: Row(
+          children: [
+            Icon(
+              Icons.search_rounded,
+              size: 14,
+              color: AppColors.emeraldGreen,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              'Found ${response.results.length} document${response.results.length == 1 ? '' : 's'}',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppColors.emeraldGreen,
+                fontWeight: FontWeight.w500,
+                fontSize: 11,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '• "${response.query}"',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppColors.onSurfaceVariant,
+                fontSize: 11,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       );
-    }).toList();
+    } catch (e) {
+      return const SizedBox.shrink();
+    }
   }
+
+  String _getToolDisplayName(String toolName) {
+    switch (toolName) {
+      case 'searchSharePoint':
+        return 'SharePoint Search';
+      case 'getDocumentStats':
+        return 'Document Stats';
+      case 'listSharePointSites':
+        return 'Sites';
+      case 'weather':
+        return 'Weather';
+      default:
+        return toolName;
+    }
+  }
+
 
   Widget _buildTimestamp(ThemeData theme) {
     if (widget.message.timestamp == null) {
@@ -334,8 +479,8 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: (isDark ? AppColors.stoneGray : AppColors.surfaceVariant)
-            .withOpacity(0.3),
-        borderRadius: BorderRadius.circular(8),
+            .withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: (isDark ? AppColors.outlineDark : AppColors.outline)
               .withOpacity(0.2),
@@ -347,14 +492,14 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
           Row(
             children: [
               Icon(
-                Icons.source_rounded,
+                Icons.link_rounded,
                 size: 16,
                 color: AppColors.crystalBlue,
               ),
               const SizedBox(width: 8),
               Text(
-                'Sources:',
-                style: theme.textTheme.bodySmall?.copyWith(
+                '${sources.length} Source${sources.length == 1 ? '' : 's'}',
+                style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppColors.crystalBlue,
                 ),
@@ -362,22 +507,62 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
             ],
           ),
           const SizedBox(height: 8),
-          ...sources.map((source) => 
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: GestureDetector(
-                onTap: () => _launchUrl(source['url']!),
-                child: Text(
-                  source['title']!,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.crystalBlue,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            children: sources.take(5).map((source) => _buildSourceChip(theme, source)).toList(),
+          ),
+          if (sources.length > 5) ...[
+            const SizedBox(height: 8),
+            Text(
+              '+ ${sources.length - 5} more documents',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppColors.onSurfaceVariant,
+                fontStyle: FontStyle.italic,
               ),
             ),
-          ),
+          ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildSourceChip(ThemeData theme, Map<String, String> source) {
+    return GestureDetector(
+      onTap: () => _launchUrl(source['url']!),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.crystalBlue.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.crystalBlue.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.open_in_new_rounded,
+              size: 12,
+              color: AppColors.crystalBlue,
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                source['title']!,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppColors.crystalBlue,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 11,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
