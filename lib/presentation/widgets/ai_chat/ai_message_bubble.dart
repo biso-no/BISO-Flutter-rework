@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../data/models/ai_chat_models.dart';
 import '../../../core/constants/app_colors.dart';
 import 'tool_output_widget.dart';
@@ -81,6 +82,11 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
                   if (widget.message.toolParts.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     ..._buildToolOutputs(theme, isDark),
+                  ],
+                  // Add sources section if we have SharePoint results
+                  if (_hasSharePointSources()) ...[
+                    const SizedBox(height: 12),
+                    _buildSourcesSection(theme, isDark),
                   ],
                   const SizedBox(height: 4),
                   _buildTimestamp(theme),
@@ -230,7 +236,11 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
   }
 
   List<Widget> _buildToolOutputs(ThemeData theme, bool isDark) {
+    print('🔧 [AI_BUBBLE] Building tool outputs for message ${widget.message.id}');
+    print('🔧 [AI_BUBBLE] Tool parts count: ${widget.message.toolParts.length}');
+    
     return widget.message.toolParts.map((toolPart) {
+      print('🔧 [AI_BUBBLE] Rendering tool: ${toolPart.toolName} (${toolPart.state})');
       return Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: ToolOutputWidget(
@@ -272,6 +282,114 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
           ),
         ),
       );
+    }
+  }
+
+  bool _hasSharePointSources() {
+    final hasSharePoint = widget.message.toolParts.any((tool) => 
+      tool.toolName == 'searchSharePoint' && 
+      tool.state == ToolPartState.outputAvailable &&
+      tool.result != null);
+    
+    if (hasSharePoint) {
+      print('📚 [AI_BUBBLE] Has SharePoint sources for message ${widget.message.id}');
+    }
+    
+    return hasSharePoint;
+  }
+
+  Widget _buildSourcesSection(ThemeData theme, bool isDark) {
+    final sharePointTools = widget.message.toolParts
+        .where((tool) => 
+          tool.toolName == 'searchSharePoint' && 
+          tool.state == ToolPartState.outputAvailable &&
+          tool.result != null)
+        .toList();
+
+    if (sharePointTools.isEmpty) return const SizedBox.shrink();
+
+    final sources = <Map<String, String>>[];
+    
+    for (final tool in sharePointTools) {
+      final result = tool.result as Map<String, dynamic>?;
+      final results = result?['results'] as List<dynamic>? ?? [];
+      
+      print('📚 [AI_BUBBLE] Processing SharePoint tool with ${results.length} results');
+      
+      for (final item in results) {
+        final title = item['title'] as String?;
+        final url = item['documentViewerUrl'] as String?;
+        print('📚 [AI_BUBBLE] Source item: title="$title", url="$url"');
+        if (title != null && url != null) {
+          sources.add({'title': title, 'url': url});
+        }
+      }
+    }
+    
+    print('📚 [AI_BUBBLE] Total sources found: ${sources.length}');
+
+    if (sources.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: (isDark ? AppColors.stoneGray : AppColors.surfaceVariant)
+            .withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: (isDark ? AppColors.outlineDark : AppColors.outline)
+              .withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.source_rounded,
+                size: 16,
+                color: AppColors.crystalBlue,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Sources:',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.crystalBlue,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ...sources.map((source) => 
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: GestureDetector(
+                onTap: () => _launchUrl(source['url']!),
+                child: Text(
+                  source['title']!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.crystalBlue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _launchUrl(String url) async {
+    try {
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      debugPrint('Failed to launch URL: $url, Error: $e');
     }
   }
 }

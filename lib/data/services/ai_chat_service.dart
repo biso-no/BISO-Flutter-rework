@@ -65,11 +65,11 @@ class AiChatService {
       final headers = {
         'Content-Type': 'application/json',
         'Accept': 'text/plain', // For NDJSON streaming
-        'X-Appwrite-JWT': authToken ?? '',
       };
       
-      // Add Authorization header if we have a token
+      // Add auth headers if we have a token
       if (authToken != null) {
+        headers['x-appwrite-user-jwt'] = authToken;
         headers['Authorization'] = 'Bearer $authToken';
       }
 
@@ -398,10 +398,10 @@ class AiChatService {
         'Content-Type': 'application/json',
         'Accept': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'X-Appwrite-JWT': authToken ?? '',
       };
       
       if (authToken != null) {
+        headers['X-Appwrite-JWT'] = authToken;
         headers['Authorization'] = 'Bearer $authToken';
       }
 
@@ -410,9 +410,14 @@ class AiChatService {
       final Map<String, ToolPart> toolCalls = {};
       String? currentStreamingMessageId;
       
+      // Create a fallback message ID for tool-only responses
+      final fallbackMessageId = DateTime.now().millisecondsSinceEpoch.toString();
+      
       print('🌐 [SSE] Connecting to: ${uri.toString()}');
       print('📋 [SSE] Headers: $headers');
       print('📦 [SSE] Body: ${jsonEncode(request.toJson())}');
+      
+      // SSE connection is working - skip HTTP test for performance
       
       // Setup flutter_client_sse connection
       SSEClient.subscribeToSSE(
@@ -424,6 +429,17 @@ class AiChatService {
         (event) {
           final eventData = event.data ?? '';
           print('📡 [SSE] Event received - ID: ${event.id}, Event: ${event.event}, Data: "$eventData"');
+          
+          // Check if we're getting HTML error pages
+          if (eventData.startsWith('<!DOCTYPE html') || eventData.startsWith('<html')) {
+            print('❌ [SSE] Received HTML error page instead of JSON stream');
+            print('❌ [SSE] This indicates a server-side authentication or routing issue');
+            if (!controller.isClosed) {
+              controller.add(StreamError(error: 'Server returned HTML error page. Check authentication and server logs.'));
+              controller.close();
+            }
+            return;
+          }
           
           if (eventData.trim().isEmpty || eventData == '[DONE]') {
             print('🏁 [SSE] Stream ended');
@@ -444,12 +460,19 @@ class AiChatService {
               accumulatedText, 
               toolCalls, 
               currentStreamingMessageId,
+              fallbackMessageId,
             );
             
             // Update current streaming message ID if we get one from server
             if (conversationEvent is TextDeltaReceived && currentStreamingMessageId == null) {
               currentStreamingMessageId = conversationEvent.messageId;
-              print('🆔 [SSE] Set streaming message ID: $currentStreamingMessageId');
+              print('🆔 [SSE] Set streaming message ID from text delta: $currentStreamingMessageId');
+            }
+            
+            // Also capture message ID from tool events to ensure tools can attach
+            if (conversationEvent is ToolCallUpdated && currentStreamingMessageId == null) {
+              currentStreamingMessageId = conversationEvent.messageId;
+              print('🆔 [SSE] Set streaming message ID from tool event: $currentStreamingMessageId');
             }
             
             if (conversationEvent != null && !controller.isClosed) {
@@ -698,6 +721,7 @@ class AiChatService {
     Map<String, String> accumulatedText,
     Map<String, ToolPart> toolCalls,
     String? currentStreamingMessageId,
+    String fallbackMessageId,
   ) {
     try {
       final frameType = frameData['type'] as String?;
@@ -741,8 +765,13 @@ class AiChatService {
           final args = frameData['args'] as Map<String, dynamic>?;
           
           if (toolCallId != null && toolName != null) {
-            final targetMessageId = messageId ?? currentStreamingMessageId;
+            // Use message ID from event, or current streaming ID, or fallback
+            final targetMessageId = messageId ?? 
+                                   currentStreamingMessageId ?? 
+                                   fallbackMessageId;
+            
             print('🔧 [SSE] Tool started: $toolName ($toolCallId) for message: $targetMessageId');
+            print('🔧 [SSE] messageId=$messageId, currentStreaming=$currentStreamingMessageId, fallback=$fallbackMessageId');
             
             final toolPart = ToolPart(
               toolCallId: toolCallId,
@@ -753,10 +782,38 @@ class AiChatService {
             
             toolCalls[toolCallId] = toolPart;
             
+            // Set currentStreamingMessageId if we don't have one yet
+            if (currentStreamingMessageId == null) {
+              currentStreamingMessageId = targetMessageId;
+              print('🆔 [SSE] Set current streaming ID from tool start: $currentStreamingMessageId');
+            }
+            
+            return ToolCallUpdated(
+              messageId: targetMessageId,
+              toolPart: toolPart,
+            );
+          }
+          return null;
+          
+        case 'tool-input-delta':
+          final toolCallId = frameData['toolCallId'] as String?;
+          final inputTextDelta = frameData['inputTextDelta'] as String?;
+          
+          if (toolCallId != null && toolCalls.containsKey(toolCallId)) {
+            final targetMessageId = messageId ?? 
+                                   currentStreamingMessageId ?? 
+                                   fallbackMessageId;
+            print('🔧 [SSE] Tool input delta: $toolCallId for message: $targetMessageId, delta: $inputTextDelta');
+            
+            final currentTool = toolCalls[toolCallId]!;
+            toolCalls[toolCallId] = currentTool.copyWith(
+              state: ToolPartState.inputStreaming,
+            );
+            
             if (targetMessageId != null) {
               return ToolCallUpdated(
                 messageId: targetMessageId,
-                toolPart: toolPart,
+                toolPart: toolCalls[toolCallId]!,
               );
             }
           }
@@ -766,7 +823,9 @@ class AiChatService {
           final toolCallId = frameData['toolCallId'] as String?;
           
           if (toolCallId != null && toolCalls.containsKey(toolCallId)) {
-            final targetMessageId = messageId ?? currentStreamingMessageId;
+            final targetMessageId = messageId ?? 
+                                   currentStreamingMessageId ?? 
+                                   fallbackMessageId;
             print('🔧 [SSE] Tool input available: $toolCallId for message: $targetMessageId');
             
             final currentTool = toolCalls[toolCallId]!;
@@ -791,8 +850,23 @@ class AiChatService {
           final isError = frameData['isError'] as bool? ?? false;
           
           if (toolCallId != null && toolCalls.containsKey(toolCallId)) {
-            final targetMessageId = messageId ?? currentStreamingMessageId;
-            print('🔧 [SSE] Tool output available: $toolCallId for message: $targetMessageId');
+            final targetMessageId = messageId ?? 
+                                   currentStreamingMessageId ?? 
+                                   fallbackMessageId;
+            print('🔧 [SSE] Tool result: $toolCallId for message: $targetMessageId');
+            print('📋 [SSE] Tool result data: ${result != null ? jsonEncode(result) : 'null'}');
+            
+            // Log specific fields for SharePoint results
+            if (toolCalls[toolCallId]?.toolName == 'searchSharePoint' && result != null) {
+              final results = result['results'] as List<dynamic>? ?? [];
+              print('📄 [SSE] SharePoint results count: ${results.length}');
+              for (int i = 0; i < results.length && i < 3; i++) {
+                final item = results[i] as Map<String, dynamic>?;
+                if (item != null) {
+                  print('📄 [SSE] Result $i: title="${item['title']}", url="${item['documentViewerUrl']}"');
+                }
+              }
+            }
             
             final updatedTool = toolCalls[toolCallId]!.copyWith(
               result: result,

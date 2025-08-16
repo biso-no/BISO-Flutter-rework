@@ -1,0 +1,1125 @@
+I/ImeTracker( 4871): com.example.bisoflutter:9f8fd68f: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT fromUser false
+D/InsetsController( 4871): show(ime(), fromIme=false)
+D/InsetsController( 4871): Setting requestedVisibleTypes to -1 (was -9)
+D/InputConnectionAdaptor( 4871): The input method toggled cursor monitoring on
+I/AssistStructure( 4871): Flattened final assist data: 532 bytes, containing 1 windows, 3 views
+I/ImeTracker( 4871): com.example.bisoflutter:9f8fd68f: onShown
+I/flutter ( 4871): Received heartbeat response from realtime server
+I/flutter ( 4871): 🚀 [AI_CHAT] Starting stream for 2 messages
+I/flutter ( 4871): 🎯 [AI_CHAT] Rendering message welcome (assistant)
+I/flutter ( 4871): 🔄 [AI_CHAT] AI message - isStreaming: true, currentStreamingId: null
+I/flutter ( 4871): 📊 [AI_CHAT] isStreamingThisMessage: false
+I/flutter ( 4871): 📝 [AI_CHAT] Message text content: "👋 Hei! Jeg er din AI-assistent for BISO. Jeg kan hjelpe deg med å finne informasjon om vedtekter, retningslinjer og andre dokumenter. Spør meg om hva som helst!
+I/flutter ( 4871): 
+I/flutter ( 4871): Hello! I'm your AI assistant for BISO. I can help you find information about bylaws, guidelines, and other documents. Ask me anything!"
+I/flutter ( 4871): 🎨 [AI_BUBBLE] Building bubble for message welcome
+I/flutter ( 4871): 📝 [AI_BUBBLE] Text content: "👋 Hei! Jeg er din AI-assistent for BISO. Jeg kan hjelpe deg med å finne informasjon om vedtekter, retningslinjer og andre dokumenter. Spør meg om hva som helst!
+I/flutter ( 4871): 
+I/flutter ( 4871): Hello! I'm your AI assistant for BISO. I can help you find information about bylaws, guidelines, and other documents. Ask me anything!" (length: 297)
+I/flutter ( 4871): ⏳ [AI_BUBBLE] Is streaming: false
+I/flutter ( 4871): 🧩 [AI_BUBBLE] Message parts: 1
+I/flutter ( 4871): 🔧 [AI_BUBBLE] Has tool parts: false (0)
+I/flutter ( 4871): 🎯 [AI_CHAT] Rendering message 1755344791526 (user)
+I/ImeTracker( 4871): com.example.bisoflutter:85c68720: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT fromUser false
+D/InsetsController( 4871): hide(ime(), fromIme=false)
+W/WindowOnBackDispatcher( 4871): sendCancelIfRunning: isInProgress=false callback=android.view.ImeBackAnimationController@68751c2
+D/InsetsController( 4871): Setting requestedVisibleTypes to -9 (was -1)
+I/flutter ( 4871): 🌐 [SSE] Connecting to: https://ai.biso.no/api/chat
+I/flutter ( 4871): 📋 [SSE] Headers: {Content-Type: application/json, Accept: text/event-stream, Cache-Control: no-cache, X-Appwrite-JWT: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiI2N2MxYTM4ZjAwMWM0NzBiN2E1MiIsInNlc3Npb25JZCI6IjY4OTc4MmE4NTNmYTZiOGVmYTZkIiwiZXhwIjoxNzU1MzQ1NjkzfQ.LCaQwFQTbCWKVglQMjHAH6nFWuR9rCt-P33l8Xn1E1U, Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiI2N2MxYTM4ZjAwMWM0NzBiN2E1MiIsInNlc3Npb25JZCI6IjY4OTc4MmE4NTNmYTZiOGVmYTZkIiwiZXhwIjoxNzU1MzQ1NjkzfQ.LCaQwFQTbCWKVglQMjHAH6nFWuR9rCt-P33l8Xn1E1U}
+I/flutter ( 4871): 📦 [SSE] Body: {"messages":[{"id":"welcome","role":"assistant","parts":[{"type":"text","text":"👋 Hei! Jeg er din AI-assistent for BISO. Jeg kan hjelpe deg med å finne informasjon om vedtekter, retningslinjer og andre dokumenter. Spør meg om hva som helst!\n\nHello! I'm your AI assistant for BISO. I can help you find information about bylaws, guidelines, and other documents. Ask me anything!"}],"timestamp":"2025-08-16T13:46:08.951329"},{"id":"1755344791526","role":"user","parts":[{"type":"text","text":"Fortell kort oppsumert 30 ord HVA paragraph 6.3 I nasjonale vedtektene omhandler"}],"timestamp":"2025-08-16T13:46:31.527457"}]}
+I/flutter ( 4871): 🧪 [SSE] Testing regular HTTP POST first...
+I/ImeTracker( 4871): system_server:8a4a3191: onCancelled at PHASE_CLIENT_ON_CONTROLS_CHANGED
+I/flutter ( 4871): Received heartbeat response from realtime server
+I/flutter ( 4871): 🧪 [SSE] HTTP Status: 200
+I/flutter ( 4871): 🧪 [SSE] HTTP Response Headers: {x-powered-by: Express, cache-control: no-cache, date: Sat, 16 Aug 2025 11:46:33 GMT, vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch, content-length: 23143, content-type: text/event-stream, x-vercel-ai-ui-message-stream: v1, x-accel-buffering: no, x-debug-speed: 18.304098129272, server: Utopia/Http}
+I/flutter ( 4871): 🧪 [SSE] HTTP Body (first 200 chars): data: {"type":"start"}
+I/flutter ( 4871): 
+I/flutter ( 4871): data: {"type":"start-step"}
+I/flutter ( 4871): 
+I/flutter ( 4871): data: {"type":"reasoning-start","id":"rs_68a06f9b34d0819fa67ae5cbde63fc6f001dc11de056e16d:0","providerMetadata":{"openai":{"itemId":"rs_68a06f9b34d
+I/flutter ( 4871): --SUBSCRIBING TO SSE---
+I/flutter ( 4871): Received heartbeat response from realtime server
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"start"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: start, messageId: null
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"start-step"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: start-step, messageId: null
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"reasoning-start","id":"rs_68a06facf46c81978f10d5a1bb9608b90743faa566000b1b:0","providerMetadata":{"openai":{"itemId":"rs_68a06facf46c81978f10d5a1bb9608b90743faa566000b1b","reasoningEncryptedContent":null}}}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: reasoning-start, messageId: rs_68a06facf46c81978f10d5a1bb9608b90743faa566000b1b:0
+I/flutter ( 4871): ! [SSE] Unknown frame type: reasoning-start
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"reasoning-end","id":"rs_68a06facf46c81978f10d5a1bb9608b90743faa566000b1b:0","providerMetadata":{"openai":{"itemId":"rs_68a06facf46c81978f10d5a1bb9608b90743faa566000b1b","reasoningEncryptedContent":null}}}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: reasoning-end, messageId: rs_68a06facf46c81978f10d5a1bb9608b90743faa566000b1b:0
+I/flutter ( 4871): ! [SSE] Unknown frame type: reasoning-end
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-start","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","toolName":"searchSharePoint"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-start, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-start
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"{\""}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"query"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"\":\""}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"par"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"ag"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"raf"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":" "}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"6"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"."}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"3"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":" Ved"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"tek"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"ter"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"\",\""}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"k"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"\":"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"5"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-delta","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","inputTextDelta":"}"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-delta, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-delta
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-input-available","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","toolName":"searchSharePoint","input":{"query":"paragraf 6.3 Vedtekter","k":5},"providerMetadata":{"openai":{"itemId":"fc_68a06faee1248197b17a8bb99428dfa80743faa566000b1b"}}}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: tool-input-available, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-input-available
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"tool-output-available","toolCallId":"call_rpEMfwJf6dyiwSTTEKItyN6h","output":{"results":[{"text":"rv i BISO\n## 6.3.1 Antall verv\nEn person kan ikke samtidig inneha mer enn ett - 1 - Tillitsverv. Dette gjelder ikke valg av delegater til\nNSOs eller BISOs Landsmøte, representanter til de respektive velferdstingene, leder av\nInvesteringskomiteen eller BISOs representant til BI - BISOs Board of Trustees.\n\n## 6.3.2 Kombinasjon av verv\nVerv i Campusledelsen og Arbeidsutvalget kan ikke kombineres med verv eller medlemskap i\nlinjestyrer, prosjekter, undergrupper/utvalg og stabsfunksjoner.\nAnsatte i BISO kan ikke ha tillitsverv, med unntak av delegater til VT og NSO. Akademisk - og Politisk\nKoordinator er tillitsvalgt, velges for ett år av Landsmøte og får ansettelseskontrakt med BISO.\n## 6.3.3 Melding av kandidatur\nNår en som er aktiv i et tillitsverv melder sitt kandidatur til et annet tillitsverv og blir valgt, vil\nkandidaten beholde sitt
+I/flutter ( 4871): 📝 [SSE] Processing: tool-output-available, messageId: null
+I/flutter ( 4871): ! [SSE] Unknown frame type: tool-output-available
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"finish-step"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: finish-step, messageId: null
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"start-step"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: start-step, messageId: null
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"reasoning-start","id":"rs_68a06fb398dc8197bec9a0242611a77e0743faa566000b1b:0","providerMetadata":{"openai":{"itemId":"rs_68a06fb398dc8197bec9a0242611a77e0743faa566000b1b","reasoningEncryptedContent":null}}}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: reasoning-start, messageId: rs_68a06fb398dc8197bec9a0242611a77e0743faa566000b1b:0
+I/flutter ( 4871): ! [SSE] Unknown frame type: reasoning-start
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"reasoning-end","id":"rs_68a06fb398dc8197bec9a0242611a77e0743faa566000b1b:0","providerMetadata":{"openai":{"itemId":"rs_68a06fb398dc8197bec9a0242611a77e0743faa566000b1b","reasoningEncryptedContent":null}}}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: reasoning-end, messageId: rs_68a06fb398dc8197bec9a0242611a77e0743faa566000b1b:0
+I/flutter ( 4871): ! [SSE] Unknown frame type: reasoning-end
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-start","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","providerMetadata":{"openai":{"itemId":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b"}}}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-start, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text started for: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"Par"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "Par" (accumulated: 3 chars)
+I/flutter ( 4871): 🆔 [SSE] Set streaming message ID from text delta: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "Par"
+I/flutter ( 4871): 🤖 [AI_CHAT] Creating assistant message with ID: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "Par"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 0
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Par"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"ag"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "ag" (accumulated: 5 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"raf"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "raf" (accumulated: 8 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "ag"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "ag"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Parag"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" "}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " " (accumulated: 9 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"6"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "6" (accumulated: 10 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "raf"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "raf"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"."}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "." (accumulated: 11 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"3"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "3" (accumulated: 12 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " "
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " "
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf "
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" regul"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " regul" (accumulated: 18 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"erer"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "erer" (accumulated: 22 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "6"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "6"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" komb"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " komb" (accumulated: 27 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "."
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "."
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6."
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "3"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "3"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " regul"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " regul"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regul"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "erer"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "erer"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " komb"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " komb"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer komb"
+I/flutter ( 4871): 🎯 [AI_CHAT] Rendering message welcome (assistant)
+I/flutter ( 4871): 🔄 [AI_CHAT] AI message - isStreaming: true, currentStreamingId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📊 [AI_CHAT] isStreamingThisMessage: false
+I/flutter ( 4871): 📝 [AI_CHAT] Message text content: "👋 Hei! Jeg er din AI-assistent for BISO. Jeg kan hjelpe deg med å finne informasjon om vedtekter, retningslinjer og andre dokumenter. Spør meg om hva som helst!
+I/flutter ( 4871): 
+I/flutter ( 4871): Hello! I'm your AI assistant for BISO. I can help you find information about bylaws, guidelines, and other documents. Ask me anything!"
+I/flutter ( 4871): 🎨 [AI_BUBBLE] Building bubble for message welcome
+I/flutter ( 4871): 📝 [AI_BUBBLE] Text content: "👋 Hei! Jeg er din AI-assistent for BISO. Jeg kan hjelpe deg med å finne informasjon om vedtekter, retningslinjer og andre dokumenter. Spør meg om hva som helst!
+I/flutter ( 4871): 
+I/flutter ( 4871): Hello! I'm your AI assistant for BISO. I can help you find information about bylaws, guidelines, and other documents. Ask me anything!" (length: 297)
+I/flutter ( 4871): ⏳ [AI_BUBBLE] Is streaming: false
+I/flutter ( 4871): 🧩 [AI_BUBBLE] Message parts: 1
+I/flutter ( 4871): 🔧 [AI_BUBBLE] Has tool parts: false (0)
+I/flutter ( 4871): 🎯 [AI_CHAT] Rendering message 1755344791526 (user)
+I/flutter ( 4871): 🎯 [AI_CHAT] Rendering message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b (assistant)
+I/flutter ( 4871): 🔄 [AI_CHAT] AI message - isStreaming: true, currentStreamingId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📊 [AI_CHAT] isStreamingThisMessage: true
+I/flutter ( 4871): 📝 [AI_CHAT] Message text content: "Paragraf 6.3 regulerer komb"
+I/flutter ( 4871): 🎨 [AI_BUBBLE] Building bubble for message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [AI_BUBBLE] Text content: "Paragraf 6.3 regulerer komb" (length: 27)
+I/flutter ( 4871): ⏳ [AI_BUBBLE] Is streaming: true
+I/flutter ( 4871): 🧩 [AI_BUBBLE] Message parts: 1
+I/flutter ( 4871): 🔧 [AI_BUBBLE] Has tool parts: false (0)
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"inas"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "inas" (accumulated: 31 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "inas"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "inas"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinas"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"jon"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "jon" (accumulated: 34 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" av"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " av" (accumulated: 37 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "jon"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "jon"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" till"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " till" (accumulated: 42 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"its"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "its" (accumulated: 45 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " av"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " av"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"ver"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "ver" (accumulated: 48 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"v"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "v" (accumulated: 49 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " till"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " till"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av till"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":":"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: ":" (accumulated: 50 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" begr"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " begr" (accumulated: 55 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "its"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "its"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillits"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"enser"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "enser" (accumulated: 60 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" at"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " at" (accumulated: 63 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "ver"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "ver"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsver"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" én"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " én" (accumulated: 66 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" person"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " person" (accumulated: 73 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "v"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "v"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" har"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " har" (accumulated: 77 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" kun"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " kun" (accumulated: 81 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: ":"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: ":"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv:"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" ett"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " ett" (accumulated: 85 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" verv"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " verv" (accumulated: 90 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " begr"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " begr"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begr"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":","}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "," (accumulated: 91 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" un"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " un" (accumulated: 94 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "enser"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "enser"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"nt"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "nt" (accumulated: 96 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"ak"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "ak" (accumulated: 98 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " at"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " at"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":","}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "," (accumulated: 99 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " én"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " én"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " person"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " person"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " har"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " har"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " kun"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " kun"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " ett"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " ett"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " verv"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " verv"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: ","
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: ","
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv,"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " un"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " un"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, un"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "nt"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "nt"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unnt"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "ak"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "ak"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: ","
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: ","
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak,"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" for"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " for" (accumulated: 103 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " for"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " for"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, for"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"bud"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "bud" (accumulated: 106 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"te"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "te" (accumulated: 108 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "bud"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "bud"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbud"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" komb"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " komb" (accumulated: 113 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"inas"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "inas" (accumulated: 117 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "te"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "te"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"joner"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "joner" (accumulated: 122 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":","}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "," (accumulated: 123 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " komb"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " komb"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte komb"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" regler"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " regler" (accumulated: 130 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" ved"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " ved" (accumulated: 134 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "inas"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "inas"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinas"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" kandid"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " kandid" (accumulated: 141 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"atur"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "atur" (accumulated: 145 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "joner"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "joner"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":","}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "," (accumulated: 146 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" ansatte"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " ansatte" (accumulated: 154 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: ","
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: ","
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner,"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" og"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " og" (accumulated: 157 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" sø"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " sø" (accumulated: 160 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " regler"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " regler"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"kn"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "kn" (accumulated: 162 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"ads"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "ads" (accumulated: 165 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " ved"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " ved"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"-un"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "-un" (accumulated: 168 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"nt"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "nt" (accumulated: 170 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " kandid"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " kandid"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandid"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"ak"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "ak" (accumulated: 172 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" via"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " via" (accumulated: 176 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "atur"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "atur"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" Kontroll"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " Kontroll" (accumulated: 185 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"kom"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "kom" (accumulated: 188 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: ","
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: ","
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur,"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"ité"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "ité" (accumulated: 191 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"en"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "en" (accumulated: 193 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " ansatte"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " ansatte"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":","}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "," (accumulated: 194 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" inklud"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " inklud" (accumulated: 201 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " og"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " og"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"ert"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "ert" (accumulated: 204 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" deleg"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " deleg" (accumulated: 210 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " sø"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " sø"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og sø"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"ater"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "ater" (accumulated: 214 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":","}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "," (accumulated: 215 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "kn"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "kn"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søkn"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" invest"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " invest" (accumulated: 222 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"erings"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "erings" (accumulated: 228 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "ads"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "ads"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"kom"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "kom" (accumulated: 231 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"ité"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "ité" (accumulated: 234 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "-un"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "-un"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-un"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"leder"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "leder" (accumulated: 239 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" og"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " og" (accumulated: 242 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "nt"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "nt"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unnt"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":" sty"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: " sty" (accumulated: 246 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"re"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "re" (accumulated: 248 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "ak"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "ak"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"-re"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "-re" (accumulated: 251 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"present"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "present" (accumulated: 258 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " via"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " via"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"anter"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "anter" (accumulated: 263 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-delta","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b","delta":"."}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-delta, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text delta: "." (accumulated: 264 chars)
+I/flutter ( 4871): ✅ [SSE] Adding event: TextDeltaReceived
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " Kontroll"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " Kontroll"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontroll"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"text-end","id":"msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: text-end, messageId: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [SSE] Text generation completed for: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"finish-step"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: finish-step, messageId: null
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "kom"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "kom"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkom"
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " {"type":"finish"}
+I/flutter ( 4871): "
+I/flutter ( 4871): 📝 [SSE] Processing: finish, messageId: null
+I/flutter ( 4871): ✅ [SSE] Stream finished for: msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): ✅ [SSE] Adding event: StreamCompleted
+I/flutter ( 4871): 📡 [SSE] Event received - ID: , Event: , Data: " [DONE]
+I/flutter ( 4871): "
+I/flutter ( 4871): ❌ [SSE] Parse error: FormatException: Unexpected character (at character 3)
+I/flutter ( 4871):  [DONE]
+I/flutter ( 4871):   ^
+I/flutter ( 4871): 📄 [SSE] Raw data: " [DONE]
+I/flutter ( 4871): "
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "ité"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "ité"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomité"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "en"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "en"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: ","
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: ","
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen,"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " inklud"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " inklud"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inklud"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "ert"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "ert"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " deleg"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " deleg"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert deleg"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "ater"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "ater"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: ","
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: ","
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater,"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " invest"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " invest"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, invest"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "erings"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "erings"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investerings"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "kom"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "kom"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investeringskom"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "ité"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "ité"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investeringskomité"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "leder"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "leder"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investeringskomitéleder"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " og"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " og"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investeringskomitéleder og"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: " sty"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: " sty"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investeringskomitéleder og sty"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "re"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "re"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investeringskomitéleder og styre"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "-re"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "-re"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investeringskomitéleder og styre-re"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "present"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "present"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investeringskomitéleder og styre-represent"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "anter"
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "anter"
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investeringskomitéleder og styre-representanter"
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: TextDeltaReceived
+I/flutter ( 4871): ✍️ [AI_CHAT] TextDelta for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b: "."
+I/flutter ( 4871): 🔄 [AI_CHAT] Updating message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b with delta: "."
+I/flutter ( 4871): 📍 [AI_CHAT] Message index: 2 (total messages: 3)
+I/flutter ( 4871): 📝 [AI_CHAT] Old message parts: 1
+I/flutter ( 4871): 📝 [AI_CHAT] New message parts: 1
+I/flutter ( 4871): 📄 [AI_CHAT] Current text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investeringskomitéleder og styre-representanter."
+I/flutter ( 4871): 📥 [AI_CHAT] Received event: StreamCompleted
+I/flutter ( 4871): ✅ [AI_CHAT] Stream completed for msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 🎯 [AI_CHAT] Rendering message welcome (assistant)
+I/flutter ( 4871): 🔄 [AI_CHAT] AI message - isStreaming: false, currentStreamingId: null
+I/flutter ( 4871): 📊 [AI_CHAT] isStreamingThisMessage: false
+I/flutter ( 4871): 📝 [AI_CHAT] Message text content: "👋 Hei! Jeg er din AI-assistent for BISO. Jeg kan hjelpe deg med å finne informasjon om vedtekter, retningslinjer og andre dokumenter. Spør meg om hva som helst!
+I/flutter ( 4871): 
+I/flutter ( 4871): Hello! I'm your AI assistant for BISO. I can help you find information about bylaws, guidelines, and other documents. Ask me anything!"
+I/flutter ( 4871): 🎨 [AI_BUBBLE] Building bubble for message welcome
+I/flutter ( 4871): 📝 [AI_BUBBLE] Text content: "👋 Hei! Jeg er din AI-assistent for BISO. Jeg kan hjelpe deg med å finne informasjon om vedtekter, retningslinjer og andre dokumenter. Spør meg om hva som helst!
+I/flutter ( 4871): 
+I/flutter ( 4871): Hello! I'm your AI assistant for BISO. I can help you find information about bylaws, guidelines, and other documents. Ask me anything!" (length: 297)
+I/flutter ( 4871): ⏳ [AI_BUBBLE] Is streaming: false
+I/flutter ( 4871): 🧩 [AI_BUBBLE] Message parts: 1
+I/flutter ( 4871): 🔧 [AI_BUBBLE] Has tool parts: false (0)
+I/flutter ( 4871): 🎯 [AI_CHAT] Rendering message 1755344791526 (user)
+I/flutter ( 4871): 🎯 [AI_CHAT] Rendering message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b (assistant)
+I/flutter ( 4871): 🔄 [AI_CHAT] AI message - isStreaming: false, currentStreamingId: null
+I/flutter ( 4871): 📊 [AI_CHAT] isStreamingThisMessage: false
+I/flutter ( 4871): 📝 [AI_CHAT] Message text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investeringskomitéleder og styre-representanter."
+I/flutter ( 4871): 🎨 [AI_BUBBLE] Building bubble for message msg_68a06fbd77f88197bc53fb248e1bc5e80743faa566000b1b
+I/flutter ( 4871): 📝 [AI_BUBBLE] Text content: "Paragraf 6.3 regulerer kombinasjon av tillitsverv: begrenser at én person har kun ett verv, unntak, forbudte kombinasjoner, regler ved kandidatur, ansatte og søknads-unntak via Kontrollkomitéen, inkludert delegater, investeringskomitéleder og styre-representanter." (length: 264)
+I/flutter ( 4871): ⏳ [AI_BUBBLE] Is streaming: false
+I/flutter ( 4871): 🧩 [AI_BUBBLE] Message parts: 1
+I/flutter ( 4871): 🔧 [AI_BUBBLE] Has tool parts: false (0)

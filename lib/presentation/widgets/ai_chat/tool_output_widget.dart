@@ -30,13 +30,34 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(seconds: 2),
       vsync: this,
     );
     _expandAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
     );
+    
+    // Start shimmer animation for loading states
+    if (widget.toolPart.state == ToolPartState.inputStreaming ||
+        widget.toolPart.state == ToolPartState.inputAvailable) {
+      _animationController.repeat();
+    }
+  }
+
+  @override
+  void didUpdateWidget(ToolOutputWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // Handle state changes
+    if (oldWidget.toolPart.state != widget.toolPart.state) {
+      if (widget.toolPart.state == ToolPartState.inputStreaming ||
+          widget.toolPart.state == ToolPartState.inputAvailable) {
+        _animationController.repeat();
+      } else {
+        _animationController.stop();
+      }
+    }
   }
 
   @override
@@ -126,6 +147,10 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
           ),
           const SizedBox(height: 12),
           _buildLoadingProgress(theme),
+          if (widget.toolPart.toolName == 'searchSharePoint' && 
+              (widget.toolPart.state == ToolPartState.inputStreaming ||
+               widget.toolPart.state == ToolPartState.inputAvailable))
+            ..._buildSharePointSearchPreview(theme),
         ],
       ),
     );
@@ -218,6 +243,11 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
   String _getLoadingMessage() {
     switch (widget.toolPart.toolName) {
       case 'searchSharePoint':
+        // Dynamic message based on the actual query
+        final query = widget.toolPart.args?['query'] as String?;
+        if (query != null && query.isNotEmpty) {
+          return 'Searching for "$query" in SharePoint...';
+        }
         return 'Searching SharePoint documents...';
       case 'getDocumentStats':
         return 'Analyzing document statistics...';
@@ -228,6 +258,188 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       default:
         return 'Executing ${widget.toolPart.toolName}...';
     }
+  }
+
+  /// Build progressive SharePoint search preview (Generative UI pattern)
+  List<Widget> _buildSharePointSearchPreview(ThemeData theme) {
+    return [
+      const SizedBox(height: 16),
+      // Search steps indicator
+      Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.crystalBlue.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.crystalBlue.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.psychology_rounded,
+                  size: 16,
+                  color: AppColors.crystalBlue,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'AI Search Process',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.crystalBlue,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            ..._buildSearchSteps(theme),
+          ],
+        ),
+      ),
+      const SizedBox(height: 12),
+      // Simulated content preview with skeleton loading
+      _buildContentPreviewSkeleton(theme),
+    ];
+  }
+
+  List<Widget> _buildSearchSteps(ThemeData theme) {
+    final steps = [
+      ('🔍', 'Analyzing query: "${widget.toolPart.args?['query'] ?? 'vedtekter'}"'),
+      ('🧠', 'Converting to vector embeddings'),
+      ('📊', 'Searching Pinecone database'),
+      ('📄', 'Fetching relevant documents'),
+    ];
+
+    return steps.asMap().entries.map((entry) {
+      final index = entry.key;
+      final (emoji, description) = entry.value;
+      final isActive = index <= 1; // Simulate progress
+      
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: isActive ? AppColors.emeraldGreen : AppColors.outline.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              emoji,
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 500),
+                opacity: isActive ? 1.0 : 0.6,
+                child: Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: isActive 
+                        ? (widget.isDark ? AppColors.onSurfaceDark : AppColors.onSurface)
+                        : AppColors.outline,
+                    fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+            if (isActive)
+              SizedBox(
+                width: 12,
+                height: 12,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.crystalBlue),
+                ),
+              ),
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  Widget _buildContentPreviewSkeleton(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: (widget.isDark ? AppColors.surfaceDark : AppColors.white).withOpacity(0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.outline.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.preview_rounded,
+                size: 16,
+                color: AppColors.outline,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Content Preview',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.outline,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Animated skeleton loading bars
+          ...List.generate(3, (index) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: _buildSkeletonLine(
+              width: [0.9, 0.7, 0.5][index],
+              delay: Duration(milliseconds: index * 200),
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonLine({required double width, required Duration delay}) {
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        // Create shimmer effect
+        final shimmerValue = (_animationController.value + delay.inMilliseconds / 1000) % 1.0;
+        return Container(
+          height: 12,
+          width: MediaQuery.of(context).size.width * width,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(6),
+            gradient: LinearGradient(
+              colors: [
+                AppColors.outline.withOpacity(0.1),
+                AppColors.outline.withOpacity(0.3),
+                AppColors.outline.withOpacity(0.1),
+              ],
+              stops: [
+                (shimmerValue - 0.3).clamp(0.0, 1.0),
+                shimmerValue,
+                (shimmerValue + 0.3).clamp(0.0, 1.0),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   String _getProgressDescription() {

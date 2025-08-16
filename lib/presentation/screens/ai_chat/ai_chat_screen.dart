@@ -111,16 +111,8 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
 
     _scrollToBottom();
 
-    // Create assistant message
-    final assistantMessage = _chatService.createAssistantMessage();
-    setState(() {
-      _messages.add(assistantMessage);
-      _currentStreamingMessageId = assistantMessage.id;
-    });
-
     try {
       print('🚀 [AI_CHAT] Starting stream for ${_messages.length} messages');
-      print('🔄 [AI_CHAT] Current streaming message ID: ${assistantMessage.id}');
       
       // Use the new streamChatMessages method with flutter_client_sse
       await for (final event in _chatService.streamChatMessages(messages: _messages, useSSE: true)) {
@@ -134,11 +126,15 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
             
           case TextDeltaReceived(:final messageId, :final delta):
             print('✍️ [AI_CHAT] TextDelta for $messageId: "$delta"');
+            _ensureAssistantMessage(messageId);
             _updateMessageWithTextDelta(messageId, delta);
             break;
             
           case ToolCallUpdated(:final messageId, :final toolPart):
             print('🔧 [AI_CHAT] ToolCall updated for $messageId: ${toolPart.toolName} (${toolPart.state})');
+            print('🔧 [AI_CHAT] ToolCall args: ${toolPart.args}');
+            print('🔧 [AI_CHAT] ToolCall result: ${toolPart.result != null ? 'has result' : 'no result'}');
+            _ensureAssistantMessage(messageId);
             _updateMessageWithTool(messageId, toolPart);
             break;
             
@@ -174,6 +170,19 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
         _currentStreamingMessageId = null;
         _errorMessage = 'Failed to send message: $e';
       });
+    }
+  }
+
+  void _ensureAssistantMessage(String messageId) {
+    // Only create assistant message if we don't have one yet
+    if (_currentStreamingMessageId == null) {
+      print('🤖 [AI_CHAT] Creating assistant message with ID: $messageId');
+      final assistantMessage = _chatService.createAssistantMessage(id: messageId);
+      setState(() {
+        _messages.add(assistantMessage);
+        _currentStreamingMessageId = messageId;
+      });
+      _scrollToBottom();
     }
   }
 
@@ -513,7 +522,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
       itemCount: _messages.length + (_isStreaming ? 1 : 0),
       itemBuilder: (context, index) {
         if (index >= _messages.length) {
-          // Show typing indicator
+          // Show typing indicator while streaming
           return const Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
             child: TypingIndicator(),
