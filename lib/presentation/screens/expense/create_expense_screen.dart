@@ -11,7 +11,6 @@ import 'package:printing/printing.dart';
 import 'dart:ui' as ui;
 
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../data/services/expense_service.dart';
 import '../../../core/utils/favorites_storage.dart';
@@ -44,8 +43,8 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
   
   String? _selectedDepartmentId;
   String _selectedDepartmentName = '';
-  bool _isPrepayment = false;
-  DateTime _expenseDate = DateTime.now();
+  final bool _isPrepayment = false;
+  final DateTime _expenseDate = DateTime.now();
   final List<File> _attachedFiles = [];
   final List<_ReceiptDraft> _receiptDrafts = [];
   bool _useAi = false;
@@ -127,7 +126,6 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
               ),
               IconButton(
                 onPressed: () async {
-                  final wasFav = _favoriteDepartmentIds.contains(dept['id']);
                   final favored = await FavoritesStorage.toggleFavoriteDepartment(dept['id']!);
                   final updated = await FavoritesStorage.getFavoriteDepartmentIds();
                   setState(() => _favoriteDepartmentIds = updated);
@@ -204,8 +202,6 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
 
   bool _validateCurrentStep() {
     switch (_currentStep) {
-      case 0: // Basic Info
-        return _formKey.currentState?.validate() ?? false;
       case 0: // Campus & Department
         return _selectedCampusId != null && _selectedDepartmentId != null;
       case 1: // Attachments
@@ -237,7 +233,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
         String description = '';
         DateTime date = _expenseDate;
         String type = file.path.split('.').last.toLowerCase();
-        if (_useAi && i < _receiptDrafts.length) {
+        if (i < _receiptDrafts.length) {
           final draft = _receiptDrafts[i];
           amount = draft.amount ?? 0;
           description = draft.description ?? '';
@@ -256,11 +252,15 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
       // Determine total and description
       double total;
       String description;
-      if (_useAi && _receiptDrafts.isNotEmpty) {
+      if (_receiptDrafts.isNotEmpty) {
         total = _receiptDrafts.fold(0, (p, e) => p + (e.amount ?? 0));
-        final descs = _receiptDrafts.map((e) => e.description ?? '').where((e) => e.isNotEmpty).toList();
-        if (descs.isNotEmpty) {
-          description = await _expenseService.summarizeExpenseDescriptions(descs);
+        if (_useAi) {
+          final descs = _receiptDrafts.map((e) => e.description ?? '').where((e) => e.isNotEmpty).toList();
+          if (descs.isNotEmpty) {
+            description = await _expenseService.summarizeExpenseDescriptions(descs);
+          } else {
+            description = _descriptionController.text.trim();
+          }
         } else {
           description = _descriptionController.text.trim();
         }
@@ -309,7 +309,6 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -619,6 +618,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
                       if (_useAi) ...[
                         const SizedBox(height: 8),
                         _AiFieldsEditor(
+                          key: ValueKey('ai-editor-${file.path}-$index'),
                           draft: index < _receiptDrafts.length ? _receiptDrafts[index] : _ReceiptDraft(),
                           onChanged: (d) {
                             if (index >= _receiptDrafts.length) {
@@ -626,11 +626,22 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
                             } else {
                               _receiptDrafts[index] = d;
                             }
-                            setState(() {});
                           },
                           onRetry: () => _analyzeSingle(index),
                         ),
                       ] else ...[
+                        const SizedBox(height: 8),
+                        _ManualFieldsEditor(
+                          key: ValueKey('manual-editor-${file.path}-$index'),
+                          initial: index < _receiptDrafts.length ? _receiptDrafts[index] : _ReceiptDraft(),
+                          onChanged: (d) {
+                            if (index >= _receiptDrafts.length) {
+                              _receiptDrafts.add(d);
+                            } else {
+                              _receiptDrafts[index] = d;
+                            }
+                          },
+                        ),
                         const SizedBox(height: 4),
                         Text(_getFileSizeText(file), style: Theme.of(context).textTheme.bodySmall),
                       ],
@@ -685,130 +696,12 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
     );
   }
 
-  // Legacy payment step kept for potential future use; not referenced in new flow
-  Widget _buildPaymentDetailsStep() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Payment information',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Where should we send the reimbursement?',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Profile-sourced contact details; no manual entry in this step
-          const SizedBox(height: 8),
-
-          // Bank Account
-          TextFormField(
-            controller: _bankAccountController,
-            decoration: const InputDecoration(
-              labelText: 'Norwegian Bank Account',
-              prefixIcon: Icon(Icons.account_balance),
-              hintText: '1234 56 78901',
-              helperText: '11-digit Norwegian account number',
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-              LengthLimitingTextInputFormatter(AppConstants.bankAccountLength),
-              _BankAccountFormatter(),
-            ],
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Bank account is required';
-              }
-              final digits = value.replaceAll(' ', '');
-              if (digits.length != AppConstants.bankAccountLength) {
-                return 'Must be ${AppConstants.bankAccountLength} digits';
-              }
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 16),
-
-          // Account Holder Name
-          TextFormField(
-            controller: _accountHolderController,
-            decoration: const InputDecoration(
-              labelText: 'Account Holder Name',
-              prefixIcon: Icon(Icons.person),
-              hintText: 'Full name as registered with bank',
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Account holder name is required';
-              }
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 24),
-
-          // Security Notice
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.subtleBlue,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.security, color: AppColors.defaultBlue),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Secure Processing',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.defaultBlue,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Your payment details are encrypted and processed securely',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.defaultBlue,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          PrimaryButton(
-            enabled: true,
-            label: 'Continue to Review',
-            onPressed: _nextStep,
-          ),
-        ],
-      ),
-    );
-  }
+  // Legacy payment step removed (unused)
 
   Widget _buildReviewStep() {
-    final amount = _useAi
+    final amount = _receiptDrafts.isNotEmpty
         ? _receiptDrafts.fold(0.0, (p, e) => p + (e.amount ?? 0.0))
-        : (double.tryParse(_amountController.text) ?? 0.0);
+        : 0.0;
     
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -909,7 +802,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
                 label: 'Files', 
                 value: '${_attachedFiles.length} file(s) attached',
               ),
-              if (_useAi)
+              if (_receiptDrafts.isNotEmpty)
                 ..._receiptDrafts.asMap().entries.map((e) => _ReviewItem(
                   label: '• ${e.value.date != null ? _formatDate(e.value.date!) : 'Date'}',
                   value: 'NOK ${(e.value.amount ?? 0).toStringAsFixed(2)} — ${e.value.description ?? ''}',
@@ -947,12 +840,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
     return '${date.day}/${date.month}/${date.year}';
   }
 
-  String _formatBankForInput(String digits) {
-    final d = digits.replaceAll(' ', '');
-    if (d.length <= 4) return d;
-    if (d.length <= 6) return '${d.substring(0, 4)} ${d.substring(4)}';
-    return '${d.substring(0, 4)} ${d.substring(4, 6)} ${d.substring(6)}';
-  }
+  // _formatBankForInput removed (unused)
 
   IconData _getFileIcon(String path) {
     if (path.toLowerCase().endsWith('.pdf')) {
@@ -1261,28 +1149,7 @@ class _ReviewItem extends StatelessWidget {
   }
 }
 
-class _BankAccountFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    final text = newValue.text.replaceAll(' ', '');
-    if (text.length <= 4) {
-      return newValue.copyWith(text: text);
-    } else if (text.length <= 6) {
-      return newValue.copyWith(
-        text: '${text.substring(0, 4)} ${text.substring(4)}',
-        selection: TextSelection.collapsed(offset: text.length + 1),
-      );
-    } else {
-      return newValue.copyWith(
-        text: '${text.substring(0, 4)} ${text.substring(4, 6)} ${text.substring(6)}',
-        selection: TextSelection.collapsed(offset: text.length + 2),
-      );
-    }
-  }
-}
+// _BankAccountFormatter removed (unused)
 
 class _ReceiptDraft {
   final double? amount;
@@ -1294,18 +1161,65 @@ class _ReceiptDraft {
   bool get isEmpty => (amount == null || amount == 0) && (description == null || description!.isEmpty) && date == null;
 }
 
-class _AiFieldsEditor extends StatelessWidget {
-  final _ReceiptDraft draft;
+class _ManualFieldsEditor extends StatefulWidget {
+  final _ReceiptDraft initial;
   final void Function(_ReceiptDraft) onChanged;
-  final Future<void> Function() onRetry;
 
-  const _AiFieldsEditor({required this.draft, required this.onChanged, required this.onRetry});
+  const _ManualFieldsEditor({super.key, required this.initial, required this.onChanged});
+
+  @override
+  State<_ManualFieldsEditor> createState() => _ManualFieldsEditorState();
+}
+
+class _ManualFieldsEditorState extends State<_ManualFieldsEditor> {
+  late final TextEditingController _amountController;
+  late final TextEditingController _descriptionController;
+  DateTime? _date;
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController = TextEditingController(text: widget.initial.amount?.toStringAsFixed(2) ?? '');
+    _descriptionController = TextEditingController(text: widget.initial.description ?? '');
+    _date = widget.initial.date;
+  }
+
+  @override
+  void didUpdateWidget(covariant _ManualFieldsEditor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final newAmount = widget.initial.amount != null ? widget.initial.amount!.toStringAsFixed(2) : '';
+    if (_amountController.text != newAmount) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _amountController.value = TextEditingValue(
+          text: newAmount,
+          selection: TextSelection.collapsed(offset: newAmount.length),
+        );
+      });
+    }
+    final newDesc = widget.initial.description ?? '';
+    if (_descriptionController.text != newDesc) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _descriptionController.value = TextEditingValue(
+          text: newDesc,
+          selection: TextSelection.collapsed(offset: newDesc.length),
+        );
+      });
+    }
+    _date = widget.initial.date ?? _date;
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final amountController = TextEditingController(text: draft.amount?.toStringAsFixed(2) ?? '');
-    final descriptionController = TextEditingController(text: draft.description ?? '');
-    final dateText = draft.date != null ? '${draft.date!.day}/${draft.date!.month}/${draft.date!.year}' : '';
+    final dateText = _date != null ? '${_date!.day}/${_date!.month}/${_date!.year}' : '';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1313,13 +1227,14 @@ class _AiFieldsEditor extends StatelessWidget {
           children: [
             Expanded(
               child: TextFormField(
-                controller: amountController,
+                controller: _amountController,
                 decoration: const InputDecoration(labelText: 'Amount (NOK)'),
-                keyboardType: TextInputType.number,
-                onChanged: (v) => onChanged(_ReceiptDraft(
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                textDirection: TextDirection.ltr,
+                onChanged: (v) => widget.onChanged(_ReceiptDraft(
                   amount: double.tryParse(v),
-                  description: descriptionController.text,
-                  date: draft.date,
+                  description: _descriptionController.text,
+                  date: _date,
                 )),
               ),
             ),
@@ -1330,14 +1245,15 @@ class _AiFieldsEditor extends StatelessWidget {
                   final now = DateTime.now();
                   final picked = await showDatePicker(
                     context: context,
-                    initialDate: draft.date ?? now,
+                    initialDate: _date ?? now,
                     firstDate: now.subtract(const Duration(days: 365 * 3)),
                     lastDate: now,
                   );
                   if (picked != null) {
-                    onChanged(_ReceiptDraft(
-                      amount: double.tryParse(amountController.text),
-                      description: descriptionController.text,
+                    setState(() => _date = picked);
+                    widget.onChanged(_ReceiptDraft(
+                      amount: double.tryParse(_amountController.text),
+                      description: _descriptionController.text,
                       date: picked,
                     ));
                   }
@@ -1352,18 +1268,136 @@ class _AiFieldsEditor extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         TextFormField(
-          controller: descriptionController,
+          controller: _descriptionController,
           decoration: const InputDecoration(labelText: 'Description'),
-          onChanged: (v) => onChanged(_ReceiptDraft(
-            amount: double.tryParse(amountController.text),
+          textDirection: TextDirection.ltr,
+          onChanged: (v) => widget.onChanged(_ReceiptDraft(
+            amount: double.tryParse(_amountController.text),
             description: v,
-            date: draft.date,
+            date: _date,
+          )),
+        ),
+      ],
+    );
+  }
+}
+class _AiFieldsEditor extends StatefulWidget {
+  final _ReceiptDraft draft;
+  final void Function(_ReceiptDraft) onChanged;
+  final Future<void> Function() onRetry;
+
+  const _AiFieldsEditor({super.key, required this.draft, required this.onChanged, required this.onRetry});
+
+  @override
+  State<_AiFieldsEditor> createState() => _AiFieldsEditorState();
+}
+
+class _AiFieldsEditorState extends State<_AiFieldsEditor> {
+  late final TextEditingController _amountController;
+  late final TextEditingController _descriptionController;
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController = TextEditingController(text: widget.draft.amount?.toStringAsFixed(2) ?? '');
+    _descriptionController = TextEditingController(text: widget.draft.description ?? '');
+  }
+
+  @override
+  void didUpdateWidget(covariant _AiFieldsEditor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final newAmountText = widget.draft.amount != null ? widget.draft.amount!.toStringAsFixed(2) : '';
+    if (_amountController.text != newAmountText) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _amountController.value = TextEditingValue(
+          text: newAmountText,
+          selection: TextSelection.collapsed(offset: newAmountText.length),
+        );
+      });
+    }
+    final newDescText = widget.draft.description ?? '';
+    if (_descriptionController.text != newDescText) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _descriptionController.value = TextEditingValue(
+          text: newDescText,
+          selection: TextSelection.collapsed(offset: newDescText.length),
+        );
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dateText = widget.draft.date != null ? '${widget.draft.date!.day}/${widget.draft.date!.month}/${widget.draft.date!.year}' : '';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _amountController,
+                decoration: const InputDecoration(labelText: 'Amount (NOK)'),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                textDirection: TextDirection.ltr,
+                onChanged: (v) => widget.onChanged(_ReceiptDraft(
+                  amount: double.tryParse(v),
+                  description: _descriptionController.text,
+                  date: widget.draft.date,
+                )),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: InkWell(
+                onTap: () async {
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: widget.draft.date ?? now,
+                    firstDate: now.subtract(const Duration(days: 365 * 3)),
+                    lastDate: now,
+                  );
+                  if (picked != null) {
+                    widget.onChanged(_ReceiptDraft(
+                      amount: double.tryParse(_amountController.text),
+                      description: _descriptionController.text,
+                      date: picked,
+                    ));
+                  }
+                },
+                child: InputDecorator(
+                  decoration: const InputDecoration(labelText: 'Date'),
+                  child: Text(dateText.isEmpty ? 'Select' : dateText),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _descriptionController,
+          decoration: const InputDecoration(labelText: 'Description'),
+          textDirection: TextDirection.ltr,
+          onChanged: (v) => widget.onChanged(_ReceiptDraft(
+            amount: double.tryParse(_amountController.text),
+            description: v,
+            date: widget.draft.date,
           )),
         ),
         Align(
           alignment: Alignment.centerRight,
           child: TextButton.icon(
-            onPressed: onRetry,
+            onPressed: widget.onRetry,
             icon: const Icon(Icons.refresh),
             label: const Text('Re-run AI'),
           ),
@@ -1440,7 +1474,6 @@ class _PremiumHeader extends StatelessWidget {
   final VoidCallback onClose;
   final String title;
   const _PremiumHeader({
-    super.key,
     required this.step,
     required this.totalSteps,
     required this.onBack,

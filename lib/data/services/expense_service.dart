@@ -16,14 +16,11 @@ class ExpenseService {
   Future<Map<String, dynamic>> createExpenseDocument({
     required Map<String, dynamic> data,
   }) async {
-    final doc = await databases.createDocument(
+    final map = await RobustDocumentService.createDocumentRobust(
       databaseId: AppConstants.databaseId,
       collectionId: expensesCollectionId,
-      documentId: ID.unique(),
       data: data,
     );
-    final map = Map<String, dynamic>.from(doc.data);
-    map['\$id'] = doc.$id;
     return map;
   }
 
@@ -43,10 +40,9 @@ class ExpenseService {
     required String description,
     required String type,
   }) async {
-    final doc = await databases.createDocument(
+    final map = await RobustDocumentService.createDocumentRobust(
       databaseId: AppConstants.databaseId,
       collectionId: attachmentsCollectionId,
-      documentId: ID.unique(),
       data: {
         'date': date.toIso8601String(),
         'url': url,
@@ -55,8 +51,6 @@ class ExpenseService {
         'type': type,
       },
     );
-    final map = Map<String, dynamic>.from(doc.data);
-    map['\$id'] = doc.$id;
     return map;
   }
 
@@ -92,14 +86,15 @@ class ExpenseService {
   Future<Map<String, dynamic>> analyzeReceiptText(String ocrText) async {
     final endpoint = client.endPoint;
     final projectId = client.config['project'];
-    final jwt = await account.createJWT();
+    final cachedJwt = await RobustDocumentService.getSessionJwt();
+    final jwt = cachedJwt ?? (await account.createJWT()).jwt;
     final url = '$endpoint/functions/${AppConstants.fnParseReceiptId}/executions';
     final res = await http.post(
       Uri.parse(url),
       headers: {
         'content-type': 'application/json',
         'X-Appwrite-Project': projectId ?? '',
-        'X-Appwrite-JWT': jwt.jwt,
+        'X-Appwrite-JWT': jwt,
       },
       body: jsonEncode({'body': ocrText}),
     );
@@ -119,7 +114,8 @@ class ExpenseService {
   Future<String> summarizeExpenseDescriptions(List<String> descriptions) async {
     final endpoint = client.endPoint;
     final projectId = client.config['project'];
-    final jwt = await account.createJWT();
+    final cachedJwt = await RobustDocumentService.getSessionJwt();
+    final jwt = cachedJwt ?? (await account.createJWT()).jwt;
     final url = '$endpoint/functions/${AppConstants.fnSummarizeExpenseId}/executions';
     final payload = {'descriptions': descriptions};
     final res = await http.post(
@@ -127,7 +123,7 @@ class ExpenseService {
       headers: {
         'content-type': 'application/json',
         'X-Appwrite-Project': projectId ?? '',
-        'X-Appwrite-JWT': jwt.jwt,
+        'X-Appwrite-JWT': jwt,
       },
       body: jsonEncode({'body': jsonEncode(payload)}),
     );

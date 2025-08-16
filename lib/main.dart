@@ -106,11 +106,13 @@ final _router = GoRouter(
         path: '/explore/products',
         name: 'products', 
         builder: (context, state) => const market.MarketplaceScreen(),
-      ),
-      GoRoute(
-        path: '/explore/products/new',
-        name: 'product-new',
-        builder: (context, state) => const SellProductScreen(),
+        routes: [
+          GoRoute(
+            path: 'new',
+            name: 'product-new',
+            builder: (context, state) => const SellProductScreen(),
+          ),
+        ],  
       ),
       GoRoute(
         path: '/explore/units',

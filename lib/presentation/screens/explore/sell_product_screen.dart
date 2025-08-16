@@ -140,7 +140,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
   final List<XFile> _images = [];
   bool _submitting = false;
 
-  String _currency = 'NOK';
+  final String _currency = 'NOK';
   String _category = 'books';
   String _condition = 'good';
   bool _isNegotiable = false;

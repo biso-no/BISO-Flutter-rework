@@ -1,5 +1,4 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../../core/constants/app_constants.dart';
@@ -17,28 +16,43 @@ class EventService {
     int limit = AppConstants.defaultPageSize,
     int offset = 0,
   }) async {
+    // Backwards-compatible wrapper over Appwrite Function-based fetch
+    return getFunctionEvents(campusId: campusId, limit: limit, offset: offset);
+  }
+
+  // Get events via Appwrite Function which fetches from WordPress
+  Future<List<EventModel>> getFunctionEvents({
+    String? campusId,
+    int limit = AppConstants.defaultPageSize,
+    int offset = 0,
+  }) async {
     try {
-      String url = AppConstants.wordPressEventsApi;
-      final queryParams = <String, String>{
-        'per_page': limit.toString(),
-        'offset': offset.toString(),
+      final requestBody = {
+        'campusId': campusId,
       };
-      
-      if (campusId != null) {
-        queryParams['campus'] = campusId;
-      }
 
-      final uri = Uri.parse(url).replace(queryParameters: queryParams);
-      final response = await http.get(uri);
+      final execution = await functions.createExecution(
+        functionId: AppConstants.fnFetchEventsId,
+        body: json.encode(requestBody),
+      );
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => EventModel.fromWordPress(json)).toList();
+      if (execution.responseStatusCode == 200) {
+        final Map<String, dynamic> payload = json.decode(execution.responseBody);
+        final List<dynamic> events = (payload['events'] as List<dynamic>? ?? <dynamic>[]);
+        final models = events
+            .map((e) => EventModel.fromFunctionEvent(e as Map<String, dynamic>))
+            .toList();
+
+        // Sort by start date ascending and apply limit/offset locally
+        models.sort((a, b) => a.startDate.compareTo(b.startDate));
+        final start = offset < models.length ? offset : models.length;
+        final end = (start + limit) < models.length ? (start + limit) : models.length;
+        return models.sublist(start, end);
       } else {
-        throw EventException('Failed to fetch WordPress events: ${response.statusCode}');
+        throw EventException('Failed to fetch events (function): HTTP ${execution.responseStatusCode}');
       }
     } catch (e) {
-      throw EventException('Network error: $e');
+      throw EventException('Error fetching events via function: $e');
     }
   }
 
@@ -95,7 +109,7 @@ class EventService {
   }) async {
     try {
       final futures = await Future.wait([
-        getWordPressEvents(campusId: campusId, limit: limit ~/ 2, offset: offset),
+        getFunctionEvents(campusId: campusId, limit: limit ~/ 2, offset: offset),
         getAppwriteEvents(
           campusId: campusId,
           category: category,

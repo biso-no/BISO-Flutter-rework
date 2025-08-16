@@ -83,31 +83,67 @@ class EventModel extends Equatable {
   // Factory for WordPress API response
   factory EventModel.fromWordPress(Map<String, dynamic> map) {
     return EventModel(
-      id: map['id'].toString(),
-      title: map['title']['rendered'] ?? '',
-      description: map['content']['rendered'] ?? '',
-      startDate: DateTime.parse(map['meta']['start_date'] ?? DateTime.now().toIso8601String()),
-      endDate: map['meta']['end_date'] != null ? DateTime.parse(map['meta']['end_date']) : null,
-      venue: map['meta']['venue'] ?? '',
-      location: map['meta']['location'],
-      organizerId: map['meta']['organizer_id'] ?? '',
-      organizerName: map['meta']['organizer_name'] ?? '',
-      organizerLogo: map['meta']['organizer_logo'],
-      campusId: map['meta']['campus_id'] ?? '',
-      categories: List<String>.from(map['categories'] ?? []),
-      images: List<String>.from(map['meta']['images'] ?? []),
-      maxAttendees: int.tryParse(map['meta']['max_attendees']?.toString() ?? '0') ?? 0,
-      currentAttendees: int.tryParse(map['meta']['current_attendees']?.toString() ?? '0') ?? 0,
-      isPublic: map['meta']['is_public'] == '1' || map['meta']['is_public'] == true,
-      requiresRegistration: map['meta']['requires_registration'] == '1' || map['meta']['requires_registration'] == true,
-      price: map['meta']['price'] != null ? double.tryParse(map['meta']['price'].toString()) : null,
-      registrationUrl: map['meta']['registration_url'],
-      registrationDeadline: map['meta']['registration_deadline'] != null 
-          ? DateTime.parse(map['meta']['registration_deadline']) : null,
-      status: map['meta']['status'] ?? 'upcoming',
-      createdAt: DateTime.parse(map['date']),
-      updatedAt: DateTime.parse(map['modified']),
+      id: (map['id'] ?? map['ID'] ?? '').toString(),
+      title: map['title'] is String ? (map['title'] ?? '') : (map['title']?['rendered'] ?? ''),
+      description: map['description'] is String
+          ? (map['description'] ?? '')
+          : (map['content']?['rendered'] ?? map['excerpt']?['rendered'] ?? ''),
+      startDate: DateTime.parse(
+          map['start_date'] ?? map['meta']?['start_date'] ?? DateTime.now().toIso8601String()),
+      endDate: (map['end_date'] ?? map['meta']?['end_date']) != null
+          ? DateTime.parse(map['end_date'] ?? map['meta']?['end_date'])
+          : null,
+      venue: map['venue'] ?? map['meta']?['venue'] ?? '',
+      location: map['location'] ?? map['meta']?['location'],
+      organizerId: (map['organizer_id'] ?? map['meta']?['organizer_id'] ?? '').toString(),
+      organizerName: map['organizer_name'] ?? map['organizer'] ?? map['meta']?['organizer_name'] ?? '',
+      organizerLogo: map['organizer_logo'] ?? map['meta']?['organizer_logo'],
+      campusId: (map['campus_id'] ?? map['meta']?['campus_id'] ?? '').toString(),
+      categories: (() {
+        final raw = map['categories'] ?? map['category'] ?? [];
+        if (raw is List) {
+          return raw.map((c) => c.toString()).toList();
+        }
+        return <String>[];
+      })(),
+      images: (() {
+        final metaImages = map['meta']?['images'];
+        if (map['images'] is List) {
+          return List<String>.from(map['images']);
+        } else if (metaImages is List) {
+          return metaImages.map((e) => e.toString()).toList();
+        } else if (map['featured_image'] is String) {
+          return [map['featured_image'] as String];
+        }
+        return <String>[];
+      })(),
+      maxAttendees: int.tryParse((map['max_attendees'] ?? map['meta']?['max_attendees'] ?? '0').toString()) ?? 0,
+      currentAttendees: int.tryParse((map['current_attendees'] ?? map['meta']?['current_attendees'] ?? '0').toString()) ?? 0,
+      isPublic: (map['is_public'] ?? map['meta']?['is_public']) == '1' || (map['is_public'] ?? map['meta']?['is_public']) == true,
+      requiresRegistration: (map['requires_registration'] ?? map['meta']?['requires_registration']) == '1' || (map['requires_registration'] ?? map['meta']?['requires_registration']) == true,
+      price: (() {
+        final raw = map['price'] ?? map['meta']?['price'];
+        return raw != null ? double.tryParse(raw.toString()) : null;
+      })(),
+      registrationUrl: map['registration_url'] ?? map['url'] ?? map['link'],
+      registrationDeadline: (map['registration_deadline'] ?? map['meta']?['registration_deadline']) != null 
+          ? DateTime.parse(map['registration_deadline'] ?? map['meta']?['registration_deadline'])
+          : null,
+      status: (map['status'] ?? map['meta']?['status'] ?? 'upcoming').toString(),
+      createdAt: (() {
+        final raw = map['date'] ?? map['created_at'] ?? map['createdAt'];
+        return raw != null ? DateTime.parse(raw) : null;
+      })(),
+      updatedAt: (() {
+        final raw = map['modified'] ?? map['updated_at'] ?? map['updatedAt'];
+        return raw != null ? DateTime.parse(raw) : null;
+      })(),
     );
+  }
+
+  // Factory for the Appwrite Function events payload
+  factory EventModel.fromFunctionEvent(Map<String, dynamic> map) {
+    return EventModel.fromWordPress(map);
   }
 
   Map<String, dynamic> toMap() {

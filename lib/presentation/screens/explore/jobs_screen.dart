@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../generated/l10n/app_localizations.dart';
+import '../../../providers/campus/campus_provider.dart';
+import '../../../data/services/job_service.dart';
+import '../../../data/models/job_model.dart';
 
-class JobsScreen extends StatefulWidget {
+// Providers
+final _jobServiceProvider = Provider<JobService>((ref) => JobService());
+final jobsProvider = FutureProvider.family<List<JobModel>, String?>((ref, campusId) {
+  final service = ref.watch(_jobServiceProvider);
+  return service.getLatestJobs(campusId: campusId, limit: 50);
+});
+
+class JobsScreen extends ConsumerStatefulWidget {
   const JobsScreen({super.key});
 
   @override
-  State<JobsScreen> createState() => _JobsScreenState();
+  ConsumerState<JobsScreen> createState() => _JobsScreenState();
 }
 
-class _JobsScreenState extends State<JobsScreen> {
+class _JobsScreenState extends ConsumerState<JobsScreen> {
   String _selectedType = 'all';
 
   final List<String> _jobTypes = [
@@ -22,72 +33,12 @@ class _JobsScreenState extends State<JobsScreen> {
     'internship',
   ];
 
-  // Mock data for demonstration
-  final List<Map<String, dynamic>> _mockJobs = [
-    {
-      'id': '1',
-      'title': 'Event Photography Volunteer',
-      'department': 'Marketing Committee',
-      'type': 'volunteer',
-      'category': 'event_help',
-      'timeCommitment': '3-4 hours/event',
-      'isUrgent': true,
-      'applicationDeadline': DateTime.now().add(const Duration(days: 7)),
-      'description': 'Help capture memorable moments at our campus events.',
-      'skills': ['Photography', 'Adobe Lightroom', 'Creative Eye'],
-      'benefits': ['Portfolio building', 'Event access', 'Certificate'],
-    },
-    {
-      'id': '2',
-      'title': 'Social Media Manager',
-      'department': 'Student Union',
-      'type': 'paid',
-      'category': 'marketing',
-      'timeCommitment': '10 hours/week',
-      'salary': 'NOK 200/hour',
-      'isUrgent': false,
-      'applicationDeadline': DateTime.now().add(const Duration(days: 14)),
-      'description': 'Manage social media accounts and create engaging content.',
-      'skills': ['Social Media', 'Content Creation', 'Canva'],
-      'benefits': ['Flexible schedule', 'Experience', 'References'],
-    },
-    {
-      'id': '3',
-      'title': 'IT Support Intern',
-      'department': 'IT Services',
-      'type': 'internship',
-      'category': 'tech',
-      'timeCommitment': '20 hours/week',
-      'salary': 'NOK 180/hour',
-      'isUrgent': false,
-      'applicationDeadline': DateTime.now().add(const Duration(days: 21)),
-      'description': 'Assist with IT support tasks and system maintenance.',
-      'skills': ['Windows/Mac Support', 'Network Basics', 'Problem Solving'],
-      'benefits': ['Real experience', 'Training', 'Future job opportunity'],
-    },
-    {
-      'id': '4',
-      'title': 'Orientation Week Helper',
-      'department': 'Student Services',
-      'type': 'volunteer',
-      'category': 'event_help',
-      'timeCommitment': 'One week commitment',
-      'isUrgent': true,
-      'applicationDeadline': DateTime.now().add(const Duration(days: 3)),
-      'description': 'Help new students navigate their first week at BI.',
-      'skills': ['Communication', 'Leadership', 'Norwegian/English'],
-      'benefits': ['Leadership experience', 'Network building', 'Fun'],
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-
-    final filteredJobs = _selectedType == 'all'
-        ? _mockJobs
-        : _mockJobs.where((job) => job['type'] == _selectedType).toList();
+    final campusId = ref.watch(filterCampusProvider).id;
+    final jobsAsync = ref.watch(jobsProvider(campusId));
 
     return Scaffold(
       appBar: AppBar(
@@ -156,8 +107,15 @@ class _JobsScreenState extends State<JobsScreen> {
 
           // Jobs List
           Expanded(
-            child: filteredJobs.isEmpty
-                ? Center(
+            child: jobsAsync.when(
+              data: (jobs) {
+                // Filter by type
+                final filtered = _selectedType == 'all'
+                    ? jobs
+                    : jobs.where((j) => j.type == _selectedType).toList();
+
+                if (filtered.isEmpty) {
+                  return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -181,19 +139,63 @@ class _JobsScreenState extends State<JobsScreen> {
                         ),
                       ],
                     ),
-                  )
-                : ListView.separated(
+                  );
+                }
+
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    ref.invalidate(jobsProvider(campusId));
+                  },
+                  child: ListView.separated(
                     padding: const EdgeInsets.all(16),
-                    itemCount: filteredJobs.length,
+                    itemCount: filtered.length,
                     separatorBuilder: (context, index) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
-                      final job = filteredJobs[index];
+                      final job = filtered[index];
                       return _JobCard(
                         job: job,
                         onTap: () => _showJobDetails(context, job),
                       );
                     },
                   ),
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, st) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: AppColors.error,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Failed to load jobs',
+                        style: theme.textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        e.toString(),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () => ref.invalidate(jobsProvider(campusId)),
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Try Again'),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -220,7 +222,7 @@ class _JobsScreenState extends State<JobsScreen> {
     }
   }
 
-  void _showJobDetails(BuildContext context, Map<String, dynamic> job) {
+  void _showJobDetails(BuildContext context, JobModel job) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -242,7 +244,7 @@ class _JobsScreenState extends State<JobsScreen> {
 }
 
 class _JobCard extends StatelessWidget {
-  final Map<String, dynamic> job;
+  final JobModel job;
   final VoidCallback onTap;
 
   const _JobCard({
@@ -271,12 +273,12 @@ class _JobCard extends StatelessWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: _getTypeColor(job['type']).withValues(alpha: 0.1),
+                      color: _getTypeColor(job.type).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
-                      _getTypeIcon(job['type']),
-                      color: _getTypeColor(job['type']),
+                      _getTypeIcon(job.type),
+                      color: _getTypeColor(job.type),
                     ),
                   ),
 
@@ -291,7 +293,7 @@ class _JobCard extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                job['title'],
+                                job.title,
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -299,7 +301,7 @@ class _JobCard extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            if (job['isUrgent'] == true)
+                            if (job.isUrgent == true)
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
@@ -320,7 +322,7 @@ class _JobCard extends StatelessWidget {
                         const SizedBox(height: 4),
 
                         Text(
-                          job['department'],
+                          job.department,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: AppColors.onSurfaceVariant,
                           ),
@@ -333,13 +335,13 @@ class _JobCard extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: _getTypeColor(job['type']).withValues(alpha: 0.1),
+                                color: _getTypeColor(job.type).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                _getTypeDisplayName(job['type']),
+                                _getTypeDisplayName(job.type),
                                 style: theme.textTheme.labelSmall?.copyWith(
-                                  color: _getTypeColor(job['type']),
+                                  color: _getTypeColor(job.type),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -352,7 +354,7 @@ class _JobCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              job['timeCommitment'],
+                              job.timeCommitment ?? '—',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: AppColors.onSurfaceVariant,
                               ),
@@ -360,10 +362,10 @@ class _JobCard extends StatelessWidget {
                           ],
                         ),
 
-                        if (job['salary'] != null) ...[
+                        if (job.salary != null) ...[
                           const SizedBox(height: 4),
                           Text(
-                            job['salary'],
+                            job.salary!,
                             style: theme.textTheme.titleSmall?.copyWith(
                               color: AppColors.success,
                               fontWeight: FontWeight.w600,
@@ -379,11 +381,11 @@ class _JobCard extends StatelessWidget {
               const SizedBox(height: 12),
 
               // Skills Tags
-              if (job['skills'] != null) ...[
+              if (job.skills.isNotEmpty) ...[
                 Wrap(
                   spacing: 6,
                   runSpacing: 6,
-                  children: (job['skills'] as List<String>).take(3).map((skill) {
+                  children: job.skills.take(3).map((skill) {
                     return Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
@@ -410,7 +412,7 @@ class _JobCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Apply by ${DateFormat('MMM dd').format(job['applicationDeadline'])}',
+                    'Apply by ${DateFormat('MMM dd').format(job.applicationDeadline)}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: AppColors.onSurfaceVariant,
                     ),
@@ -466,7 +468,7 @@ class _JobCard extends StatelessWidget {
 }
 
 class _JobDetailSheet extends StatelessWidget {
-  final Map<String, dynamic> job;
+  final JobModel job;
   final ScrollController scrollController;
 
   const _JobDetailSheet({
@@ -502,7 +504,7 @@ class _JobDetailSheet extends StatelessWidget {
               padding: const EdgeInsets.all(24),
               children: [
                 Text(
-                  job['title'],
+                  job.title,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -511,7 +513,7 @@ class _JobDetailSheet extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 Text(
-                  job['department'],
+                  job.department,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: AppColors.defaultBlue,
                     fontWeight: FontWeight.w600,
@@ -527,7 +529,7 @@ class _JobDetailSheet extends StatelessWidget {
                       child: _InfoCard(
                         icon: Icons.access_time,
                         label: 'Time Commitment',
-                        value: job['timeCommitment'],
+                        value: job.timeCommitment ?? '—',
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -535,18 +537,18 @@ class _JobDetailSheet extends StatelessWidget {
                       child: _InfoCard(
                         icon: Icons.schedule,
                         label: 'Deadline',
-                        value: DateFormat('MMM dd, yyyy').format(job['applicationDeadline']),
+                        value: DateFormat('MMM dd, yyyy').format(job.applicationDeadline),
                       ),
                     ),
                   ],
                 ),
 
-                if (job['salary'] != null) ...[
+                if (job.salary != null) ...[
                   const SizedBox(height: 12),
                   _InfoCard(
                     icon: Icons.payments,
                     label: 'Compensation',
-                    value: job['salary'],
+                    value: job.salary!,
                   ),
                 ],
 
@@ -561,14 +563,14 @@ class _JobDetailSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  job['description'],
+                  job.description,
                   style: theme.textTheme.bodyMedium,
                 ),
 
                 const SizedBox(height: 24),
 
                 // Required Skills
-                if (job['skills'] != null) ...[
+                if (job.skills.isNotEmpty) ...[
                   Text(
                     'Required Skills',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -579,7 +581,7 @@ class _JobDetailSheet extends StatelessWidget {
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: (job['skills'] as List<String>).map((skill) {
+                    children: job.skills.map((skill) {
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
@@ -600,7 +602,7 @@ class _JobDetailSheet extends StatelessWidget {
                 ],
 
                 // Benefits
-                if (job['benefits'] != null) ...[
+                if (job.benefits.isNotEmpty) ...[
                   Text(
                     'What you get',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -608,7 +610,7 @@ class _JobDetailSheet extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  ...((job['benefits'] as List<String>).map((benefit) {
+                  ...(job.benefits.map((benefit) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2),
                       child: Row(

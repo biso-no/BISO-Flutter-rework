@@ -108,7 +108,7 @@ class _HomePage extends ConsumerWidget {
 
   static final _latestEventsProvider = FutureProvider.family<List<EventModel>, String>((ref, campusId) async {
     final service = ref.watch(_eventServiceProvider);
-    return service.getAllEvents(campusId: campusId, limit: 10);
+    return service.getWordPressEvents(campusId: campusId, limit: 10);
   });
 
   static final _latestProductsProvider = FutureProvider.family<List<ProductModel>, String>((ref, campusId) async {

@@ -22,6 +22,8 @@ class AppConstants {
   // Appwrite Functions (IDs)
   static const String fnParseReceiptId = 'fn_parse_receipt';
   static const String fnSummarizeExpenseId = 'fn_summarize_expense';
+  static const String fnFetchEventsId = 'fetch_events';
+  static const String fnFetchJobsId = 'fetch_jobs';
   
   // External APIs
   static const String wordPressEventsApi = 'https://biso.no/wp-json/biso/v1/events';

@@ -7,6 +7,7 @@ import '../../../core/utils/navigation_utils.dart';
 import '../../../data/models/event_model.dart';
 import '../../../data/services/event_service.dart';
 import '../../../generated/l10n/app_localizations.dart';
+import '../../../providers/campus/campus_provider.dart';
 
 // Provider for EventService
 final eventServiceProvider = Provider<EventService>((ref) => EventService());
@@ -27,7 +28,6 @@ class EventsScreen extends ConsumerStatefulWidget {
 class _EventsScreenState extends ConsumerState<EventsScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedCategory = 'all';
-  String? _selectedCampusId;
 
   final List<String> _categories = [
     'all',
@@ -48,7 +48,8 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final eventsAsync = ref.watch(eventsProvider(_selectedCampusId));
+    final campusId = ref.watch(filterCampusProvider).id;
+    final eventsAsync = ref.watch(eventsProvider(campusId));
 
     return Scaffold(
       appBar: AppBar(
@@ -125,7 +126,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
 
                 return RefreshIndicator(
                   onRefresh: () async {
-                    ref.invalidate(eventsProvider);
+                    ref.invalidate(eventsProvider(campusId));
                   },
                   child: ListView.separated(
                     padding: const EdgeInsets.all(16),

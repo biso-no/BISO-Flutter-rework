@@ -69,6 +69,49 @@ class JobModel extends Equatable {
     this.updatedAt,
   });
 
+  // Create from the Appwrite Function jobs payload (WordPress-backed)
+  factory JobModel.fromFunctionJob(Map<String, dynamic> map, {required String campusId}) {
+    // Function returns fields like id, title, deadline, description, contact, language,
+    // responsibilities, qualities, expiry_date?, url?, campus (array of names)
+    return JobModel(
+      id: (map['id'] ?? '').toString(),
+      title: (map['title'] ?? '').toString(),
+      description: (map['description'] ?? '').toString(),
+      department: (map['contact'] ?? '').toString(),
+      departmentId: '',
+      departmentLogo: null,
+      campusId: campusId,
+      type: 'volunteer',
+      category: 'general',
+      requirements: List<String>.from((map['qualities'] as List?)?.map((e) => e.toString()) ?? const <String>[]),
+      responsibilities: List<String>.from((map['responsibilities'] as List?)?.map((e) => e.toString()) ?? const <String>[]),
+      skills: const <String>[],
+      salary: null,
+      timeCommitment: null,
+      startDate: DateTime.now(),
+      endDate: null,
+      applicationDeadline: DateTime.tryParse((map['deadline'] ?? map['expiry_date'] ?? '').toString()) ?? DateTime.now().add(const Duration(days: 14)),
+      applicationMethod: 'external',
+      applicationUrl: map['url']?.toString(),
+      applicationEmail: null,
+      contactPersonName: (map['contact'] ?? '').toString(),
+      contactPersonEmail: null,
+      contactPersonPhone: null,
+      maxApplicants: 0,
+      currentApplicants: 0,
+      status: 'open',
+      isUrgent: false,
+      isFeatured: false,
+      benefits: const <String>[],
+      metadata: <String, dynamic>{
+        'language': map['language'],
+        'campusNames': map['campus'],
+      },
+      createdAt: null,
+      updatedAt: null,
+    );
+  }
+
   factory JobModel.fromMap(Map<String, dynamic> map) {
     return JobModel(
       id: map['\$id'] ?? '',
