@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
+import '../../../providers/privacy/privacy_provider.dart';
 
 // Settings providers
 final appSettingsProvider = StateNotifierProvider<AppSettingsNotifier, AppSettingsState>((ref) {
@@ -114,7 +115,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 3,
+      length: 4, // Added Privacy tab
       vsync: this,
       initialIndex: widget.initialTab,
     );
@@ -143,6 +144,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           tabs: const [
             Tab(text: 'General'),
             Tab(text: 'Notifications'),
+            Tab(text: 'Privacy'),
             Tab(text: 'Language'),
           ],
         ),
@@ -152,6 +154,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
         children: [
           _GeneralSettingsTab(),
           _NotificationSettingsTab(),
+          _PrivacySettingsTab(),
           _LanguageSettingsTab(),
         ],
       ),
@@ -529,6 +532,228 @@ class _NotificationSettingsTab extends ConsumerWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getCampusColor(String campusId) {
+    switch (campusId) {
+      case 'oslo':
+        return AppColors.defaultBlue;
+      case 'bergen':
+        return AppColors.green9;
+      case 'trondheim':
+        return AppColors.purple9;
+      case 'stavanger':
+        return AppColors.orange9;
+      default:
+        return AppColors.gray400;
+    }
+  }
+}
+
+class _PrivacySettingsTab extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final authState = ref.watch(authStateProvider);
+    final selectedCampus = ref.watch(selectedCampusProvider);
+
+    if (authState.user == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final userId = authState.user!.id;
+    final privacyStatusAsync = ref.watch(privacyStatusProvider(userId));
+    final userPrivacyAsync = ref.watch(userPrivacyProvider(userId));
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Chat Privacy',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.strongBlue,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          Card(
+            child: Column(
+              children: [
+                userPrivacyAsync.when(
+                  data: (isPublic) => SwitchListTile(
+                    secondary: Icon(
+                      isPublic == true ? Icons.public : Icons.lock_outline,
+                      color: isPublic == true ? AppColors.green9 : AppColors.orange9,
+                    ),
+                    title: const Text('Public Profile'),
+                    subtitle: Text(
+                      isPublic == true
+                          ? 'Others can find and message you'
+                          : 'Others cannot find you in search'
+                    ),
+                    value: isPublic == true,
+                    onChanged: (value) async {
+                      try {
+                        final privacyService = ref.read(privacyServiceProvider);
+                        await privacyService.setUserPrivacySetting(userId, value);
+                        
+                        // Refresh the privacy status
+                        ref.invalidate(userPrivacyProvider(userId));
+                        ref.invalidate(privacyStatusProvider(userId));
+                        
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                value 
+                                  ? 'Profile set to public - others can find you'
+                                  : 'Profile set to private - you won\'t appear in search',
+                              ),
+                              backgroundColor: AppColors.defaultBlue,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to update privacy setting: $e'),
+                              backgroundColor: AppColors.error,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    activeColor: _getCampusColor(selectedCampus.id),
+                  ),
+                  loading: () => const ListTile(
+                    leading: CircularProgressIndicator(),
+                    title: Text('Loading privacy settings...'),
+                  ),
+                  error: (error, stack) => ListTile(
+                    leading: const Icon(Icons.error_outline, color: AppColors.error),
+                    title: const Text('Error loading privacy settings'),
+                    subtitle: Text(error.toString()),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Privacy status display
+          privacyStatusAsync.when(
+            data: (status) => Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.subtleBlue,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.info_outline,
+                    color: AppColors.defaultBlue,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      status,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: AppColors.defaultBlue,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            loading: () => const SizedBox.shrink(),
+            error: (error, stack) => const SizedBox.shrink(),
+          ),
+
+          const SizedBox(height: 24),
+
+          Text(
+            'Privacy Information',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.strongBlue,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.public,
+                        color: AppColors.green9,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Public Profile',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.green9,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    '• Others can find you in user search\n'
+                    '• Students can start conversations with you\n'
+                    '• You appear in recent contacts\n'
+                    '• You can still control who messages you',
+                    style: TextStyle(height: 1.4),
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.lock_outline,
+                        color: AppColors.orange9,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Private Profile',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.orange9,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    '• Others cannot find you in search\n'
+                    '• You can still message others\n'
+                    '• Only you can start new conversations\n'
+                    '• Existing conversations remain active',
+                    style: TextStyle(height: 1.4),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

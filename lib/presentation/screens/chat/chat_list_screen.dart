@@ -7,8 +7,12 @@ import '../../../core/constants/app_colors.dart';
 import '../../../data/models/chat_model.dart';
 import '../../../data/services/chat_service.dart';
 import '../../../providers/auth/auth_provider.dart';
+import '../../../providers/privacy/privacy_provider.dart';
 import '../../../generated/l10n/app_localizations.dart';
+import '../../widgets/privacy_prompt_dialog.dart';
 import 'chat_conversation_screen.dart';
+import 'chat_info_screen.dart';
+import 'message_search_screen.dart';
 import 'new_chat_screen.dart';
 
 // Provider for chat service
@@ -16,22 +20,22 @@ final chatServiceProvider = Provider<ChatService>((ref) {
   return ChatService();
 });
 
-// Provider for user chats
-final userChatsProvider = StreamProvider.family<List<ChatModel>, String>((ref, userId) {
+// Provider for user chats  
+final userChatsProvider = FutureProvider.family<List<ChatModel>, String>((ref, userId) async {
   final chatService = ref.read(chatServiceProvider);
   
-  // Subscribe to real-time updates
-  chatService.subscribeToUpdates(userId);
-  
-  // Return the chats stream
-  return chatService.chatsStream;
+  try {
+    // Subscribe to real-time updates
+    chatService.subscribeToUpdates(userId);
+    
+    // Get initial chats
+    final chats = await chatService.getUserChats(userId);
+    return chats;
+  } catch (e) {
+    return <ChatModel>[]; // Return empty list on error
+  }
 });
 
-// Provider for fetching initial chats
-final initialChatsProvider = FutureProvider.family<List<ChatModel>, String>((ref, userId) {
-  final chatService = ref.read(chatServiceProvider);
-  return chatService.getUserChats(userId);
-});
 
 class ChatListScreen extends ConsumerStatefulWidget {
   const ChatListScreen({super.key});
@@ -64,6 +68,11 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
         _searchQuery = _searchController.text.toLowerCase();
       });
     });
+    
+    // Check privacy settings after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkPrivacySettings();
+    });
   }
 
   @override
@@ -72,6 +81,70 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     // Dispose chat service using stored reference
     _chatService.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkPrivacySettings() async {
+    final authState = ref.read(authStateProvider);
+    if (authState.user == null) return;
+    
+    final userId = authState.user!.id;
+    final shouldPrompt = await ref.read(shouldPromptPrivacyProvider(userId).future);
+    
+    if (shouldPrompt && mounted) {
+      _showPrivacyPrompt();
+    }
+  }
+
+  void _showPrivacyPrompt() {
+    final authState = ref.read(authStateProvider);
+    if (authState.user == null) return;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false, // User must make a choice
+      builder: (context) => PrivacyPromptDialog(
+        onAcceptPublic: () async {
+          Navigator.of(context).pop();
+          await _setPrivacySetting(true);
+        },
+        onChoosePrivate: () async {
+          Navigator.of(context).pop();
+          await _setPrivacySetting(false);
+        },
+      ),
+    );
+  }
+
+  Future<void> _setPrivacySetting(bool isPublic) async {
+    final authState = ref.read(authStateProvider);
+    if (authState.user == null) return;
+    
+    try {
+      final privacyService = ref.read(privacyServiceProvider);
+      await privacyService.setUserPrivacySetting(authState.user!.id, isPublic);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isPublic 
+                ? 'Profile set to public - others can find and message you'
+                : 'Profile set to private - others cannot find you in search',
+            ),
+            backgroundColor: AppColors.defaultBlue,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update privacy setting: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -107,36 +180,11 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
             onPressed: () => _showSearchDialog(context),
             icon: const Icon(Icons.search),
           ),
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'new_group') {
-                _createNewGroupChat(context);
-              } else if (value == 'settings') {
-                // TODO: Navigate to chat settings
-              }
+          IconButton(
+            onPressed: () {
+              // TODO: Navigate to chat settings
             },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'new_group',
-                child: Row(
-                  children: [
-                    Icon(Icons.group_add),
-                    SizedBox(width: 12),
-                    Text('New Group Chat'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'settings',
-                child: Row(
-                  children: [
-                    Icon(Icons.settings),
-                    SizedBox(width: 12),
-                    Text('Chat Settings'),
-                  ],
-                ),
-              ),
-            ],
+            icon: const Icon(Icons.settings),
           ),
         ],
       ),
@@ -205,7 +253,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
 
                 return RefreshIndicator(
                   onRefresh: () async {
-                    return ref.refresh(initialChatsProvider(userId));
+                    return ref.refresh(userChatsProvider(userId));
                   },
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -252,7 +300,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        ref.invalidate(initialChatsProvider(userId));
+                        ref.invalidate(userChatsProvider(userId));
                       },
                       child: const Text('Retry'),
                     ),
@@ -359,14 +407,6 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     );
   }
 
-  void _createNewGroupChat(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const NewChatScreen(isGroupChat: true),
-      ),
-    );
-  }
 }
 
 class _ChatListItem extends StatelessWidget {
@@ -598,13 +638,13 @@ class _ChatListItem extends StatelessWidget {
   }
 }
 
-class _ChatOptionsSheet extends StatelessWidget {
+class _ChatOptionsSheet extends ConsumerWidget {
   final ChatModel chat;
 
   const _ChatOptionsSheet({required this.chat});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
@@ -626,9 +666,26 @@ class _ChatOptionsSheet extends StatelessWidget {
               color: AppColors.onSurfaceVariant,
             ),
             title: Text(chat.isMuted ? 'Unmute' : 'Mute'),
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context);
-              // TODO: Implement mute/unmute
+              try {
+                final chatService = ref.read(chatServiceProvider);
+                await chatService.muteChat(chat.id, !chat.isMuted);
+                
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(chat.isMuted ? 'Chat unmuted' : 'Chat muted'),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to ${chat.isMuted ? 'unmute' : 'mute'} chat')),
+                  );
+                }
+              }
             },
           ),
           
@@ -638,7 +695,11 @@ class _ChatOptionsSheet extends StatelessWidget {
               title: const Text('Chat Info'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Show chat info
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ChatInfoScreen(chat: chat),
+                  ),
+                );
               },
             ),
           
@@ -647,7 +708,11 @@ class _ChatOptionsSheet extends StatelessWidget {
             title: const Text('Search Messages'),
             onTap: () {
               Navigator.pop(context);
-              // TODO: Implement message search
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MessageSearchScreen(chat: chat),
+                ),
+              );
             },
           ),
           
@@ -660,7 +725,7 @@ class _ChatOptionsSheet extends StatelessWidget {
               textColor: AppColors.error,
               onTap: () {
                 Navigator.pop(context);
-                _showDeleteConfirmation(context);
+                _showDeleteConfirmation(context, chat);
               },
             ),
         ],
@@ -668,7 +733,7 @@ class _ChatOptionsSheet extends StatelessWidget {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context) {
+  void _showDeleteConfirmation(BuildContext context, ChatModel chat) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -680,12 +745,24 @@ class _ChatOptionsSheet extends StatelessWidget {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              // TODO: Implement chat deletion
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Chat deleted')),
-              );
+              try {
+                final chatService = ChatService();
+                await chatService.deleteChat(chat.id);
+                
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Chat deleted successfully')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to delete chat: $e')),
+                  );
+                }
+              }
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Delete'),

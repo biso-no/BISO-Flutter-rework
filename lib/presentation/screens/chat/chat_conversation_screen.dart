@@ -11,6 +11,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../data/models/chat_model.dart';
 import '../../../providers/auth/auth_provider.dart';
 import 'chat_list_screen.dart';
+import 'chat_info_screen.dart';
 
 final chatMessagesProvider = StreamProvider.family<List<ChatMessageModel>, String>((ref, chatId) {
   final chatService = ref.read(chatServiceProvider);
@@ -66,10 +67,10 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
         _isTyping = hasText;
       });
       
-      // TODO: Send typing indicator
       final chatService = ref.read(chatServiceProvider);
       final currentUserId = ref.read(authStateProvider).user!.id;
-      chatService.sendTypingIndicator(widget.chat.id, currentUserId, hasText);
+      final userName = ref.read(authStateProvider).user?.name ?? 'Unknown';
+      chatService.sendTypingIndicator(widget.chat.id, currentUserId, userName, hasText);
     }
   }
 
@@ -402,25 +403,32 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
         );
         _cancelEdit();
       } else {
-        // Send new message
-        final attachmentUrls = <String>[];
-        
-        // Upload attachments if any
-        for (final _ in _attachments) {
-          // TODO: Implement file upload
-          // final url = await chatService.uploadFile(attachment);
-          // attachmentUrls.add(url);
+        // Handle file attachments separately
+        if (_attachments.isNotEmpty) {
+          // Send each file as a separate message
+          for (final attachment in _attachments) {
+            final fileName = attachment.path.split('/').last;
+            await chatService.sendFileMessage(
+              chatId: widget.chat.id,
+              senderId: currentUserId,
+              senderName: ref.read(authStateProvider).user?.name ?? 'Unknown',
+              file: attachment,
+              fileName: fileName,
+              caption: content.isNotEmpty ? content : null,
+              replyToId: _replyingTo?.id,
+            );
+          }
+        } else {
+          // Send text message
+          await chatService.sendMessage(
+            chatId: widget.chat.id,
+            senderId: currentUserId,
+            senderName: ref.read(authStateProvider).user?.name ?? 'Unknown',
+            content: content,
+            type: 'text',
+            replyToId: _replyingTo?.id,
+          );
         }
-
-        await chatService.sendMessage(
-          chatId: widget.chat.id,
-          senderId: currentUserId,
-          senderName: ref.read(authStateProvider).user?.name ?? 'Unknown',
-          content: content,
-          type: attachmentUrls.isNotEmpty ? 'file' : 'text',
-          replyToId: _replyingTo?.id,
-          attachments: attachmentUrls,
-        );
 
         _messageController.clear();
         _cancelReply();
@@ -500,6 +508,7 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
       await chatService.reactToMessage(
         messageId: message.id,
         userId: currentUserId,
+        userName: ref.read(authStateProvider).user?.name ?? 'Unknown',
         reaction: emoji,
       );
     } catch (e) {
@@ -615,9 +624,10 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
   }
 
   void _showChatInfo() {
-    // TODO: Implement chat info screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Chat info coming soon')),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ChatInfoScreen(chat: widget.chat),
+      ),
     );
   }
 }
@@ -681,7 +691,7 @@ class _MessageBubble extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Text(
-                      message.senderId, // TODO: Show actual sender name
+                      message.senderName,
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -1017,7 +1027,7 @@ class _MessageBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            message.replyTo!.senderId, // TODO: Show actual sender name
+            message.replyTo!.senderName,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -1323,7 +1333,7 @@ class _ReplyBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Replying to ${message.senderId}', // TODO: Show actual sender name
+                  'Replying to ${message.senderName}',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

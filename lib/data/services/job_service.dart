@@ -16,7 +16,6 @@ class JobService {
 	}) async {
 		// Try Appwrite Function (WordPress-backed)
 		try {
-			print('🔄 JobService: Fetching jobs for campus: $campusId');
 			final execution = await functions.createExecution(
 				functionId: AppConstants.fnFetchJobsId,
         xasync: false,

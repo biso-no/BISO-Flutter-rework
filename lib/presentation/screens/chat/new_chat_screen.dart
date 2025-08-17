@@ -3,30 +3,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
-import '../../../data/models/user_model.dart';
 import '../../../providers/auth/auth_provider.dart';
 import 'chat_conversation_screen.dart';
 import 'chat_list_screen.dart';
 
-final userSearchProvider = FutureProvider.family<List<UserModel>, String>((ref, query) async {
-  // TODO: Implement user search via Appwrite
-  await Future.delayed(const Duration(milliseconds: 500));
-  return [];
+final userSearchProvider = FutureProvider.family<List<Map<String, dynamic>>, String>((ref, query) async {
+  final chatService = ref.read(chatServiceProvider);
+  return await chatService.searchUsers(query);
 });
 
-final departmentUsersProvider = FutureProvider.family<List<UserModel>, String>((ref, departmentId) async {
-  // TODO: Implement department user fetching
-  await Future.delayed(const Duration(milliseconds: 500));
-  return [];
+final recentContactsProvider = FutureProvider<List<String>>((ref) async {
+  final chatService = ref.read(chatServiceProvider);
+  final authState = ref.read(authStateProvider);
+  
+  if (authState.user == null) return [];
+  
+  return await chatService.getRecentContacts(authState.user!.id);
+});
+
+final departmentsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final chatService = ref.read(chatServiceProvider);
+  return await chatService.getDepartments();
+});
+
+final teamsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final chatService = ref.read(chatServiceProvider);
+  return await chatService.getTeams();
 });
 
 class NewChatScreen extends ConsumerStatefulWidget {
-  final bool isGroupChat;
-
-  const NewChatScreen({
-    super.key,
-    this.isGroupChat = false,
-  });
+  const NewChatScreen({super.key});
 
   @override
   ConsumerState<NewChatScreen> createState() => _NewChatScreenState();
@@ -34,10 +40,10 @@ class NewChatScreen extends ConsumerStatefulWidget {
 
 class _NewChatScreenState extends ConsumerState<NewChatScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final TextEditingController _groupNameController = TextEditingController();
   
   String _searchQuery = '';
-  final List<String> _selectedUsers = [];
+  final List<String> _selectedUserIds = [];
+  final Map<String, Map<String, dynamic>> _selectedUserData = {};
   bool _isCreating = false;
   String _selectedTab = 'users';
 
@@ -56,7 +62,6 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
   @override
   void dispose() {
     _searchController.dispose();
-    _groupNameController.dispose();
     super.dispose();
   }
 
@@ -72,7 +77,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isGroupChat ? 'New Group Chat' : 'New Chat'),
+        title: const Text('New Chat'),
         leading: IconButton(
           onPressed: () => context.pop(),
           icon: const Icon(Icons.close),
@@ -87,46 +92,70 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Create'),
+                  : Text(_selectedUserIds.length == 1 ? 'Message' : 'Create Group'),
             ),
         ],
       ),
       body: Column(
         children: [
-          // Group name input (only for group chats)
-          if (widget.isGroupChat) ...[
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _groupNameController,
-                decoration: InputDecoration(
-                  hintText: 'Group name (optional)',
-                  prefixIcon: const Icon(Icons.group),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+          // Selected users tags + Search bar
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Selected users chips
+                if (_selectedUserIds.isNotEmpty) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _selectedUserIds.map((userId) {
+                        final userData = _selectedUserData[userId];
+                        final userName = userData?['name'] ?? userId;
+                        
+                        return Chip(
+                          avatar: CircleAvatar(
+                            backgroundColor: AppColors.subtleBlue,
+                            radius: 12,
+                            child: Text(
+                              userName.isNotEmpty ? userName[0].toUpperCase() : '?',
+                              style: const TextStyle(
+                                color: AppColors.defaultBlue,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          label: Text(userName),
+                          deleteIcon: const Icon(Icons.close, size: 18),
+                          onDeleted: () => _removeSelectedUser(userId),
+                          backgroundColor: AppColors.subtleBlue,
+                          deleteIconColor: AppColors.defaultBlue,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+                
+                // Search bar
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: _selectedUserIds.isEmpty 
+                        ? 'Search for people...' 
+                        : 'Add more people...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: AppColors.gray100,
                   ),
                 ),
-                onChanged: (value) => setState(() {}),
-              ),
-            ),
-            const Divider(height: 1),
-          ],
-
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search for people...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: AppColors.gray100,
-              ),
+              ],
             ),
           ),
 
@@ -228,34 +257,107 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
   }
 
   Widget _buildRecentContacts() {
-    return ListView(
-      children: [
-        const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text(
-            'Recent Contacts',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppColors.onSurfaceVariant,
+    final recentContactsAsync = ref.watch(recentContactsProvider);
+    
+    return recentContactsAsync.when(
+      data: (contactIds) {
+        return ListView(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Recent Contacts',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
             ),
-          ),
-        ),
-        // TODO: Implement recent contacts from chat history
-        const Center(
-          child: Padding(
-            padding: EdgeInsets.all(32),
+            if (contactIds.isEmpty)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(32),
+                  child: Text(
+                    'No recent contacts',
+                    style: TextStyle(color: AppColors.onSurfaceVariant),
+                  ),
+                ),
+              )
+            else
+              ...contactIds.map((userId) {
+                final isSelected = _selectedUsers.contains(userId);
+
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: AppColors.subtleBlue,
+                    child: Text(
+                      userId.isNotEmpty ? userId[0].toUpperCase() : '?',
+                      style: const TextStyle(
+                        color: AppColors.defaultBlue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  title: Text(userId), // TODO: Show actual user name
+                  trailing: widget.isGroupChat
+                      ? Checkbox(
+                          value: isSelected,
+                          onChanged: (value) {
+                            if (value == true) {
+                              _addSelectedUser(userId);
+                            } else {
+                              _removeSelectedUser(userId);
+                            }
+                          },
+                        )
+                      : null,
+                  onTap: () {
+                    if (widget.isGroupChat) {
+                      if (isSelected) {
+                        _removeSelectedUser(userId);
+                      } else {
+                        _addSelectedUser(userId);
+                      }
+                    } else {
+                      _createDirectChat(userId);
+                    }
+                  },
+                );
+              }),
+          ],
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => ListView(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
             child: Text(
-              'No recent contacts',
-              style: TextStyle(color: AppColors.onSurfaceVariant),
+              'Recent Contacts',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.onSurfaceVariant,
+              ),
             ),
           ),
-        ),
-      ],
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Text(
+                'Failed to load recent contacts: $error',
+                style: const TextStyle(color: AppColors.error),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildUserListView(List<UserModel> users) {
+  Widget _buildUserListView(List<Map<String, dynamic>> users) {
     if (users.isEmpty) {
       return const Center(
         child: Column(
@@ -280,34 +382,32 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
       itemCount: users.length,
       itemBuilder: (context, index) {
         final user = users[index];
-        final isSelected = _selectedUsers.contains(user.id);
+        final userId = user['\$id'] ?? '';
+        final userName = user['name'] ?? 'Unknown User';
+        final userEmail = user['email'] ?? '';
+        final isSelected = _selectedUsers.contains(userId);
 
         return ListTile(
           leading: CircleAvatar(
-            backgroundImage: user.avatarUrl != null
-                ? NetworkImage(user.avatarUrl!)
-                : null,
-            backgroundColor: AppColors.gray300,
-            child: user.avatarUrl == null
-                ? Text(
-                    user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                : null,
+            backgroundColor: AppColors.subtleBlue,
+            child: Text(
+              userName.isNotEmpty ? userName[0].toUpperCase() : '?',
+              style: const TextStyle(
+                color: AppColors.defaultBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-          title: Text(user.name),
-          subtitle: Text(user.email),
+          title: Text(userName),
+          subtitle: userEmail.isNotEmpty ? Text(userEmail) : null,
           trailing: widget.isGroupChat
               ? Checkbox(
                   value: isSelected,
                   onChanged: (value) {
                     if (value == true) {
-                      _addSelectedUser(user.id);
+                      _addSelectedUser(userId);
                     } else {
-                      _removeSelectedUser(user.id);
+                      _removeSelectedUser(userId);
                     }
                   },
                 )
@@ -315,12 +415,12 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
           onTap: () {
             if (widget.isGroupChat) {
               if (isSelected) {
-                _removeSelectedUser(user.id);
+                _removeSelectedUser(userId);
               } else {
-                _addSelectedUser(user.id);
+                _addSelectedUser(userId);
               }
             } else {
-              _createDirectChat(user.id);
+              _createDirectChat(userId);
             }
           },
         );
@@ -329,43 +429,143 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
   }
 
   Widget _buildDepartmentsList() {
-    // TODO: Implement departments list
-    return const Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.business,
-            size: 48,
-            color: AppColors.onSurfaceVariant,
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Department chats coming soon',
-            style: TextStyle(color: AppColors.onSurfaceVariant),
-          ),
-        ],
+    final departmentsAsync = ref.watch(departmentsProvider);
+    
+    return departmentsAsync.when(
+      data: (departments) {
+        if (departments.isEmpty) {
+          return const Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.business,
+                  size: 48,
+                  color: AppColors.onSurfaceVariant,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'No departments available',
+                  style: TextStyle(color: AppColors.onSurfaceVariant),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          itemCount: departments.length,
+          itemBuilder: (context, index) {
+            final department = departments[index];
+            final departmentId = department['\$id'] ?? '';
+            final departmentName = department['name'] ?? 'Unknown Department';
+            final description = department['description'] ?? '';
+
+            return ListTile(
+              leading: CircleAvatar(
+                backgroundColor: AppColors.orange9,
+                child: Icon(
+                  Icons.business,
+                  color: Colors.white,
+                ),
+              ),
+              title: Text(departmentName),
+              subtitle: description.isNotEmpty ? Text(description) : null,
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () => _createDepartmentChat(departmentId, departmentName),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppColors.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Failed to load departments: $error',
+              style: const TextStyle(color: AppColors.error),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildTeamsList() {
-    // TODO: Implement teams list
-    return const Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.groups,
-            size: 48,
-            color: AppColors.onSurfaceVariant,
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Team chats coming soon',
-            style: TextStyle(color: AppColors.onSurfaceVariant),
-          ),
-        ],
+    final teamsAsync = ref.watch(teamsProvider);
+    
+    return teamsAsync.when(
+      data: (teams) {
+        if (teams.isEmpty) {
+          return const Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.groups,
+                  size: 48,
+                  color: AppColors.onSurfaceVariant,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'No teams available',
+                  style: TextStyle(color: AppColors.onSurfaceVariant),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          itemCount: teams.length,
+          itemBuilder: (context, index) {
+            final team = teams[index];
+            final teamId = team['\$id'] ?? '';
+            final teamName = team['name'] ?? 'Unknown Team';
+            final description = team['description'] ?? '';
+
+            return ListTile(
+              leading: CircleAvatar(
+                backgroundColor: AppColors.purple9,
+                child: Icon(
+                  Icons.groups,
+                  color: Colors.white,
+                ),
+              ),
+              title: Text(teamName),
+              subtitle: description.isNotEmpty ? Text(description) : null,
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () => _createTeamChat(teamId, teamName),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppColors.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Failed to load teams: $error',
+              style: const TextStyle(color: AppColors.error),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -454,6 +654,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
 
       final chat = await chatService.createDirectChat(
         participants: [currentUserId, userId],
+        createdBy: currentUserId,
       );
 
       if (mounted) {
@@ -469,6 +670,90 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to create chat: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCreating = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _createDepartmentChat(String departmentId, String departmentName) async {
+    setState(() {
+      _isCreating = true;
+    });
+
+    try {
+      final chatService = ref.read(chatServiceProvider);
+      final currentUserId = ref.read(authStateProvider).user!.id;
+
+      final chat = await chatService.createDepartmentChat(
+        name: departmentName,
+        departmentId: departmentId,
+        participants: [currentUserId],
+        createdBy: currentUserId,
+      );
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatConversationScreen(chat: chat),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to create department chat: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCreating = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _createTeamChat(String teamId, String teamName) async {
+    setState(() {
+      _isCreating = true;
+    });
+
+    try {
+      final chatService = ref.read(chatServiceProvider);
+      final currentUserId = ref.read(authStateProvider).user!.id;
+
+      final chat = await chatService.createTeamChat(
+        name: teamName,
+        teamId: teamId,
+        participants: [currentUserId],
+        createdBy: currentUserId,
+      );
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatConversationScreen(chat: chat),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to create team chat: ${e.toString()}'),
             backgroundColor: AppColors.error,
           ),
         );
