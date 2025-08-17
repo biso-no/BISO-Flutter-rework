@@ -8,6 +8,12 @@
       "WebFetch(domain:developer.vippsmobilepay.com)",
       "Bash(find:*)",
       "Bash(grep:*)",
+      "Bash(touch:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)",
+      "Bash(mv:*)",
+      "Bash(cp:*)",
+      "Bash(le:*)",
       "WebSearch",
       "WebFetch(domain:ai-sdk-preview-rsc-genui.vercel.app)",
       "WebFetch(domain:ai-sdk.dev)"

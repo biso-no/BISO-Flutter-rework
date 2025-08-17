@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 
-import 'core/theme/app_theme.dart';
+import 'core/theme/premium_theme.dart';
 import 'core/logging/logging_config.dart';
 // Appwrite services are now globally initialized
 import 'generated/l10n/app_localizations.dart';
@@ -59,8 +59,8 @@ class BisoApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'BISO',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: PremiumTheme.lightTheme,
+      darkTheme: PremiumTheme.darkTheme,
       themeMode: ThemeMode.system,
       localizationsDelegates: const [
         AppLocalizations.delegate,
