@@ -10,6 +10,7 @@ import '../../../providers/campus/campus_provider.dart';
 import '../../../presentation/widgets/premium/premium_components.dart';
 import '../../../presentation/widgets/premium/premium_layouts.dart';
 import '../../../presentation/widgets/premium/premium_navigation.dart';
+import '../../../presentation/widgets/premium/premium_html_renderer.dart';
 
 import '../../../providers/large_event/large_event_provider.dart';
 import '../../../data/services/event_service.dart';
@@ -238,7 +239,7 @@ class _PremiumHomePage extends ConsumerWidget {
 
         // Volunteer Opportunities Section
         _buildPremiumContentSection(
-          title: 'Join the Community',
+          title: 'Open Positions',
           subtitle: 'Volunteer opportunities with BISO',
           icon: Icons.volunteer_activism_rounded,
           onViewAll: () => context.go('/explore/volunteer'),
@@ -279,7 +280,7 @@ class _PremiumHomePage extends ConsumerWidget {
         onActionTap: onViewAll,
         margin: const EdgeInsets.only(top: 32, bottom: 16),
         child: SizedBox(
-          height: 280,
+          height: 320,
           child: asyncData.when(
             data: (items) => items.isEmpty 
                 ? _PremiumEmptyState(message: 'Nothing here yet. Check back soon!')
@@ -1357,41 +1358,46 @@ class _PremiumJobCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
-          // Job title
-          Text(
-            job.title,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w600,
+          // Job title with HTML rendering - flexible height
+          Flexible(
+            child: job.title.toCompactHtml(
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+              ),
+              maxLines: 3,
+              fontSize: 15,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
 
           const SizedBox(height: 8),
 
-          // Skills
-          if (job.skills.isNotEmpty)
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: job.skills.take(3).map((skill) => 
-                PremiumChip(
-                  label: skill,
-                  selectedColor: AppColors.mist,
+          // Job description preview with HTML - made more compact
+          if (job.description.isNotEmpty)
+            Flexible(
+              child: job.description.toCompactHtml(
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppColors.stoneGray,
+                  height: 1.2,
                 ),
-              ).toList(),
+                maxLines: 2,
+                fontSize: 12,
+              ),
             ),
 
-          const Spacer(),
+          const SizedBox(height: 8),
 
-          // Apply button
+
+          const SizedBox(height: 12),
+
+          // Apply button - reduced padding
           PremiumButton(
             text: 'Learn More',
             isSecondary: true,
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: 10),
             onPressed: () => context.go('/explore/volunteer'),
           ),
         ],

@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/campus/campus_provider.dart';
 import '../../../data/services/job_service.dart';
 import '../../../data/models/job_model.dart';
+import '../../widgets/premium/premium_html_renderer.dart';
 
 // Providers
 final _jobServiceProvider = Provider<JobService>((ref) => JobService());
@@ -199,16 +201,6 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Post Opportunity - Coming Soon')),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Post Job'),
-        backgroundColor: AppColors.purple9,
-      ),
     );
   }
 
@@ -292,13 +284,12 @@ class _JobCard extends StatelessWidget {
                         Row(
                           children: [
                             Expanded(
-                              child: Text(
-                                job.title,
+                              child: job.title.toCompactHtml(
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                 ),
                                 maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                                fontSize: 16,
                               ),
                             ),
                             if (job.isUrgent == true)
@@ -503,11 +494,11 @@ class _JobDetailSheet extends StatelessWidget {
               controller: scrollController,
               padding: const EdgeInsets.all(24),
               children: [
-                Text(
-                  job.title,
+                job.title.toFullHtml(
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
+                  fontSize: 20,
                 ),
 
                 const SizedBox(height: 8),
@@ -543,6 +534,33 @@ class _JobDetailSheet extends StatelessWidget {
                   ],
                 ),
 
+                const SizedBox(height: 24),
+
+                // Action Buttons - Below time commitment and deadline
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.bookmark_border),
+                        label: const Text('Save'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          //Open the URL in the browser
+                          launchUrl(Uri.parse(job.url));
+                        },
+                        icon: const Icon(Icons.send),
+                        label: const Text('Apply Now'),
+                      ),
+                    ),
+                  ],
+                ),
+
                 if (job.salary != null) ...[
                   const SizedBox(height: 12),
                   _InfoCard(
@@ -562,9 +580,9 @@ class _JobDetailSheet extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  job.description,
+                job.description.toFullHtml(
                   style: theme.textTheme.bodyMedium,
+                  fontSize: 16,
                 ),
 
                 const SizedBox(height: 24),
@@ -633,33 +651,6 @@ class _JobDetailSheet extends StatelessWidget {
                   })),
                   const SizedBox(height: 24),
                 ],
-
-                // Action Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.bookmark_border),
-                        label: const Text('Save'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      flex: 2,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Application - Coming Soon')),
-                          );
-                        },
-                        icon: const Icon(Icons.send),
-                        label: const Text('Apply Now'),
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),

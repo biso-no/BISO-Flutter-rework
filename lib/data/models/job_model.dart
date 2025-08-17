@@ -16,6 +16,7 @@ class JobModel extends Equatable {
   final String? salary; // For paid positions
   final String? timeCommitment; // e.g., "5 hours/week", "One-time event"
   final DateTime startDate;
+  final String url;
   final DateTime? endDate;
   final DateTime applicationDeadline;
   final String applicationMethod; // 'internal', 'external', 'email'
@@ -50,6 +51,7 @@ class JobModel extends Equatable {
     this.salary,
     this.timeCommitment,
     required this.startDate,
+    required this.url,
     this.endDate,
     required this.applicationDeadline,
     this.applicationMethod = 'internal',
@@ -77,25 +79,26 @@ class JobModel extends Equatable {
     final campusList = map['campus'] as List<dynamic>? ?? [];
     
     // Extract department from type array or use first item
-    final department = typeList.isNotEmpty ? typeList.first.toString() : 'BISO';
+    final department = typeList.isNotEmpty ? _decodeHtmlEntities(typeList.first.toString()) : 'BISO';
     
     return JobModel(
       id: (map['id'] ?? '').toString(),
-      title: (map['title'] ?? '').toString(),
-      description: (map['description'] ?? '').toString(), // Already cleaned by function
+      title: _decodeHtmlEntities((map['title'] ?? '').toString()),
+      description: _decodeHtmlEntities((map['description'] ?? '').toString()),
       department: department,
       departmentId: '',
       departmentLogo: null,
       campusId: campusId,
       type: 'volunteer',
-      category: typeList.isNotEmpty ? typeList.first.toString() : 'general',
-      requirements: List<String>.from(interestsList.map((e) => e.toString())),
+      category: typeList.isNotEmpty ? _decodeHtmlEntities(typeList.first.toString()) : 'general',
+      requirements: List<String>.from(interestsList.map((e) => _decodeHtmlEntities(e.toString()))),
       responsibilities: const <String>[],
-      skills: List<String>.from(typeList.map((e) => e.toString())),
+      skills: List<String>.from(typeList.map((e) => _decodeHtmlEntities(e.toString()))),
       salary: null,
       timeCommitment: null,
       startDate: DateTime.now(),
       endDate: null,
+      url: map['url']?.toString() ?? '',
       applicationDeadline: DateTime.tryParse((map['expiry_date'] ?? '').toString()) ?? DateTime.now().add(const Duration(days: 14)),
       applicationMethod: 'external',
       applicationUrl: map['url']?.toString(),
@@ -137,6 +140,7 @@ class JobModel extends Equatable {
       salary: map['salary'],
       timeCommitment: map['time_commitment'],
       startDate: DateTime.parse(map['start_date']),
+      url: map['url']?.toString() ?? '',
       endDate: map['end_date'] != null ? DateTime.parse(map['end_date']) : null,
       applicationDeadline: DateTime.parse(map['application_deadline']),
       applicationMethod: map['application_method'] ?? 'internal',
@@ -173,6 +177,7 @@ class JobModel extends Equatable {
       'salary': salary,
       'time_commitment': timeCommitment,
       'start_date': startDate.toIso8601String(),
+      'url': url,
       'end_date': endDate?.toIso8601String(),
       'application_deadline': applicationDeadline.toIso8601String(),
       'application_method': applicationMethod,
@@ -207,6 +212,7 @@ class JobModel extends Equatable {
     String? salary,
     String? timeCommitment,
     DateTime? startDate,
+    String? url,
     DateTime? endDate,
     DateTime? applicationDeadline,
     String? applicationMethod,
@@ -241,6 +247,7 @@ class JobModel extends Equatable {
       salary: salary ?? this.salary,
       timeCommitment: timeCommitment ?? this.timeCommitment,
       startDate: startDate ?? this.startDate,
+      url: url ?? this.url,
       endDate: endDate ?? this.endDate,
       applicationDeadline: applicationDeadline ?? this.applicationDeadline,
       applicationMethod: applicationMethod ?? this.applicationMethod,
@@ -288,4 +295,29 @@ class JobModel extends Equatable {
     contactPersonEmail, contactPersonPhone, maxApplicants, currentApplicants,
     status, isUrgent, isFeatured, benefits, metadata, createdAt, updatedAt,
   ];
+
+  /// Decode HTML entities from WordPress content
+  static String _decodeHtmlEntities(String text) {
+    if (text.isEmpty) return text;
+    
+    return text
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll('&#x27;', "'")
+        .replaceAll('&apos;', "'")
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&mdash;', '—')
+        .replaceAll('&ndash;', '–')
+        .replaceAll('&ldquo;', '"')
+        .replaceAll('&rdquo;', '"')
+        .replaceAll('&lsquo;', ''')
+        .replaceAll('&rsquo;', ''')
+        .replaceAll('&hellip;', '…')
+        .replaceAll('&copy;', '©')
+        .replaceAll('&reg;', '®')
+        .replaceAll('&trade;', '™');
+  }
 }

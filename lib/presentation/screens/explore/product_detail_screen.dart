@@ -83,13 +83,20 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     final auth = ref.read(authStateProvider);
     if (!auth.isAuthenticated || auth.user == null) {
       // Show login prompt
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please sign in to save favorites')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please sign in to save favorites')),
+        );
+      }
       return;
     }
 
-    setState(() => _favoriteLoading = true);
+    // Prevent multiple simultaneous calls
+    if (_favoriteLoading) return;
+
+    if (mounted) {
+      setState(() => _favoriteLoading = true);
+    }
     
     try {
       final service = ProductService();
@@ -98,22 +105,26 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         productId: widget.productId,
       );
       
-      setState(() {
-        _isFavorited = newState;
-        _favoriteLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isFavorited = newState;
+          _favoriteLoading = false;
+        });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(newState ? 'Added to favorites' : 'Removed from favorites'),
-          duration: const Duration(seconds: 1),
-        ),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newState ? 'Added to favorites' : 'Removed from favorites'),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
     } catch (e) {
-      setState(() => _favoriteLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update favorite: $e')),
-      );
+      if (mounted) {
+        setState(() => _favoriteLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update favorite: $e')),
+        );
+      }
     }
   }
 

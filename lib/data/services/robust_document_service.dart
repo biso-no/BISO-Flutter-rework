@@ -98,35 +98,17 @@ class RobustDocumentService {
     String? documentId,
     List<String>? permissions,
   }) async {
-    try {
-      logPrint('🛡️ RobustDocumentService: Using robust create for collection $collectionId');
-      final doc = await databases.createDocument(
-        databaseId: databaseId,
-        collectionId: collectionId,
-        documentId: documentId ?? ID.unique(),
-        data: data,
-        permissions: permissions,
-      );
-      logPrint('🛡️ RobustDocumentService: SDK create successful');
-      final map = Map<String, dynamic>.from(doc.data);
-      map['\$id'] = doc.$id;
-      return map;
-    } catch (e) {
-      if (e.toString().contains("is not a subtype of type 'int'") ||
-          e.toString().contains('is not a subtype of type')) {
-        logPrint('🛡️ RobustDocumentService: SDK failed on create, using HTTP fallback');
-        logPrint('🛡️ RobustDocumentService: Error was: $e');
-        return await _createDocumentViaHttp(
-          databaseId: databaseId,
-          collectionId: collectionId,
-          data: data,
-          documentId: documentId,
-          permissions: permissions,
-        );
-      } else {
-        rethrow;
-      }
-    }
+    // Skip SDK entirely for database operations due to deserialization bugs
+    // Use HTTP-only approach for reliability
+    logPrint('🛡️ RobustDocumentService: Using HTTP-only create for collection $collectionId');
+    
+    return await _createDocumentViaHttp(
+      databaseId: databaseId,
+      collectionId: collectionId,
+      data: data,
+      documentId: documentId,
+      permissions: permissions,
+    );
   }
 
   /// Updates a document with robust error handling
@@ -137,35 +119,17 @@ class RobustDocumentService {
     required Map<String, dynamic> data,
     List<String>? permissions,
   }) async {
-    try {
-      logPrint('🛡️ RobustDocumentService: Using robust update for document $documentId');
-      final doc = await databases.updateDocument(
-        databaseId: databaseId,
-        collectionId: collectionId,
-        documentId: documentId,
-        data: data,
-        permissions: permissions,
-      );
-      logPrint('🛡️ RobustDocumentService: SDK update successful');
-      final map = Map<String, dynamic>.from(doc.data);
-      map['\$id'] = doc.$id;
-      return map;
-    } catch (e) {
-      if (e.toString().contains("is not a subtype of type 'int'") ||
-          e.toString().contains('is not a subtype of type')) {
-        logPrint('🛡️ RobustDocumentService: SDK failed on update, using HTTP fallback');
-        logPrint('🛡️ RobustDocumentService: Error was: $e');
-        return await _updateDocumentViaHttp(
-          databaseId: databaseId,
-          collectionId: collectionId,
-          documentId: documentId,
-          data: data,
-          permissions: permissions,
-        );
-      } else {
-        rethrow;
-      }
-    }
+    // Skip SDK entirely for database operations due to deserialization bugs
+    // Use HTTP-only approach for reliability
+    logPrint('🛡️ RobustDocumentService: Using HTTP-only update for document $documentId');
+    
+    return await _updateDocumentViaHttp(
+      databaseId: databaseId,
+      collectionId: collectionId,
+      documentId: documentId,
+      data: data,
+      permissions: permissions,
+    );
   }
 
   /// Deletes a document with robust error handling
@@ -174,28 +138,15 @@ class RobustDocumentService {
     required String collectionId,
     required String documentId,
   }) async {
-    try {
-      logPrint('🛡️ RobustDocumentService: Using robust delete for document $documentId');
-      await databases.deleteDocument(
-        databaseId: databaseId,
-        collectionId: collectionId,
-        documentId: documentId,
-      );
-      logPrint('🛡️ RobustDocumentService: SDK delete successful');
-    } catch (e) {
-      if (e.toString().contains("is not a subtype of type 'int'") ||
-          e.toString().contains('is not a subtype of type')) {
-        logPrint('🛡️ RobustDocumentService: SDK failed on delete, using HTTP fallback');
-        logPrint('🛡️ RobustDocumentService: Error was: $e');
-        await _deleteDocumentViaHttp(
-          databaseId: databaseId,
-          collectionId: collectionId,
-          documentId: documentId,
-        );
-      } else {
-        rethrow;
-      }
-    }
+    // Skip SDK entirely for database operations due to deserialization bugs
+    // Use HTTP-only approach for reliability
+    logPrint('🛡️ RobustDocumentService: Using HTTP-only delete for document $documentId');
+    
+    await _deleteDocumentViaHttp(
+      databaseId: databaseId,
+      collectionId: collectionId,
+      documentId: documentId,
+    );
   }
 
   /// Fetches document via direct HTTP call
@@ -487,6 +438,7 @@ class RobustDocumentService {
             
       } else {
         logPrint('🛡️ RobustDocumentService: HTTP list failed with status: ${response.statusCode}');
+        logPrint('🛡️ RobustDocumentService: Response body: ${response.body}');
         throw AppwriteException('HTTP list request failed: ${response.statusCode}');
       }
       

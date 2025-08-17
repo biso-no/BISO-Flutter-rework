@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,13 +17,23 @@ final _chatServiceProvider = Provider<ChatService>((ref) => ChatService());
 
 final productsProvider = FutureProvider.autoDispose.family<List<ProductModel>, _ProductQuery>((ref, query) async {
   final service = ref.watch(_productServiceProvider);
-  return service.listProducts(
-    campusId: query.campusId,
-    category: query.category,
-    status: query.status,
-    search: query.search,
-    limit: 50,
-  );
+  
+  if (query.showFavorites && query.userId != null) {
+    return service.getUserFavoriteProducts(
+      userId: query.userId!,
+      campusId: query.campusId,
+      category: query.category,
+      limit: 50,
+    );
+  } else {
+    return service.listProducts(
+      campusId: query.campusId,
+      category: query.category,
+      status: query.status,
+      search: query.search,
+      limit: 50,
+    );
+  }
 });
 
 class MarketplaceScreen extends ConsumerStatefulWidget {
@@ -35,6 +46,9 @@ class MarketplaceScreen extends ConsumerStatefulWidget {
 class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   String _selectedCategory = 'all';
   String? _search;
+  bool _showFavorites = false;
+  Timer? _debounceTimer;
+  final TextEditingController _searchController = TextEditingController();
 
   final List<String> _categories = [
     'all',
@@ -46,6 +60,21 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
     'other',
   ];
 
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      setState(() {
+        _search = value.trim().isEmpty ? null : value.trim();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +88,8 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
       category: _selectedCategory,
       status: 'available',
       search: _search,
+      showFavorites: _showFavorites,
+      userId: auth.isAuthenticated ? auth.user?.id : null,
     );
     final productsAsync = ref.watch(productsProvider(query));
 
@@ -74,98 +105,72 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
           icon: const Icon(Icons.arrow_back, color: AppColors.charcoalBlack),
         ),
         actions: [
-          IconButton(
-            onPressed: () async {
-              final textController = TextEditingController(text: _search ?? '');
-              await showModalBottomSheet(
-                context: context,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                ),
-                builder: (_) => Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Search marketplace', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: textController,
-                        decoration: InputDecoration(
-                          hintText: 'Try "MacBook", "Textbook", "Lamp"',
-                          prefixIcon: const Icon(Icons.search),
-                          filled: true,
-                          fillColor: AppColors.gray50,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(color: AppColors.outlineVariant),
-                          ),
-                        ),
-                        textInputAction: TextInputAction.search,
-                        onSubmitted: (_) => Navigator.pop(context),
-                      ),
-                      const SizedBox(height: 12),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: FilledButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Apply'),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              );
-              setState(() => _search = textController.text.trim().isEmpty ? null : textController.text.trim());
-            },
-            icon: const Icon(Icons.search, color: AppColors.charcoalBlack),
-          ),
           if (auth.isAuthenticated)
             IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.favorite_border, color: AppColors.charcoalBlack),
+              onPressed: () {
+                setState(() {
+                  _showFavorites = !_showFavorites;
+                  if (_showFavorites) {
+                    // Clear search when switching to favorites
+                    _searchController.clear();
+                    _search = null;
+                  }
+                });
+              },
+              icon: Icon(
+                _showFavorites ? Icons.favorite : Icons.favorite_border,
+                color: _showFavorites ? AppColors.error : AppColors.charcoalBlack,
+              ),
+              tooltip: _showFavorites ? 'Show all products' : 'Show favorites only',
             ),
         ],
       ),
       body: Column(
         children: [
-          // Search hint row
+          // Search field
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.gray50,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.outlineVariant),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _showFavorites ? null : _onSearchChanged,
+              enabled: !_showFavorites,
+              decoration: InputDecoration(
+                hintText: _showFavorites ? 'Search disabled in favorites' : 'Search marketplace',
+                prefixIcon: const Icon(Icons.search, color: AppColors.onSurfaceVariant),
+                suffixIcon: _search != null
+                    ? IconButton(
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _search = null);
+                        },
+                        icon: const Icon(Icons.clear, color: AppColors.onSurfaceVariant),
+                      )
+                    : null,
+                filled: true,
+                fillColor: AppColors.gray50,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: AppColors.outlineVariant),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: AppColors.outlineVariant),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: AppColors.defaultBlue, width: 2),
+                ),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, color: AppColors.onSurfaceVariant),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _search == null || _search!.isEmpty ? 'Search marketplace' : 'Results for "$_search"',
-                      style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
-                    ),
-                  ),
-                  if (_search != null)
-                    TextButton(
-                      onPressed: () => setState(() => _search = null),
-                      child: const Text('Clear'),
-                    )
-                ],
-              ),
+              textInputAction: TextInputAction.search,
             ),
           ),
 
           // Category Filter – premium pill row
           SizedBox(
-            height: 56,
+            height: 48,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               itemBuilder: (_, i) {
                 final cat = _categories[i];
                 final selected = cat == _selectedCategory;
@@ -173,17 +178,20 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                   onTap: () => setState(() => _selectedCategory = cat),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
                       color: selected ? AppColors.subtleBlue : Colors.white,
                       border: Border.all(color: selected ? AppColors.defaultBlue : AppColors.outlineVariant),
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text(
-                      _getCategoryDisplayName(cat),
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: selected ? AppColors.defaultBlue : AppColors.charcoalBlack,
-                        fontWeight: FontWeight.w600,
+                    child: Center(
+                      child: Text(
+                        _getCategoryDisplayName(cat),
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: selected ? AppColors.defaultBlue : AppColors.charcoalBlack,
+                          fontWeight: FontWeight.w600,
+                          height: 1.0,
+                        ),
                       ),
                     ),
                   ),
@@ -204,11 +212,24 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.shopping_bag_outlined, size: 64, color: AppColors.onSurfaceVariant),
+                          Icon(
+                            _showFavorites ? Icons.favorite_border : Icons.shopping_bag_outlined,
+                            size: 64,
+                            color: AppColors.onSurfaceVariant,
+                          ),
                           const SizedBox(height: 16),
-                          Text('No items found', style: theme.textTheme.titleLarge),
+                          Text(
+                            _showFavorites ? 'No favorites yet' : 'No items found',
+                            style: theme.textTheme.titleLarge,
+                          ),
                           const SizedBox(height: 8),
-                          Text('Try changing your filter or check back later', style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant), textAlign: TextAlign.center),
+                          Text(
+                            _showFavorites 
+                                ? 'Heart items you like to see them here!'
+                                : 'Try changing your filter or check back later',
+                            style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
+                            textAlign: TextAlign.center,
+                          ),
                         ],
                       ),
                     )
@@ -407,7 +428,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   }
 }
 
-class _PremiumProductCard extends StatelessWidget {
+class _PremiumProductCard extends ConsumerStatefulWidget {
   final ProductModel product;
 
   const _PremiumProductCard({
@@ -415,11 +436,96 @@ class _PremiumProductCard extends StatelessWidget {
   });
 
   @override
+  ConsumerState<_PremiumProductCard> createState() => _PremiumProductCardState();
+}
+
+class _PremiumProductCardState extends ConsumerState<_PremiumProductCard> {
+  bool _isFavorited = false;
+  bool _favoriteLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFavoriteStatus();
+  }
+
+  Future<void> _checkFavoriteStatus() async {
+    final auth = ref.read(authStateProvider);
+    if (auth.isAuthenticated && auth.user != null) {
+      try {
+        final service = ProductService();
+        final isFavorited = await service.isFavorited(
+          userId: auth.user!.id,
+          productId: widget.product.id,
+        );
+        if (mounted) {
+          setState(() {
+            _isFavorited = isFavorited;
+          });
+        }
+      } catch (e) {
+        // Silently fail - favorite status is not critical
+      }
+    }
+  }
+
+  Future<void> _toggleFavorite() async {
+    final auth = ref.read(authStateProvider);
+    if (!auth.isAuthenticated || auth.user == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please sign in to save favorites')),
+        );
+      }
+      return;
+    }
+
+    if (_favoriteLoading) return;
+
+    if (mounted) {
+      setState(() => _favoriteLoading = true);
+    }
+
+    try {
+      final service = ProductService();
+      final newState = await service.toggleFavorite(
+        userId: auth.user!.id,
+        productId: widget.product.id,
+      );
+
+      if (mounted) {
+        setState(() {
+          _isFavorited = newState;
+          _favoriteLoading = false;
+        });
+
+        // Show subtle feedback
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newState ? 'Added to favorites' : 'Removed from favorites'),
+            duration: const Duration(milliseconds: 800),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _favoriteLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update favorite: $e')),
+        );
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final auth = ref.watch(authStateProvider);
 
     return InkWell(
-      onTap: () => context.go('/explore/products/${product.id}'),
+      onTap: () => context.go('/explore/products/${widget.product.id}'),
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
@@ -441,15 +547,15 @@ class _PremiumProductCard extends StatelessWidget {
                   Positioned.fill(
                     child: ClipRRect(
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                      child: product.images.isNotEmpty
+                      child: widget.product.images.isNotEmpty
                           ? Image.network(
-                              product.images.first,
+                              widget.product.images.first,
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => Container(color: AppColors.gray100, child: const Icon(Icons.image_outlined)),
                             )
                           : Container(
                               color: AppColors.gray100,
-                              child: Icon(_getCategoryIcon(product.category), size: 48, color: AppColors.onSurfaceVariant),
+                              child: Icon(_getCategoryIcon(widget.product.category), size: 48, color: AppColors.onSurfaceVariant),
                             ),
                     ),
                   ),
@@ -464,26 +570,40 @@ class _PremiumProductCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
-                        'NOK ${product.price.toStringAsFixed(0)}',
+                        'NOK ${widget.product.price.toStringAsFixed(0)}',
                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                       ),
                     ),
                   ),
-                  // Favorite icon placeholder
-                  Positioned(
-                    bottom: 10,
-                    right: 10,
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        shape: BoxShape.circle,
-                        boxShadow: const [BoxShadow(color: AppColors.shadowLight, blurRadius: 12)],
+                  // Functional favorite icon
+                  if (auth.isAuthenticated)
+                    Positioned(
+                      bottom: 10,
+                      right: 10,
+                      child: GestureDetector(
+                        onTap: _toggleFavorite,
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            shape: BoxShape.circle,
+                            boxShadow: const [BoxShadow(color: AppColors.shadowLight, blurRadius: 12)],
+                          ),
+                          child: _favoriteLoading
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.defaultBlue),
+                                )
+                              : Icon(
+                                  _isFavorited ? Icons.favorite : Icons.favorite_border,
+                                  color: _isFavorited ? AppColors.error : AppColors.defaultBlue,
+                                  size: 20,
+                                ),
+                        ),
                       ),
-                      child: const Icon(Icons.favorite_border, color: AppColors.defaultBlue, size: 20),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -496,7 +616,7 @@ class _PremiumProductCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                   Text(
-                    product.name,
+                    widget.product.name,
                     style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -506,7 +626,7 @@ class _PremiumProductCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          product.sellerName,
+                          widget.product.sellerName,
                           style: theme.textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -516,12 +636,12 @@ class _PremiumProductCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: _getConditionColor(product.condition).withValues(alpha: 0.1),
+                          color: _getConditionColor(widget.product.condition).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          product.displayCondition,
-                          style: theme.textTheme.labelSmall?.copyWith(color: _getConditionColor(product.condition), fontWeight: FontWeight.w600),
+                          widget.product.displayCondition,
+                          style: theme.textTheme.labelSmall?.copyWith(color: _getConditionColor(widget.product.condition), fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
@@ -564,7 +684,17 @@ class _ProductQuery {
   final String? category;
   final String? status;
   final String? search;
-  const _ProductQuery({required this.campusId, this.category, this.status, this.search});
+  final bool showFavorites;
+  final String? userId;
+  
+  const _ProductQuery({
+    required this.campusId,
+    this.category,
+    this.status,
+    this.search,
+    this.showFavorites = false,
+    this.userId,
+  });
 
   @override
   bool operator ==(Object other) {
@@ -573,9 +703,11 @@ class _ProductQuery {
         other.campusId == campusId &&
         other.category == category &&
         other.status == status &&
-        other.search == search;
+        other.search == search &&
+        other.showFavorites == showFavorites &&
+        other.userId == userId;
   }
 
   @override
-  int get hashCode => Object.hash(campusId, category, status, search);
+  int get hashCode => Object.hash(campusId, category, status, search, showFavorites, userId);
 }

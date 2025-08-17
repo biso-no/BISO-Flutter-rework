@@ -51,6 +51,7 @@ class ProductService {
     if (category != null && category != 'all') queries.add(Query.equal('category', category));
     if (status != null) queries.add(Query.equal('status', status));
     if (search != null && search.trim().isNotEmpty) {
+      queries.add(Query.search('description', search.trim()));
       queries.add(Query.search('name', search.trim()));
     }
 
@@ -59,6 +60,7 @@ class ProductService {
       collectionId: collectionId,
       queries: queries,
     );
+    //Since we search on both description and name, we need to deduplicate the results
     return results.map(ProductModel.fromMap).toList(growable: false);
   }
 
@@ -147,7 +149,7 @@ class ProductService {
       collectionId: favoritesCollectionId,
       queries: [
         Query.equal('user_id', userId),
-        Query.equal('product_id', productId),
+        Query.equal('product', productId),
         Query.limit(1),
       ],
     );
@@ -160,7 +162,7 @@ class ProductService {
       collectionId: favoritesCollectionId,
       queries: [
         Query.equal('user_id', userId),
-        Query.equal('product_id', productId),
+        Query.equal('product', productId),
         Query.limit(1),
       ],
     );
@@ -171,7 +173,7 @@ class ProductService {
         documentId: ID.unique(),
         data: {
           'user_id': userId,
-          'product_id': productId,
+          'product': productId,
         },
       );
       await _bumpFavoriteCount(productId, 1);
@@ -185,6 +187,54 @@ class ProductService {
       await _bumpFavoriteCount(productId, -1);
       return false;
     }
+  }
+
+  Future<List<ProductModel>> getUserFavoriteProducts({
+    required String userId,
+    String? campusId,
+    String? category,
+    int limit = AppConstants.defaultPageSize,
+    int offset = 0,
+  }) async {
+    final List<String> queries = [
+      Query.limit(limit),
+      Query.offset(offset),
+      Query.orderDesc('\$createdAt'),
+      Query.equal('user_id', userId),
+    ];
+
+    final results = await RobustDocumentService.listDocumentsRobust(
+      databaseId: AppConstants.databaseId,
+      collectionId: favoritesCollectionId,
+      queries: queries,
+    );
+
+    // Extract products from the relationship field and filter them
+    final List<ProductModel> products = [];
+    for (final favorite in results) {
+      final productData = favorite['product'];
+      if (productData != null && productData is Map<String, dynamic>) {
+        try {
+          final product = ProductModel.fromMap(productData);
+          
+          // Apply campus filter
+          if (campusId != null && product.campusId != campusId) continue;
+          
+          // Apply category filter  
+          if (category != null && category != 'all' && product.category != category) continue;
+          
+          // Only include available products
+          if (product.status != 'available') continue;
+          
+          products.add(product);
+        } catch (e) {
+          // Skip malformed product data
+          continue;
+        }
+      }
+    }
+
+    return products;
   }
 
   Future<void> _bumpFavoriteCount(String productId, int delta) async {
