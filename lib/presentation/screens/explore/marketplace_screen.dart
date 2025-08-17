@@ -7,13 +7,10 @@ import '../../../core/constants/app_colors.dart';
 import '../../../generated/l10n/app_localizations.dart';
 import '../../../data/models/product_model.dart';
 import '../../../data/services/product_service.dart';
-import '../../../data/services/chat_service.dart';
 import '../../../providers/campus/campus_provider.dart';
 import '../../../providers/auth/auth_provider.dart';
-import '../chat/chat_conversation_screen.dart';
 
 final _productServiceProvider = Provider<ProductService>((ref) => ProductService());
-final _chatServiceProvider = Provider<ChatService>((ref) => ChatService());
 
 final productsProvider = FutureProvider.autoDispose.family<List<ProductModel>, _ProductQuery>((ref, query) async {
   final service = ref.watch(_productServiceProvider);
@@ -291,141 +288,6 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
     }
   }
 
-  void _openMarketplaceChat(BuildContext context, ProductModel product) async {
-    final auth = ref.read(authStateProvider);
-    
-    if (!auth.isAuthenticated) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to message sellers')),
-      );
-      return;
-    }
-
-    if (auth.user!.id == product.sellerId) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You cannot message yourself')),
-      );
-      return;
-    }
-
-    // Show dialog to compose initial message
-    final messageController = TextEditingController(
-      text: 'Hi! I\'m interested in your ${product.name}. Is it still available?',
-    );
-
-    final shouldSend = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: SizedBox(
-                width: 48,
-                height: 48,
-                child: product.images.isNotEmpty
-                    ? Image.network(product.images.first, fit: BoxFit.cover)
-                    : Container(
-                        color: AppColors.gray100,
-                        child: const Icon(Icons.shopping_bag),
-                      ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Message ${product.sellerName}',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  Text(
-                    product.name,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.onSurfaceVariant,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        content: TextField(
-          controller: messageController,
-          decoration: const InputDecoration(
-            hintText: 'Write your message...',
-            border: OutlineInputBorder(),
-          ),
-          maxLines: 3,
-          textInputAction: TextInputAction.done,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Send Message'),
-          ),
-        ],
-      ),
-    );
-
-    if (shouldSend == true && messageController.text.trim().isNotEmpty) {
-      // Show loading
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => const Center(child: CircularProgressIndicator()),
-        );
-      }
-
-      try {
-        final chatService = ref.read(_chatServiceProvider);
-        final chat = await chatService.createMarketplaceChat(
-          buyerId: auth.user!.id,
-          buyerName: auth.user!.name,
-          sellerId: product.sellerId,
-          sellerName: product.sellerName,
-          productId: product.id,
-          productName: product.name,
-          productImageUrl: product.images.isNotEmpty ? product.images.first : '',
-          productPrice: product.price,
-          userMessage: messageController.text.trim(),
-        );
-
-        // Dismiss loading
-        if (context.mounted) Navigator.pop(context);
-
-        // Navigate to chat
-        if (context.mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatConversationScreen(chat: chat),
-            ),
-          );
-        }
-      } catch (e) {
-        // Dismiss loading
-        if (context.mounted) Navigator.pop(context);
-        
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to create chat: $e')),
-          );
-        }
-      }
-    }
-
-    messageController.dispose();
-  }
 }
 
 class _PremiumProductCard extends ConsumerStatefulWidget {

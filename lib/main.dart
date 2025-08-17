@@ -6,12 +6,15 @@ import 'package:go_router/go_router.dart';
 
 import 'core/theme/premium_theme.dart';
 import 'core/logging/logging_config.dart';
+import 'core/constants/app_colors.dart';
 // Appwrite services are now globally initialized
 import 'generated/l10n/app_localizations.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/otp_verification_screen.dart';
 import 'presentation/screens/onboarding/onboarding_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
+import 'presentation/screens/home/premium_home_screen.dart';
+import 'presentation/screens/explore/explore_screen.dart';
 import 'presentation/screens/explore/events_screen.dart';
 // marketplace screen imported as alias below
 import 'presentation/screens/explore/marketplace_screen.dart' as market;
@@ -21,6 +24,7 @@ import 'presentation/screens/explore/jobs_screen.dart';
 import 'presentation/screens/explore/expenses_screen.dart';
 import 'presentation/screens/chat/chat_list_screen.dart';
 import 'presentation/screens/ai_chat/ai_chat_screen.dart';
+import 'presentation/screens/profile/profile_screen.dart';
 import 'providers/auth/auth_provider.dart';
 import 'presentation/screens/events/large_event_screen.dart';
 import 'data/models/large_event_model.dart';
@@ -79,96 +83,330 @@ class BisoApp extends ConsumerWidget {
 
 // Create router as a static instance to prevent rebuilding
 final _router = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/',
   routes: [
-      GoRoute(
-        path: '/auth/login',
-        name: 'login',
-        builder: (context, state) => const LoginScreen(),
+    // Auth routes (outside shell)
+    GoRoute(
+      path: '/auth/login',
+      name: 'login',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/auth/verify-otp',
+      name: 'verify-otp',
+      builder: (context, state) => OtpVerificationScreen(
+        email: state.extra as String? ?? '',
       ),
-      GoRoute(
-        path: '/auth/verify-otp',
-        name: 'verify-otp',
-        builder: (context, state) => OtpVerificationScreen(
-          email: state.extra as String? ?? '',
+    ),
+    GoRoute(
+      path: '/onboarding',
+      name: 'onboarding',
+      builder: (context, state) => const OnboardingScreen(),
+    ),
+    
+    // Main app shell with tab navigation
+    ShellRoute(
+      builder: (context, state, child) {
+        return _AppShell(child: child);
+      },
+      routes: [
+        // Main tabs
+        GoRoute(
+          path: '/',
+          redirect: (context, state) => '/home',
         ),
-      ),
-      GoRoute(
-        path: '/onboarding',
-        name: 'onboarding',
-        builder: (context, state) => const OnboardingScreen(),
-      ),
-      GoRoute(
-        path: '/home',
-        name: 'home',
-        builder: (context, state) => const HomeScreen(),
-      ),
-      GoRoute(
-        path: '/explore/events',
-        name: 'events',
-        builder: (context, state) => const EventsScreen(),
-      ),
-      GoRoute(
-        path: '/explore/products',
-        name: 'products', 
-        builder: (context, state) => const market.MarketplaceScreen(),
-        routes: [
-          GoRoute(
-            path: 'new',
-            name: 'product-new',
-            builder: (context, state) => const SellProductScreen(),
+        GoRoute(
+          path: '/home',
+          name: 'home',
+          pageBuilder: (context, state) => const NoTransitionPage(
+            child: _HomePage(),
           ),
-          GoRoute(
-            path: ':productId',
-            name: 'product-detail',
-            builder: (context, state) => ProductDetailScreen(
-              productId: state.pathParameters['productId']!,
+        ),
+        GoRoute(
+          path: '/explore',
+          name: 'explore',
+          pageBuilder: (context, state) => const NoTransitionPage(
+            child: _ExplorePage(),
+          ),
+          routes: [
+            // Explore sub-routes - these will now properly return to explore tab
+            GoRoute(
+              path: '/events',
+              name: 'events',
+              builder: (context, state) => const EventsScreen(),
             ),
-          ),
-        ],  
-      ),
-      GoRoute(
-        path: '/explore/units',
-        name: 'units',
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Clubs & Units - Coming Soon')),
+            GoRoute(
+              path: '/products',
+              name: 'products', 
+              builder: (context, state) => const market.MarketplaceScreen(),
+              routes: [
+                GoRoute(
+                  path: '/new',
+                  name: 'product-new',
+                  builder: (context, state) => const SellProductScreen(),
+                ),
+                GoRoute(
+                  path: '/:productId',
+                  name: 'product-detail',
+                  builder: (context, state) => ProductDetailScreen(
+                    productId: state.pathParameters['productId']!,
+                  ),
+                ),
+              ],  
+            ),
+            GoRoute(
+              path: '/units',
+              name: 'units',
+              builder: (context, state) => const Scaffold(
+                body: Center(child: Text('Clubs & Units - Coming Soon')),
+              ),
+            ),
+            GoRoute(
+              path: '/expenses',
+              name: 'expenses',
+              builder: (context, state) => const ExpensesScreen(),
+            ),
+            GoRoute(
+              path: '/volunteer',
+              name: 'volunteer',
+              builder: (context, state) => const JobsScreen(),
+            ),
+            GoRoute(
+              path: '/ai-chat',
+              name: 'ai-chat',
+              builder: (context, state) => const AiChatScreen(),
+            ),
+          ],
         ),
-      ),
-      GoRoute(
-        path: '/explore/expenses',
-        name: 'expenses',
-        builder: (context, state) => const ExpensesScreen(),
-      ),
-      GoRoute(
-        path: '/explore/volunteer',
-        name: 'volunteer',
-        builder: (context, state) => const JobsScreen(),
-      ),
-      GoRoute(
-        path: '/explore/chat',
-        name: 'chat',
-        builder: (context, state) => const ChatListScreen(),
-      ),
-      GoRoute(
-        path: '/explore/ai-chat',
-        name: 'ai-chat',
-        builder: (context, state) => const AiChatScreen(),
-      ),
-      GoRoute(
-        path: '/events/large/:slug',
-        name: 'large-event',
-        builder: (context, state) {
-          final extra = state.extra;
-          if (extra is LargeEventModel) {
-            return LargeEventScreen(event: extra);
-          }
-          // Deep link fallback: fetch by slug
-          final slug = state.pathParameters['slug'] ?? '';
-          return _LargeEventLoader(slug: slug);
-        },
-      ),
+        GoRoute(
+          path: '/chat',
+          name: 'chat',
+          pageBuilder: (context, state) => const NoTransitionPage(
+            child: _ChatPage(),
+          ),
+        ),
+        GoRoute(
+          path: '/profile',
+          name: 'profile',
+          pageBuilder: (context, state) => const NoTransitionPage(
+            child: _ProfilePage(),
+          ),
+        ),
+      ],
+    ),
+    
+    // Special routes (outside shell)
+    GoRoute(
+      path: '/events/large/:slug',
+      name: 'large-event',
+      builder: (context, state) {
+        final extra = state.extra;
+        if (extra is LargeEventModel) {
+          return LargeEventScreen(event: extra);
+        }
+        // Deep link fallback: fetch by slug
+        final slug = state.pathParameters['slug'] ?? '';
+        return _LargeEventLoader(slug: slug);
+      },
+    ),
   ],
 );
+
+// App Shell that contains the bottom navigation and manages tab state
+class _AppShell extends ConsumerStatefulWidget {
+  final Widget child;
+  
+  const _AppShell({required this.child});
+
+  @override
+  ConsumerState<_AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends ConsumerState<_AppShell> {
+  int _selectedIndex = 0;
+
+  void _onTabChanged(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    
+    // Navigate to the appropriate tab route
+    switch (index) {
+      case 0:
+        context.go('/home');
+        break;
+      case 1:
+        context.go('/explore');
+        break;
+      case 2:
+        context.go('/chat');
+        break;
+      case 3:
+        context.go('/profile');
+        break;
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Update selected index based on current route
+    final location = GoRouterState.of(context).matchedLocation;
+    if (location.startsWith('/home')) {
+      _selectedIndex = 0;
+    } else if (location.startsWith('/explore')) {
+      _selectedIndex = 1;
+    } else if (location.startsWith('/chat')) {
+      _selectedIndex = 2;
+    } else if (location.startsWith('/profile')) {
+      _selectedIndex = 3;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final authState = ref.watch(authStateProvider);
+    
+    return Scaffold(
+      body: widget.child,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onTabChanged,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: AppColors.defaultBlue,
+          unselectedItemColor: Colors.grey,
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.home_outlined),
+              activeIcon: const Icon(Icons.home_rounded),
+              label: l10n.home,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.explore_outlined),
+              activeIcon: const Icon(Icons.explore_rounded),
+              label: l10n.explore,
+            ),
+            BottomNavigationBarItem(
+              icon: Stack(
+                children: [
+                  const Icon(Icons.forum_outlined),
+                  if (!authState.isAuthenticated)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: AppColors.defaultBlue,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              activeIcon: const Icon(Icons.forum_rounded),
+              label: l10n.chat,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.person_outline_rounded),
+              activeIcon: const Icon(Icons.person_rounded),
+              label: l10n.profile,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Page wrapper components
+class _HomePage extends StatelessWidget {
+  const _HomePage();
+
+  @override
+  Widget build(BuildContext context) {
+    return PremiumHomePage(
+      navigateToTab: (int index) {
+        switch (index) {
+          case 1:
+            context.go('/explore');
+            break;
+          case 2:
+            context.go('/chat');
+            break;
+          case 3:
+            context.go('/profile');
+            break;
+          default:
+            context.go('/home');
+            break;
+        }
+      },
+    );
+  }
+}
+
+class _ExplorePage extends StatelessWidget {
+  const _ExplorePage();
+
+  @override
+  Widget build(BuildContext context) {
+    return const ExploreScreen();
+  }
+}
+
+class _ChatPage extends ConsumerWidget {
+  const _ChatPage();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+    final l10n = AppLocalizations.of(context);
+    
+    if (authState.isAuthenticated) {
+      return const ChatListScreen();
+    } else {
+      return PremiumAuthRequiredPage(
+        title: l10n.chat,
+        description: 'Connect with students and organizations across BI',
+        icon: Icons.forum_outlined,
+      );
+    }
+  }
+}
+
+class _ProfilePage extends ConsumerWidget {
+  const _ProfilePage();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+    final l10n = AppLocalizations.of(context);
+    
+    if (authState.isAuthenticated) {
+      return const ProfileScreen();
+    } else {
+      return PremiumAuthRequiredPage(
+        title: l10n.profile,
+        description: 'Manage your account and preferences',
+        icon: Icons.person_outline_rounded,
+      );
+    }
+  }
+}
 
 class _LargeEventLoader extends StatefulWidget {
   final String slug;

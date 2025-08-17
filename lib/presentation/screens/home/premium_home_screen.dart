@@ -73,18 +73,18 @@ class _PremiumHomeScreenState extends ConsumerState<PremiumHomeScreen>
     final authState = ref.watch(authStateProvider);
     
     final pages = [
-      _PremiumHomePage(navigateToTab: _navigateToTab),
+      PremiumHomePage(navigateToTab: _navigateToTab),
       const ExploreScreen(),
       authState.isAuthenticated 
           ? const ChatListScreen()
-          : _PremiumAuthRequiredPage(
+          : PremiumAuthRequiredPage(
               title: l10n.chat,
               description: 'Connect with students and organizations across BI',
               icon: Icons.forum_outlined,
             ),
       authState.isAuthenticated 
           ? const ProfileScreen()
-          : _PremiumAuthRequiredPage(
+          : PremiumAuthRequiredPage(
               title: l10n.profile,
               description: 'Manage your account and preferences',
               icon: Icons.person_outline_rounded,
@@ -147,10 +147,10 @@ class _PremiumHomeScreenState extends ConsumerState<PremiumHomeScreen>
 
 // === PREMIUM HOME PAGE ===
 
-class _PremiumHomePage extends ConsumerWidget {
+class PremiumHomePage extends ConsumerWidget {
   final Function(int) navigateToTab;
   
-  const _PremiumHomePage({required this.navigateToTab});
+  const PremiumHomePage({super.key, required this.navigateToTab});
 
   // Data providers
   static final _eventServiceProvider = Provider<EventService>((ref) => EventService());
@@ -1497,13 +1497,14 @@ class _PremiumErrorState extends StatelessWidget {
 
 // === AUTH REQUIRED PAGE ===
 
-class _PremiumAuthRequiredPage extends StatelessWidget {
+class PremiumAuthRequiredPage extends StatelessWidget {
   final String title;
   final String description;
   final IconData icon;
   final Function(int)? navigateToTab;
 
-  const _PremiumAuthRequiredPage({
+  const PremiumAuthRequiredPage({
+    super.key,
     required this.title,
     required this.description,
     required this.icon,
