@@ -72,9 +72,9 @@ class _LargeEventHeroState extends State<LargeEventHero> with TickerProviderStat
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withOpacity(0.2),
+                      Colors.black.withValues(alpha: 0.2),
                       Colors.transparent,
-                      Colors.black.withOpacity(0.6),
+                      Colors.black.withValues(alpha: 0.6),
                     ],
                     stops: const [0.0, 0.5, 1.0],
                   ),
@@ -98,7 +98,7 @@ class _LargeEventHeroState extends State<LargeEventHero> with TickerProviderStat
                       boxShadow: t > 0.01
                           ? [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.06 * t),
+                                color: Colors.black.withValues(alpha: 0.06 * t),
                                 blurRadius: 12 * t,
                                 offset: const Offset(0, 4),
                               )
@@ -170,7 +170,7 @@ class _LargeEventHeroState extends State<LargeEventHero> with TickerProviderStat
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: textColor.withOpacity(0.9),
+                color: textColor.withValues(alpha: 0.9),
               ),
             ),
           ],

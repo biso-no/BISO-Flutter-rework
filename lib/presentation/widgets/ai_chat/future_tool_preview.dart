@@ -97,10 +97,10 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.crystalBlue.withOpacity(0.1),
+        color: AppColors.crystalBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.crystalBlue.withOpacity(0.2),
+          color: AppColors.crystalBlue.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -147,10 +147,10 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.emeraldGreen.withOpacity(0.1),
+        color: AppColors.emeraldGreen.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.emeraldGreen.withOpacity(0.2),
+          color: AppColors.emeraldGreen.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -195,10 +195,10 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.warmGold.withOpacity(0.1),
+        color: AppColors.warmGold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.warmGold.withOpacity(0.2),
+          color: AppColors.warmGold.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -251,10 +251,10 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.skyBlue.withOpacity(0.1),
+        color: AppColors.skyBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.skyBlue.withOpacity(0.2),
+          color: AppColors.skyBlue.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -301,10 +301,10 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.sunGold.withOpacity(0.1),
+        color: AppColors.sunGold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.sunGold.withOpacity(0.2),
+          color: AppColors.sunGold.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -357,10 +357,10 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.richNavy.withOpacity(0.1),
+        color: AppColors.richNavy.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.richNavy.withOpacity(0.2),
+          color: AppColors.richNavy.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -405,10 +405,10 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.onSurfaceVariant.withOpacity(0.1),
+        color: AppColors.onSurfaceVariant.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.onSurfaceVariant.withOpacity(0.2),
+          color: AppColors.onSurfaceVariant.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -449,7 +449,7 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -514,9 +514,9 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
                 begin: Alignment(_shimmerAnimation.value - 1, 0),
                 end: Alignment(_shimmerAnimation.value, 0),
                 colors: [
-                  AppColors.onSurfaceVariant.withOpacity(0.1),
-                  AppColors.onSurfaceVariant.withOpacity(0.3),
-                  AppColors.onSurfaceVariant.withOpacity(0.1),
+                  AppColors.onSurfaceVariant.withValues(alpha: 0.1),
+                  AppColors.onSurfaceVariant.withValues(alpha: 0.3),
+                  AppColors.onSurfaceVariant.withValues(alpha: 0.1),
                 ],
               ),
             ),
@@ -530,10 +530,10 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: AppColors.warmGold.withOpacity(0.1),
+        color: AppColors.warmGold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColors.warmGold.withOpacity(0.2),
+          color: AppColors.warmGold.withValues(alpha: 0.2),
         ),
       ),
       child: Text(
@@ -552,10 +552,10 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: AppColors.sunGold.withOpacity(0.1),
+        color: AppColors.sunGold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColors.sunGold.withOpacity(0.2),
+          color: AppColors.sunGold.withValues(alpha: 0.2),
         ),
       ),
       child: Text(

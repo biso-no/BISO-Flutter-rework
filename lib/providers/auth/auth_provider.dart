@@ -3,6 +3,7 @@ import '../../data/models/user_model.dart';
 import '../../data/services/auth_service.dart';
 import '../../data/services/robust_document_service.dart';
 
+import '../../core/logging/print_migration.dart';
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 
 final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
@@ -94,7 +95,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Loads complete user profile from database using RobustDocumentService
   Future<void> _loadCompleteProfile(String userId) async {
     try {
-      print('🔐 AuthProvider: Loading complete profile for userId: $userId');
+      logPrint('🔐 AuthProvider: Loading complete profile for userId: $userId');
       
       // Use RobustDocumentService to handle SDK issues
       final documentData = await RobustDocumentService.getDocumentRobust(
@@ -104,7 +105,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
 
       final profile = UserModel.fromMap(documentData);
-      print('🔐 AuthProvider: Profile loaded successfully: ${profile.name}');
+      logPrint('🔐 AuthProvider: Profile loaded successfully: ${profile.name}');
       
       final hasProfile = true;
       final isProfileComplete = profile.campusId != null && profile.campusId!.isNotEmpty;
@@ -120,7 +121,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       if (e.toString().contains('404')) {
         // Profile doesn't exist yet - user needs onboarding
-        print('🔐 AuthProvider: Profile not found (404) - user needs onboarding');
+        logPrint('🔐 AuthProvider: Profile not found (404) - user needs onboarding');
         
         // Get basic user info from auth service
         final basicUser = await _authService.getCurrentUser();
@@ -133,7 +134,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           isProfileComplete: false,
         );
       } else {
-        print('🔐 AuthProvider: Error loading profile: $e');
+        logPrint('🔐 AuthProvider: Error loading profile: $e');
         rethrow;
       }
     }
@@ -156,12 +157,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> verifyOtp(String userId, String secret) async {
-    print('🔥 DEBUG: Starting verifyOtp with userId: $userId, secret: $secret');
+    logPrint('🔥 DEBUG: Starting verifyOtp with userId: $userId, secret: $secret');
     state = state.copyWith(isLoading: true, error: null);
     
     try {
       final user = await _authService.verifyOtp(userId, secret);
-      print('🔥 DEBUG: OTP verification successful, user: ${user.email}');
+      logPrint('🔥 DEBUG: OTP verification successful, user: ${user.email}');
       
       // After successful OTP verification, load complete profile
       await _loadCompleteProfile(user.id);
@@ -169,7 +170,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // Clear pending userId
       state = state.copyWith(pendingUserId: null);
     } catch (e) {
-      print('🔥 DEBUG: OTP verification failed: $e');
+      logPrint('🔥 DEBUG: OTP verification failed: $e');
       state = state.copyWith(
         error: e.toString(),
         isLoading: false,

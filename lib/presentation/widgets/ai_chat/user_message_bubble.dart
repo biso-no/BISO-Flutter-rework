@@ -99,7 +99,7 @@ class _UserMessageBubbleState extends State<UserMessageBubble>
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.crystalBlue.withOpacity(0.3),
+            color: AppColors.crystalBlue.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -140,12 +140,12 @@ class _UserMessageBubbleState extends State<UserMessageBubble>
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: AppColors.crystalBlue.withOpacity(0.3),
+                color: AppColors.crystalBlue.withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
               BoxShadow(
-                color: AppColors.white.withOpacity(0.2),
+                color: AppColors.white.withValues(alpha: 0.2),
                 blurRadius: 1,
                 offset: const Offset(0, 1),
               ),

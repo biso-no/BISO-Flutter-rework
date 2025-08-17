@@ -646,9 +646,10 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
   }
 
   void _closeModal(BuildContext context) async {
+    final navigator = Navigator.of(context);
     await _slideController.reverse();
     if (mounted) {
-      Navigator.of(context).pop();
+      navigator.pop();
     }
   }
 }

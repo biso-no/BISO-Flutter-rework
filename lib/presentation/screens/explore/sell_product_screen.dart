@@ -189,9 +189,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
       );
     }
 
-    return WillPopScope(
-      onWillPop: _handleWillPop,
-      child: Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Sell Item'),
@@ -200,7 +198,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
         backgroundColor: Colors.white,
           leading: IconButton(
             icon: const Icon(Icons.close),
-            onPressed: _onCancelPressed,
+            onPressed: _handleCancel,
           ),
         actions: [
           Padding(
@@ -305,8 +303,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
           ],
         ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildImagesPicker(ThemeData theme) {
@@ -392,29 +389,13 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
         _condition != 'good';
   }
 
-  Future<void> _onCancelPressed() async {
-    if (!_hasChanges()) {
-      _navigateBack();
-      return;
+  Future<void> _handleCancel() async {
+    if (_hasChanges()) {
+      final discard = await _showDiscardDialog();
+      if (!discard) return;
     }
-    final discard = await _showDiscardDialog();
-    if (discard) {
-      _navigateBack();
-    }
-  }
-
-  Future<bool> _handleWillPop() async {
-    if (!_hasChanges()) return true;
-    final discard = await _showDiscardDialog();
-    return discard;
-  }
-
-  void _navigateBack() {
-    if (context.canPop()) {
-      context.pop();
-    } else {
-      context.go('/explore/products');
-    }
+    // Simple direct navigation
+    context.go('/explore/products');
   }
 
   Future<bool> _showDiscardDialog() async {
@@ -452,6 +433,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
     final user = auth.user!;
 
     setState(() => _submitting = true);
+    
     try {
       final price = double.parse(_priceController.text.replaceAll(',', '.'));
       final product = ProductModel(
@@ -474,19 +456,27 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
       );
 
       final service = ProductService();
-      await service.createProduct(
+      final createdProduct = await service.createProduct(
         product: product,
         imagePaths: _images.map((x) => x.path).toList(),
       );
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Your item is now live')));
-      context.go('/explore/products');
+      
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Your item is now live!')),
+      );
+      
+      // Navigate directly to the new product details screen
+      context.go('/explore/products/${createdProduct.id}');
+      
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to publish: $e')));
-    } finally {
-      if (mounted) setState(() => _submitting = false);
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to publish: $e')),
+      );
     }
   }
 

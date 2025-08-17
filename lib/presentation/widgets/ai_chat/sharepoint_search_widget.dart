@@ -73,17 +73,17 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: (isDark ? AppColors.surfaceDark : AppColors.white)
-                      .withOpacity(0.7),
+                      .withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: (isDark ? AppColors.outlineDark : AppColors.outline)
-                        .withOpacity(0.2),
+                        .withValues(alpha: 0.2),
                     width: 1,
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: (isDark ? AppColors.shadowHeavy : AppColors.shadowLight)
-                          .withOpacity(0.1),
+                          .withValues(alpha: 0.1),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -122,7 +122,7 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.crystalBlue.withOpacity(0.3),
+            color: AppColors.crystalBlue.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -150,7 +150,7 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.crystalBlue.withOpacity(0.1),
+            color: AppColors.crystalBlue.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
@@ -218,10 +218,10 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.crystalBlue.withOpacity(0.1),
+        color: AppColors.crystalBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.crystalBlue.withOpacity(0.3),
+          color: AppColors.crystalBlue.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -279,7 +279,7 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
                     ? AppColors.emeraldGreen 
                     : isActive 
                         ? AppColors.crystalBlue 
-                        : AppColors.outline.withOpacity(0.3),
+                        : AppColors.outline.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -329,10 +329,10 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: (isDark ? AppColors.surfaceDark : AppColors.white).withOpacity(0.5),
+        color: (isDark ? AppColors.surfaceDark : AppColors.white).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.outline.withOpacity(0.2),
+          color: AppColors.outline.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -383,9 +383,9 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
             borderRadius: BorderRadius.circular(6),
             gradient: LinearGradient(
               colors: [
-                AppColors.outline.withOpacity(0.1),
-                AppColors.outline.withOpacity(0.3),
-                AppColors.outline.withOpacity(0.1),
+                AppColors.outline.withValues(alpha: 0.1),
+                AppColors.outline.withValues(alpha: 0.3),
+                AppColors.outline.withValues(alpha: 0.1),
               ],
               stops: [
                 (shimmerValue - 0.3).clamp(0.0, 1.0),

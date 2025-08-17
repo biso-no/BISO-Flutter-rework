@@ -125,10 +125,12 @@ class _HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final campus = ref.watch(filterCampusProvider);
-    final authState = ref.watch(authStateProvider);
+        final campus = ref.watch(filterCampusProvider);
+
+    // TODO: Uncomment when these are ready
+    //final l10n = AppLocalizations.of(context);
+    //final theme = Theme.of(context);
+    //final authState = ref.watch(authStateProvider);
 
     final featuredEvent = ref.watch(featuredLargeEventProvider);
     final campusId = campus.id;
@@ -305,7 +307,7 @@ class _HomePage extends ConsumerWidget {
                         title: p.name,
                         price: p.formattedPrice,
                         seller: p.sellerName,
-                        onTap: () => context.go('/explore/products'),
+                        onTap: () => context.go('/explore/products/${p.id}'),
                       ),
                     );
                   },
@@ -348,32 +350,6 @@ class _HomePage extends ConsumerWidget {
                 error: (err, st) => _ErrorRow(onRetry: () => ref.invalidate(_latestJobsProvider(campusId))),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAuthPrompt(BuildContext context, String feature) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sign In Required'),
-        content: Text('You need to sign in to access $feature functionality.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-              );
-            },
-            child: const Text('Sign In'),
           ),
         ],
       ),

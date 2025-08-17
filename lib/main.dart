@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/theme/app_theme.dart';
+import 'core/logging/logging_config.dart';
 // Appwrite services are now globally initialized
 import 'generated/l10n/app_localizations.dart';
 import 'presentation/screens/auth/login_screen.dart';
@@ -15,6 +16,7 @@ import 'presentation/screens/explore/events_screen.dart';
 // marketplace screen imported as alias below
 import 'presentation/screens/explore/marketplace_screen.dart' as market;
 import 'presentation/screens/explore/sell_product_screen.dart';
+import 'presentation/screens/explore/product_detail_screen.dart';
 import 'presentation/screens/explore/jobs_screen.dart';
 import 'presentation/screens/explore/expenses_screen.dart';
 import 'presentation/screens/chat/chat_list_screen.dart';
@@ -26,6 +28,9 @@ import 'data/services/large_event_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize logging system early
+  await LoggingConfig.initialize();
   
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
@@ -112,6 +117,13 @@ final _router = GoRouter(
             path: 'new',
             name: 'product-new',
             builder: (context, state) => const SellProductScreen(),
+          ),
+          GoRoute(
+            path: ':productId',
+            name: 'product-detail',
+            builder: (context, state) => ProductDetailScreen(
+              productId: state.pathParameters['productId']!,
+            ),
           ),
         ],  
       ),

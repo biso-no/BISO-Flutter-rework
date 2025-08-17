@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
@@ -216,6 +215,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
   }
 
   Future<void> _submitExpense() async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     try {
       setState(() {});
       final user = ref.read(currentUserProvider);
@@ -290,7 +290,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           const SnackBar(
             content: Text('Expense submitted'),
             backgroundColor: AppColors.success,
@@ -298,12 +298,14 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to submit: $e'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      if (mounted) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text('Failed to submit: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 
@@ -1415,7 +1417,7 @@ class _PrimaryButtonPainter extends CustomPainter {
     final r = RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(14));
     final paint = Paint()
       ..shader = LinearGradient(
-        colors: [color.withOpacity(0.95), color.withOpacity(0.85)],
+        colors: [color.withValues(alpha: 0.95), color.withValues(alpha: 0.85)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ).createShader(r.outerRect)

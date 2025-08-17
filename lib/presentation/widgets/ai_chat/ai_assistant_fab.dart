@@ -82,8 +82,8 @@ class _AiAssistantFabState extends State<AiAssistantFab>
                       borderRadius: BorderRadius.circular(36),
                       gradient: LinearGradient(
                         colors: [
-                          AppColors.crystalBlue.withOpacity(0.2),
-                          AppColors.emeraldGreen.withOpacity(0.2),
+                          AppColors.crystalBlue.withValues(alpha: 0.2),
+                          AppColors.emeraldGreen.withValues(alpha: 0.2),
                         ],
                       ),
                     ),
@@ -105,12 +105,12 @@ class _AiAssistantFabState extends State<AiAssistantFab>
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.crystalBlue.withOpacity(0.4),
+                        color: AppColors.crystalBlue.withValues(alpha: 0.4),
                         blurRadius: 16,
                         offset: const Offset(0, 4),
                       ),
                       BoxShadow(
-                        color: AppColors.emeraldGreen.withOpacity(0.2),
+                        color: AppColors.emeraldGreen.withValues(alpha: 0.2),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -251,7 +251,7 @@ class _AiAssistantFabExtendedState extends State<AiAssistantFabExtended>
                   borderRadius: BorderRadius.circular(32),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.crystalBlue.withOpacity(0.3 * _glowAnimation.value),
+                      color: AppColors.crystalBlue.withValues(alpha: 0.3 * _glowAnimation.value),
                       blurRadius: 20 * _glowAnimation.value,
                       offset: const Offset(0, 4),
                     ),

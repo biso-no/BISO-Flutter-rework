@@ -140,8 +140,8 @@ class _ChatInputFieldState extends State<ChatInputField>
         hintText: 'Ask me anything about BISO...',
         hintStyle: theme.textTheme.bodyLarge?.copyWith(
           color: widget.isDark 
-              ? AppColors.mist.withOpacity(0.7)
-              : AppColors.onSurfaceVariant.withOpacity(0.7),
+              ? AppColors.mist.withValues(alpha: 0.7)
+              : AppColors.onSurfaceVariant.withValues(alpha: 0.7),
         ),
         border: InputBorder.none,
         enabledBorder: InputBorder.none,
@@ -189,7 +189,7 @@ class _ChatInputFieldState extends State<ChatInputField>
                 boxShadow: _hasText && widget.enabled
                     ? [
                         BoxShadow(
-                          color: AppColors.crystalBlue.withOpacity(0.3),
+                          color: AppColors.crystalBlue.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -227,7 +227,7 @@ class _ChatInputFieldState extends State<ChatInputField>
       height: 40,
       decoration: BoxDecoration(
         color: (widget.isDark ? AppColors.stoneGray : AppColors.outline)
-            .withOpacity(0.5),
+            .withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Material(

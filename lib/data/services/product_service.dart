@@ -85,15 +85,17 @@ class ProductService {
     }
 
     final data = product.copyWith(images: imageUrls, imageFileIds: fileIds).toMap();
-    final doc = await databases.createDocument(
+    final docId = ID.unique();
+    
+    // Use HTTP method directly to avoid SDK creation + fallback double call
+    final doc = await RobustDocumentService.createDocumentViaHttpDirect(
       databaseId: AppConstants.databaseId,
       collectionId: collectionId,
-      documentId: ID.unique(),
+      documentId: docId,
       data: data,
     );
-    final map = Map<String, dynamic>.from(doc.data);
-    map['\$id'] = doc.$id;
-    return ProductModel.fromMap(map);
+    
+    return ProductModel.fromMap(doc);
   }
 
   Future<ProductModel> updateProduct(ProductModel product) async {
@@ -112,7 +114,7 @@ class ProductService {
     required String productId,
     required String status, // 'available' | 'sold' | 'reserved' | 'inactive'
   }) async {
-    await databases.updateDocument(
+    await RobustDocumentService.updateDocumentRobust(
       databaseId: AppConstants.databaseId,
       collectionId: collectionId,
       documentId: productId,
@@ -140,7 +142,7 @@ class ProductService {
   }
 
   Future<bool> isFavorited({required String userId, required String productId}) async {
-    final res = await databases.listDocuments(
+    final res = await RobustDocumentService.listDocumentsRobust(
       databaseId: AppConstants.databaseId,
       collectionId: favoritesCollectionId,
       queries: [
@@ -149,11 +151,11 @@ class ProductService {
         Query.limit(1),
       ],
     );
-    return res.total > 0;
+    return res.isNotEmpty;
   }
 
   Future<bool> toggleFavorite({required String userId, required String productId}) async {
-    final res = await databases.listDocuments(
+    final res = await RobustDocumentService.listDocumentsRobust(
       databaseId: AppConstants.databaseId,
       collectionId: favoritesCollectionId,
       queries: [
@@ -162,8 +164,8 @@ class ProductService {
         Query.limit(1),
       ],
     );
-    if (res.documents.isEmpty) {
-      await databases.createDocument(
+    if (res.isEmpty) {
+      await RobustDocumentService.createDocumentRobust(
         databaseId: AppConstants.databaseId,
         collectionId: favoritesCollectionId,
         documentId: ID.unique(),
@@ -175,10 +177,10 @@ class ProductService {
       await _bumpFavoriteCount(productId, 1);
       return true;
     } else {
-      await databases.deleteDocument(
+      await RobustDocumentService.deleteDocumentRobust(
         databaseId: AppConstants.databaseId,
         collectionId: favoritesCollectionId,
-        documentId: res.documents.first.$id,
+        documentId: res.first['\$id'],
       );
       await _bumpFavoriteCount(productId, -1);
       return false;

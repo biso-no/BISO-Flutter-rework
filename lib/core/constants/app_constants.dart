@@ -16,6 +16,9 @@ class AppConstants {
   static const String campusesCollectionId = 'campus';
   static const String departmentsCollectionId = 'departments';
   static const String usersCollectionId = 'user';
+  static const String chatMessagesCollectionId = 'chat_messages';
+  static const String chatParticipantsCollectionId = 'chat_participants';
+  static const String chatRoomsCollectionId = 'chat_rooms';
   
   // AI Service  
   static const String aiApiUrl = 'https://ai.biso.no';

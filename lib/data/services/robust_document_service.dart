@@ -3,14 +3,15 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'appwrite_service.dart';
 
-/// Robust document service to handle Appwrite SDK deserialization issues
+import '../../core/logging/print_migration.dart';
+/// Robust document service that uses HTTP-only requests for database operations
 /// 
-/// This service provides a workaround for the known issue where Appwrite SDK
-/// fails to deserialize documents when system fields like $sequence are 
-/// returned as String instead of int from the API.
+/// This service bypasses the Appwrite SDK for database queries due to known
+/// deserialization issues where system fields like $sequence are returned as
+/// String instead of int, causing type errors.
 /// 
-/// TEMPORARY WORKAROUND - Can be removed once Appwrite SDK fixes the issue:
-/// https://github.com/appwrite/sdk-for-dart/issues/261
+/// Uses direct HTTP calls for better performance and reliability.
+/// Other Appwrite modules (auth, storage, etc.) can still use the SDK safely.
 class RobustDocumentService {
   // JWT cache with 15-minute expiration
   static String? _cachedJwt;
@@ -25,20 +26,20 @@ class RobustDocumentService {
     if (_cachedJwt != null && 
         _jwtExpiration != null && 
         now.isBefore(_jwtExpiration!)) {
-      print('🛡️ RobustDocumentService: Using cached JWT (expires at $_jwtExpiration)');
+      logPrint('🛡️ RobustDocumentService: Using cached JWT (expires at $_jwtExpiration)');
       return _cachedJwt;
     }
     
     // JWT expired or doesn't exist, create new one
     try {
-      print('🛡️ RobustDocumentService: Creating new JWT token');
+      logPrint('🛡️ RobustDocumentService: Creating new JWT token');
       final jwt = await account.createJWT();
       _cachedJwt = jwt.jwt;
       _jwtExpiration = now.add(_jwtDuration);
-      print('🛡️ RobustDocumentService: New JWT cached until $_jwtExpiration');
+      logPrint('🛡️ RobustDocumentService: New JWT cached until $_jwtExpiration');
       return _cachedJwt;
     } catch (e) {
-      print('🛡️ RobustDocumentService: Failed to create JWT: $e');
+      logPrint('🛡️ RobustDocumentService: Failed to create JWT: $e');
       // Clear cache on failure
       _cachedJwt = null;
       _jwtExpiration = null;
@@ -48,14 +49,14 @@ class RobustDocumentService {
 
   /// Clears the JWT cache (call this when user signs out)
   static void clearJwtCache() {
-    print('🛡️ RobustDocumentService: Clearing JWT cache');
+    logPrint('🛡️ RobustDocumentService: Clearing JWT cache');
     _cachedJwt = null;
     _jwtExpiration = null;
   }
 
   /// Forces refresh of JWT token (useful if current token becomes invalid)
   static Future<String?> refreshJwt() async {
-    print('🛡️ RobustDocumentService: Forcing JWT refresh');
+    logPrint('🛡️ RobustDocumentService: Forcing JWT refresh');
     _cachedJwt = null;
     _jwtExpiration = null;
     return await _getCachedJwt();
@@ -80,37 +81,13 @@ class RobustDocumentService {
     required String collectionId,
     required String documentId,
   }) async {
-    try {
-      print('🛡️ RobustDocumentService: Using robust fetch for document $documentId');
-      
-      // First try the normal SDK method
-      final document = await databases.getDocument(
-        databaseId: databaseId,
-        collectionId: collectionId,
-        documentId: documentId,
-      );
-      
-      print('🛡️ RobustDocumentService: SDK fetch successful');
-      return document.data;
-      
-    } catch (e) {
-      // If SDK fails with type error, use HTTP fallback
-      if (e.toString().contains("is not a subtype of type 'int'") ||
-          e.toString().contains("is not a subtype of type")) {
-        
-        print('🛡️ RobustDocumentService: SDK failed with type error, using HTTP fallback');
-        print('🛡️ RobustDocumentService: Error was: $e');
-        
-        return await _getDocumentViaHttp(
-          databaseId: databaseId,
-          collectionId: collectionId,
-          documentId: documentId,
-        );
-      } else {
-        // Re-throw other errors
-        rethrow;
-      }
-    }
+    logPrint('🛡️ RobustDocumentService: Using HTTP-only fetch for document $documentId');
+    
+    return await _getDocumentViaHttp(
+      databaseId: databaseId,
+      collectionId: collectionId,
+      documentId: documentId,
+    );
   }
 
   /// Creates a document with robust error handling
@@ -122,7 +99,7 @@ class RobustDocumentService {
     List<String>? permissions,
   }) async {
     try {
-      print('🛡️ RobustDocumentService: Using robust create for collection $collectionId');
+      logPrint('🛡️ RobustDocumentService: Using robust create for collection $collectionId');
       final doc = await databases.createDocument(
         databaseId: databaseId,
         collectionId: collectionId,
@@ -130,15 +107,15 @@ class RobustDocumentService {
         data: data,
         permissions: permissions,
       );
-      print('🛡️ RobustDocumentService: SDK create successful');
+      logPrint('🛡️ RobustDocumentService: SDK create successful');
       final map = Map<String, dynamic>.from(doc.data);
       map['\$id'] = doc.$id;
       return map;
     } catch (e) {
       if (e.toString().contains("is not a subtype of type 'int'") ||
           e.toString().contains('is not a subtype of type')) {
-        print('🛡️ RobustDocumentService: SDK failed on create, using HTTP fallback');
-        print('🛡️ RobustDocumentService: Error was: $e');
+        logPrint('🛡️ RobustDocumentService: SDK failed on create, using HTTP fallback');
+        logPrint('🛡️ RobustDocumentService: Error was: $e');
         return await _createDocumentViaHttp(
           databaseId: databaseId,
           collectionId: collectionId,
@@ -161,7 +138,7 @@ class RobustDocumentService {
     List<String>? permissions,
   }) async {
     try {
-      print('🛡️ RobustDocumentService: Using robust update for document $documentId');
+      logPrint('🛡️ RobustDocumentService: Using robust update for document $documentId');
       final doc = await databases.updateDocument(
         databaseId: databaseId,
         collectionId: collectionId,
@@ -169,15 +146,15 @@ class RobustDocumentService {
         data: data,
         permissions: permissions,
       );
-      print('🛡️ RobustDocumentService: SDK update successful');
+      logPrint('🛡️ RobustDocumentService: SDK update successful');
       final map = Map<String, dynamic>.from(doc.data);
       map['\$id'] = doc.$id;
       return map;
     } catch (e) {
       if (e.toString().contains("is not a subtype of type 'int'") ||
           e.toString().contains('is not a subtype of type')) {
-        print('🛡️ RobustDocumentService: SDK failed on update, using HTTP fallback');
-        print('🛡️ RobustDocumentService: Error was: $e');
+        logPrint('🛡️ RobustDocumentService: SDK failed on update, using HTTP fallback');
+        logPrint('🛡️ RobustDocumentService: Error was: $e');
         return await _updateDocumentViaHttp(
           databaseId: databaseId,
           collectionId: collectionId,
@@ -198,18 +175,18 @@ class RobustDocumentService {
     required String documentId,
   }) async {
     try {
-      print('🛡️ RobustDocumentService: Using robust delete for document $documentId');
+      logPrint('🛡️ RobustDocumentService: Using robust delete for document $documentId');
       await databases.deleteDocument(
         databaseId: databaseId,
         collectionId: collectionId,
         documentId: documentId,
       );
-      print('🛡️ RobustDocumentService: SDK delete successful');
+      logPrint('🛡️ RobustDocumentService: SDK delete successful');
     } catch (e) {
       if (e.toString().contains("is not a subtype of type 'int'") ||
           e.toString().contains('is not a subtype of type')) {
-        print('🛡️ RobustDocumentService: SDK failed on delete, using HTTP fallback');
-        print('🛡️ RobustDocumentService: Error was: $e');
+        logPrint('🛡️ RobustDocumentService: SDK failed on delete, using HTTP fallback');
+        logPrint('🛡️ RobustDocumentService: Error was: $e');
         await _deleteDocumentViaHttp(
           databaseId: databaseId,
           collectionId: collectionId,
@@ -246,31 +223,48 @@ class RobustDocumentService {
         headers['X-Appwrite-JWT'] = sessionToken;
       }
       
-      print('🛡️ RobustDocumentService: Making HTTP request to: $url');
+      logPrint('🛡️ RobustDocumentService: Making HTTP request to: $url');
       
       final response = await http.get(Uri.parse(url), headers: headers);
       
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as Map<String, dynamic>;
-        print('🛡️ RobustDocumentService: HTTP fetch successful');
+        logPrint('🛡️ RobustDocumentService: HTTP fetch successful');
         
         // Clean up system fields that might cause issues
         final cleanedData = _cleanSystemFields(data);
         return cleanedData;
         
       } else {
-        print('🛡️ RobustDocumentService: HTTP request failed with status: ${response.statusCode}');
-        print('🛡️ RobustDocumentService: Response body: ${response.body}');
+        logPrint('🛡️ RobustDocumentService: HTTP request failed with status: ${response.statusCode}');
+        logPrint('🛡️ RobustDocumentService: Response body: ${response.body}');
         throw AppwriteException('HTTP request failed: ${response.statusCode}');
       }
       
     } catch (e) {
-      print('🛡️ RobustDocumentService: HTTP fallback failed: $e');
+      logPrint('🛡️ RobustDocumentService: HTTP fallback failed: $e');
       rethrow;
     }
   }
 
-  /// Creates document via direct HTTP call
+  /// Creates document via direct HTTP call (public method)
+  static Future<Map<String, dynamic>> createDocumentViaHttpDirect({
+    required String databaseId,
+    required String collectionId,
+    required String documentId,
+    required Map<String, dynamic> data,
+    List<String>? permissions,
+  }) async {
+    return await _createDocumentViaHttp(
+      databaseId: databaseId,
+      collectionId: collectionId,
+      data: data,
+      documentId: documentId,
+      permissions: permissions,
+    );
+  }
+
+  /// Creates document via direct HTTP call (private)
   static Future<Map<String, dynamic>> _createDocumentViaHttp({
     required String databaseId,
     required String collectionId,
@@ -295,7 +289,7 @@ class RobustDocumentService {
         'data': data,
         if (permissions != null) 'permissions': permissions,
       };
-      print('🛡️ RobustDocumentService: Making HTTP create request to: $url');
+      logPrint('🛡️ RobustDocumentService: Making HTTP create request to: $url');
       final response = await http.post(
         Uri.parse(url),
         headers: headers,
@@ -303,15 +297,15 @@ class RobustDocumentService {
       );
       if (response.statusCode == 201) {
         final created = json.decode(response.body) as Map<String, dynamic>;
-        print('🛡️ RobustDocumentService: HTTP create successful');
+        logPrint('🛡️ RobustDocumentService: HTTP create successful');
         return _cleanSystemFields(created);
       } else {
-        print('🛡️ RobustDocumentService: HTTP create failed with status: ${response.statusCode}');
-        print('🛡️ RobustDocumentService: Response body: ${response.body}');
+        logPrint('🛡️ RobustDocumentService: HTTP create failed with status: ${response.statusCode}');
+        logPrint('🛡️ RobustDocumentService: Response body: ${response.body}');
         throw AppwriteException('HTTP create request failed: ${response.statusCode}');
       }
     } catch (e) {
-      print('🛡️ RobustDocumentService: HTTP create fallback failed: $e');
+      logPrint('🛡️ RobustDocumentService: HTTP create fallback failed: $e');
       rethrow;
     }
   }
@@ -340,7 +334,7 @@ class RobustDocumentService {
         'data': data,
         if (permissions != null) 'permissions': permissions,
       };
-      print('🛡️ RobustDocumentService: Making HTTP update request to: $url');
+      logPrint('🛡️ RobustDocumentService: Making HTTP update request to: $url');
       final response = await http.patch(
         Uri.parse(url),
         headers: headers,
@@ -348,15 +342,15 @@ class RobustDocumentService {
       );
       if (response.statusCode == 200) {
         final updated = json.decode(response.body) as Map<String, dynamic>;
-        print('🛡️ RobustDocumentService: HTTP update successful');
+        logPrint('🛡️ RobustDocumentService: HTTP update successful');
         return _cleanSystemFields(updated);
       } else {
-        print('🛡️ RobustDocumentService: HTTP update failed with status: ${response.statusCode}');
-        print('🛡️ RobustDocumentService: Response body: ${response.body}');
+        logPrint('🛡️ RobustDocumentService: HTTP update failed with status: ${response.statusCode}');
+        logPrint('🛡️ RobustDocumentService: Response body: ${response.body}');
         throw AppwriteException('HTTP update request failed: ${response.statusCode}');
       }
     } catch (e) {
-      print('🛡️ RobustDocumentService: HTTP update fallback failed: $e');
+      logPrint('🛡️ RobustDocumentService: HTTP update fallback failed: $e');
       rethrow;
     }
   }
@@ -379,18 +373,18 @@ class RobustDocumentService {
       if (sessionToken != null) {
         headers['X-Appwrite-JWT'] = sessionToken;
       }
-      print('🛡️ RobustDocumentService: Making HTTP delete request to: $url');
+      logPrint('🛡️ RobustDocumentService: Making HTTP delete request to: $url');
       final response = await http.delete(Uri.parse(url), headers: headers);
       if (response.statusCode == 204) {
-        print('🛡️ RobustDocumentService: HTTP delete successful');
+        logPrint('🛡️ RobustDocumentService: HTTP delete successful');
         return;
       } else {
-        print('🛡️ RobustDocumentService: HTTP delete failed with status: ${response.statusCode}');
-        print('🛡️ RobustDocumentService: Response body: ${response.body}');
+        logPrint('🛡️ RobustDocumentService: HTTP delete failed with status: ${response.statusCode}');
+        logPrint('🛡️ RobustDocumentService: Response body: ${response.body}');
         throw AppwriteException('HTTP delete request failed: ${response.statusCode}');
       }
     } catch (e) {
-      print('🛡️ RobustDocumentService: HTTP delete fallback failed: $e');
+      logPrint('🛡️ RobustDocumentService: HTTP delete fallback failed: $e');
       rethrow;
     }
   }
@@ -403,11 +397,11 @@ class RobustDocumentService {
     if (cleaned['\$sequence'] is String) {
       try {
         cleaned['\$sequence'] = int.parse(cleaned['\$sequence']);
-        print('🛡️ RobustDocumentService: Fixed \$sequence field from String to int');
+        logPrint('🛡️ RobustDocumentService: Fixed \$sequence field from String to int');
       } catch (e) {
         // If parsing fails, remove the field entirely
         cleaned.remove('\$sequence');
-        print('🛡️ RobustDocumentService: Removed problematic \$sequence field');
+        logPrint('🛡️ RobustDocumentService: Removed problematic \$sequence field');
       }
     }
     
@@ -419,10 +413,10 @@ class RobustDocumentService {
           if (field == '\$internalId') {
             cleaned[field] = int.parse(cleaned[field]);
           }
-          print('🛡️ RobustDocumentService: Fixed $field field from String to int');
+          logPrint('🛡️ RobustDocumentService: Fixed $field field from String to int');
         } catch (e) {
           // If parsing fails, leave as string or remove
-          print('🛡️ RobustDocumentService: Could not fix $field field: $e');
+          logPrint('🛡️ RobustDocumentService: Could not fix $field field: $e');
         }
       }
     }
@@ -436,37 +430,13 @@ class RobustDocumentService {
     required String collectionId,
     List<String> queries = const [],
   }) async {
-    try {
-      print('🛡️ RobustDocumentService: Using robust list for collection $collectionId');
-      
-      // First try the normal SDK method
-      final response = await databases.listDocuments(
-        databaseId: databaseId,
-        collectionId: collectionId,
-        queries: queries,
-      );
-      
-      print('🛡️ RobustDocumentService: SDK list successful');
-      return response.documents.map((doc) => doc.data).toList();
-      
-    } catch (e) {
-      // If SDK fails with type error, use HTTP fallback
-      if (e.toString().contains("is not a subtype of type 'int'") ||
-          e.toString().contains("is not a subtype of type")) {
-        
-        print('🛡️ RobustDocumentService: SDK failed with type error, using HTTP fallback for list');
-        print('🛡️ RobustDocumentService: Error was: $e');
-        
-        return await _listDocumentsViaHttp(
-          databaseId: databaseId,
-          collectionId: collectionId,
-          queries: queries,
-        );
-      } else {
-        // Re-throw other errors
-        rethrow;
-      }
-    }
+    logPrint('🛡️ RobustDocumentService: Using HTTP-only list for collection $collectionId');
+    
+    return await _listDocumentsViaHttp(
+      databaseId: databaseId,
+      collectionId: collectionId,
+      queries: queries,
+    );
   }
 
   /// Lists documents via direct HTTP call
@@ -499,7 +469,7 @@ class RobustDocumentService {
         headers['X-Appwrite-JWT'] = sessionToken;
       }
       
-      print('🛡️ RobustDocumentService: Making HTTP list request to: $url');
+      logPrint('🛡️ RobustDocumentService: Making HTTP list request to: $url');
       
       final response = await http.get(Uri.parse(url), headers: headers);
       
@@ -507,7 +477,7 @@ class RobustDocumentService {
         final data = json.decode(response.body) as Map<String, dynamic>;
         final documents = data['documents'] as List<dynamic>;
         
-        print('🛡️ RobustDocumentService: HTTP list successful, found ${documents.length} documents');
+        logPrint('🛡️ RobustDocumentService: HTTP list successful, found ${documents.length} documents');
         
         // Clean up system fields for each document
         return documents
@@ -516,12 +486,12 @@ class RobustDocumentService {
             .toList();
             
       } else {
-        print('🛡️ RobustDocumentService: HTTP list failed with status: ${response.statusCode}');
+        logPrint('🛡️ RobustDocumentService: HTTP list failed with status: ${response.statusCode}');
         throw AppwriteException('HTTP list request failed: ${response.statusCode}');
       }
       
     } catch (e) {
-      print('🛡️ RobustDocumentService: HTTP list fallback failed: $e');
+      logPrint('🛡️ RobustDocumentService: HTTP list fallback failed: $e');
       rethrow;
     }
   }

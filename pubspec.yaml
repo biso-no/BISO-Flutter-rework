@@ -38,6 +38,8 @@ dependencies:
     git:
       url: https://github.com/pratikbaid3/flutter_client_sse
       path: .
+  talker_flutter: ^4.9.3
+  talker_dio_logger: ^4.9.3
 
 dev_dependencies:
   flutter_test:

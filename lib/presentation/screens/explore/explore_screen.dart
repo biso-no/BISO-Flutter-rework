@@ -317,7 +317,7 @@ class _LargeEventBanner extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: event.textColor.withOpacity(0.9),
+                          color: event.textColor.withValues(alpha: 0.9),
                         ),
                   ),
                 ],

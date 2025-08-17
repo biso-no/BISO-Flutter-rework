@@ -484,21 +484,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       ),
     );
   }
-
-  Color _getCampusColor(String campusId) {
-    switch (campusId) {
-      case 'oslo':
-        return AppColors.defaultBlue;
-      case 'bergen':
-        return AppColors.green9;
-      case 'trondheim':
-        return AppColors.purple9;
-      case 'stavanger':
-        return AppColors.orange9;
-      default:
-        return AppColors.gray400;
-    }
-  }
 }
 
 class _DepartmentPicker extends StatefulWidget {

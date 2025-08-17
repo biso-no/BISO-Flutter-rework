@@ -18,7 +18,6 @@ class ProductModel extends Equatable {
   final bool isNegotiable;
   final String? contactMethod; // 'message', 'phone', 'email'
   final String? contactInfo;
-  final Map<String, dynamic> metadata; // Additional product-specific data
   final int viewCount;
   final int favoriteCount;
   final DateTime? createdAt;
@@ -42,7 +41,6 @@ class ProductModel extends Equatable {
     this.isNegotiable = false,
     this.contactMethod,
     this.contactInfo,
-    this.metadata = const {},
     this.viewCount = 0,
     this.favoriteCount = 0,
     this.createdAt,
@@ -68,7 +66,6 @@ class ProductModel extends Equatable {
       isNegotiable: map['is_negotiable'] ?? false,
       contactMethod: map['contact_method'],
       contactInfo: map['contact_info'],
-      metadata: Map<String, dynamic>.from(map['metadata'] ?? {}),
       viewCount: map['view_count'] ?? 0,
       favoriteCount: map['favorite_count'] ?? 0,
       createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
@@ -94,7 +91,6 @@ class ProductModel extends Equatable {
       'is_negotiable': isNegotiable,
       'contact_method': contactMethod,
       'contact_info': contactInfo,
-      'metadata': metadata,
       'view_count': viewCount,
       'favorite_count': favoriteCount,
     };
@@ -118,7 +114,6 @@ class ProductModel extends Equatable {
     bool? isNegotiable,
     String? contactMethod,
     String? contactInfo,
-    Map<String, dynamic>? metadata,
     int? viewCount,
     int? favoriteCount,
     DateTime? createdAt,
@@ -142,7 +137,6 @@ class ProductModel extends Equatable {
       isNegotiable: isNegotiable ?? this.isNegotiable,
       contactMethod: contactMethod ?? this.contactMethod,
       contactInfo: contactInfo ?? this.contactInfo,
-      metadata: metadata ?? this.metadata,
       viewCount: viewCount ?? this.viewCount,
       favoriteCount: favoriteCount ?? this.favoriteCount,
       createdAt: createdAt ?? this.createdAt,
@@ -169,7 +163,7 @@ class ProductModel extends Equatable {
   List<Object?> get props => [
     id, name, description, price, currency, sellerId, sellerName,
     sellerAvatar, campusId, category, images, imageFileIds, condition, status,
-    isNegotiable, contactMethod, contactInfo, metadata, viewCount,
+    isNegotiable, contactMethod, contactInfo, viewCount,
     favoriteCount, createdAt, updatedAt,
   ];
 }

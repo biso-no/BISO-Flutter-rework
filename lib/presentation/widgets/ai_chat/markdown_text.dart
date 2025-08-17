@@ -94,8 +94,8 @@ class MarkdownText extends StatelessWidget {
         fontSize: 14,
         color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
         backgroundColor: isDark 
-            ? AppColors.stoneGray.withOpacity(0.3)
-            : AppColors.surfaceVariant.withOpacity(0.5),
+            ? AppColors.stoneGray.withValues(alpha: 0.3)
+            : AppColors.surfaceVariant.withValues(alpha: 0.5),
       ),
     );
   }
@@ -111,8 +111,8 @@ class MarkdownText extends StatelessWidget {
         fontSize: 14,
         color: AppColors.crystalBlue,
         backgroundColor: isDark 
-            ? AppColors.stoneGray.withOpacity(0.3)
-            : AppColors.surfaceVariant.withOpacity(0.5),
+            ? AppColors.stoneGray.withValues(alpha: 0.3)
+            : AppColors.surfaceVariant.withValues(alpha: 0.5),
       ),
     );
   }

@@ -87,6 +87,7 @@ class ChatService {
     String type = 'text',
     List<String> attachments = const [],
     String? replyToId,
+    Map<String, dynamic>? metadata,
   }) async {
     try {
       final messageData = {
@@ -101,7 +102,7 @@ class ChatService {
         'is_edited': false,
         'is_deleted': false,
         'reactions': [],
-        'metadata': {},
+        'metadata': metadata ?? {},
       };
 
       final doc = await _databases.createDocument(
@@ -440,6 +441,77 @@ class ChatService {
     }
   }
 
+  // Create marketplace chat with product context
+  Future<ChatModel> createMarketplaceChat({
+    required String buyerId,
+    required String buyerName,
+    required String sellerId,
+    required String sellerName,
+    required String productId,
+    required String productName,
+    required String productImageUrl,
+    required double productPrice,
+    required String userMessage,
+  }) async {
+    try {
+      final participants = [buyerId, sellerId];
+      
+      // Check if direct chat already exists between these participants
+      final existingChats = await _databases.listDocuments(
+        databaseId: AppConstants.databaseId,
+        collectionId: 'chats',
+        queries: [
+          Query.equal('type', 'direct'),
+          Query.contains('participants', buyerId),
+          Query.contains('participants', sellerId),
+        ],
+      );
+
+      ChatModel chat;
+      if (existingChats.documents.isNotEmpty) {
+        chat = ChatModel.fromMap(existingChats.documents.first.data);
+      } else {
+        // Create new direct chat
+        final chatData = {
+          'name': 'Marketplace Chat',
+          'type': 'direct',
+          'participants': participants,
+          'is_active': true,
+          'created_by': buyerId,
+          'last_activity_at': DateTime.now().toIso8601String(),
+          'metadata': {
+            'marketplace_initiated': true,
+            'product_id': productId,
+          },
+        };
+
+        final response = await _databases.createDocument(
+          databaseId: AppConstants.databaseId,
+          collectionId: 'chats',
+          documentId: ID.unique(),
+          data: chatData,
+        );
+        chat = ChatModel.fromMap(response.data);
+      }
+
+      // Send combined product + user message
+      await _sendMarketplaceMessage(
+        chatId: chat.id,
+        buyerId: buyerId,
+        buyerName: buyerName,
+        productId: productId,
+        productName: productName,
+        productImageUrl: productImageUrl,
+        productPrice: productPrice,
+        userMessage: userMessage,
+      );
+
+      return chat;
+    } catch (e) {
+      throw Exception('Failed to create marketplace chat: $e');
+    }
+  }
+
   // Create direct chat
   Future<ChatModel> createDirectChat({
     required List<String> participants,
@@ -516,6 +588,50 @@ class ChatService {
     } catch (e) {
       // Mark as read error: $e
     }
+  }
+
+  // Send marketplace message (product + user text combined)
+  Future<ChatMessageModel> _sendMarketplaceMessage({
+    required String chatId,
+    required String buyerId,
+    required String buyerName,
+    required String productId,
+    required String productName,
+    required String productImageUrl,
+    required double productPrice,
+    required String userMessage,
+  }) async {
+    // Create a single message that contains both product info and user message
+    final messageData = {
+      'chat_id': chatId,
+      'sender_id': buyerId,
+      'sender_name': buyerName,
+      'content': userMessage,
+      'type': 'product',
+      'attachments': [productImageUrl],
+      'timestamp': DateTime.now().toIso8601String(),
+      'is_edited': false,
+      'is_deleted': false,
+      'reactions': [],
+      'metadata': {
+        'product_id': productId,
+        'product_name': productName,
+        'product_price': productPrice,
+        'product_image': productImageUrl,
+        'is_marketplace_initial': true,
+      },
+    };
+
+    final doc = await _databases.createDocument(
+      databaseId: AppConstants.databaseId,
+      collectionId: 'chat_messages',
+      documentId: ID.unique(),
+      data: messageData,
+    );
+
+    final message = ChatMessageModel.fromMap(doc.data);
+    await _updateChatLastMessage(chatId, message);
+    return message;
   }
 
   // Clean up resources

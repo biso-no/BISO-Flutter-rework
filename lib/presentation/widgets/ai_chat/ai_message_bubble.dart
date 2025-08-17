@@ -6,6 +6,7 @@ import '../../../data/models/ai_chat_models.dart';
 import '../../../core/constants/app_colors.dart';
 import 'markdown_text.dart';
 
+import '../../../core/logging/print_migration.dart';
 class AiMessageBubble extends StatefulWidget {
   final ChatMessage message;
   final bool isStreaming;
@@ -114,7 +115,7 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.crystalBlue.withOpacity(0.3),
+            color: AppColors.crystalBlue.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -131,23 +132,23 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
   Widget _buildMessageBubble(ThemeData theme, bool isDark) {
     final textContent = widget.message.textContent;
     
-    print('🎨 [AI_BUBBLE] Building bubble for message ${widget.message.id}');
-    print('📝 [AI_BUBBLE] Text content: "$textContent" (length: ${textContent.length})');
-    print('⏳ [AI_BUBBLE] Is streaming: ${widget.isStreaming}');
-    print('🧩 [AI_BUBBLE] Message parts: ${widget.message.parts.length}');
+    logPrint('🎨 [AI_BUBBLE] Building bubble for message ${widget.message.id}');
+    logPrint('📝 [AI_BUBBLE] Text content: "$textContent" (length: ${textContent.length})');
+    logPrint('⏳ [AI_BUBBLE] Is streaming: ${widget.isStreaming}');
+    logPrint('🧩 [AI_BUBBLE] Message parts: ${widget.message.parts.length}');
     
     // Only hide bubble if there's no text content, no tool parts, and not streaming
     if (textContent.isEmpty && widget.message.toolParts.isEmpty && !widget.isStreaming) {
-      print('👻 [AI_BUBBLE] Returning empty bubble - no content, no tools, and not streaming');
+      logPrint('👻 [AI_BUBBLE] Returning empty bubble - no content, no tools, and not streaming');
       return const SizedBox.shrink();
     }
     
     // If no text but has tool parts, show a placeholder message
     final hasToolParts = widget.message.toolParts.isNotEmpty;
-    print('🔧 [AI_BUBBLE] Has tool parts: $hasToolParts (${widget.message.toolParts.length})');
+    logPrint('🔧 [AI_BUBBLE] Has tool parts: $hasToolParts (${widget.message.toolParts.length})');
     
     if (textContent.isEmpty && hasToolParts && !widget.isStreaming) {
-      print('🔧 [AI_BUBBLE] Showing tool-only response');
+      logPrint('🔧 [AI_BUBBLE] Showing tool-only response');
     }
 
     return GestureDetector(
@@ -160,17 +161,17 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: (isDark ? AppColors.surfaceDark : AppColors.white)
-                  .withOpacity(0.7),
+                  .withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: (isDark ? AppColors.outlineDark : AppColors.outline)
-                    .withOpacity(0.2),
+                    .withValues(alpha: 0.2),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
                   color: (isDark ? AppColors.shadowHeavy : AppColors.shadowLight)
-                      .withOpacity(0.1),
+                      .withValues(alpha: 0.1),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -195,7 +196,7 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
                       'Found information using search tools:',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: (isDark ? AppColors.onSurfaceDark : AppColors.onSurface)
-                            .withOpacity(0.7),
+                            .withValues(alpha: 0.7),
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -236,8 +237,8 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
   }
 
   Widget _buildCompactToolSummary(ThemeData theme, bool isDark) {
-    print('🔧 [AI_BUBBLE] Building compact tool summary for message ${widget.message.id}');
-    print('🔧 [AI_BUBBLE] Tool parts count: ${widget.message.toolParts.length}');
+    logPrint('🔧 [AI_BUBBLE] Building compact tool summary for message ${widget.message.id}');
+    logPrint('🔧 [AI_BUBBLE] Tool parts count: ${widget.message.toolParts.length}');
     
     final completedTools = widget.message.toolParts
         .where((tool) => tool.state == ToolPartState.outputAvailable)
@@ -255,10 +256,10 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.crystalBlue.withOpacity(0.1),
+        color: AppColors.crystalBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.crystalBlue.withOpacity(0.2),
+          color: AppColors.crystalBlue.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -308,10 +309,10 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -342,7 +343,7 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
     if (result == null) return const SizedBox.shrink();
     
     try {
-      final response = SharePointSearchResponse.fromJson(result as Map<String, dynamic>);
+      final response = SharePointSearchResponse.fromJson(result);
       if (response.results.isEmpty) return const SizedBox.shrink();
       
       return Padding(
@@ -437,7 +438,7 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
       tool.result != null);
     
     if (hasSharePoint) {
-      print('📚 [AI_BUBBLE] Has SharePoint sources for message ${widget.message.id}');
+      logPrint('📚 [AI_BUBBLE] Has SharePoint sources for message ${widget.message.id}');
     }
     
     return hasSharePoint;
@@ -456,22 +457,22 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
     final sources = <Map<String, String>>[];
     
     for (final tool in sharePointTools) {
-      final result = tool.result as Map<String, dynamic>?;
+      final result = tool.result;
       final results = result?['results'] as List<dynamic>? ?? [];
       
-      print('📚 [AI_BUBBLE] Processing SharePoint tool with ${results.length} results');
+      logPrint('📚 [AI_BUBBLE] Processing SharePoint tool with ${results.length} results');
       
       for (final item in results) {
         final title = item['title'] as String?;
         final url = item['documentViewerUrl'] as String?;
-        print('📚 [AI_BUBBLE] Source item: title="$title", url="$url"');
+        logPrint('📚 [AI_BUBBLE] Source item: title="$title", url="$url"');
         if (title != null && url != null) {
           sources.add({'title': title, 'url': url});
         }
       }
     }
     
-    print('📚 [AI_BUBBLE] Total sources found: ${sources.length}');
+    logPrint('📚 [AI_BUBBLE] Total sources found: ${sources.length}');
 
     if (sources.isEmpty) return const SizedBox.shrink();
 
@@ -479,11 +480,11 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: (isDark ? AppColors.stoneGray : AppColors.surfaceVariant)
-            .withOpacity(0.2),
+            .withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: (isDark ? AppColors.outlineDark : AppColors.outline)
-              .withOpacity(0.2),
+              .withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -533,10 +534,10 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.crystalBlue.withOpacity(0.1),
+          color: AppColors.crystalBlue.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppColors.crystalBlue.withOpacity(0.3),
+            color: AppColors.crystalBlue.withValues(alpha: 0.3),
             width: 1,
           ),
         ),

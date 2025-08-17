@@ -44,6 +44,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String _selectedFilter = 'all';
+  late final ChatService _chatService;
 
   final List<String> _chatFilters = [
     'all',
@@ -56,6 +57,8 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialize chat service reference
+    _chatService = ref.read(chatServiceProvider);
     _searchController.addListener(() {
       setState(() {
         _searchQuery = _searchController.text.toLowerCase();
@@ -66,9 +69,8 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   @override
   void dispose() {
     _searchController.dispose();
-    // Dispose chat service
-    final chatService = ref.read(chatServiceProvider);
-    chatService.dispose();
+    // Dispose chat service using stored reference
+    _chatService.dispose();
     super.dispose();
   }
 
@@ -567,6 +569,12 @@ class _ChatListItem extends StatelessWidget {
         return '📎 ${message.attachments.isNotEmpty ? message.attachments.first : 'File'}';
       case 'system':
         return message.content;
+      case 'product':
+        final productName = message.metadata['product_name'] as String? ?? 'Product';
+        final hasMessage = message.content.isNotEmpty;
+        return hasMessage 
+            ? '🛍️ $productName: ${message.content}'
+            : '🛍️ Shared $productName';
       default:
         return message.content;
     }

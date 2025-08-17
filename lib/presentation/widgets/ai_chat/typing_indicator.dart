@@ -60,17 +60,17 @@ class _TypingIndicatorState extends State<TypingIndicator>
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: (isDark ? AppColors.surfaceDark : AppColors.white)
-                  .withOpacity(0.7),
+                  .withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: (isDark ? AppColors.outlineDark : AppColors.outline)
-                    .withOpacity(0.2),
+                    .withValues(alpha: 0.2),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
                   color: (isDark ? AppColors.shadowHeavy : AppColors.shadowLight)
-                      .withOpacity(0.1),
+                      .withValues(alpha: 0.1),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -127,13 +127,13 @@ class _TypingIndicatorState extends State<TypingIndicator>
         borderRadius: BorderRadius.circular(18),
         gradient: LinearGradient(
           colors: [
-            AppColors.crystalBlue.withOpacity(0.8),
-            AppColors.emeraldGreen.withOpacity(0.8),
+            AppColors.crystalBlue.withValues(alpha: 0.8),
+            AppColors.emeraldGreen.withValues(alpha: 0.8),
           ],
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.crystalBlue.withOpacity(0.2),
+            color: AppColors.crystalBlue.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

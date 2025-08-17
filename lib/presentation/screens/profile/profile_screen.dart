@@ -14,6 +14,7 @@ import 'edit_profile_screen.dart';
 import 'student_id_screen.dart';
 import 'settings_screen.dart';
 
+import '../../../core/logging/print_migration.dart';
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -380,7 +381,7 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildMembershipSection(WidgetRef ref, AuthState authState, campus) {
-    print('User data: ${authState.user}');
+    logPrint('User data: ${authState.user}');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

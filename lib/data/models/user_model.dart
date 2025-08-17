@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../core/logging/print_migration.dart';
 class UserModel extends Equatable {
   final String id;
   final String name;
@@ -34,8 +35,8 @@ class UserModel extends Equatable {
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
-    print('🔍 UserModel.fromMap - Raw map keys: ${map.keys.toList()}');
-    print('🔍 UserModel.fromMap - department_ids type: ${map['department_ids'].runtimeType}, value: ${map['department_ids']}');
+    logPrint('🔍 UserModel.fromMap - Raw map keys: ${map.keys.toList()}');
+    logPrint('🔍 UserModel.fromMap - department_ids type: ${map['department_ids'].runtimeType}, value: ${map['department_ids']}');
     
     return UserModel(
       id: map['\$id'] ?? '',

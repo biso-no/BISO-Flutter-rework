@@ -9,6 +9,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/auth/auth_provider.dart';
 
+import '../../../core/logging/print_migration.dart';
 class OtpVerificationScreen extends ConsumerStatefulWidget {
   final String email;
 
@@ -97,31 +98,31 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
   Future<void> _verifyOtp() async {
     if (_otpCode.length != AppConstants.otpLength) return;
 
-    print('🔥 DEBUG: Starting OTP verification with code: $_otpCode');
+    logPrint('🔥 DEBUG: Starting OTP verification with code: $_otpCode');
     setState(() => _isLoading = true);
 
     try {
       final authState = ref.read(authStateProvider);
-      print('🔥 DEBUG: Current auth state - pendingUserId: ${authState.pendingUserId}');
+      logPrint('🔥 DEBUG: Current auth state - pendingUserId: ${authState.pendingUserId}');
       
       if (authState.pendingUserId == null) {
-        print('🔥 DEBUG: No pending userId found!');
+        logPrint('🔥 DEBUG: No pending userId found!');
         throw Exception('No pending OTP verification');
       }
       
-      print('🔥 DEBUG: Calling verifyOtp with userId: ${authState.pendingUserId}, code: $_otpCode');
+      logPrint('🔥 DEBUG: Calling verifyOtp with userId: ${authState.pendingUserId}, code: $_otpCode');
       await ref.read(authStateProvider.notifier).verifyOtp(authState.pendingUserId!, _otpCode);
       
       if (mounted) {
         final updatedAuthState = ref.read(authStateProvider);
-        print('🔥 DEBUG: OTP verification completed, user: ${updatedAuthState.user?.email}');
+        logPrint('🔥 DEBUG: OTP verification completed, user: ${updatedAuthState.user?.email}');
         
         // Always redirect to home after successful authentication
-        print('🔥 DEBUG: Authentication successful, going to home');
+        logPrint('🔥 DEBUG: Authentication successful, going to home');
         context.go('/home');
       }
     } catch (e) {
-      print('🔥 DEBUG: OTP verification error: $e');
+      logPrint('🔥 DEBUG: OTP verification error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

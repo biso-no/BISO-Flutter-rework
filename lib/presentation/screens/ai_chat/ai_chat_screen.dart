@@ -8,8 +8,8 @@ import '../../widgets/ai_chat/ai_message_bubble.dart';
 import '../../widgets/ai_chat/user_message_bubble.dart';
 import '../../widgets/ai_chat/chat_input_field.dart';
 import '../../widgets/ai_chat/typing_indicator.dart';
-import '../../widgets/ai_chat/tool_output_widget.dart';
 
+import '../../../core/logging/print_migration.dart';
 class AiChatScreen extends ConsumerStatefulWidget {
   const AiChatScreen({super.key});
 
@@ -112,34 +112,34 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
     _scrollToBottom();
 
     try {
-      print('🚀 [AI_CHAT] Starting stream for ${_messages.length} messages');
+      logPrint('🚀 [AI_CHAT] Starting stream for ${_messages.length} messages');
       
       // Use the new streamChatMessages method with flutter_client_sse
       await for (final event in _chatService.streamChatMessages(messages: _messages, useSSE: true)) {
-        print('📥 [AI_CHAT] Received event: ${event.runtimeType}');
+        logPrint('📥 [AI_CHAT] Received event: ${event.runtimeType}');
         
         switch (event) {
           case MessagePartReceived(:final messageId, :final part):
-            print('📝 [AI_CHAT] MessagePart received for $messageId: ${part.runtimeType}');
+            logPrint('📝 [AI_CHAT] MessagePart received for $messageId: ${part.runtimeType}');
             // Handle new message part
             break;
             
           case TextDeltaReceived(:final messageId, :final delta):
-            print('✍️ [AI_CHAT] TextDelta for $messageId: "$delta"');
+            logPrint('✍️ [AI_CHAT] TextDelta for $messageId: "$delta"');
             _ensureAssistantMessage(messageId);
             _updateMessageWithTextDelta(messageId, delta);
             break;
             
           case ToolCallUpdated(:final messageId, :final toolPart):
-            print('🔧 [AI_CHAT] ToolCall updated for $messageId: ${toolPart.toolName} (${toolPart.state})');
-            print('🔧 [AI_CHAT] ToolCall args: ${toolPart.args}');
-            print('🔧 [AI_CHAT] ToolCall result: ${toolPart.result != null ? 'has result' : 'no result'}');
+            logPrint('🔧 [AI_CHAT] ToolCall updated for $messageId: ${toolPart.toolName} (${toolPart.state})');
+            logPrint('🔧 [AI_CHAT] ToolCall args: ${toolPart.args}');
+            logPrint('🔧 [AI_CHAT] ToolCall result: ${toolPart.result != null ? 'has result' : 'no result'}');
             _ensureAssistantMessage(messageId);
             _updateMessageWithTool(messageId, toolPart);
             break;
             
           case StreamCompleted(:final messageId):
-            print('✅ [AI_CHAT] Stream completed for $messageId');
+            logPrint('✅ [AI_CHAT] Stream completed for $messageId');
             setState(() {
               _isStreaming = false;
               _currentStreamingMessageId = null;
@@ -147,24 +147,22 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
             break;
             
           case StreamError(:final error):
-            print('❌ [AI_CHAT] Stream error: $error');
+            logPrint('❌ [AI_CHAT] Stream error: $error');
             setState(() {
               _isStreaming = false;
               _currentStreamingMessageId = null;
               _errorMessage = error;
             });
             break;
-            
-          default:
-            print('⚠️ [AI_CHAT] Unknown event type: ${event.runtimeType}');
+
         }
         
         _scrollToBottom();
       }
       
-      print('🏁 [AI_CHAT] Stream finished');
+      logPrint('🏁 [AI_CHAT] Stream finished');
     } catch (e) {
-      print('💥 [AI_CHAT] Stream exception: $e');
+      logPrint('💥 [AI_CHAT] Stream exception: $e');
       setState(() {
         _isStreaming = false;
         _currentStreamingMessageId = null;
@@ -176,7 +174,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
   void _ensureAssistantMessage(String messageId) {
     // Only create assistant message if we don't have one yet
     if (_currentStreamingMessageId == null) {
-      print('🤖 [AI_CHAT] Creating assistant message with ID: $messageId');
+      logPrint('🤖 [AI_CHAT] Creating assistant message with ID: $messageId');
       final assistantMessage = _chatService.createAssistantMessage(id: messageId);
       setState(() {
         _messages.add(assistantMessage);
@@ -187,17 +185,17 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
   }
 
   void _updateMessageWithTextDelta(String messageId, String delta) {
-    print('🔄 [AI_CHAT] Updating message $messageId with delta: "$delta"');
+    logPrint('🔄 [AI_CHAT] Updating message $messageId with delta: "$delta"');
     
     setState(() {
       var messageIndex = _messages.indexWhere((msg) => msg.id == messageId);
-      print('📍 [AI_CHAT] Message index: $messageIndex (total messages: ${_messages.length})');
+      logPrint('📍 [AI_CHAT] Message index: $messageIndex (total messages: ${_messages.length})');
       
       // If message not found by server ID, try to find the current streaming message
       if (messageIndex < 0 && _currentStreamingMessageId != null) {
         messageIndex = _messages.indexWhere((msg) => msg.id == _currentStreamingMessageId);
         if (messageIndex >= 0) {
-          print('🔄 [AI_CHAT] Updating current streaming message ID from $_currentStreamingMessageId to $messageId');
+          logPrint('🔄 [AI_CHAT] Updating current streaming message ID from $_currentStreamingMessageId to $messageId');
           // Update the message ID to match the server's ID
           _messages[messageIndex] = _messages[messageIndex].copyWith(id: messageId);
           _currentStreamingMessageId = messageId;
@@ -206,7 +204,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
       
       if (messageIndex >= 0) {
         final oldMessage = _messages[messageIndex];
-        print('📝 [AI_CHAT] Old message parts: ${oldMessage.parts.length}');
+        logPrint('📝 [AI_CHAT] Old message parts: ${oldMessage.parts.length}');
         
         _messages[messageIndex] = _chatService.updateMessageWithText(
           _messages[messageIndex],
@@ -214,27 +212,27 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
         );
         
         final newMessage = _messages[messageIndex];
-        print('📝 [AI_CHAT] New message parts: ${newMessage.parts.length}');
-        print('📄 [AI_CHAT] Current text content: "${newMessage.textContent}"');
+        logPrint('📝 [AI_CHAT] New message parts: ${newMessage.parts.length}');
+        logPrint('📄 [AI_CHAT] Current text content: "${newMessage.textContent}"');
       } else {
-        print('❌ [AI_CHAT] Message not found for ID: $messageId');
-        print('📋 [AI_CHAT] Available message IDs: ${_messages.map((m) => m.id).toList()}');
+        logPrint('❌ [AI_CHAT] Message not found for ID: $messageId');
+        logPrint('📋 [AI_CHAT] Available message IDs: ${_messages.map((m) => m.id).toList()}');
       }
     });
   }
 
   void _updateMessageWithTool(String messageId, ToolPart toolPart) {
-    print('🔧 [AI_CHAT] Updating message $messageId with tool: ${toolPart.toolName} (${toolPart.state})');
+    logPrint('🔧 [AI_CHAT] Updating message $messageId with tool: ${toolPart.toolName} (${toolPart.state})');
     
     setState(() {
       var messageIndex = _messages.indexWhere((msg) => msg.id == messageId);
-      print('📍 [AI_CHAT] Tool message index: $messageIndex');
+      logPrint('📍 [AI_CHAT] Tool message index: $messageIndex');
       
       // If message not found by tool message ID, try to find the current streaming message
       if (messageIndex < 0 && _currentStreamingMessageId != null) {
         messageIndex = _messages.indexWhere((msg) => msg.id == _currentStreamingMessageId);
         if (messageIndex >= 0) {
-          print('🔄 [AI_CHAT] Updating tool message ID from $_currentStreamingMessageId to $messageId');
+          logPrint('🔄 [AI_CHAT] Updating tool message ID from $_currentStreamingMessageId to $messageId');
           // Update the message ID to match the tool event's ID
           _messages[messageIndex] = _messages[messageIndex].copyWith(id: messageId);
           _currentStreamingMessageId = messageId;
@@ -243,7 +241,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
       
       if (messageIndex >= 0) {
         final oldMessage = _messages[messageIndex];
-        print('🔧 [AI_CHAT] Old tool parts: ${oldMessage.toolParts.length}');
+        logPrint('🔧 [AI_CHAT] Old tool parts: ${oldMessage.toolParts.length}');
         
         _messages[messageIndex] = _chatService.updateMessageWithTool(
           _messages[messageIndex],
@@ -251,17 +249,17 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
         );
         
         final newMessage = _messages[messageIndex];
-        print('🔧 [AI_CHAT] New tool parts: ${newMessage.toolParts.length}');
+        logPrint('🔧 [AI_CHAT] New tool parts: ${newMessage.toolParts.length}');
         
         // Add haptic feedback when tool completes
         if (toolPart.state == ToolPartState.outputAvailable) {
-          print('✅ [AI_CHAT] Tool completed: ${toolPart.toolName}');
+          logPrint('✅ [AI_CHAT] Tool completed: ${toolPart.toolName}');
           // Optional: Add haptic feedback
           // HapticFeedback.lightImpact();
         }
       } else {
-        print('❌ [AI_CHAT] Tool message not found for ID: $messageId');
-        print('📋 [AI_CHAT] Available message IDs: ${_messages.map((m) => m.id).toList()}');
+        logPrint('❌ [AI_CHAT] Tool message not found for ID: $messageId');
+        logPrint('📋 [AI_CHAT] Available message IDs: ${_messages.map((m) => m.id).toList()}');
       }
     });
   }
@@ -428,11 +426,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
           child: Container(
             decoration: BoxDecoration(
               color: (isDark ? AppColors.backgroundDark : AppColors.white)
-                  .withOpacity(0.8),
+                  .withValues(alpha: 0.8),
               border: Border(
                 bottom: BorderSide(
                   color: (isDark ? AppColors.outlineDark : AppColors.outline)
-                      .withOpacity(0.2),
+                      .withValues(alpha: 0.2),
                   width: 0.5,
                 ),
               ),
@@ -448,8 +446,8 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
               borderRadius: BorderRadius.circular(12),
               gradient: LinearGradient(
                 colors: [
-                  AppColors.crystalBlue.withOpacity(0.2),
-                  AppColors.emeraldGreen.withOpacity(0.2),
+                  AppColors.crystalBlue.withValues(alpha: 0.2),
+                  AppColors.emeraldGreen.withValues(alpha: 0.2),
                 ],
               ),
             ),
@@ -485,7 +483,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
           icon: const Icon(Icons.refresh_rounded),
           tooltip: 'Clear chat',
           style: IconButton.styleFrom(
-            backgroundColor: theme.colorScheme.surface.withOpacity(0.5),
+            backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.5),
           ),
         ),
         const SizedBox(width: 8),
@@ -502,13 +500,13 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
           colors: isDark
               ? [
                   AppColors.backgroundDark,
-                  AppColors.charcoalBlack.withOpacity(0.9),
-                  AppColors.richNavy.withOpacity(0.8),
+                  AppColors.charcoalBlack.withValues(alpha: 0.9),
+                  AppColors.richNavy.withValues(alpha: 0.8),
                 ]
               : [
                   AppColors.background,
-                  AppColors.skyBlue.withOpacity(0.1),
-                  AppColors.subtleBlue.withOpacity(0.3),
+                  AppColors.skyBlue.withValues(alpha: 0.1),
+                  AppColors.subtleBlue.withValues(alpha: 0.3),
                 ],
         ),
       ),
@@ -533,11 +531,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
         final isUser = message.role == 'user';
         final isStreamingThisMessage = _isStreaming && message.id == _currentStreamingMessageId;
         
-        print('🎯 [AI_CHAT] Rendering message ${message.id} (${message.role})');
+        logPrint('🎯 [AI_CHAT] Rendering message ${message.id} (${message.role})');
         if (!isUser) {
-          print('🔄 [AI_CHAT] AI message - isStreaming: $_isStreaming, currentStreamingId: $_currentStreamingMessageId');
-          print('📊 [AI_CHAT] isStreamingThisMessage: $isStreamingThisMessage');
-          print('📝 [AI_CHAT] Message text content: "${message.textContent}"');
+          logPrint('🔄 [AI_CHAT] AI message - isStreaming: $_isStreaming, currentStreamingId: $_currentStreamingMessageId');
+          logPrint('📊 [AI_CHAT] isStreamingThisMessage: $isStreamingThisMessage');
+          logPrint('📝 [AI_CHAT] Message text content: "${message.textContent}"');
         }
         
         return Padding(
@@ -558,10 +556,10 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.error.withOpacity(0.1),
+        color: AppColors.error.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.error.withOpacity(0.3),
+          color: AppColors.error.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -599,7 +597,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
         border: Border(
           top: BorderSide(
             color: (isDark ? AppColors.outlineDark : AppColors.outline)
-                .withOpacity(0.2),
+                .withValues(alpha: 0.2),
             width: 0.5,
           ),
         ),
@@ -611,11 +609,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
           child: Container(
             decoration: BoxDecoration(
               color: (isDark ? AppColors.surfaceDark : AppColors.white)
-                  .withOpacity(0.9),
+                  .withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
                 color: (isDark ? AppColors.outlineDark : AppColors.outline)
-                    .withOpacity(0.3),
+                    .withValues(alpha: 0.3),
                 width: 1,
               ),
             ),

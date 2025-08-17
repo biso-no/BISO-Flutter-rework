@@ -151,9 +151,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 TextButton(
                   onPressed: () async {
                     // Clear any existing session
+                    final scaffoldMessenger = ScaffoldMessenger.of(context);
                     await ref.read(authStateProvider.notifier).clearSession();
                     if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      scaffoldMessenger.showSnackBar(
                         const SnackBar(
                           content: Text('Session cleared - OTP flow should work now'),
                           backgroundColor: AppColors.success,

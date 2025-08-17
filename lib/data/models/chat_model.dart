@@ -137,7 +137,7 @@ class ChatMessageModel extends Equatable {
   final String senderName;
   final String? senderAvatar;
   final String content;
-  final String type; // 'text', 'image', 'file', 'system'
+  final String type; // 'text', 'image', 'file', 'system', 'product'
   final List<String> attachments;
   final Map<String, dynamic> metadata;
   final bool isEdited;
@@ -254,6 +254,7 @@ class ChatMessageModel extends Equatable {
   bool get isImage => type == 'image';
   bool get isFile => type == 'file';
   bool get isSystem => type == 'system';
+  bool get isProduct => type == 'product';
   bool get hasAttachments => attachments.isNotEmpty;
   bool get hasReactions => reactions.isNotEmpty;
   bool get isReply => replyToId != null;

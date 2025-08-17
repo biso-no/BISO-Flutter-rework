@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../data/models/ai_chat_models.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../data/services/ai_chat_service.dart';
 
 class ToolOutputWidget extends StatefulWidget {
   final ToolPart toolPart;
@@ -24,7 +23,6 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
   late AnimationController _animationController;
   late Animation<double> _expandAnimation;
   bool _isExpanded = false;
-  final AiChatService _chatService = AiChatService();
 
   @override
   void initState() {
@@ -77,17 +75,17 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
         child: Container(
           decoration: BoxDecoration(
             color: (widget.isDark ? AppColors.surfaceDark : AppColors.white)
-                .withOpacity(0.8),
+                .withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: (widget.isDark ? AppColors.outlineDark : AppColors.outline)
-                  .withOpacity(0.3),
+                  .withValues(alpha: 0.3),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
                 color: (widget.isDark ? AppColors.shadowHeavy : AppColors.shadowLight)
-                    .withOpacity(0.1),
+                    .withValues(alpha: 0.1),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -189,10 +187,10 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.crystalBlue.withOpacity(0.1),
+        color: AppColors.crystalBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColors.crystalBlue.withOpacity(0.2),
+          color: AppColors.crystalBlue.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -230,9 +228,9 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       builder: (context, child) {
         return LinearProgressIndicator(
           value: null, // Indeterminate
-          backgroundColor: AppColors.crystalBlue.withOpacity(0.2),
+          backgroundColor: AppColors.crystalBlue.withValues(alpha: 0.2),
           valueColor: AlwaysStoppedAnimation<Color>(
-            AppColors.crystalBlue.withOpacity(0.8),
+            AppColors.crystalBlue.withValues(alpha: 0.8),
           ),
           minHeight: 3,
         );
@@ -268,10 +266,10 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.crystalBlue.withOpacity(0.1),
+          color: AppColors.crystalBlue.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.crystalBlue.withOpacity(0.3),
+            color: AppColors.crystalBlue.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -328,7 +326,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
               width: 6,
               height: 6,
               decoration: BoxDecoration(
-                color: isActive ? AppColors.emeraldGreen : AppColors.outline.withOpacity(0.3),
+                color: isActive ? AppColors.emeraldGreen : AppColors.outline.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -372,10 +370,10 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: (widget.isDark ? AppColors.surfaceDark : AppColors.white).withOpacity(0.5),
+        color: (widget.isDark ? AppColors.surfaceDark : AppColors.white).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.outline.withOpacity(0.2),
+          color: AppColors.outline.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -426,9 +424,9 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
             borderRadius: BorderRadius.circular(6),
             gradient: LinearGradient(
               colors: [
-                AppColors.outline.withOpacity(0.1),
-                AppColors.outline.withOpacity(0.3),
-                AppColors.outline.withOpacity(0.1),
+                AppColors.outline.withValues(alpha: 0.1),
+                AppColors.outline.withValues(alpha: 0.3),
+                AppColors.outline.withValues(alpha: 0.1),
               ],
               stops: [
                 (shimmerValue - 0.3).clamp(0.0, 1.0),
@@ -539,10 +537,10 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.emeraldGreen.withOpacity(0.1),
+                color: AppColors.emeraldGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: AppColors.emeraldGreen.withOpacity(0.2),
+                  color: AppColors.emeraldGreen.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -589,11 +587,11 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: (widget.isDark ? AppColors.stoneGray : AppColors.surfaceVariant)
-            .withOpacity(0.3),
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: (widget.isDark ? AppColors.outlineDark : AppColors.outline)
-              .withOpacity(0.2),
+              .withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -629,10 +627,10 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.crystalBlue.withOpacity(0.05),
+        color: AppColors.crystalBlue.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColors.crystalBlue.withOpacity(0.1),
+          color: AppColors.crystalBlue.withValues(alpha: 0.1),
         ),
       ),
       child: Row(
@@ -660,10 +658,10 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.sunGold.withOpacity(0.1),
+        color: AppColors.sunGold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.sunGold.withOpacity(0.2),
+          color: AppColors.sunGold.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -702,15 +700,15 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: (widget.isDark ? AppColors.surfaceDark : AppColors.white)
-            .withOpacity(0.8),
+            .withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: scoreColor.withOpacity(0.2),
+          color: scoreColor.withValues(alpha: 0.2),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: scoreColor.withOpacity(0.1),
+            color: scoreColor.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -733,7 +731,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: scoreColor.withOpacity(0.1),
+                        color: scoreColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Icon(
@@ -763,7 +761,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: (widget.isDark ? AppColors.stoneGray : AppColors.surfaceVariant)
-                        .withOpacity(0.3),
+                        .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -823,10 +821,10 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.crystalBlue.withOpacity(0.1),
+                            color: AppColors.crystalBlue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: AppColors.crystalBlue.withOpacity(0.2),
+                              color: AppColors.crystalBlue.withValues(alpha: 0.2),
                             ),
                           ),
                           child: Row(
@@ -864,10 +862,10 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: scoreColor.withOpacity(0.15),
+        color: scoreColor.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: scoreColor.withOpacity(0.3),
+          color: scoreColor.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -981,10 +979,10 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.crystalBlue.withOpacity(0.1),
+        color: AppColors.crystalBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.crystalBlue.withOpacity(0.2),
+          color: AppColors.crystalBlue.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -1025,7 +1023,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.crystalBlue.withOpacity(0.1),
+                  color: AppColors.crystalBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -1129,11 +1127,11 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: (widget.isDark ? AppColors.stoneGray : AppColors.surfaceVariant)
-                    .withOpacity(0.3),
+                    .withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: (widget.isDark ? AppColors.outlineDark : AppColors.outline)
-                      .withOpacity(0.2),
+                      .withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -1183,7 +1181,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
         border: Border(
           bottom: BorderSide(
             color: (widget.isDark ? AppColors.outlineDark : AppColors.outline)
-                .withOpacity(0.2),
+                .withValues(alpha: 0.2),
           ),
         ),
       ),
@@ -1227,7 +1225,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(

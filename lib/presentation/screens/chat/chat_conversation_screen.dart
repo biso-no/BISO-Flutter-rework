@@ -654,6 +654,10 @@ class _MessageBubble extends StatelessWidget {
       return _buildSystemMessage(context);
     }
 
+    if (message.type == 'product') {
+      return _buildProductMessage(context);
+    }
+
     return Container(
       margin: EdgeInsets.symmetric(
         vertical: showAvatar ? 8 : 2,
@@ -789,6 +793,162 @@ class _MessageBubble extends StatelessWidget {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductMessage(BuildContext context) {
+    final productName = message.metadata['product_name'] as String? ?? 'Product';
+    final productPrice = message.metadata['product_price'] as double? ?? 0.0;
+    final productImage = message.metadata['product_image'] as String? ?? '';
+    
+    return Container(
+      margin: EdgeInsets.symmetric(
+        vertical: showAvatar ? 8 : 2,
+        horizontal: 16,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (!isMe && showAvatar)
+            _buildAvatar()
+          else if (!isMe)
+            const SizedBox(width: 40),
+          
+          if (!isMe) const SizedBox(width: 8),
+          
+          Expanded(
+            child: Column(
+              crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                if (!isMe && showAvatar)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      message.senderName,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                
+                Container(
+                  constraints: const BoxConstraints(maxWidth: 300),
+                  decoration: BoxDecoration(
+                    color: isMe ? AppColors.defaultBlue : Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: const Radius.circular(16),
+                      topRight: const Radius.circular(16),
+                      bottomLeft: Radius.circular(isMe ? 16 : 4),
+                      bottomRight: Radius.circular(isMe ? 4 : 16),
+                    ),
+                    border: !isMe ? Border.all(color: AppColors.outline) : null,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Product card
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isMe ? Colors.white.withValues(alpha: 0.1) : AppColors.gray50,
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: SizedBox(
+                                width: 48,
+                                height: 48,
+                                child: productImage.isNotEmpty
+                                    ? Image.network(
+                                        productImage,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(
+                                          color: AppColors.gray200,
+                                          child: const Icon(Icons.shopping_bag),
+                                        ),
+                                      )
+                                    : Container(
+                                        color: AppColors.gray200,
+                                        child: const Icon(Icons.shopping_bag),
+                                      ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    productName,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      color: isMe ? Colors.white : AppColors.onSurface,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'NOK ${productPrice.toStringAsFixed(0)}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                      color: isMe ? Colors.white : AppColors.defaultBlue,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      // User message
+                      if (message.content.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Text(
+                            message.content,
+                            style: TextStyle(
+                              color: isMe ? Colors.white : AppColors.onSurface,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                
+                if (message.reactions.isNotEmpty)
+                  _buildReactions(),
+                
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    _formatTime(message.timestamp),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          if (isMe) const SizedBox(width: 8),
+          
+          if (isMe && showAvatar)
+            _buildAvatar()
+          else if (isMe)
+            const SizedBox(width: 40),
         ],
       ),
     );
