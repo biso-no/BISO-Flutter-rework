@@ -40,6 +40,7 @@ dependencies:
       path: .
   talker_flutter: ^4.9.3
   talker_dio_logger: ^4.9.3
+  flutter_html: ^3.0.0
 
 dev_dependencies:
   flutter_test:

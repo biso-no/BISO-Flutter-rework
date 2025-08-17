@@ -96,10 +96,7 @@ class ExploreScreen extends StatelessWidget {
                   title: 'AI Assistant',
                   subtitle: 'Get help & information',
                   color: AppColors.defaultGold,
-                  //Navigate to this URL https://www.bi.no/om-bi/kontakt-oss/
-                  onTap: () {
-                    launchUrl(Uri.parse('https://www.bi.no/om-bi/kontakt-oss/'));
-                  },
+                  onTap: () => context.go('/explore/ai-chat')
                 ),
               ],
             ),
@@ -242,6 +239,7 @@ class _CategoryCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 width: 48,
@@ -252,7 +250,7 @@ class _CategoryCard extends StatelessWidget {
                 ),
                 child: Icon(icon, color: color, size: 24),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8), // Reduced from 12 to 8
               Text(
                 title,
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -261,14 +259,16 @@ class _CategoryCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.onSurfaceVariant,
+              const SizedBox(height: 2), // Reduced from 4 to 2
+              Expanded(
+                child: Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

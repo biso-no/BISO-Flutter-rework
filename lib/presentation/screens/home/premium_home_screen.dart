@@ -10,7 +10,7 @@ import '../../../providers/campus/campus_provider.dart';
 import '../../../presentation/widgets/premium/premium_components.dart';
 import '../../../presentation/widgets/premium/premium_layouts.dart';
 import '../../../presentation/widgets/premium/premium_navigation.dart';
-import '../../../presentation/widgets/campus_switcher.dart';
+
 import '../../../providers/large_event/large_event_provider.dart';
 import '../../../data/services/event_service.dart';
 import '../../../data/services/job_service.dart';
@@ -139,7 +139,7 @@ class _PremiumHomeScreenState extends ConsumerState<PremiumHomeScreen>
           ),
         ],
       ),
-      floatingActionButton: const AiAssistantFab(),
+      //floatingActionButton: const AiAssistantFab(),
     );
   }
 }
@@ -196,6 +196,7 @@ class _PremiumHomePage extends ConsumerWidget {
           ),
         ),
 
+/*
         // Quick Actions Grid
         SliverToBoxAdapter(
           child: _PremiumQuickActions(
@@ -204,7 +205,7 @@ class _PremiumHomePage extends ConsumerWidget {
             l10n: l10n,
           ),
         ),
-
+*/
         // Latest Events Section
         _buildPremiumContentSection(
           title: 'Happening at ${campus.name}',
@@ -298,9 +299,19 @@ class _PremiumHomePage extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => CampusSwitcher(
-        onCampusChanged: () {
-          Navigator.of(context).pop();
+      builder: (context) => Consumer(
+        builder: (context, ref, child) {
+          final selectedCampus = ref.watch(filterCampusProvider);
+          final allCampuses = ref.watch(allCampusesSyncProvider);
+          
+          return _CampusSwitcherModal(
+            selectedCampus: selectedCampus,
+            allCampuses: allCampuses,
+            onCampusSelected: (campus) {
+              ref.read(filterCampusProvider.notifier).selectFilterCampus(campus);
+              Navigator.pop(context);
+            },
+          );
         },
       ),
     );
@@ -402,12 +413,9 @@ class _PremiumHeroSection extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    PremiumIconButton(
-                      icon: Icons.location_on_rounded,
-                      onPressed: onCampusTap,
-                      backgroundColor: Colors.white.withValues(alpha:0.1),
-                      iconColor: Colors.white,
-                      isGlass: true,
+                    _CampusButton(
+                      campus: campus,
+                      onTap: onCampusTap,
                     ),
                   ],
                 ),
@@ -452,6 +460,290 @@ class _PremiumHeroSection extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+// === CAMPUS BUTTON ===
+
+class _CampusButton extends StatelessWidget {
+  final dynamic campus;
+  final VoidCallback onTap;
+
+  const _CampusButton({
+    required this.campus,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.location_on_rounded,
+              size: 18,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              campus.name,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              Icons.expand_more,
+              size: 16,
+              color: Colors.white.withValues(alpha: 0.8),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// === CAMPUS SWITCHER MODAL ===
+
+class _CampusSwitcherModal extends StatelessWidget {
+  final dynamic selectedCampus;
+  final List<dynamic> allCampuses;
+  final Function(dynamic) onCampusSelected;
+
+  const _CampusSwitcherModal({
+    required this.selectedCampus,
+    required this.allCampuses,
+    required this.onCampusSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.75,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // Handle
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.gray300,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Text(
+                  'Select Campus',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
+                  style: IconButton.styleFrom(
+                    backgroundColor: AppColors.gray100,
+                    foregroundColor: AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Campus List
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              itemCount: allCampuses.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final campus = allCampuses[index];
+                final isSelected = campus.id == selectedCampus.id;
+
+                return _CampusModalCard(
+                  campus: campus,
+                  isSelected: isSelected,
+                  onTap: () => onCampusSelected(campus),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
+
+// === CAMPUS MODAL CARD ===
+
+class _CampusModalCard extends StatelessWidget {
+  final dynamic campus;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _CampusModalCard({
+    required this.campus,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.subtleBlue : AppColors.gray50,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? AppColors.defaultBlue : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: _getCampusColor(campus.id),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  campus.name[0],
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 16),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    campus.name,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: isSelected ? AppColors.defaultBlue : null,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    campus.location,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text(
+                        '${(campus.stats.studentCount / 1000).toStringAsFixed(1)}k students',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Text(
+                        '${campus.stats.activeEvents} events',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            Column(
+              children: [
+                if (campus.weather != null) ...[
+                  Text(
+                    campus.weather!.icon,
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${campus.weather!.temperature.toStringAsFixed(0)}°',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 8),
+                if (isSelected)
+                  const Icon(
+                    Icons.check_circle,
+                    color: AppColors.defaultBlue,
+                    size: 24,
+                  )
+                else
+                  const Icon(
+                    Icons.radio_button_unchecked,
+                    color: AppColors.onSurfaceVariant,
+                    size: 24,
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getCampusColor(String campusId) {
+    switch (campusId) {
+      case 'oslo':
+        return AppColors.defaultBlue;
+      case 'bergen':
+        return AppColors.green9;
+      case 'trondheim':
+        return AppColors.purple9;
+      case 'stavanger':
+        return AppColors.orange9;
+      default:
+        return AppColors.gray400;
+    }
   }
 }
 

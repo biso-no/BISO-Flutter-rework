@@ -145,12 +145,12 @@ final _router = GoRouter(
         builder: (context, state) => const JobsScreen(),
       ),
       GoRoute(
-        path: '/chat',
+        path: '/explore/chat',
         name: 'chat',
         builder: (context, state) => const ChatListScreen(),
       ),
       GoRoute(
-        path: '/ai-chat',
+        path: '/explore/ai-chat',
         name: 'ai-chat',
         builder: (context, state) => const AiChatScreen(),
       ),

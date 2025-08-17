@@ -71,30 +71,36 @@ class JobModel extends Equatable {
 
   // Create from the Appwrite Function jobs payload (WordPress-backed)
   factory JobModel.fromFunctionJob(Map<String, dynamic> map, {required String campusId}) {
-    // Function returns fields like id, title, deadline, description, contact, language,
-    // responsibilities, qualities, expiry_date?, url?, campus (array of names)
+    // Transformed function returns: id, title, description (cleaned), campus (array), type (array), interests (array), expiry_date, url
+    final typeList = map['type'] as List<dynamic>? ?? [];
+    final interestsList = map['interests'] as List<dynamic>? ?? [];
+    final campusList = map['campus'] as List<dynamic>? ?? [];
+    
+    // Extract department from type array or use first item
+    final department = typeList.isNotEmpty ? typeList.first.toString() : 'BISO';
+    
     return JobModel(
       id: (map['id'] ?? '').toString(),
       title: (map['title'] ?? '').toString(),
-      description: (map['description'] ?? '').toString(),
-      department: (map['contact'] ?? '').toString(),
+      description: (map['description'] ?? '').toString(), // Already cleaned by function
+      department: department,
       departmentId: '',
       departmentLogo: null,
       campusId: campusId,
       type: 'volunteer',
-      category: 'general',
-      requirements: List<String>.from((map['qualities'] as List?)?.map((e) => e.toString()) ?? const <String>[]),
-      responsibilities: List<String>.from((map['responsibilities'] as List?)?.map((e) => e.toString()) ?? const <String>[]),
-      skills: const <String>[],
+      category: typeList.isNotEmpty ? typeList.first.toString() : 'general',
+      requirements: List<String>.from(interestsList.map((e) => e.toString())),
+      responsibilities: const <String>[],
+      skills: List<String>.from(typeList.map((e) => e.toString())),
       salary: null,
       timeCommitment: null,
       startDate: DateTime.now(),
       endDate: null,
-      applicationDeadline: DateTime.tryParse((map['deadline'] ?? map['expiry_date'] ?? '').toString()) ?? DateTime.now().add(const Duration(days: 14)),
+      applicationDeadline: DateTime.tryParse((map['expiry_date'] ?? '').toString()) ?? DateTime.now().add(const Duration(days: 14)),
       applicationMethod: 'external',
       applicationUrl: map['url']?.toString(),
       applicationEmail: null,
-      contactPersonName: (map['contact'] ?? '').toString(),
+      contactPersonName: department,
       contactPersonEmail: null,
       contactPersonPhone: null,
       maxApplicants: 0,
@@ -104,13 +110,15 @@ class JobModel extends Equatable {
       isFeatured: false,
       benefits: const <String>[],
       metadata: <String, dynamic>{
-        'language': map['language'],
-        'campusNames': map['campus'],
+        'campusNames': campusList,
+        'type': typeList,
+        'interests': interestsList,
       },
       createdAt: null,
       updatedAt: null,
     );
   }
+
 
   factory JobModel.fromMap(Map<String, dynamic> map) {
     return JobModel(

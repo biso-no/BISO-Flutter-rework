@@ -18,7 +18,7 @@ class CampusSwitcher extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedCampus = ref.watch(filterCampusProvider);
-    final allCampuses = ref.watch(allCampusesProvider);
+    final allCampuses = ref.watch(allCampusesSyncProvider);
     final theme = Theme.of(context);
 
     if (showFullScreen) {
@@ -88,7 +88,7 @@ class CampusSwitcher extends ConsumerWidget {
       builder: (context) => Consumer(
         builder: (context, ref, child) {
           final selectedCampus = ref.watch(filterCampusProvider);
-          final allCampuses = ref.watch(allCampusesProvider);
+          final allCampuses = ref.watch(allCampusesSyncProvider);
           
           return _CampusSwitcherModal(
             selectedCampus: selectedCampus,

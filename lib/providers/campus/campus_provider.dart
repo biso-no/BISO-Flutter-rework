@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/models/campus_model.dart';
+import '../../data/services/campus_service.dart';
 import '../auth/auth_provider.dart';
 
 // Filter campus provider - used for filtering content display
@@ -26,14 +27,26 @@ final profileCampusProvider = Provider<CampusModel?>((ref) {
   return null;
 });
 
-// All campuses provider
-final allCampusesProvider = Provider<List<CampusModel>>((ref) {
-  return CampusData.campuses;
+// All campuses provider - fetches from Appwrite with fallback to static data
+final allCampusesProvider = FutureProvider<List<CampusModel>>((ref) async {
+  final campusService = CampusService();
+  return await campusService.getAllCampuses();
+});
+
+// Synchronous provider for immediate access (with static fallback)
+final allCampusesSyncProvider = Provider<List<CampusModel>>((ref) {
+  final asyncCampuses = ref.watch(allCampusesProvider);
+  return asyncCampuses.when(
+    data: (campuses) => campuses,
+    loading: () => CampusData.campuses, // Fallback while loading
+    error: (_, __) => CampusData.campuses, // Fallback on error
+  );
 });
 
 // Filter campus state notifier - manages campus for content filtering
 class FilterCampusNotifier extends StateNotifier<CampusModel> {
   static const String _filterCampusKey = 'filter_campus_id';
+  final CampusService _campusService = CampusService();
 
   FilterCampusNotifier() : super(CampusData.defaultCampus) {
     _loadFilterCampus();
@@ -45,12 +58,24 @@ class FilterCampusNotifier extends StateNotifier<CampusModel> {
       final campusId = prefs.getString(_filterCampusKey);
       
       if (campusId != null) {
-        final campus = CampusData.getCampusById(campusId);
+        print('🏛️ FilterCampusNotifier: Loading campus with ID: $campusId');
+        
+        // Try to fetch from Appwrite first
+        final campus = await _campusService.getCampusById(campusId);
         if (campus != null) {
+          print('✅ FilterCampusNotifier: Loaded campus: ${campus.name}');
           state = campus;
+        } else {
+          // Fallback to static data
+          final staticCampus = CampusData.getCampusById(campusId);
+          if (staticCampus != null) {
+            print('🔄 FilterCampusNotifier: Using static campus: ${staticCampus.name}');
+            state = staticCampus;
+          }
         }
       }
     } catch (e) {
+      print('❌ FilterCampusNotifier: Error loading campus: $e');
       // If loading fails, keep default campus
     }
   }
