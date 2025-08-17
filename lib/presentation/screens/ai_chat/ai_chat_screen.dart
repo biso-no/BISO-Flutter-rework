@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/ai_chat_models.dart';
 import '../../../data/services/ai_chat_service.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/navigation_utils.dart';
 import '../../widgets/ai_chat/ai_message_bubble.dart';
 import '../../widgets/ai_chat/user_message_bubble.dart';
 import '../../widgets/ai_chat/chat_input_field.dart';
@@ -420,6 +421,10 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
+      leading: NavigationUtils.buildBackButton(
+        context,
+        fallbackRoute: '/home',
+      ),
       flexibleSpace: ClipRRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
