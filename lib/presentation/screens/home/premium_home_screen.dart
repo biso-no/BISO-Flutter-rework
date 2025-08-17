@@ -1263,11 +1263,10 @@ class _PremiumProductCard extends StatelessWidget {
           const SizedBox(height: 8),
 
           // Product info
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
                 Text(
                   product.name,
                   style: theme.textTheme.titleSmall?.copyWith(
@@ -1276,8 +1275,6 @@ class _PremiumProductCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-
-                const Spacer(),
 
                 Text(
                   product.formattedPrice,
@@ -1297,7 +1294,6 @@ class _PremiumProductCard extends StatelessWidget {
                 ),
               ],
             ),
-          ),
         ],
       ),
     );
