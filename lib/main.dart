@@ -12,7 +12,6 @@ import 'generated/l10n/app_localizations.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/otp_verification_screen.dart';
 import 'presentation/screens/onboarding/onboarding_screen.dart';
-import 'presentation/screens/home/home_screen.dart';
 import 'presentation/screens/home/premium_home_screen.dart';
 import 'presentation/screens/explore/explore_screen.dart';
 import 'presentation/screens/explore/events_screen.dart';

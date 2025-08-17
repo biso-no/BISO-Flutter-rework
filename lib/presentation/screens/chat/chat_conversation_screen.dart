@@ -980,15 +980,22 @@ class _MessageBubble extends StatelessWidget {
   Widget _buildAvatar() {
     return CircleAvatar(
       radius: 16,
+      backgroundImage: message.senderAvatar != null 
+          ? NetworkImage(message.senderAvatar!)
+          : null,
       backgroundColor: AppColors.gray300,
-      child: Text(
-        message.senderId[0].toUpperCase(), // TODO: Show actual avatar
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-      ),
+      child: message.senderAvatar == null
+          ? Text(
+              (message.senderName.isNotEmpty 
+                  ? message.senderName[0] 
+                  : message.senderId[0]).toUpperCase(),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            )
+          : null,
     );
   }
 

@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:appwrite/appwrite.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../core/constants/app_constants.dart';
 import '../models/user_model.dart';
 import 'appwrite_service.dart';
@@ -9,6 +11,7 @@ class AuthService {
   // Using simplified global Appwrite instances
   Account get _account => account;
   Databases get _databases => databases;
+  Storage get _storage => storage;
 
   Future<String> sendOtp(String email) async {
     try {
@@ -210,12 +213,12 @@ class AuthService {
       // Handle avatar upload if provided
       String? avatarUrl = currentUser.avatarUrl;
       if (avatarFile != null) {
-        // TODO: Implement file upload to Appwrite storage
-        // For now, we'll keep the existing avatar URL
-        // In a real implementation, you would:
-        // 1. Upload the file to Appwrite Storage
-        // 2. Get the file URL
-        // 3. Update avatarUrl with the new URL
+        try {
+          avatarUrl = await _uploadAvatar(avatarFile, currentUser.id);
+        } catch (e) {
+          logPrint('🔴 Avatar upload failed: $e');
+          // Continue with profile update even if avatar upload fails
+        }
       }
 
       // Create updated user data
@@ -243,6 +246,61 @@ class AuthService {
       throw AuthException('Failed to update profile: ${e.message}');
     } catch (e) {
       throw AuthException('Network error occurred: $e');
+    }
+  }
+
+  /// Uploads an avatar image to Appwrite Storage and returns the file URL
+  Future<String> _uploadAvatar(dynamic avatarFile, String userId) async {
+    try {
+      // Delete any existing avatar for this user
+      try {
+        final existingFiles = await _storage.listFiles(bucketId: 'avatars');
+        final userAvatars = existingFiles.files.where((file) => file.name.startsWith('avatar_$userId'));
+        for (final file in userAvatars) {
+          await _storage.deleteFile(bucketId: 'avatars', fileId: file.$id);
+        }
+      } catch (e) {
+        // Ignore errors when deleting old avatars
+        logPrint('🟡 Could not delete existing avatar: $e');
+      }
+
+      // Create a unique file ID for this avatar
+      final fileId = 'avatar_${userId}_${DateTime.now().millisecondsSinceEpoch}';
+      
+      // Prepare the file for upload
+      InputFile inputFile;
+      if (avatarFile is XFile) {
+        inputFile = InputFile.fromPath(
+          path: avatarFile.path,
+          filename: '$fileId.jpg',
+        );
+      } else if (avatarFile is File) {
+        inputFile = InputFile.fromPath(
+          path: avatarFile.path,
+          filename: '$fileId.jpg',
+        );
+      } else {
+        throw AuthException('Invalid file type for avatar upload');
+      }
+
+      // Upload the file to Appwrite Storage
+      final file = await _storage.createFile(
+        bucketId: 'avatars',
+        fileId: fileId,
+        file: inputFile,
+      );
+
+      // Generate the file URL for viewing
+      final fileUrl = '${AppConstants.appwriteEndpoint}/storage/buckets/avatars/files/${file.$id}/view?project=${AppConstants.appwriteProjectId}';
+      
+      logPrint('✅ Avatar uploaded successfully: $fileUrl');
+      return fileUrl;
+    } on AppwriteException catch (e) {
+      logPrint('🔴 Appwrite avatar upload error: ${e.message}');
+      throw AuthException('Failed to upload avatar: ${e.message}');
+    } catch (e) {
+      logPrint('🔴 General avatar upload error: $e');
+      throw AuthException('Avatar upload failed: $e');
     }
   }
 }

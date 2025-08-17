@@ -23,7 +23,6 @@ import '../explore/explore_screen.dart';
 import '../chat/chat_list_screen.dart';
 import '../auth/login_screen.dart';
 import '../profile/profile_screen.dart';
-import '../../widgets/ai_chat/ai_assistant_fab.dart';
 
 /// Premium Home Screen
 /// 
@@ -175,8 +174,8 @@ class PremiumHomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final campus = ref.watch(filterCampusProvider);
-    final authState = ref.watch(authStateProvider);
-    final l10n = AppLocalizations.of(context);
+    ref.watch(authStateProvider);
+    AppLocalizations.of(context);
 
     final featuredEvent = ref.watch(featuredLargeEventProvider);
     final campusId = campus.id;
@@ -810,6 +809,7 @@ class _PremiumStatItem extends StatelessWidget {
 */
 // === PREMIUM QUICK ACTIONS ===
 
+// ignore: unused_element
 class _PremiumQuickActions extends StatelessWidget {
   final dynamic authState;
   final dynamic campus;
