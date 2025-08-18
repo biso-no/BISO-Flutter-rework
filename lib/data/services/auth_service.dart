@@ -3,7 +3,9 @@ import 'package:appwrite/appwrite.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/constants/app_constants.dart';
 import '../models/user_model.dart';
+import '../models/student_id_model.dart';
 import 'appwrite_service.dart';
+import 'student_service.dart';
 import '../../core/logging/app_logger.dart';
 
 import '../../core/logging/print_migration.dart';
@@ -12,6 +14,9 @@ class AuthService {
   Account get _account => account;
   Databases get _databases => databases;
   Storage get _storage => storage;
+  
+  // Student service for managing student verification
+  final StudentService _studentService = StudentService();
 
   Future<String> sendOtp(String email) async {
     try {
@@ -301,6 +306,99 @@ class AuthService {
     } catch (e) {
       logPrint('🔴 General avatar upload error: $e');
       throw AuthException('Avatar upload failed: $e');
+    }
+  }
+
+  /// Register student ID via OAuth (Azure)
+  Future<String> registerStudentIdViaOAuth() async {
+    try {
+      return await _studentService.registerStudentIdViaOAuth();
+    } catch (e) {
+      if (e is StudentException) {
+        throw AuthException(e.message);
+      }
+      throw AuthException('Student ID registration failed: $e');
+    }
+  }
+
+
+  /// Check membership status for a student
+  Future<bool> checkMembershipStatus(String studentNumber) async {
+    try {
+      return await _studentService.checkMembershipStatus(studentNumber);
+    } catch (e) {
+      if (e is StudentException) {
+        throw AuthException(e.message);
+      }
+      throw AuthException('Failed to check membership: $e');
+    }
+  }
+
+  /// Get student ID record for current user
+  Future<StudentIdModel?> getStudentIdRecord() async {
+    try {
+      final currentUser = await getCurrentUser();
+      if (currentUser == null) {
+        return null;
+      }
+
+      return await _studentService.getStudentIdRecord(currentUser.id);
+    } catch (e) {
+      if (e is StudentException) {
+        throw AuthException(e.message);
+      }
+      throw AuthException('Failed to get student ID: $e');
+    }
+  }
+
+  /// Update membership status
+  Future<StudentIdModel> updateMembershipStatus({
+    required String studentId,
+    required bool isMember,
+    DateTime? membershipExpiry,
+    Map<String, dynamic>? membershipDetails,
+  }) async {
+    try {
+      return await _studentService.updateMembershipStatus(
+        studentId: studentId,
+        isMember: isMember,
+        membershipExpiry: membershipExpiry,
+        membershipDetails: membershipDetails,
+      );
+    } catch (e) {
+      if (e is StudentException) {
+        throw AuthException(e.message);
+      }
+      throw AuthException('Failed to update membership: $e');
+    }
+  }
+
+  /// Remove student ID
+  Future<void> removeStudentId() async {
+    try {
+      final currentUser = await getCurrentUser();
+      if (currentUser == null) {
+        throw AuthException('User not authenticated');
+      }
+
+      await _studentService.removeStudentId(currentUser.id);
+    } catch (e) {
+      if (e is StudentException) {
+        throw AuthException(e.message);
+      }
+      throw AuthException('Failed to remove student ID: $e');
+    }
+  }
+
+  /// Launch membership purchase page
+  Future<void> launchMembershipPurchase() async {
+    try {
+      await _studentService.launchMembershipPurchase();
+    } catch (e) {
+      if (e is StudentException) {
+        throw AuthException(e.message);
+      }
+      throw AuthException('Failed to open membership page: $e');
     }
   }
 }

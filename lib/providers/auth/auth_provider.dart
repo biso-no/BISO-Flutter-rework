@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/user_model.dart';
+import '../../data/models/student_id_model.dart';
+import '../../data/models/membership_model.dart';
 import '../../data/services/auth_service.dart';
+import '../../data/services/membership_service.dart';
 import '../../data/services/robust_document_service.dart';
 
 import '../../core/logging/print_migration.dart';
@@ -12,6 +15,8 @@ final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
 
 class AuthState {
   final UserModel? user;
+  final StudentIdModel? studentRecord;
+  final MembershipVerificationResult? membershipVerification;
   final bool isLoading;
   final String? error;
   final bool isAuthenticated;
@@ -21,6 +26,8 @@ class AuthState {
 
   const AuthState({
     this.user,
+    this.studentRecord,
+    this.membershipVerification,
     this.isLoading = false,
     this.error,
     this.isAuthenticated = false,
@@ -31,6 +38,8 @@ class AuthState {
 
   AuthState copyWith({
     UserModel? user,
+    StudentIdModel? studentRecord,
+    MembershipVerificationResult? membershipVerification,
     bool? isLoading,
     String? error,
     bool? isAuthenticated,
@@ -40,6 +49,8 @@ class AuthState {
   }) {
     return AuthState(
       user: user ?? this.user,
+      studentRecord: studentRecord ?? this.studentRecord,
+      membershipVerification: membershipVerification ?? this.membershipVerification,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
@@ -50,14 +61,26 @@ class AuthState {
   }
 
   // Computed properties
-  bool get hasStudentId => user?.studentId != null && user!.studentId!.isNotEmpty;
-  String? get studentNumber => user?.studentId;
+  bool get hasStudentId => studentRecord != null;
+  String? get studentNumber => studentRecord?.studentNumber;
+  bool get isStudentVerified => studentRecord?.isVerified ?? false;
+  bool get isStudentMember => membershipVerification?.isMember ?? false;
+  bool get hasValidMembership => membershipVerification?.isMember ?? false;
+  MembershipModel? get membershipDetails => membershipVerification?.membership;
+  String get membershipStatus {
+    if (!hasStudentId) return 'No Student ID';
+    if (!isStudentVerified) return 'Student ID Pending Verification';
+    if (membershipVerification == null) return 'Membership Not Checked';
+    if (membershipVerification!.isMember) return 'Active Member';
+    return 'Not a Member';
+  }
   bool get needsOnboarding => isAuthenticated && !isProfileComplete;
   bool get needsStudentId => isAuthenticated && !hasStudentId;
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService _authService;
+  final MembershipService _membershipService = MembershipService();
 
   AuthNotifier(this._authService) : super(const AuthState()) {
     _checkAuthState();
@@ -107,11 +130,29 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final profile = UserModel.fromMap(documentData);
       logPrint('🔐 AuthProvider: Profile loaded successfully: ${profile.name}');
       
+      // Also load student record if available
+      StudentIdModel? studentRecord;
+      MembershipVerificationResult? membershipVerification;
+      try {
+        studentRecord = await _authService.getStudentIdRecord();
+        logPrint('🔐 AuthProvider: Student record loaded: ${studentRecord?.studentNumber}');
+        
+        // If student record exists and is verified, check membership
+        if (studentRecord != null && studentRecord.isVerified) {
+          membershipVerification = await _membershipService.verifyMembership(studentRecord.studentNumber);
+          logPrint('🔐 AuthProvider: Membership verified: ${membershipVerification.isMember}');
+        }
+      } catch (e) {
+        logPrint('🔐 AuthProvider: No student record found or error: $e');
+      }
+      
       final hasProfile = true;
       final isProfileComplete = profile.campusId != null && profile.campusId!.isNotEmpty;
       
       state = state.copyWith(
         user: profile,
+        studentRecord: studentRecord,
+        membershipVerification: membershipVerification,
         isAuthenticated: true,
         isLoading: false,
         hasProfile: hasProfile,
@@ -304,6 +345,113 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await _loadCompleteProfile(currentUser.id);
     }
   }
+
+  /// Register student ID via OAuth
+  Future<void> registerStudentIdViaOAuth() async {
+    state = state.copyWith(isLoading: true, error: null);
+    
+    try {
+      final studentNumber = await _authService.registerStudentIdViaOAuth();
+      
+      // Reload profile to get updated student information
+      final currentUser = state.user;
+      if (currentUser != null) {
+        await _loadCompleteProfile(currentUser.id);
+      }
+      
+      // Check membership status
+      final isMember = await _authService.checkMembershipStatus(studentNumber);
+      if (state.studentRecord != null && isMember) {
+        await _authService.updateMembershipStatus(
+          studentId: state.studentRecord!.id,
+          isMember: true,
+        );
+        // Reload again to get updated membership status
+        if (currentUser != null) {
+          await _loadCompleteProfile(currentUser.id);
+        }
+      }
+      
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(
+        error: e.toString(),
+        isLoading: false,
+      );
+      rethrow;
+    }
+  }
+
+
+  /// Check and update membership status using proper membership verification
+  Future<void> checkMembershipStatus() async {
+    final studentRecord = state.studentRecord;
+    if (studentRecord == null || !studentRecord.isVerified) {
+      return;
+    }
+    
+    state = state.copyWith(isLoading: true, error: null);
+    
+    try {
+      final membershipVerification = await _membershipService.verifyMembership(studentRecord.studentNumber);
+      
+      // Update the membership status in the student record if needed
+      if (membershipVerification.isMember != studentRecord.isMember) {
+        final updatedRecord = await _authService.updateMembershipStatus(
+          studentId: studentRecord.id,
+          isMember: membershipVerification.isMember,
+          membershipExpiry: membershipVerification.membership?.expiryDate,
+          membershipDetails: membershipVerification.membership?.toMap(),
+        );
+        
+        state = state.copyWith(
+          studentRecord: updatedRecord,
+          membershipVerification: membershipVerification,
+          isLoading: false,
+        );
+      } else {
+        state = state.copyWith(
+          membershipVerification: membershipVerification,
+          isLoading: false,
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(
+        error: e.toString(),
+        isLoading: false,
+      );
+    }
+  }
+
+  /// Remove student ID
+  Future<void> removeStudentId() async {
+    state = state.copyWith(isLoading: true, error: null);
+    
+    try {
+      await _authService.removeStudentId();
+      
+      state = state.copyWith(
+        studentRecord: null,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        error: e.toString(),
+        isLoading: false,
+      );
+      rethrow;
+    }
+  }
+
+  /// Launch membership purchase page
+  Future<void> launchMembershipPurchase() async {
+    try {
+      await _authService.launchMembershipPurchase();
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+      rethrow;
+    }
+  }
 }
 
 // Helper providers for simplified access
@@ -340,4 +488,30 @@ final studentNumberProvider = Provider<String?>((ref) {
 final needsOnboardingProvider = Provider<bool>((ref) {
   final authState = ref.watch(authStateProvider);
   return authState.needsOnboarding;
+});
+
+// Student-related providers
+final studentRecordProvider = Provider<StudentIdModel?>((ref) {
+  final authState = ref.watch(authStateProvider);
+  return authState.studentRecord;
+});
+
+final isStudentVerifiedProvider = Provider<bool>((ref) {
+  final authState = ref.watch(authStateProvider);
+  return authState.isStudentVerified;
+});
+
+final isStudentMemberProvider = Provider<bool>((ref) {
+  final authState = ref.watch(authStateProvider);
+  return authState.isStudentMember;
+});
+
+final hasValidMembershipProvider = Provider<bool>((ref) {
+  final authState = ref.watch(authStateProvider);
+  return authState.hasValidMembership;
+});
+
+final membershipStatusProvider = Provider<String>((ref) {
+  final authState = ref.watch(authStateProvider);
+  return authState.membershipStatus;
 });

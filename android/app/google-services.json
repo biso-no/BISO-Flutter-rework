@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "633338868564",
+    "firebase_url": "https://fsbiso-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "fsbiso",
+    "storage_bucket": "fsbiso.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633338868564:android:18ec67a243c11e65248ec1",
+        "android_client_info": {
+          "package_name": "com.biso.fs"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVvt3C4aCAFKNT2kLW1mYbvM1mgtV1Idg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633338868564:android:48eea6bc9a6606bd248ec1",
+        "android_client_info": {
+          "package_name": "com.biso.no"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVvt3C4aCAFKNT2kLW1mYbvM1mgtV1Idg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633338868564:android:c273a450981a3009248ec1",
+        "android_client_info": {
+          "package_name": "com.example.bisoflutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVvt3C4aCAFKNT2kLW1mYbvM1mgtV1Idg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

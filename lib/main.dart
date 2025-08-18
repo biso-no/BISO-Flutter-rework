@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+import 'firebase_options.dart';
 import 'core/theme/premium_theme.dart';
 import 'core/logging/logging_config.dart';
 import 'core/constants/app_colors.dart';
@@ -35,7 +36,9 @@ import 'data/services/notification_service.dart';
 // Background message handler for Firebase
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // Handle background messages here if needed
   print('Handling a background message: ${message.messageId}');
 }

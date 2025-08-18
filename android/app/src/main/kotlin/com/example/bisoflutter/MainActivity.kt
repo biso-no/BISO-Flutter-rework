@@ -1,4 +1,4 @@
-package com.example.bisoflutter
+package com.biso.no
 
 import io.flutter.embedding.android.FlutterActivity
 

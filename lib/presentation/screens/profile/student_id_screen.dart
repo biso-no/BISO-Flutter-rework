@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/services.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
-
-// Student ID is now managed directly in user profile via AuthProvider
-// No separate provider needed
-
+import '../../../core/utils/navigation_utils.dart';
+import '../../../data/models/student_id_model.dart';
 
 class StudentIdScreen extends ConsumerStatefulWidget {
   const StudentIdScreen({super.key});
@@ -18,122 +15,85 @@ class StudentIdScreen extends ConsumerStatefulWidget {
 }
 
 class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
-  final _studentNumberController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    super.initState();
-    // Load existing student ID
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final user = ref.read(authStateProvider).user;
-      if (user != null) {
-        // Student ID is loaded as part of user profile
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _studentNumberController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final authState = ref.watch(authStateProvider);
+    final studentRecord = authState.studentRecord;
     final hasStudentId = authState.hasStudentId;
-    final studentNumber = authState.studentNumber;
+    final isStudentVerified = authState.isStudentVerified;
+    final isStudentMember = authState.isStudentMember;
+    final hasValidMembership = authState.hasValidMembership;
+    final membershipStatus = authState.membershipStatus;
     final selectedCampus = ref.watch(selectedCampusProvider);
+    final campusColor = _getCampusColor(selectedCampus.id);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Student ID'),
+        title: const Text('Student Verification'),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => NavigationUtils.safeGoBack(context),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header Card
-            Card(
-              color: _getCampusColor(selectedCampus.id).withValues(alpha: 0.1),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: _getCampusColor(selectedCampus.id),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Icon(
-                        Icons.school,
-                        color: Colors.white,
-                        size: 32,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Student Verification',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Verify your student status to access exclusive features and benefits',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
+            // Premium Header Card with Animation
+            _PremiumHeaderCard(
+              campusColor: campusColor,
+              campusName: selectedCampus.name,
             ),
 
             const SizedBox(height: 24),
 
             if (authState.isLoading)
-              const Center(child: CircularProgressIndicator())
+              _LoadingCard(campusColor: campusColor)
             else if (authState.error != null)
               _ErrorCard(
                 error: authState.error!,
-                onRetry: () {
-                  final user = authState.user;
-                  if (user != null) {
-                    // Student ID is loaded as part of user profile
-                  }
-                },
+                onRetry: () => ref.read(authStateProvider.notifier).refreshProfile(),
+                campusColor: campusColor,
               )
             else if (!hasStudentId)
-              _AddStudentIdForm(
-                formKey: _formKey,
-                controller: _studentNumberController,
-                onSubmit: () => _addStudentId(),
+              _RegisterStudentIdSection(
                 onOAuthRegistration: () => _registerStudentIdOAuth(),
-                campusColor: _getCampusColor(selectedCampus.id),
+                campusColor: campusColor,
               )
             else
-              _StudentIdCard(
-                studentNumber: studentNumber!,
-                isVerified: false, // TODO: implement verification
+              _StudentStatusCard(
+                studentRecord: studentRecord!,
                 campusName: selectedCampus.name,
-                campusColor: _getCampusColor(selectedCampus.id),
-                onRequestVerification: () => _requestVerification(),
+                campusColor: campusColor,
+                isVerified: isStudentVerified,
+                isMember: isStudentMember,
+                hasValidMembership: hasValidMembership,
+                membershipStatus: membershipStatus,
+                onCheckMembership: () => _checkMembershipStatus(),
+                onPurchaseMembership: () => _purchaseMembership(),
                 onRemove: () => _removeStudentId(),
               ),
 
             const SizedBox(height: 24),
 
-            // Benefits Section
-            _BenefitsSection(campusColor: _getCampusColor(selectedCampus.id)),
+            // Premium Benefits Section
+            _PremiumBenefitsSection(
+              campusColor: campusColor,
+              hasValidMembership: hasValidMembership,
+            ),
+
+            const SizedBox(height: 24),
+
+            // Membership CTA if not a member
+            if (hasStudentId && isStudentVerified && !hasValidMembership)
+              _MembershipCTACard(
+                campusColor: campusColor,
+                onPurchase: () => _purchaseMembership(),
+              ),
           ],
         ),
       ),
@@ -155,20 +115,16 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
     }
   }
 
-  void _addStudentId() {
-    if (_formKey.currentState!.validate()) {
-      // TODO: Implement student ID update in AuthProvider
-    }
+  void _registerStudentIdOAuth() {
+    ref.read(authStateProvider.notifier).registerStudentIdViaOAuth();
   }
 
-  void _requestVerification() {
-    // TODO: Implement student ID verification
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Verification request submitted! You will receive an email with next steps.'),
-        backgroundColor: AppColors.green9,
-      ),
-    );
+  void _checkMembershipStatus() {
+    ref.read(authStateProvider.notifier).checkMembershipStatus();
+  }
+
+  void _purchaseMembership() {
+    ref.read(authStateProvider.notifier).launchMembershipPurchase();
   }
 
   void _removeStudentId() {
@@ -185,7 +141,7 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // TODO: Implement student ID removal
+              ref.read(authStateProvider.notifier).removeStudentId();
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Remove'),
@@ -194,26 +150,186 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
       ),
     );
   }
+}
 
-  void _registerStudentIdOAuth() {
-    final user = ref.read(authStateProvider).user;
-    if (user != null) {
-      // TODO: Implement OAuth student ID registration
-    }
+// Premium UI Components
+
+class _PremiumHeaderCard extends StatelessWidget {
+  final Color campusColor;
+  final String campusName;
+
+  const _PremiumHeaderCard({
+    required this.campusColor,
+    required this.campusName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            campusColor,
+            campusColor.withValues(alpha: 0.8),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: campusColor.withValues(alpha: 0.3),
+            offset: const Offset(0, 8),
+            blurRadius: 20,
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.3),
+                width: 2,
+              ),
+            ),
+            child: const Icon(
+              Icons.verified_user,
+              color: Colors.white,
+              size: 40,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Student Verification',
+            style: theme.textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Verify your BI $campusName student status and unlock exclusive features, membership benefits, and campus-wide access.',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: Colors.white.withValues(alpha: 0.9),
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 }
 
-class _AddStudentIdForm extends StatelessWidget {
-  final GlobalKey<FormState> formKey;
-  final TextEditingController controller;
-  final VoidCallback onSubmit;
+class _LoadingCard extends StatelessWidget {
+  final Color campusColor;
+
+  const _LoadingCard({required this.campusColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          children: [
+            CircularProgressIndicator(color: campusColor),
+            const SizedBox(height: 16),
+            Text(
+              'Loading student information...',
+              style: Theme.of(context).textTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorCard extends StatelessWidget {
+  final String error;
+  final VoidCallback onRetry;
+  final Color campusColor;
+
+  const _ErrorCard({
+    required this.error,
+    required this.onRetry,
+    required this.campusColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: AppColors.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Icon(
+                Icons.error_outline,
+                color: AppColors.error,
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Something went wrong',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              style: FilledButton.styleFrom(
+                backgroundColor: campusColor,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RegisterStudentIdSection extends StatelessWidget {
   final VoidCallback onOAuthRegistration;
   final Color campusColor;
 
-  const _AddStudentIdForm({
-    required this.formKey,
-    required this.controller,
-    required this.onSubmit,
+  const _RegisterStudentIdSection({
     required this.onOAuthRegistration,
     required this.campusColor,
   });
@@ -222,148 +338,218 @@ class _AddStudentIdForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Form(
-      key: formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Add Student Number',
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppColors.strongBlue,
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Verify Your Student Status',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: campusColor,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
 
-          const SizedBox(height: 16),
+            const SizedBox(height: 8),
 
-          TextFormField(
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: 'Student Number',
-              hintText: 's123456',
-              prefixIcon: const Icon(Icons.badge_outlined),
-              helperText: 'Enter your BI student number (starts with "s")',
+            Text(
+              'Connect with your BI student account for instant verification and access to exclusive member features.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textCapitalization: TextCapitalization.none,
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
-              LengthLimitingTextInputFormatter(10),
-            ],
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Student number is required';
-              }
-              if (!value.toLowerCase().startsWith('s')) {
-                return 'Student number should start with "s"';
-              }
-              if (value.length < 6) {
-                return 'Student number is too short';
-              }
-              return null;
-            },
-          ),
 
-          const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
-          FilledButton.icon(
-            onPressed: onSubmit,
-            icon: const Icon(Icons.add),
-            label: const Text('Add Student ID'),
-            style: FilledButton.styleFrom(
-              backgroundColor: campusColor,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Divider with "OR"
-          Row(
-            children: [
-              const Expanded(child: Divider()),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.gray300),
+            // OAuth Registration Card
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    campusColor.withValues(alpha: 0.15),
+                    campusColor.withValues(alpha: 0.08),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                child: Text(
-                  'OR',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
-                  ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: campusColor.withValues(alpha: 0.3),
+                  width: 1.5,
                 ),
               ),
-              const Expanded(child: Divider()),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // OAuth Registration Button
-          OutlinedButton.icon(
-            onPressed: onOAuthRegistration,
-            icon: const Icon(Icons.login),
-            label: const Text('Register with BI Account'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: campusColor,
-              side: BorderSide(color: campusColor),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: campusColor.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: campusColor.withValues(alpha: 0.2)),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.info_outline,
-                  color: campusColor,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Register automatically using your BI student account (@bi.no)',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.onSurfaceVariant,
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: campusColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(
+                      Icons.verified_user,
+                      color: campusColor,
+                      size: 32,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  Text(
+                    'Sign In with BI Account',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: campusColor,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Use your @bi.no email for secure, instant verification. This ensures your student ID belongs to you.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: onOAuthRegistration,
+                    icon: const Icon(Icons.login),
+                    label: const Text('Connect BI Account'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: campusColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+
+            const SizedBox(height: 24),
+
+            // Security Notice
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.blue1.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.blue6.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.security,
+                    color: AppColors.blue9,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Secure Verification',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: AppColors.blue9,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Your credentials are processed securely through BI\'s official authentication system. We never store your password.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.blue8,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Benefits Preview
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.green1.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.green6.withValues(alpha: 0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.star,
+                        color: AppColors.green9,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Unlock After Verification',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: AppColors.green9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '• Check membership status\n• Purchase BISO membership\n• Access exclusive features\n• Expense reimbursements',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.green8,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _StudentIdCard extends StatelessWidget {
-  final String studentNumber;
-  final bool isVerified;
+class _StudentStatusCard extends StatelessWidget {
+  final StudentIdModel studentRecord;
   final String campusName;
   final Color campusColor;
-  final VoidCallback onRequestVerification;
+  final bool isVerified;
+  final bool isMember;
+  final bool hasValidMembership;
+  final String membershipStatus;
+  final VoidCallback onCheckMembership;
+  final VoidCallback onPurchaseMembership;
   final VoidCallback onRemove;
 
-  const _StudentIdCard({
-    required this.studentNumber,
-    required this.isVerified,
+  const _StudentStatusCard({
+    required this.studentRecord,
     required this.campusName,
     required this.campusColor,
-    required this.onRequestVerification,
+    required this.isVerified,
+    required this.isMember,
+    required this.hasValidMembership,
+    required this.membershipStatus,
+    required this.onCheckMembership,
+    required this.onPurchaseMembership,
     required this.onRemove,
   });
 
@@ -372,23 +558,42 @@ class _StudentIdCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            colors: [
+              campusColor.withValues(alpha: 0.05),
+              Colors.transparent,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        padding: const EdgeInsets.all(24),
         child: Column(
           children: [
+            // Student ID Header
             Row(
               children: [
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: 60,
+                  height: 60,
                   decoration: BoxDecoration(
-                    color: isVerified ? AppColors.green9 : AppColors.orange9,
-                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        campusColor,
+                        campusColor.withValues(alpha: 0.8),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(
-                    isVerified ? Icons.verified : Icons.pending,
+                  child: const Icon(
+                    Icons.school,
                     color: Colors.white,
-                    size: 28,
+                    size: 30,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -397,7 +602,7 @@ class _StudentIdCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        studentNumber,
+                        studentRecord.studentNumber,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -411,126 +616,158 @@ class _StudentIdCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: (isVerified ? AppColors.green9 : AppColors.orange9).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    isVerified ? 'Verified' : 'Pending',
-                    style: TextStyle(
-                      color: isVerified ? AppColors.green9 : AppColors.orange9,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                    ),
-                  ),
+                _StatusBadge(
+                  isVerified: isVerified,
+                  hasValidMembership: hasValidMembership,
+                  membershipStatus: membershipStatus,
                 ),
               ],
             ),
 
-            if (!isVerified) ...[
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.orange9.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+            const SizedBox(height: 24),
+
+            // Verification Status
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isVerified 
+                  ? AppColors.green1.withValues(alpha: 0.5)
+                  : AppColors.orange1.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isVerified 
+                    ? AppColors.green6.withValues(alpha: 0.3)
+                    : AppColors.orange6.withValues(alpha: 0.3),
                 ),
-                child: Column(
-                  children: [
-                    Row(
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    isVerified ? Icons.verified : Icons.pending,
+                    color: isVerified ? AppColors.green9 : AppColors.orange9,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.info_outline, color: AppColors.orange9, size: 20),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Verification Pending',
-                            style: TextStyle(
-                              color: AppColors.orange9,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        Text(
+                          isVerified ? 'Verified Student' : 'Verification Pending',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: isVerified ? AppColors.green9 : AppColors.orange9,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          isVerified 
+                            ? 'Your student status has been confirmed'
+                            : 'Please verify your student status to unlock features',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.onSurfaceVariant,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Your student status needs to be verified to access all features. Click below to request verification.',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppColors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: onRequestVerification,
-                      icon: const Icon(Icons.send),
-                      label: const Text('Request Verification'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  IconButton(
-                    onPressed: onRemove,
-                    icon: const Icon(Icons.delete_outline, color: AppColors.error),
-                    tooltip: 'Remove Student ID',
                   ),
                 ],
               ),
-            ] else ...[
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.green9.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Membership Status
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: hasValidMembership 
+                  ? AppColors.green1.withValues(alpha: 0.5)
+                  : AppColors.gray100.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: hasValidMembership 
+                    ? AppColors.green6.withValues(alpha: 0.3)
+                    : AppColors.gray300.withValues(alpha: 0.3),
                 ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.check_circle, color: AppColors.green9, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Verified Student',
-                            style: TextStyle(
-                              color: AppColors.green9,
-                              fontWeight: FontWeight.w600,
-                            ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    hasValidMembership ? Icons.card_membership : Icons.card_membership_outlined,
+                    color: hasValidMembership ? AppColors.green9 : AppColors.gray400,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          membershipStatus,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: hasValidMembership ? AppColors.green9 : AppColors.gray600,
+                            fontWeight: FontWeight.bold,
                           ),
-                          Text(
-                            'You have full access to student features and benefits.',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppColors.onSurfaceVariant,
-                            ),
+                        ),
+                        Text(
+                          hasValidMembership 
+                            ? 'Access to all premium features and events'
+                            : 'Purchase membership to unlock exclusive benefits',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.onSurfaceVariant,
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Action Buttons
+            if (isVerified && !hasValidMembership) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: onPurchaseMembership,
+                      icon: const Icon(Icons.shopping_cart),
+                      label: const Text('Purchase Membership'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: campusColor,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                     ),
-                  ],
+                  ),
+                  const SizedBox(width: 12),
+                  OutlinedButton(
+                    onPressed: onCheckMembership,
+                    child: const Icon(Icons.refresh),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+            ] else if (isVerified && hasValidMembership) ...[
+              OutlinedButton.icon(
+                onPressed: onCheckMembership,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Refresh Status'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: campusColor,
+                  side: BorderSide(color: campusColor),
                 ),
               ),
-
-              const SizedBox(height: 16),
-
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton.icon(
-                  onPressed: onRemove,
-                  icon: const Icon(Icons.delete_outline, color: AppColors.error),
-                  label: const Text('Remove', style: TextStyle(color: AppColors.error)),
-                ),
-              ),
+              const SizedBox(height: 12),
             ],
+
+            // Remove Button
+            TextButton.icon(
+              onPressed: onRemove,
+              icon: const Icon(Icons.delete_outline, color: AppColors.error),
+              label: const Text('Remove Student ID', style: TextStyle(color: AppColors.error)),
+            ),
           ],
         ),
       ),
@@ -538,10 +775,63 @@ class _StudentIdCard extends StatelessWidget {
   }
 }
 
-class _BenefitsSection extends StatelessWidget {
-  final Color campusColor;
+class _StatusBadge extends StatelessWidget {
+  final bool isVerified;
+  final bool hasValidMembership;
+  final String membershipStatus;
 
-  const _BenefitsSection({required this.campusColor});
+  const _StatusBadge({
+    required this.isVerified,
+    required this.hasValidMembership,
+    required this.membershipStatus,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Color backgroundColor;
+    Color textColor;
+    String text;
+
+    if (hasValidMembership) {
+      backgroundColor = AppColors.green9;
+      textColor = Colors.white;
+      text = 'Member';
+    } else if (isVerified) {
+      backgroundColor = AppColors.blue9;
+      textColor = Colors.white;
+      text = 'Verified';
+    } else {
+      backgroundColor = AppColors.orange9;
+      textColor = Colors.white;
+      text = 'Pending';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: textColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+}
+
+class _PremiumBenefitsSection extends StatelessWidget {
+  final Color campusColor;
+  final bool hasValidMembership;
+
+  const _PremiumBenefitsSection({
+    required this.campusColor,
+    required this.hasValidMembership,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -551,46 +841,60 @@ class _BenefitsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Student Benefits',
-          style: theme.textTheme.titleMedium?.copyWith(
+          hasValidMembership ? 'Your Member Benefits' : 'Unlock These Benefits',
+          style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppColors.strongBlue,
+            color: campusColor,
           ),
         ),
 
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
 
         Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               children: [
                 _BenefitItem(
                   icon: Icons.chat,
-                  title: 'Student Chat',
-                  description: 'Access to exclusive student chat channels',
+                  title: 'Exclusive Chat Channels',
+                  description: 'Access to member-only discussion groups',
                   campusColor: campusColor,
+                  isUnlocked: hasValidMembership,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 _BenefitItem(
-                  icon: Icons.receipt,
+                  icon: Icons.receipt_long,
                   title: 'Expense Reimbursement',
-                  description: 'Submit and track expense reimbursements',
+                  description: 'Submit and track your expense claims',
                   campusColor: campusColor,
+                  isUnlocked: hasValidMembership,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 _BenefitItem(
                   icon: Icons.local_offer,
-                  title: 'Student Discounts',
-                  description: 'Access to student-only marketplace deals',
+                  title: 'Member Discounts',
+                  description: 'Exclusive deals on marketplace items',
                   campusColor: campusColor,
+                  isUnlocked: hasValidMembership,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 _BenefitItem(
                   icon: Icons.event,
-                  title: 'Priority Events',
-                  description: 'Early access to popular events and workshops',
+                  title: 'Priority Event Access',
+                  description: 'Early registration for popular events',
                   campusColor: campusColor,
+                  isUnlocked: hasValidMembership,
+                ),
+                const SizedBox(height: 20),
+                _BenefitItem(
+                  icon: Icons.workspace_premium,
+                  title: 'Premium Features',
+                  description: 'Advanced app features and tools',
+                  campusColor: campusColor,
+                  isUnlocked: hasValidMembership,
                 ),
               ],
             ),
@@ -606,12 +910,14 @@ class _BenefitItem extends StatelessWidget {
   final String title;
   final String description;
   final Color campusColor;
+  final bool isUnlocked;
 
   const _BenefitItem({
     required this.icon,
     required this.title,
     required this.description,
     required this.campusColor,
+    required this.isUnlocked,
   });
 
   @override
@@ -621,30 +927,49 @@ class _BenefitItem extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 40,
-          height: 40,
+          width: 48,
+          height: 48,
           decoration: BoxDecoration(
-            color: campusColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(10),
+            color: isUnlocked 
+              ? campusColor.withValues(alpha: 0.15)
+              : AppColors.gray100,
+            borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: campusColor, size: 20),
+          child: Icon(
+            icon,
+            color: isUnlocked ? campusColor : AppColors.gray400,
+            size: 24,
+          ),
         ),
         const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+              Row(
+                children: [
+                  Text(
+                    title,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: isUnlocked ? null : AppColors.gray600,
+                    ),
+                  ),
+                  if (isUnlocked) ...[
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.check_circle,
+                      color: AppColors.green9,
+                      size: 16,
+                    ),
+                  ],
+                ],
               ),
               const SizedBox(height: 2),
               Text(
                 description,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.onSurfaceVariant,
+                  color: isUnlocked ? AppColors.onSurfaceVariant : AppColors.gray500,
                 ),
               ),
             ],
@@ -655,53 +980,71 @@ class _BenefitItem extends StatelessWidget {
   }
 }
 
-class _ErrorCard extends StatelessWidget {
-  final String error;
-  final VoidCallback onRetry;
+class _MembershipCTACard extends StatelessWidget {
+  final Color campusColor;
+  final VoidCallback onPurchase;
 
-  const _ErrorCard({
-    required this.error,
-    required this.onRetry,
+  const _MembershipCTACard({
+    required this.campusColor,
+    required this.onPurchase,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Card(
-      color: AppColors.error.withValues(alpha: 0.1),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Icon(
-              Icons.error_outline,
-              color: AppColors.error,
-              size: 32,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Error Loading Student ID',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            campusColor.withValues(alpha: 0.1),
+            campusColor.withValues(alpha: 0.05),
           ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: campusColor.withValues(alpha: 0.3),
+        ),
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          Icon(
+            Icons.workspace_premium,
+            color: campusColor,
+            size: 48,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Become a BISO Member',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: campusColor,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Join thousands of BI students and unlock exclusive features, events, and benefits.',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: AppColors.onSurfaceVariant,
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          FilledButton.icon(
+            onPressed: onPurchase,
+            icon: const Icon(Icons.shopping_cart),
+            label: const Text('Purchase Membership'),
+            style: FilledButton.styleFrom(
+              backgroundColor: campusColor,
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+            ),
+          ),
+        ],
       ),
     );
   }
