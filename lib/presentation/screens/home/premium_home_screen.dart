@@ -1497,7 +1497,7 @@ class _PremiumErrorState extends StatelessWidget {
 
 // === AUTH REQUIRED PAGE ===
 
-class PremiumAuthRequiredPage extends StatelessWidget {
+class PremiumAuthRequiredPage extends ConsumerWidget {
   final String title;
   final String description;
   final IconData icon;
@@ -1512,7 +1512,7 @@ class PremiumAuthRequiredPage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
     return PremiumScaffold(
@@ -1577,6 +1577,12 @@ class PremiumAuthRequiredPage extends StatelessWidget {
                 width: double.infinity,
                 onPressed: () => navigateToTab?.call(1),
               ),
+              PremiumButton(
+                text: 'Clear session',
+                isSecondary: true,
+                onPressed: () => ref.read(authStateProvider.notifier).clearSession(),
+                width: double.infinity,
+              )
             ],
           ),
         ),

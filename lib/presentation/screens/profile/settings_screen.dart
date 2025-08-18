@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
 import '../../../providers/privacy/privacy_provider.dart';
+import '../../../data/services/validator_service.dart';
 import 'settings_screen_chat_tab.dart';
 
 // Settings providers
 final appSettingsProvider = StateNotifierProvider<AppSettingsNotifier, AppSettingsState>((ref) {
   return AppSettingsNotifier();
+});
+
+// Controller permissions provider
+final controllerPermissionsProvider = FutureProvider<bool>((ref) async {
+  final validatorService = ValidatorService();
+  return await validatorService.hasControllerPermissions();
 });
 
 class AppSettingsState {
@@ -281,6 +289,48 @@ class _GeneralSettingsTab extends ConsumerWidget {
           ),
 
           const SizedBox(height: 24),
+
+          // Controller Mode Section (only show if user has permissions)
+          ref.watch(controllerPermissionsProvider).when(
+            data: (hasPermissions) => hasPermissions ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Validator Mode',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.strongBlue,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  child: ListTile(
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: _getCampusColor(selectedCampus.id),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.qr_code_scanner,
+                        color: Colors.white,
+                      ),
+                    ),
+                    title: const Text('Open Validator Mode'),
+                    subtitle: const Text('Scan student QR codes to verify membership'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      context.push('/controller-mode');
+                    },
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+            ) : const SizedBox.shrink(),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
 
           // Data Section
           Text(
@@ -606,8 +656,8 @@ class _PrivacySettingsTab extends ConsumerWidget {
                     value: isPublic == true,
                     onChanged: (value) async {
                       try {
-                        final privacyService = ref.read(privacyServiceProvider);
-                        await privacyService.setUserPrivacySetting(userId, value);
+                        final privacyNotifier = ref.read(privacySettingProvider(userId).notifier);
+                        await privacyNotifier.updatePrivacySetting(value);
                         
                         // Refresh the privacy status
                         ref.invalidate(userPrivacyProvider(userId));
@@ -618,8 +668,8 @@ class _PrivacySettingsTab extends ConsumerWidget {
                             SnackBar(
                               content: Text(
                                 value 
-                                  ? 'Profile set to public - others can find you'
-                                  : 'Profile set to private - you won\'t appear in search',
+                                  ? 'Public profile created - others can find you in search'
+                                  : 'Public profile removed - you won\'t appear in search',
                               ),
                               backgroundColor: AppColors.defaultBlue,
                             ),

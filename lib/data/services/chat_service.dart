@@ -4,7 +4,9 @@ import 'dart:io';
 
 import '../../core/constants/app_constants.dart';
 import '../models/chat_model.dart';
+import '../models/public_profile_model.dart';
 import 'appwrite_service.dart';
+import 'public_profile_service.dart';
 import 'robust_document_service.dart';
 
 class ChatService {
@@ -1118,29 +1120,25 @@ class ChatService {
     }
   }
 
-  // Search users by name or email (only public users)
-  Future<List<Map<String, dynamic>>> searchUsers(String query) async {
+  // Search users by name using public profiles
+  Future<List<PublicProfileModel>> searchUsers(String query, {String? campusId}) async {
     try {
       if (query.trim().isEmpty) return [];
       
-      final documents = await RobustDocumentService.listDocumentsRobust(
-        databaseId: AppConstants.databaseId,
-        collectionId: 'user',
-        queries: [
-          'search("name", "$query")',
-          'equal("is_public", true)', // Only return public users
-          'limit(20)',
-        ],
+      final publicProfileService = PublicProfileService();
+      return await publicProfileService.searchPublicProfiles(
+        query: query,
+        campusId: campusId,
+        limit: 20,
       );
-
-      return documents;
     } catch (e) {
+      print('Failed to search users: $e');
       throw ChatException('Failed to search users: $e');
     }
   }
 
-  // Get recent chat contacts (only public users)
-  Future<List<String>> getRecentContacts(String currentUserId) async {
+  // Get recent chat contacts (only users with public profiles)
+  Future<List<PublicProfileModel>> getRecentContacts(String currentUserId) async {
     try {
       final documents = await RobustDocumentService.listDocumentsRobust(
         databaseId: AppConstants.databaseId,
@@ -1163,27 +1161,13 @@ class ChatService {
         }
       }
 
-      // Filter contacts to only include public users
-      final publicContacts = <String>[];
-      for (final contactId in contacts) {
-        try {
-          final userDoc = await RobustDocumentService.getDocumentRobust(
-            databaseId: AppConstants.databaseId,
-            collectionId: 'user',
-            documentId: contactId,
-          );
-          
-          // Only include if user is public
-          if (userDoc['is_public'] == true) {
-            publicContacts.add(contactId);
-          }
-        } catch (e) {
-          // Skip contacts that can't be retrieved
-          continue;
-        }
-      }
+      // Get public profiles for these contacts
+      final publicProfileService = PublicProfileService();
+      final publicProfiles = await publicProfileService.getMultiplePublicProfiles(
+        contacts.toList(),
+      );
 
-      return publicContacts;
+      return publicProfiles;
     } catch (e) {
       return [];
     }

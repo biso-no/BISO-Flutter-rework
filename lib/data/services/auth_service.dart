@@ -5,6 +5,7 @@ import '../../core/constants/app_constants.dart';
 import '../models/user_model.dart';
 import '../models/student_id_model.dart';
 import 'appwrite_service.dart';
+import 'privacy_service.dart';
 import 'student_service.dart';
 import '../../core/logging/app_logger.dart';
 
@@ -246,7 +247,20 @@ class AuthService {
         data: updatedData,
       );
 
-      return UserModel.fromMap(doc.data);
+      final updatedUser = UserModel.fromMap(doc.data);
+
+      // Sync public profile if user is public
+      try {
+        final privacyService = PrivacyService();
+        if (updatedUser.isPublic == true) {
+          await privacyService.syncPublicProfile(updatedUser);
+        }
+      } catch (e) {
+        logPrint('🔴 Failed to sync public profile: $e');
+        // Don't fail the entire profile update if public profile sync fails
+      }
+
+      return updatedUser;
     } on AppwriteException catch (e) {
       throw AuthException('Failed to update profile: ${e.message}');
     } catch (e) {
@@ -379,6 +393,56 @@ class AuthService {
         throw AuthException(e.message);
       }
       throw AuthException('Failed to open membership page: $e');
+    }
+  }
+
+  /// Update payment information (bank account and SWIFT code)
+  Future<UserModel> updatePaymentInformation({
+    required String bankAccount,
+    String? swift,
+  }) async {
+    try {
+      final currentUser = await getCurrentUser();
+      if (currentUser == null) {
+        throw AuthException('User not authenticated');
+      }
+
+      AppLogger.auth('Updating payment information', 
+        userId: currentUser.id, 
+        action: 'update_payment_info',
+        extra: {
+          'has_bank_account': bankAccount.isNotEmpty,
+          'has_swift': swift?.isNotEmpty == true,
+        },
+      );
+
+      // Prepare update data
+      final updateData = <String, dynamic>{
+        'bank_account': bankAccount,
+      };
+
+      // Only include SWIFT if provided, otherwise set to null
+      updateData['swift'] = swift?.isNotEmpty == true ? swift : null;
+
+      // Update user document in Appwrite
+      final response = await _databases.updateDocument(
+        databaseId: AppConstants.databaseId,
+        collectionId: 'user',
+        documentId: currentUser.id,
+        data: updateData,
+      );
+
+      AppLogger.auth('Payment information updated successfully', 
+        userId: currentUser.id, 
+        action: 'payment_info_updated',
+      );
+
+      // Return updated user model
+      return UserModel.fromDocument(response);
+    } on AppwriteException catch (e) {
+      throw AuthException('Failed to update payment information: ${e.message}');
+    } catch (e) {
+      throw AuthException('Network error occurred: $e');
     }
   }
 }

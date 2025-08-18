@@ -14,6 +14,7 @@ class UserModel extends Equatable {
   final List<String> departments;
   final String? avatarUrl;
   final String? bankAccount;
+  final String? swift;
   final bool? isPublic; // null = not set, false = private, true = public
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -31,6 +32,7 @@ class UserModel extends Equatable {
     this.departments = const [],
     this.avatarUrl,
     this.bankAccount,
+    this.swift,
     this.isPublic,
     this.createdAt,
     this.updatedAt,
@@ -53,10 +55,18 @@ class UserModel extends Equatable {
       departments: _parseDepartmentIds(map['department_ids']), // Use department_ids string array
       avatarUrl: map['avatar'],
       bankAccount: map['bank_account'],
+      swift: map['swift'],
       isPublic: map['is_public'], // Can be null for existing users
       createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
       updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
     );
+  }
+
+  factory UserModel.fromDocument(dynamic document) {
+    if (document is Map<String, dynamic>) {
+      return UserModel.fromMap(document);
+    }
+    return UserModel.fromMap(document.data);
   }
 
   // Helper method to safely parse department IDs
@@ -84,6 +94,7 @@ class UserModel extends Equatable {
       'departments': departments,
       'avatar': avatarUrl,
       'bank_account': bankAccount,
+      'swift': swift,
       'is_public': isPublic,
     };
   }
@@ -101,6 +112,7 @@ class UserModel extends Equatable {
     List<String>? departments,
     String? avatarUrl,
     String? bankAccount,
+    String? swift,
     bool? isPublic,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -118,6 +130,7 @@ class UserModel extends Equatable {
       departments: departments ?? this.departments,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       bankAccount: bankAccount ?? this.bankAccount,
+      swift: swift ?? this.swift,
       isPublic: isPublic ?? this.isPublic,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -138,6 +151,7 @@ class UserModel extends Equatable {
         departments,
         avatarUrl,
         bankAccount,
+        swift,
         isPublic,
         createdAt,
         updatedAt,

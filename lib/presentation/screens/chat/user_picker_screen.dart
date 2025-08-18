@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../data/models/public_profile_model.dart';
+import '../../../providers/campus/campus_provider.dart';
 import 'chat_list_screen.dart';
 
 class UserPickerScreen extends ConsumerStatefulWidget {
@@ -23,7 +25,7 @@ class UserPickerScreen extends ConsumerStatefulWidget {
 
 class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, dynamic>> _searchResults = [];
+  List<PublicProfileModel> _searchResults = [];
   List<String> _selectedUserIds = [];
   bool _isLoading = false;
   String _searchQuery = '';
@@ -63,12 +65,12 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
 
     try {
       final chatService = ref.read(chatServiceProvider);
-      final results = await chatService.searchUsers(query);
+      final selectedCampus = ref.read(selectedCampusProvider);
+      final results = await chatService.searchUsers(query, campusId: selectedCampus.id);
       
       // Filter out excluded users
-      final filteredResults = results.where((user) {
-        final userId = user['\$id'] ?? '';
-        return !widget.excludeUserIds.contains(userId);
+      final filteredResults = results.where((profile) {
+        return !widget.excludeUserIds.contains(profile.userId);
       }).toList();
 
       setState(() {
@@ -159,13 +161,13 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
               child: Wrap(
                 spacing: 8,
                 children: _selectedUserIds.map((userId) {
-                  final user = _searchResults.firstWhere(
-                    (u) => u['\$id'] == userId,
-                    orElse: () => {'\$id': userId, 'name': 'Selected User'},
+                  final profile = _searchResults.firstWhere(
+                    (p) => p.userId == userId,
+                    orElse: () => PublicProfileModel(id: '', userId: userId, name: 'Selected User'),
                   );
                   
                   return Chip(
-                    label: Text(user['name'] ?? 'Unknown'),
+                    label: Text(profile.name),
                     onDeleted: () => _toggleUser(userId),
                     backgroundColor: AppColors.subtleBlue,
                   );
@@ -238,28 +240,26 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
     return ListView.builder(
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
-        final user = _searchResults[index];
-        final userId = user['\$id'] ?? '';
-        final userName = user['name'] ?? 'Unknown User';
-        final userEmail = user['email'] ?? '';
-        final isSelected = _selectedUserIds.contains(userId);
+        final profile = _searchResults[index];
+        final isSelected = _selectedUserIds.contains(profile.userId);
 
         return ListTile(
           leading: CircleAvatar(
             backgroundColor: AppColors.subtleBlue,
-            child: Text(
-              userName.isNotEmpty ? userName[0].toUpperCase() : '?',
+            backgroundImage: profile.avatar != null ? NetworkImage(profile.avatar!) : null,
+            child: profile.avatar == null ? Text(
+              profile.name.isNotEmpty ? profile.name[0].toUpperCase() : '?',
               style: const TextStyle(
                 color: AppColors.defaultBlue,
                 fontWeight: FontWeight.bold,
               ),
-            ),
+            ) : null,
           ),
           title: Text(
-            userName,
+            profile.name,
             style: const TextStyle(fontWeight: FontWeight.w500),
           ),
-          subtitle: userEmail.isNotEmpty ? Text(userEmail) : null,
+          subtitle: profile.displayEmail != null ? Text(profile.displayEmail!) : null,
           trailing: isSelected
               ? const Icon(
                   Icons.check_circle,
@@ -270,7 +270,7 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                   color: AppColors.onSurfaceVariant,
                 ),
           onTap: () {
-            _toggleUser(userId);
+            _toggleUser(profile.userId);
             
             // If single select, immediately return
             if (!widget.multiSelect && _selectedUserIds.isNotEmpty) {

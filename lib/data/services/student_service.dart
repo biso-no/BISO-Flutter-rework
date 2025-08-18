@@ -1,13 +1,19 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_appauth/flutter_appauth.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../core/constants/app_constants.dart';
 import '../models/student_id_model.dart';
 import 'membership_service.dart';
 import 'robust_document_service.dart';
 import '../../core/logging/app_logger.dart';
+import 'auth_service.dart';
 
 class StudentService {
   // Other Appwrite modules (auth/functions) are fine; database access uses RobustDocumentService
+  static final _appAuth = FlutterAppAuth();
+  static final _authService = AuthService();
 
   /// Initiates OAuth2 flow with Microsoft Azure for BI student account
   /// Returns the student ID extracted from the email
@@ -15,24 +21,125 @@ class StudentService {
     try {
       AppLogger.info('Starting OAuth student ID registration');
       
-      // TODO: Implement OAuth2 flow with Microsoft Azure
-      // This requires proper Azure tenant configuration in Appwrite
-      throw StudentException('OAuth registration is not yet implemented. Please use manual registration for now.');
+      // Microsoft Azure configuration for BI tenant
+      const String clientId = '09d8bb72-2cef-4b98-a1d3-2414a7a40873';
+      const String tenantId = 'adee44b2-91fc-40f1-abdd-9cc29351b5fd';
+      const String discoveryUrl = 'https://login.microsoftonline.com/$tenantId/v2.0';
+      const String redirectUrl = 'com.biso.no://oauth/callback';
       
-      // Note: The OAuth flow will be implemented once Azure tenant is configured
-      // It should:
-      // 1. Create OAuth2 session for Microsoft
-      // 2. Verify @bi.no domain
-      // 3. Extract student number from email
-      // 4. Create verified student record
-      // 5. Update user profile relationship
+      // OAuth2 request configuration
+      final AuthorizationTokenRequest request = AuthorizationTokenRequest(
+        clientId,
+        redirectUrl,
+        discoveryUrl: discoveryUrl,
+        scopes: ['openid', 'email', 'profile'],
+        additionalParameters: {
+          'prompt': 'select_account',
+          'response_mode': 'query',
+        },
+      );
+      
+      AppLogger.info('Initiating OAuth flow with Microsoft Azure');
+      
+      // Perform OAuth flow
+      final AuthorizationTokenResponse? response = await _appAuth.authorizeAndExchangeCode(request);
+      
+      if (response == null) {
+        throw StudentException('OAuth flow was cancelled by user');
+      }
+      
+      final AuthorizationTokenResponse result = response;
+      
+      if (result.accessToken == null) {
+        throw StudentException('Failed to obtain access token from Microsoft');
+      }
+      
+      AppLogger.info('OAuth flow completed successfully, fetching user email');
+      
+      // Fetch user email from Microsoft Graph API
+      final String email = await _fetchUserEmailFromMicrosoft(result.accessToken!);
+      
+      // Validate email domain
+      if (!email.endsWith('@bi.no') && !email.endsWith('@biso.no')) {
+        throw StudentException('Please use a valid BI email address ending with @bi.no or @biso.no');
+      }
+      
+      // Extract student number from email
+      final String studentNumber = email.replaceAll(RegExp(r'@(bi\.no|biso\.no)$'), '');
+      
+      AppLogger.info('Student number extracted from email', extra: {
+        'studentNumber': studentNumber,
+        'email': email,
+      });
+      
+      // Get current user
+      final currentUser = await _authService.getCurrentUser();
+      if (currentUser == null) {
+        throw StudentException('User not authenticated. Please log in first.');
+      }
+      
+      // Create student ID record
+      final studentRecord = await createStudentIdRecord(
+        userId: currentUser.id,
+        studentNumber: studentNumber,
+        isVerified: true, // OAuth verification counts as verified
+      );
+      
+      // Update user profile to link student ID
+      await RobustDocumentService.updateDocumentRobust(
+        databaseId: AppConstants.databaseId,
+        collectionId: 'user',
+        documentId: currentUser.id,
+        data: {
+          'student_id': studentNumber,
+          'student': studentRecord.id,
+        },
+      );
+      
+      AppLogger.info('OAuth student registration completed successfully', extra: {
+        'userId': currentUser.id,
+        'studentNumber': studentNumber,
+        'studentRecordId': studentRecord.id,
+      });
+      
+      return studentNumber;
       
     } catch (e) {
-      AppLogger.error('Student registration failed', error: e.toString());
+      AppLogger.error('OAuth student registration failed', error: e.toString());
       if (e is StudentException) {
         rethrow;
       }
-      throw StudentException('Student registration failed: $e');
+      throw StudentException('OAuth registration failed: $e');
+    }
+  }
+  
+  /// Fetches user email from Microsoft Graph API using access token
+  Future<String> _fetchUserEmailFromMicrosoft(String accessToken) async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://graph.microsoft.com/oidc/userinfo'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+      
+      if (response.statusCode != 200) {
+        throw StudentException('Failed to fetch user email from Microsoft: ${response.statusCode}');
+      }
+      
+      final dynamic userData = json.decode(response.body);
+      final String? email = userData['email'];
+      
+      if (email == null || email.isEmpty) {
+        throw StudentException('Email not found in Microsoft user profile');
+      }
+      
+      return email;
+      
+    } catch (e) {
+      AppLogger.error('Error fetching user email from Microsoft', error: e.toString());
+      throw StudentException('Failed to fetch user email: $e');
     }
   }
 

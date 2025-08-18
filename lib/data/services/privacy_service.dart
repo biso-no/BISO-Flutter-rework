@@ -1,4 +1,6 @@
 import '../../core/constants/app_constants.dart';
+import '../models/user_model.dart';
+import 'public_profile_service.dart';
 import 'robust_document_service.dart';
 
 class PrivacyService {
@@ -22,9 +24,20 @@ class PrivacyService {
     }
   }
 
-  /// Update user's privacy setting
-  Future<bool> setUserPrivacySetting(String userId, bool isPublic) async {
+  /// Update user's privacy setting and manage public profile
+  Future<bool> setUserPrivacySetting(String userId, bool isPublic, {UserModel? userData}) async {
     try {
+      final publicProfileService = PublicProfileService();
+      
+      if (isPublic) {
+        // Create public profile if making user public
+        await _createPublicProfileIfNeeded(userId, userData);
+      } else {
+        // Delete public profile if making user private
+        await publicProfileService.deletePublicProfile(userId);
+      }
+
+      // Update the user's privacy setting
       await RobustDocumentService.updateDocumentRobust(
         databaseId: AppConstants.databaseId,
         collectionId: 'user',
@@ -56,5 +69,72 @@ class PrivacyService {
     } else {
       return 'Private - Others cannot find you in search';
     }
+  }
+
+  /// Check if user has a public profile
+  Future<bool> hasPublicProfile(String userId) async {
+    final publicProfileService = PublicProfileService();
+    return await publicProfileService.hasPublicProfile(userId);
+  }
+
+  /// Create public profile with user data
+  Future<void> createPublicProfileFromUserData(UserModel userData, {
+    bool emailVisible = false,
+    bool phoneVisible = false,
+  }) async {
+    final publicProfileService = PublicProfileService();
+    await publicProfileService.createPublicProfile(
+      userId: userData.id,
+      name: userData.name,
+      email: userData.email,
+      phone: userData.phone,
+      campusId: userData.campusId,
+      avatar: userData.avatarUrl,
+      emailVisible: emailVisible,
+      phoneVisible: phoneVisible,
+    );
+  }
+
+  /// Sync public profile when user data changes
+  Future<void> syncPublicProfile(UserModel userData) async {
+    final publicProfileService = PublicProfileService();
+    await publicProfileService.syncWithUserData(
+      userId: userData.id,
+      name: userData.name,
+      email: userData.email,
+      phone: userData.phone,
+      campusId: userData.campusId,
+      avatar: userData.avatarUrl,
+    );
+  }
+
+  /// Private helper to create public profile if needed
+  Future<void> _createPublicProfileIfNeeded(String userId, UserModel? userData) async {
+    final publicProfileService = PublicProfileService();
+    final hasProfile = await publicProfileService.hasPublicProfile(userId);
+    
+    if (hasProfile) {
+      // Profile already exists, sync with current user data if provided
+      if (userData != null) {
+        await syncPublicProfile(userData);
+      }
+      return;
+    }
+
+    // Need to fetch user data if not provided
+    UserModel user;
+    if (userData != null) {
+      user = userData;
+    } else {
+      final userDoc = await RobustDocumentService.getDocumentRobust(
+        databaseId: AppConstants.databaseId,
+        collectionId: 'user',
+        documentId: userId,
+      );
+      user = UserModel.fromMap(userDoc);
+    }
+
+    // Create new public profile
+    await createPublicProfileFromUserData(user);
   }
 }

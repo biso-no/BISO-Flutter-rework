@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/models/user_model.dart';
 import '../../data/services/privacy_service.dart';
+import '../auth/auth_provider.dart';
 
 // Privacy service provider
 final privacyServiceProvider = Provider<PrivacyService>((ref) {
@@ -27,16 +29,26 @@ final privacyStatusProvider = FutureProvider.family<String, String>((ref, userId
 
 // Update privacy setting notifier
 class PrivacySettingNotifier extends StateNotifier<AsyncValue<bool>> {
-  PrivacySettingNotifier(this._privacyService, this._userId) : super(const AsyncValue.loading());
+  PrivacySettingNotifier(this._privacyService, this._userId, this._ref) : super(const AsyncValue.loading());
 
   final PrivacyService _privacyService;
   final String _userId;
+  final Ref _ref;
 
   Future<void> updatePrivacySetting(bool isPublic) async {
     state = const AsyncValue.loading();
     
     try {
-      final success = await _privacyService.setUserPrivacySetting(_userId, isPublic);
+      // Get current user data for public profile creation
+      final authState = _ref.read(authStateProvider);
+      UserModel? userData = authState.user;
+
+      final success = await _privacyService.setUserPrivacySetting(
+        _userId,
+        isPublic,
+        userData: userData,
+      );
+      
       if (success) {
         state = AsyncValue.data(isPublic);
       } else {
@@ -64,5 +76,5 @@ class PrivacySettingNotifier extends StateNotifier<AsyncValue<bool>> {
 // Privacy setting notifier provider
 final privacySettingProvider = StateNotifierProvider.family<PrivacySettingNotifier, AsyncValue<bool>, String>((ref, userId) {
   final privacyService = ref.read(privacyServiceProvider);
-  return PrivacySettingNotifier(privacyService, userId);
+  return PrivacySettingNotifier(privacyService, userId, ref);
 });

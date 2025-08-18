@@ -42,6 +42,9 @@ dependencies:
   talker_dio_logger: ^4.9.3
   flutter_html: ^3.0.0
   permission_handler: ^12.0.1
+  mobile_scanner: ^7.0.1
+  qr_flutter: ^4.1.0
+  flutter_appauth: ^9.0.1
 
 dev_dependencies:
   flutter_test:

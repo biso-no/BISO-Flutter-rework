@@ -312,6 +312,31 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> updatePaymentInformation({
+    required String bankAccount,
+    String? swift,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+    
+    try {
+      final updatedUser = await _authService.updatePaymentInformation(
+        bankAccount: bankAccount,
+        swift: swift,
+      );
+      
+      state = state.copyWith(
+        user: updatedUser,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        error: e.toString(),
+        isLoading: false,
+      );
+      rethrow;
+    }
+  }
+
   Future<void> signOut() async {
     await logout();
   }

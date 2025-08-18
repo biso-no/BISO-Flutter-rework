@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'dart:async';
+import 'dart:math' as math;
 
 import '../../../core/constants/app_colors.dart';
 import '../../../providers/auth/auth_provider.dart';
@@ -7,6 +10,7 @@ import '../../../providers/campus/campus_provider.dart';
 import '../../../core/utils/navigation_utils.dart';
 import '../../../data/models/student_id_model.dart';
 import '../../widgets/show_membership_purchase_modal.dart';
+import '../../../data/services/validator_service.dart';
 
 class StudentIdScreen extends ConsumerStatefulWidget {
   const StudentIdScreen({super.key});
@@ -15,7 +19,178 @@ class StudentIdScreen extends ConsumerStatefulWidget {
   ConsumerState<StudentIdScreen> createState() => _StudentIdScreenState();
 }
 
-class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
+class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerProviderStateMixin {
+  Timer? _tokenRefreshTimer;
+  Timer? _animationTimer;
+  Timer? _countdownUpdateTimer;
+  String? _currentToken;
+  DateTime? _tokenExpiry;
+  DateTime? _serverTime;
+  bool _isLoadingToken = false;
+  String? _tokenError;
+  int _remainingSeconds = 0;
+  
+  // Animation controllers
+  late AnimationController _watermarkController;
+  late AnimationController _pulseController;
+  late AnimationController _countdownController;
+  late AnimationController _gradientController;
+  
+  // Animation values
+  late Animation<double> _watermarkAnimation;
+  late Animation<double> _pulseAnimation;
+  late Animation<double> _countdownAnimation;
+  late Animation<double> _gradientAnimation;
+
+  // Services
+  late final ValidatorService _validatorService = ValidatorService();
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAnimations();
+    _startTokenRefresh();
+  }
+
+  @override
+  void dispose() {
+    _tokenRefreshTimer?.cancel();
+    _animationTimer?.cancel();
+    _countdownUpdateTimer?.cancel();
+    _watermarkController.dispose();
+    _pulseController.dispose();
+    _countdownController.dispose();
+    _gradientController.dispose();
+    super.dispose();
+  }
+
+  void _initializeAnimations() {
+    // Watermark animation (moves every 10s)
+    _watermarkController = AnimationController(
+      duration: const Duration(seconds: 10),
+      vsync: this,
+    );
+    _watermarkAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _watermarkController, curve: Curves.easeInOut),
+    );
+
+    // Pulse animation (continuous)
+    _pulseController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+    _pulseAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    // Countdown animation (30s cycle)
+    _countdownController = AnimationController(
+      duration: const Duration(seconds: 30),
+      vsync: this,
+    );
+    _countdownAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _countdownController, curve: Curves.linear),
+    );
+
+    // Gradient animation (continuous subtle movement)
+    _gradientController = AnimationController(
+      duration: const Duration(seconds: 8),
+      vsync: this,
+    );
+    _gradientAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _gradientController, curve: Curves.easeInOut),
+    );
+
+    // Start continuous animations
+    _pulseController.repeat(reverse: true);
+    _gradientController.repeat();
+    _countdownController.repeat();
+  }
+
+  void _startTokenRefresh() {
+    // Initial token fetch
+    _fetchNewToken();
+    
+    // Set up timer for token refresh every 30 seconds
+    _tokenRefreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      _fetchNewToken();
+    });
+    
+    // Set up timer for watermark animation every 10 seconds
+    _animationTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      _watermarkController.forward(from: 0);
+    });
+    
+    // Set up countdown update timer (updates every second)
+    _countdownUpdateTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _updateCountdown();
+    });
+  }
+
+  void _updateCountdown() {
+    if (_tokenExpiry != null) {
+      final now = DateTime.now();
+      final timeUntilExpiry = _tokenExpiry!.difference(now).inSeconds;
+      
+      if (mounted) {
+        setState(() {
+          _remainingSeconds = timeUntilExpiry > 0 ? timeUntilExpiry : 0;
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchNewToken() async {
+    if (_isLoadingToken) return;
+    
+    setState(() {
+      _isLoadingToken = true;
+      _tokenError = null;
+    });
+
+    try {
+      final result = await _validatorService.issuePassToken();
+      
+      if (result.ok) {
+        setState(() {
+          _currentToken = result.token;
+          _tokenExpiry = DateTime.now().add(Duration(seconds: result.ttlSeconds));
+          _serverTime = result.serverTime;
+          _remainingSeconds = result.ttlSeconds;
+          _isLoadingToken = false;
+        });
+        
+        // Reset countdown animation
+        _countdownController.reset();
+        _countdownController.forward();
+      } else {
+        setState(() {
+          _tokenError = result.error ?? 'Failed to generate verification token.';
+          _isLoadingToken = false;
+        });
+      }
+      
+    } catch (e) {
+      String userFriendlyError;
+      
+      if (e.toString().contains('NO_ACTIVE_MEMBERSHIP')) {
+        userFriendlyError = 'No active membership found. Please purchase a BISO membership first.';
+      } else if (e.toString().contains('NO_STUDENT_ID')) {
+        userFriendlyError = 'Student ID not found. Please verify your student status first.';
+      } else if (e.toString().contains('UNAUTHENTICATED')) {
+        userFriendlyError = 'Authentication required. Please log in again.';
+      } else if (e.toString().contains('FAILED_TO_VERIFY_MEMBERSHIP')) {
+        userFriendlyError = 'Unable to verify membership status. Please try again.';
+      } else {
+        userFriendlyError = 'Network error: ${e.toString()}';
+      }
+      
+      setState(() {
+        _tokenError = userFriendlyError;
+        _isLoadingToken = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +198,14 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
     final studentRecord = authState.studentRecord;
     final hasStudentId = authState.hasStudentId;
     final isStudentVerified = authState.isStudentVerified;
-    final isStudentMember = authState.isStudentMember;
     final hasValidMembership = authState.hasValidMembership;
     final membershipStatus = authState.membershipStatus;
     final selectedCampus = ref.watch(selectedCampusProvider);
     final campusColor = _getCampusColor(selectedCampus.id);
+    
+    // Use the continuously updated countdown
+    final isExpired = _remainingSeconds <= 0;
+    final isExpiringSoon = _remainingSeconds <= 10;
 
     return Scaffold(
       appBar: AppBar(
@@ -66,18 +244,29 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
                 campusColor: campusColor,
               )
             else
-              _StudentStatusCard(
+              _AnimatedStudentIdCard(
                 studentRecord: studentRecord!,
                 campusName: selectedCampus.name,
                 campusColor: campusColor,
                 isVerified: isStudentVerified,
-                isMember: isStudentMember,
                 hasValidMembership: hasValidMembership,
                 membershipStatus: membershipStatus,
                 expiryDate: authState.membershipVerification?.membership?.expiryDate,
+                currentToken: _currentToken,
+                tokenExpiry: _tokenExpiry,
+                serverTime: _serverTime,
+                isLoadingToken: _isLoadingToken,
+                tokenError: _tokenError,
+                remainingSeconds: _remainingSeconds,
+                watermarkAnimation: _watermarkAnimation,
+                pulseAnimation: _pulseAnimation,
+                countdownAnimation: _countdownAnimation,
+                gradientAnimation: _gradientAnimation,
                 onCheckMembership: () => _checkMembershipStatus(),
                 onPurchaseMembership: () => _purchaseMembership(),
                 onRemove: () => _removeStudentId(),
+                onRefreshToken: () => _fetchNewToken(),
+                onCopyToken: () => _copyTokenToClipboard(),
               ),
 
             const SizedBox(height: 24),
@@ -169,6 +358,21 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
       ),
     );
   }
+
+  void _copyTokenToClipboard() {
+    if (_currentToken != null) {
+      final qrData = 'bisoapp://verify?token=$_currentToken';
+      // TODO: Implement clipboard functionality
+      // For now, just show a snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('QR data copied to clipboard: ${qrData.substring(0, 40)}...'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
+  }
+
 }
 
 // Premium UI Components
@@ -547,283 +751,817 @@ class _RegisterStudentIdSection extends StatelessWidget {
   }
 }
 
-class _StudentStatusCard extends StatelessWidget {
+
+class _AnimatedBackgroundPainter extends CustomPainter {
+  final Color campusColor;
+  final double animationValue;
+
+  _AnimatedBackgroundPainter({required this.campusColor, required this.animationValue});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final gradient = LinearGradient(
+      colors: [
+        campusColor.withValues(alpha: 0.1),
+        campusColor.withValues(alpha: 0.05),
+        Colors.white,
+      ],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      stops: [0.0, 0.7, 1.0],
+    );
+
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    final paint = Paint()
+      ..shader = gradient.createShader(rect)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawRect(rect, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    if (oldDelegate is! _AnimatedBackgroundPainter) return true;
+    return oldDelegate.campusColor != campusColor ||
+           oldDelegate.animationValue != animationValue;
+  }
+}
+
+
+class _AnimatedStudentIdCard extends StatelessWidget {
   final StudentIdModel studentRecord;
   final String campusName;
   final Color campusColor;
   final bool isVerified;
-  final bool isMember;
   final bool hasValidMembership;
   final String membershipStatus;
   final DateTime? expiryDate;
+  final String? currentToken;
+  final DateTime? tokenExpiry;
+  final DateTime? serverTime;
+  final bool isLoadingToken;
+  final String? tokenError;
+  final int remainingSeconds;
+  final Animation<double> watermarkAnimation;
+  final Animation<double> pulseAnimation;
+  final Animation<double> countdownAnimation;
+  final Animation<double> gradientAnimation;
   final VoidCallback onCheckMembership;
   final VoidCallback onPurchaseMembership;
   final VoidCallback onRemove;
+  final VoidCallback onRefreshToken;
+  final VoidCallback onCopyToken;
 
-  const _StudentStatusCard({
+  const _AnimatedStudentIdCard({
     required this.studentRecord,
     required this.campusName,
     required this.campusColor,
     required this.isVerified,
-    required this.isMember,
     required this.hasValidMembership,
     required this.membershipStatus,
     required this.expiryDate,
+    required this.currentToken,
+    required this.tokenExpiry,
+    required this.serverTime,
+    required this.isLoadingToken,
+    required this.tokenError,
+    required this.remainingSeconds,
+    required this.watermarkAnimation,
+    required this.pulseAnimation,
+    required this.countdownAnimation,
+    required this.gradientAnimation,
     required this.onCheckMembership,
     required this.onPurchaseMembership,
     required this.onRemove,
+    required this.onRefreshToken,
+    required this.onCopyToken,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    String formatExpiryDate(DateTime date) {
-      const months = [
-        'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
-      ];
-      final d = date.day.toString().padLeft(2, '0');
-      final m = months[date.month - 1];
-      final y = date.year.toString();
-      return '$d $m $y';
-    }
+    final isExpired = remainingSeconds <= 0;
+    final isExpiringSoon = remainingSeconds <= 10;
 
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           gradient: LinearGradient(
-            colors: [
-              campusColor.withValues(alpha: 0.05),
-              Colors.transparent,
-            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
+            colors: [
+              campusColor.withValues(alpha: 0.1),
+              campusColor.withValues(alpha: 0.05),
+              Colors.white,
+            ],
+            stops: [0.0, 0.7, 1.0],
           ),
         ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
+        child: Stack(
           children: [
-            // Student ID Header
-            Row(
-              children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        campusColor,
-                        campusColor.withValues(alpha: 0.8),
-                      ],
+            // Animated background elements
+            Positioned.fill(
+              child: AnimatedBuilder(
+                animation: gradientAnimation,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: _AnimatedBackgroundPainter(
+                      campusColor: campusColor,
+                      animationValue: gradientAnimation.value,
                     ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.school,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        studentRecord.studentNumber,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                  );
+                },
+              ),
+            ),
+            
+            // Floating particles
+            Positioned.fill(
+              child: AnimatedBuilder(
+                animation: gradientAnimation,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: _ParticlePainter(
+                      campusColor: campusColor,
+                      animationValue: gradientAnimation.value,
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Moving watermark
+            Positioned(
+              top: 20 + (watermarkAnimation.value * 20),
+              right: 20 + (watermarkAnimation.value * 15),
+              child: AnimatedBuilder(
+                animation: watermarkAnimation,
+                builder: (context, child) {
+                  return Transform.rotate(
+                    angle: watermarkAnimation.value * math.pi * 0.1,
+                    child: Opacity(
+                      opacity: 0.1 + (watermarkAnimation.value * 0.05),
+                      child: Icon(
+                        Icons.verified_user,
+                        size: 40 + (watermarkAnimation.value * 10),
+                        color: campusColor,
                       ),
-                      Text(
-                        'BI $campusName',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.onSurfaceVariant,
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // "Now" glyph that changes every 10 seconds
+            Positioned(
+              top: 20,
+              left: 20,
+              child: AnimatedBuilder(
+                animation: watermarkAnimation,
+                builder: (context, child) {
+                  final glyphIndex = ((watermarkAnimation.value * 10).floor() % 3).toInt();
+                  final glyph = _getNowGlyph(glyphIndex);
+                  
+                  return Transform.rotate(
+                    angle: watermarkAnimation.value * math.pi * 0.05,
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: campusColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Icon(
+                        glyph,
+                        size: 16,
+                        color: campusColor,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Main content
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  // Header with student info
+                  Row(
+                    children: [
+                      // Animated avatar
+                      AnimatedBuilder(
+                        animation: pulseAnimation,
+                        builder: (context, child) {
+                          return Transform.scale(
+                            scale: pulseAnimation.value,
+                            child: Container(
+                              width: 70,
+                              height: 70,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    campusColor,
+                                    campusColor.withValues(alpha: 0.8),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: campusColor.withValues(alpha: 0.3),
+                                    offset: const Offset(0, 8),
+                                    blurRadius: 20,
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.school,
+                                color: Colors.white,
+                                size: 35,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      
+                      const SizedBox(width: 20),
+                      
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              studentRecord.studentNumber,
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: campusColor,
+                              ),
+                            ),
+                            Text(
+                              'BI $campusName',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: AppColors.onSurfaceVariant,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            _PremiumStatusBadge(
+                              isVerified: isVerified,
+                              hasValidMembership: hasValidMembership,
+                              membershipStatus: membershipStatus,
+                              campusColor: campusColor,
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
-                _StatusBadge(
-                  isVerified: isVerified,
-                  hasValidMembership: hasValidMembership,
-                  membershipStatus: membershipStatus,
-                ),
-              ],
-            ),
 
-            const SizedBox(height: 24),
+                  const SizedBox(height: 32),
 
-            // Verification Status
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: isVerified 
-                  ? AppColors.green1.withValues(alpha: 0.5)
-                  : AppColors.orange1.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isVerified 
-                    ? AppColors.green6.withValues(alpha: 0.3)
-                    : AppColors.orange6.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    isVerified ? Icons.verified : Icons.pending,
-                    color: isVerified ? AppColors.green9 : AppColors.orange9,
-                    size: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
+                  // QR Code Section - Enhanced Design
+                  Container(
+                    padding: const EdgeInsets.all(28),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white,
+                          campusColor.withValues(alpha: 0.02),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: campusColor.withValues(alpha: 0.08),
+                          offset: const Offset(0, 8),
+                          blurRadius: 32,
+                          spreadRadius: 0,
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          offset: const Offset(0, 2),
+                          blurRadius: 8,
+                          spreadRadius: 0,
+                        ),
+                      ],
+                    ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          isVerified ? 'Verified Student' : 'Verification Pending',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: isVerified ? AppColors.green9 : AppColors.orange9,
-                            fontWeight: FontWeight.bold,
+                        // Header
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    campusColor.withValues(alpha: 0.1),
+                                    campusColor.withValues(alpha: 0.05),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.qr_code_2,
+                                color: campusColor,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Verification Code',
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[800],
+                                    ),
+                                  ),
+                                  Text(
+                                    'Show this to validators',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // Enhanced QR Code with countdown ring
+                        GestureDetector(
+                          onTap: () => _showQRDialog(context, campusColor),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Smooth countdown ring with gradient
+                              SizedBox(
+                                width: 180,
+                                height: 180,
+                                child: AnimatedBuilder(
+                                  animation: countdownAnimation,
+                                  builder: (context, child) {
+                                    return CustomPaint(
+                                      painter: _PremiumCountdownRingPainter(
+                                        progress: countdownAnimation.value,
+                                        color: _getStatusColor(tokenExpiry),
+                                        strokeWidth: 6,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              
+                              // QR Code container with enhanced styling
+                              Container(
+                                width: 150,
+                                height: 150,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: campusColor.withValues(alpha: 0.1),
+                                      offset: const Offset(0, 4),
+                                      blurRadius: 20,
+                                      spreadRadius: 0,
+                                    ),
+                                  ],
+                                  border: Border.all(
+                                    color: campusColor.withValues(alpha: 0.15),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(18),
+                                  child: _buildQRCodeContent(context, campusColor),
+                                ),
+                              ),
+                              
+                              // Tap indicator
+                              if (currentToken != null && !isLoadingToken && tokenError == null)
+                                Positioned(
+                                  bottom: 8,
+                                  right: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: campusColor,
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: campusColor.withValues(alpha: 0.3),
+                                          blurRadius: 8,
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(
+                                      Icons.fullscreen,
+                                      color: Colors.white,
+                                      size: 16,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                        Text(
-                          isVerified 
-                            ? 'Your student status has been confirmed'
-                            : 'Please verify your student status to unlock features',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.onSurfaceVariant,
-                          ),
+
+                        const SizedBox(height: 20),
+
+                        // Token info and refresh button
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Token expires in',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: AppColors.onSurfaceVariant,
+                                  ),
+                                ),
+                                Text(
+                                  '${remainingSeconds}s',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    color: isExpired 
+                                      ? AppColors.error 
+                                      : isExpiringSoon 
+                                        ? AppColors.orange9 
+                                        : campusColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            FilledButton.icon(
+                              onPressed: onRefreshToken,
+                              icon: const Icon(Icons.refresh, size: 18),
+                              label: const Text('Refresh'),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: campusColor,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            if (currentToken != null)
+                              IconButton(
+                                onPressed: onCopyToken,
+                                icon: const Icon(Icons.copy, size: 18),
+                                tooltip: 'Copy token for testing',
+                                style: IconButton.styleFrom(
+                                  backgroundColor: campusColor.withValues(alpha: 0.1),
+                                  foregroundColor: campusColor,
+                                ),
+                              ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
 
-            const SizedBox(height: 16),
+                  const SizedBox(height: 24),
 
-            // Membership Status
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: hasValidMembership 
-                  ? AppColors.green1.withValues(alpha: 0.5)
-                  : AppColors.gray100.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: hasValidMembership 
-                    ? AppColors.green6.withValues(alpha: 0.3)
-                    : AppColors.gray300.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    hasValidMembership ? Icons.card_membership : Icons.card_membership_outlined,
-                    color: hasValidMembership ? AppColors.green9 : AppColors.gray400,
-                    size: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  // Action buttons
+                  if (isVerified && !hasValidMembership) ...[
+                    Row(
                       children: [
-                        Text(
-                          membershipStatus,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: hasValidMembership ? AppColors.green9 : AppColors.gray600,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        if (hasValidMembership && expiryDate != null) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            'Valid until: ${formatExpiryDate(expiryDate!)}',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppColors.onSurfaceVariant,
+                        Expanded(
+                          child: FilledButton.icon(
+                            onPressed: onPurchaseMembership,
+                            icon: const Icon(Icons.shopping_cart),
+                            label: const Text('Purchase Membership'),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: campusColor,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ),
-                        ],
-                        Text(
-                          hasValidMembership 
-                            ? 'Access to all premium features and events'
-                            : 'Purchase membership to unlock exclusive benefits',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.onSurfaceVariant,
-                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        OutlinedButton(
+                          onPressed: onCheckMembership,
+                          child: const Icon(Icons.refresh),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Action Buttons
-            if (isVerified && !hasValidMembership) ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: onPurchaseMembership,
-                      icon: const Icon(Icons.shopping_cart),
-                      label: const Text('Purchase Membership'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: campusColor,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                  ] else if (isVerified && hasValidMembership) ...[
+                    OutlinedButton.icon(
+                      onPressed: onCheckMembership,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Refresh Status'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: campusColor,
+                        side: BorderSide(color: campusColor),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  OutlinedButton(
-                    onPressed: onCheckMembership,
-                    child: const Icon(Icons.refresh),
+                  ],
+
+                  const SizedBox(height: 16),
+
+                  // Remove button
+                  TextButton.icon(
+                    onPressed: onRemove,
+                    icon: const Icon(Icons.delete_outline, color: AppColors.error),
+                    label: const Text('Remove Student ID', style: TextStyle(color: AppColors.error)),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-            ] else if (isVerified && hasValidMembership) ...[
-              OutlinedButton.icon(
-                onPressed: onCheckMembership,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Refresh Status'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: campusColor,
-                  side: BorderSide(color: campusColor),
-                ),
-              ),
-              const SizedBox(height: 12),
-            ],
-
-            // Remove Button
-            TextButton.icon(
-              onPressed: onRemove,
-              icon: const Icon(Icons.delete_outline, color: AppColors.error),
-              label: const Text('Remove Student ID', style: TextStyle(color: AppColors.error)),
             ),
           ],
         ),
       ),
     );
   }
+
+  IconData _getNowGlyph(int index) {
+    switch (index) {
+      case 0:
+        return Icons.change_history;
+      case 1:
+        return Icons.circle;
+      case 2:
+        return Icons.square;
+      default:
+        return Icons.change_history;
+    }
+  }
+
+  Color _getStatusColor(DateTime? tokenExpiry) {
+    if (remainingSeconds <= 0) {
+      return AppColors.error;
+    } else if (remainingSeconds <= 10) {
+      return AppColors.orange9;
+    } else {
+      return campusColor;
+    }
+  }
+
+  Widget _buildQRCodeContent(BuildContext context, Color campusColor) {
+    final theme = Theme.of(context);
+    
+    if (isLoadingToken) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 32,
+              height: 32,
+              child: CircularProgressIndicator(
+                color: campusColor,
+                strokeWidth: 3,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Generating...',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: campusColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    if (tokenError != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: AppColors.error,
+              size: 32,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'QR Error',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppColors.error,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    if (currentToken != null) {
+      return Stack(
+        children: [
+          _QRCodePlaceholder(
+            qrData: 'bisoapp://verify?token=$currentToken',
+            campusColor: campusColor,
+          ),
+          // Enhanced shimmer effect
+          if (!(tokenExpiry?.isBefore(DateTime.now()) ?? true))
+            Positioned.fill(
+              child: AnimatedBuilder(
+                animation: gradientAnimation,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: _EnhancedShimmerPainter(
+                      campusColor: campusColor,
+                      animationValue: gradientAnimation.value,
+                    ),
+                  );
+                },
+              ),
+            ),
+        ],
+      );
+    }
+    
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.qr_code_2,
+            color: campusColor.withValues(alpha: 0.6),
+            size: 48,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Tap to Generate',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: campusColor.withValues(alpha: 0.8),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showQRDialog(BuildContext context, Color campusColor) {
+    if (currentToken == null) return;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: 320,
+          height: 420,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                blurRadius: 40,
+                spreadRadius: 0,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      campusColor.withValues(alpha: 0.1),
+                      campusColor.withValues(alpha: 0.05),
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.qr_code_2,
+                      color: campusColor,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Verification QR Code',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: campusColor,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(
+                        Icons.close,
+                        color: campusColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Large QR Code
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Center(
+                    child: AspectRatio(
+                      aspectRatio: 1.0, // Force square aspect ratio
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: campusColor.withValues(alpha: 0.1),
+                              blurRadius: 20,
+                              spreadRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: _QRCodePlaceholder(
+                            qrData: 'bisoapp://verify?token=$currentToken',
+                            campusColor: campusColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              
+              // Footer with timer
+              Container(
+                padding: const EdgeInsets.all(24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.timer,
+                      color: campusColor,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Expires in ${remainingSeconds}s',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: campusColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 }
 
-class _StatusBadge extends StatelessWidget {
+
+class _PremiumStatusBadge extends StatelessWidget {
   final bool isVerified;
   final bool hasValidMembership;
   final String membershipStatus;
+  final Color campusColor;
 
-  const _StatusBadge({
+  const _PremiumStatusBadge({
     required this.isVerified,
     required this.hasValidMembership,
     required this.membershipStatus,
+    required this.campusColor,
   });
 
   @override
@@ -1017,5 +1755,233 @@ class _BenefitItem extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _QRCodePlaceholder extends StatelessWidget {
+  final String qrData;
+  final Color campusColor;
+
+  const _QRCodePlaceholder({
+    required this.qrData,
+    required this.campusColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: QrImageView(
+        data: qrData,
+        version: QrVersions.auto,
+        size: double.infinity,
+        backgroundColor: Colors.white,
+        dataModuleStyle: QrDataModuleStyle(
+          dataModuleShape: QrDataModuleShape.square,
+          color: campusColor,
+        ),
+        eyeStyle: QrEyeStyle(
+          eyeShape: QrEyeShape.square,
+          color: campusColor,
+        ),
+        errorCorrectionLevel: QrErrorCorrectLevel.M,
+        padding: const EdgeInsets.all(8),
+      ),
+    );
+  }
+}
+
+
+class _ParticlePainter extends CustomPainter {
+  final Color campusColor;
+  final double animationValue;
+
+  _ParticlePainter({
+    required this.campusColor,
+    required this.animationValue,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..style = PaintingStyle.fill;
+
+    // Create 8 floating particles
+    for (int i = 0; i < 8; i++) {
+      final angle = (i / 8.0) * 2 * math.pi + animationValue * 2 * math.pi;
+      final radius = 80 + math.sin(animationValue * 4 + i) * 20;
+      final x = size.width / 2 + math.cos(angle) * radius;
+      final y = size.height / 2 + math.sin(angle) * radius;
+      
+      final opacity = 0.1 + 0.05 * math.sin(animationValue * 3 + i);
+      final particleSize = 2 + math.sin(animationValue * 2 + i) * 1;
+      
+      paint.color = campusColor.withValues(alpha: opacity);
+      canvas.drawCircle(Offset(x, y), particleSize, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return oldDelegate is! _ParticlePainter ||
+           oldDelegate.campusColor != campusColor ||
+           oldDelegate.animationValue != animationValue;
+  }
+}
+
+
+class _PremiumCountdownRingPainter extends CustomPainter {
+  final double progress;
+  final Color color;
+  final double strokeWidth;
+
+  _PremiumCountdownRingPainter({
+    required this.progress,
+    required this.color,
+    required this.strokeWidth,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = math.min(size.width, size.height) / 2 - strokeWidth / 2;
+
+    // Background ring with subtle gradient
+    final backgroundPaint = Paint()
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..shader = LinearGradient(
+        colors: [
+          color.withValues(alpha: 0.08),
+          color.withValues(alpha: 0.12),
+        ],
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
+
+    canvas.drawCircle(center, radius, backgroundPaint);
+
+    // Progress ring with enhanced gradient
+    if (progress > 0) {
+      final progressPaint = Paint()
+        ..strokeWidth = strokeWidth
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..shader = LinearGradient(
+          colors: [
+            color.withValues(alpha: 0.8),
+            color,
+            color.withValues(alpha: 0.9),
+          ],
+          stops: [0.0, 0.5, 1.0],
+        ).createShader(Rect.fromCircle(center: center, radius: radius));
+
+      final sweepAngle = (progress * 360).toDouble();
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        -90, // Start from the top
+        sweepAngle,
+        false,
+        progressPaint,
+      );
+    }
+
+    // Subtle inner glow
+    if (progress > 0.1) {
+      final glowPaint = Paint()
+        ..strokeWidth = strokeWidth * 0.5
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..color = color.withValues(alpha: 0.3);
+
+      final sweepAngle = (progress * 360).toDouble();
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius - strokeWidth * 0.25),
+        -90,
+        sweepAngle,
+        false,
+        glowPaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return oldDelegate is! _PremiumCountdownRingPainter ||
+           oldDelegate.progress != progress ||
+           oldDelegate.color != color ||
+           oldDelegate.strokeWidth != strokeWidth;
+  }
+}
+
+class _EnhancedShimmerPainter extends CustomPainter {
+  final Color campusColor;
+  final double animationValue;
+
+  _EnhancedShimmerPainter({
+    required this.campusColor,
+    required this.animationValue,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..style = PaintingStyle.fill;
+
+    // Create multiple shimmer waves
+    final shimmerWidth = size.width * 0.25;
+    final shimmerPosition = (animationValue * (size.width + shimmerWidth)) - shimmerWidth;
+    
+    // Primary shimmer
+    final primaryGradient = LinearGradient(
+      colors: [
+        Colors.transparent,
+        campusColor.withValues(alpha: 0.08),
+        campusColor.withValues(alpha: 0.15),
+        campusColor.withValues(alpha: 0.08),
+        Colors.transparent,
+      ],
+      stops: [0.0, 0.2, 0.5, 0.8, 1.0],
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+    );
+
+    final primaryRect = Rect.fromLTWH(
+      shimmerPosition,
+      0,
+      shimmerWidth,
+      size.height,
+    );
+
+    paint.shader = primaryGradient.createShader(primaryRect);
+    canvas.drawRect(primaryRect, paint);
+
+    // Secondary shimmer (offset)
+    final secondaryShimmerPosition = shimmerPosition - shimmerWidth * 0.7;
+    final secondaryGradient = LinearGradient(
+      colors: [
+        Colors.transparent,
+        campusColor.withValues(alpha: 0.04),
+        campusColor.withValues(alpha: 0.08),
+        campusColor.withValues(alpha: 0.04),
+        Colors.transparent,
+      ],
+      stops: [0.0, 0.3, 0.5, 0.7, 1.0],
+    );
+
+    final secondaryRect = Rect.fromLTWH(
+      secondaryShimmerPosition,
+      0,
+      shimmerWidth * 0.6,
+      size.height,
+    );
+
+    paint.shader = secondaryGradient.createShader(secondaryRect);
+    canvas.drawRect(secondaryRect, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return oldDelegate is! _EnhancedShimmerPainter ||
+           oldDelegate.campusColor != campusColor ||
+           oldDelegate.animationValue != animationValue;
   }
 }

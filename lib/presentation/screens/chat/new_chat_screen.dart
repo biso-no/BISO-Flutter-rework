@@ -3,16 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../data/models/public_profile_model.dart';
 import '../../../providers/auth/auth_provider.dart';
+import '../../../providers/campus/campus_provider.dart';
 import 'chat_conversation_screen.dart';
 import 'chat_list_screen.dart';
 
-final userSearchProvider = FutureProvider.family<List<Map<String, dynamic>>, String>((ref, query) async {
+final publicUserSearchProvider = FutureProvider.family<List<PublicProfileModel>, String>((ref, query) async {
   final chatService = ref.read(chatServiceProvider);
-  return await chatService.searchUsers(query);
+  final selectedCampus = ref.read(selectedCampusProvider);
+  return await chatService.searchUsers(query, campusId: selectedCampus.id);
 });
 
-final recentContactsProvider = FutureProvider<List<String>>((ref) async {
+final recentPublicContactsProvider = FutureProvider<List<PublicProfileModel>>((ref) async {
   final chatService = ref.read(chatServiceProvider);
   final authState = ref.read(authStateProvider);
   
@@ -43,7 +46,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
   
   String _searchQuery = '';
   final List<String> _selectedUserIds = [];
-  final Map<String, Map<String, dynamic>> _selectedUserData = {};
+  final Map<String, PublicProfileModel> _selectedUserData = {};
   bool _isCreating = false;
   String _selectedTab = 'users';
 
@@ -113,7 +116,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
                       runSpacing: 8,
                       children: _selectedUserIds.map((userId) {
                         final userData = _selectedUserData[userId];
-                        final userName = userData?['name'] ?? userId;
+                        final userName = userData?.name ?? userId;
                         
                         return Chip(
                           avatar: CircleAvatar(
@@ -217,7 +220,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
       if (_searchQuery.isEmpty) {
         return _buildRecentContacts();
       } else {
-        final usersAsync = ref.watch(userSearchProvider(_searchQuery));
+        final usersAsync = ref.watch(publicUserSearchProvider(_searchQuery));
         return usersAsync.when(
           data: (users) => _buildUserListView(users),
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -234,10 +237,10 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
   }
 
   Widget _buildRecentContacts() {
-    final recentContactsAsync = ref.watch(recentContactsProvider);
+    final recentContactsAsync = ref.watch(recentPublicContactsProvider);
     
     return recentContactsAsync.when(
-      data: (contactIds) {
+      data: (contacts) {
         return ListView(
           children: [
             const Padding(
@@ -251,7 +254,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
                 ),
               ),
             ),
-            if (contactIds.isEmpty)
+            if (contacts.isEmpty)
               const Center(
                 child: Padding(
                   padding: EdgeInsets.all(32),
@@ -262,41 +265,38 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
                 ),
               )
             else
-              ...contactIds.map((userId) {
-                final isSelected = _selectedUserIds.contains(userId);
+              ...contacts.map((profile) {
+                final isSelected = _selectedUserIds.contains(profile.userId);
 
                 return ListTile(
                   leading: CircleAvatar(
                     backgroundColor: AppColors.subtleBlue,
-                    child: Text(
-                      userId.isNotEmpty ? userId[0].toUpperCase() : '?',
+                    backgroundImage: profile.avatar != null ? NetworkImage(profile.avatar!) : null,
+                    child: profile.avatar == null ? Text(
+                      profile.name.isNotEmpty ? profile.name[0].toUpperCase() : '?',
                       style: const TextStyle(
                         color: AppColors.defaultBlue,
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
+                    ) : null,
                   ),
-                  title: FutureBuilder<String>(
-                    future: ref.read(chatServiceProvider).getUserName(userId),
-                    builder: (context, snapshot) {
-                      return Text(snapshot.data ?? userId);
-                    },
-                  ),
+                  title: Text(profile.name),
+                  subtitle: profile.displayEmail != null ? Text(profile.displayEmail!) : null,
                   trailing: Checkbox(
                       value: isSelected,
                       onChanged: (value) {
                         if (value == true) {
-                          _addSelectedUser(userId, {'name': userId});
+                          _addSelectedUser(profile.userId, profile);
                         } else {
-                          _removeSelectedUser(userId);
+                          _removeSelectedUser(profile.userId);
                         }
                       },
                     ),
                   onTap: () {
                     if (isSelected) {
-                      _removeSelectedUser(userId);
+                      _removeSelectedUser(profile.userId);
                     } else {
-                      _addSelectedUser(userId, {'name': userId});
+                      _addSelectedUser(profile.userId, profile);
                     }
                   },
                 );
@@ -333,7 +333,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
     );
   }
 
-  Widget _buildUserListView(List<Map<String, dynamic>> users) {
+  Widget _buildUserListView(List<PublicProfileModel> users) {
     if (users.isEmpty) {
       return const Center(
         child: Column(
@@ -357,40 +357,38 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
     return ListView.builder(
       itemCount: users.length,
       itemBuilder: (context, index) {
-        final user = users[index];
-        final userId = user['\$id'] ?? '';
-        final userName = user['name'] ?? 'Unknown User';
-        final userEmail = user['email'] ?? '';
-        final isSelected = _selectedUserIds.contains(userId);
+        final profile = users[index];
+        final isSelected = _selectedUserIds.contains(profile.userId);
 
         return ListTile(
           leading: CircleAvatar(
             backgroundColor: AppColors.subtleBlue,
-            child: Text(
-              userName.isNotEmpty ? userName[0].toUpperCase() : '?',
+            backgroundImage: profile.avatar != null ? NetworkImage(profile.avatar!) : null,
+            child: profile.avatar == null ? Text(
+              profile.name.isNotEmpty ? profile.name[0].toUpperCase() : '?',
               style: const TextStyle(
                 color: AppColors.defaultBlue,
                 fontWeight: FontWeight.bold,
               ),
-            ),
+            ) : null,
           ),
-          title: Text(userName),
-          subtitle: userEmail.isNotEmpty ? Text(userEmail) : null,
+          title: Text(profile.name),
+          subtitle: profile.displayEmail != null ? Text(profile.displayEmail!) : null,
           trailing: Checkbox(
               value: isSelected,
               onChanged: (value) {
                 if (value == true) {
-                  _addSelectedUser(userId, user);
+                  _addSelectedUser(profile.userId, profile);
                 } else {
-                  _removeSelectedUser(userId);
+                  _removeSelectedUser(profile.userId);
                 }
               },
             ),
           onTap: () {
             if (isSelected) {
-              _removeSelectedUser(userId);
+              _removeSelectedUser(profile.userId);
             } else {
-              _addSelectedUser(userId, user);
+              _addSelectedUser(profile.userId, profile);
             }
           },
         );
@@ -540,7 +538,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
     );
   }
 
-  void _addSelectedUser(String userId, Map<String, dynamic> userData) {
+  void _addSelectedUser(String userId, PublicProfileModel userData) {
     setState(() {
       if (!_selectedUserIds.contains(userId)) {
         _selectedUserIds.add(userId);
@@ -715,7 +713,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
     // Get the names of selected users
     final names = _selectedUserIds.map((userId) {
       final userData = _selectedUserData[userId];
-      return userData?['name'] ?? userId;
+      return userData?.name ?? userId;
     }).toList();
     
     // Sort names for consistent ordering

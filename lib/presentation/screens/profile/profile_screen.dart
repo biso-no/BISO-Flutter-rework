@@ -7,13 +7,11 @@ import '../../../data/models/user_model.dart';
 import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
-import '../../widgets/membership_status_widget.dart';
-import '../../widgets/show_membership_purchase_modal.dart';
 import 'edit_profile_screen.dart';
 import 'student_id_screen.dart';
 import 'settings_screen.dart';
+import 'payment_information_screen.dart';
 
-import '../../../core/logging/print_migration.dart';
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -249,8 +247,6 @@ class ProfileScreen extends ConsumerWidget {
 
                   const SizedBox(height: 24),
 
-                  // Membership Section
-                  _buildMembershipSection(ref, authState, selectedCampus),
 
                   const SizedBox(height: 24),
 
@@ -261,7 +257,7 @@ class ProfileScreen extends ConsumerWidget {
                       _ProfileInfoTile(
                         icon: Icons.email_outlined,
                         label: 'Email',
-                        value: user?.email ?? '',
+                        value: authState.user?.email ?? '',
                       ),
                       if (profile?.phone != null)
                         _ProfileInfoTile(
@@ -317,20 +313,19 @@ class ProfileScreen extends ConsumerWidget {
                         label: 'Expense History',
                         onTap: () {
                           // TODO: Navigate to expense history
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Expense history coming soon')),
-                          );
+                          //Redirect to expenses
+                          context.push('/explore/expenses');
                         },
                       ),
                       _ProfileActionTile(
                         icon: Icons.payment_outlined,
                         label: 'Payment Information',
-                        onTap: () {
-                          // TODO: Navigate to payment settings
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Payment settings coming soon')),
-                          );
-                        },
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PaymentInformationScreen(),
+                          ),
+                        ),
                       ),
                       _ProfileActionTile(
                         icon: Icons.notifications_outlined,
@@ -379,73 +374,7 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMembershipSection(WidgetRef ref, AuthState authState, campus) {
-    logPrint('User data: ${authState.user}');
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Builder(
-          builder: (context) => Text(
-            'BISO Membership',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppColors.strongBlue,
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Builder(
-          builder: (context) => MembershipStatusWidget(
-            membership: null, // TODO: implement membership check
-            isVerified: false, // TODO: implement membership check
-            campusColor: _getCampusColor(campus.id),
-            onBuyMembership: () => _showMembershipPurchaseModal(context, ref, authState, campus),
-          ),
-        ),
-      ],
-    );
-  }
 
-  void _showMembershipPurchaseModal(BuildContext context, WidgetRef ref, AuthState authState, campus) async {
-    // Check if user has student ID first
-    if (!authState.hasStudentId) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Student ID Required'),
-          content: const Text(
-            'You need to register your student ID before purchasing a membership. Would you like to register now?'
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const StudentIdScreen(),
-                  ),
-                );
-              },
-              child: const Text('Register Student ID'),
-            ),
-          ],
-        ),
-      );
-      return;
-    }
-
-    await showMembershipPurchaseModal(
-      context,
-      ref,
-      studentId: authState.studentNumber!,
-      campusColor: _getCampusColor(campus.id),
-    );
-  }
 
 
   String _formatAddress(UserModel user) {

@@ -11,3 +11,4 @@ final Databases databases = Databases(client);
 final Storage storage = Storage(client);
 final Realtime realtime = Realtime(client);
 final Functions functions = Functions(client);
+final Teams teams = Teams(client);
