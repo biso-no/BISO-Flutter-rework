@@ -130,20 +130,30 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final profile = UserModel.fromMap(documentData);
       logPrint('🔐 AuthProvider: Profile loaded successfully: ${profile.name}');
       
-      // Also load student record if available
+      // Check if user has student_id in their profile
       StudentIdModel? studentRecord;
       MembershipVerificationResult? membershipVerification;
-      try {
-        studentRecord = await _authService.getStudentIdRecord();
-        logPrint('🔐 AuthProvider: Student record loaded: ${studentRecord?.studentNumber}');
+      
+      if (profile.studentId != null && profile.studentId!.isNotEmpty) {
+        // Create StudentIdModel from user profile data
+        studentRecord = StudentIdModel(
+          id: 'profile_${profile.id}', // Synthetic ID since it's from user profile
+          userId: profile.id,
+          studentNumber: profile.studentId!,
+          isVerified: true, // Assume verified since it's in their profile
+          createdAt: profile.createdAt ?? DateTime.now(),
+        );
+        logPrint('🔐 AuthProvider: Student ID found in profile: ${studentRecord.studentNumber}');
         
-        // If student record exists and is verified, check membership
-        if (studentRecord != null && studentRecord.isVerified) {
+        // Check membership status using the student number
+        try {
           membershipVerification = await _membershipService.verifyMembership(studentRecord.studentNumber);
           logPrint('🔐 AuthProvider: Membership verified: ${membershipVerification.isMember}');
+        } catch (e) {
+          logPrint('🔐 AuthProvider: Error verifying membership: $e');
         }
-      } catch (e) {
-        logPrint('🔐 AuthProvider: No student record found or error: $e');
+      } else {
+        logPrint('🔐 AuthProvider: No student ID found in user profile');
       }
       
       final hasProfile = true;
@@ -351,25 +361,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
     
     try {
-      final studentNumber = await _authService.registerStudentIdViaOAuth();
+      await _authService.registerStudentIdViaOAuth();
       
       // Reload profile to get updated student information
       final currentUser = state.user;
       if (currentUser != null) {
         await _loadCompleteProfile(currentUser.id);
-      }
-      
-      // Check membership status
-      final isMember = await _authService.checkMembershipStatus(studentNumber);
-      if (state.studentRecord != null && isMember) {
-        await _authService.updateMembershipStatus(
-          studentId: state.studentRecord!.id,
-          isMember: true,
-        );
-        // Reload again to get updated membership status
-        if (currentUser != null) {
-          await _loadCompleteProfile(currentUser.id);
-        }
       }
       
       state = state.copyWith(isLoading: false);
@@ -394,27 +391,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     
     try {
       final membershipVerification = await _membershipService.verifyMembership(studentRecord.studentNumber);
-      
-      // Update the membership status in the student record if needed
-      if (membershipVerification.isMember != studentRecord.isMember) {
-        final updatedRecord = await _authService.updateMembershipStatus(
-          studentId: studentRecord.id,
-          isMember: membershipVerification.isMember,
-          membershipExpiry: membershipVerification.membership?.expiryDate,
-          membershipDetails: membershipVerification.membership?.toMap(),
-        );
-        
-        state = state.copyWith(
-          studentRecord: updatedRecord,
-          membershipVerification: membershipVerification,
-          isLoading: false,
-        );
-      } else {
-        state = state.copyWith(
-          membershipVerification: membershipVerification,
-          isLoading: false,
-        );
-      }
+      state = state.copyWith(
+        membershipVerification: membershipVerification,
+        isLoading: false,
+      );
     } catch (e) {
       state = state.copyWith(
         error: e.toString(),

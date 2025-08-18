@@ -93,16 +93,20 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
                         padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
                         child: Column(
                           children: [
-                            _buildMembershipOptions(theme),
-                            const SizedBox(height: 24),
-                            if (selectedOption != null) ...[
-                              _buildPaymentMethodSelection(theme),
+                            if (widget.membershipOptions.isEmpty) ...[
+                              _buildNoMembershipsAvailable(theme),
+                            ] else ...[
+                              _buildMembershipOptions(theme),
                               const SizedBox(height: 24),
-                              if (selectedPaymentMethod == 'VIPPS') ...[
-                                _buildPhoneNumberInput(theme),
+                              if (selectedOption != null) ...[
+                                _buildPaymentMethodSelection(theme),
                                 const SizedBox(height: 24),
+                                if (selectedPaymentMethod == 'VIPPS') ...[
+                                  _buildPhoneNumberInput(theme),
+                                  const SizedBox(height: 24),
+                                ],
+                                _buildPurchaseButton(theme),
                               ],
-                              _buildPurchaseButton(theme),
                             ],
                           ],
                         ),
@@ -114,6 +118,69 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildNoMembershipsAvailable(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.gray50,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: widget.campusColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
+              Icons.info_outline,
+              color: widget.campusColor,
+              size: 32,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No memberships available',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.strongBlue,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'There are currently no active membership plans for your campus. This may be because membership sales are temporarily disabled or undergoing maintenance. Please check back later.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.onSurfaceVariant,
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: () => _closeModal(context),
+              style: FilledButton.styleFrom(
+                backgroundColor: widget.campusColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text('Close'),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -7,9 +7,8 @@ import '../../../data/models/user_model.dart';
 import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
-import '../../../providers/membership/membership_provider.dart';
 import '../../widgets/membership_status_widget.dart';
-import '../../widgets/membership_purchase_modal.dart';
+import '../../widgets/show_membership_purchase_modal.dart';
 import 'edit_profile_screen.dart';
 import 'student_id_screen.dart';
 import 'settings_screen.dart';
@@ -410,7 +409,6 @@ class ProfileScreen extends ConsumerWidget {
   void _showMembershipPurchaseModal(BuildContext context, WidgetRef ref, AuthState authState, campus) async {
     // Check if user has student ID first
     if (!authState.hasStudentId) {
-      // Show dialog to register student ID first
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -441,60 +439,12 @@ class ProfileScreen extends ConsumerWidget {
       return;
     }
 
-    // Load available memberships and show purchase modal
-    try {
-      final membershipOptions = await ref.read(membershipProvider.notifier).getAvailableMemberships();
-      
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => MembershipPurchaseModal(
-            studentId: authState.studentNumber!,
-            campusColor: _getCampusColor(campus.id),
-            membershipOptions: membershipOptions,
-            onPurchase: (option, paymentMethod, phoneNumber) async {
-              try {
-                await ref.read(membershipProvider.notifier).purchaseMembership(
-                  membershipId: option.membershipId,
-                  membershipName: option.displayName,
-                  amount: option.priceNok,
-                  paymentMethod: paymentMethod,
-                  phoneNumber: phoneNumber,
-                );
-                
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Membership purchase initiated! Complete payment to activate.'),
-                      backgroundColor: AppColors.green9,
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Purchase failed: ${e.toString()}'),
-                      backgroundColor: AppColors.error,
-                    ),
-                  );
-                }
-              }
-            },
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to load membership options: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    }
+    await showMembershipPurchaseModal(
+      context,
+      ref,
+      studentId: authState.studentNumber!,
+      campusColor: _getCampusColor(campus.id),
+    );
   }
 
 

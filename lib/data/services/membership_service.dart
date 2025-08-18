@@ -77,6 +77,7 @@ class MembershipService {
         queries: [
           Query.equal('status', true).toString(), // Only active memberships
           Query.orderAsc('price').toString(), // Order by price
+          Query.equal('canPurchase', true).toString(),
         ],
       );
 

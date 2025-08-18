@@ -108,7 +108,7 @@ class AuthService {
           collectionId: 'user',
           documentId: accountUser.$id,
           queries: [
-            Query.select(['name', 'email', 'phone', 'address', 'city', 'zip', 'campus_id', 'avatar'])
+            Query.select(['name', 'email', 'phone', 'address', 'city', 'zip', 'campus_id', 'avatar', '\$id', 'student_id'])
           ]
         );
         return UserModel.fromMap(doc.data);
@@ -351,27 +351,7 @@ class AuthService {
     }
   }
 
-  /// Update membership status
-  Future<StudentIdModel> updateMembershipStatus({
-    required String studentId,
-    required bool isMember,
-    DateTime? membershipExpiry,
-    Map<String, dynamic>? membershipDetails,
-  }) async {
-    try {
-      return await _studentService.updateMembershipStatus(
-        studentId: studentId,
-        isMember: isMember,
-        membershipExpiry: membershipExpiry,
-        membershipDetails: membershipDetails,
-      );
-    } catch (e) {
-      if (e is StudentException) {
-        throw AuthException(e.message);
-      }
-      throw AuthException('Failed to update membership: $e');
-    }
-  }
+  // Removed write-based membership status updates. Verification is read-only via MembershipService.
 
   /// Remove student ID
   Future<void> removeStudentId() async {

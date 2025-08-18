@@ -6,6 +6,7 @@ import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
 import '../../../core/utils/navigation_utils.dart';
 import '../../../data/models/student_id_model.dart';
+import '../../widgets/show_membership_purchase_modal.dart';
 
 class StudentIdScreen extends ConsumerStatefulWidget {
   const StudentIdScreen({super.key});
@@ -73,6 +74,7 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
                 isMember: isStudentMember,
                 hasValidMembership: hasValidMembership,
                 membershipStatus: membershipStatus,
+                expiryDate: authState.membershipVerification?.membership?.expiryDate,
                 onCheckMembership: () => _checkMembershipStatus(),
                 onPurchaseMembership: () => _purchaseMembership(),
                 onRemove: () => _removeStudentId(),
@@ -87,18 +89,13 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
             ),
 
             const SizedBox(height: 24),
-
-            // Membership CTA if not a member
-            if (hasStudentId && isStudentVerified && !hasValidMembership)
-              _MembershipCTACard(
-                campusColor: campusColor,
-                onPurchase: () => _purchaseMembership(),
-              ),
           ],
         ),
       ),
     );
   }
+
+  
 
   Color _getCampusColor(String campusId) {
     switch (campusId) {
@@ -124,7 +121,29 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> {
   }
 
   void _purchaseMembership() {
-    ref.read(authStateProvider.notifier).launchMembershipPurchase();
+    final authState = ref.read(authStateProvider);
+    final studentNumber = authState.studentNumber;
+    final selectedCampus = ref.read(selectedCampusProvider);
+    final campusColor = _getCampusColor(selectedCampus.id);
+
+    if (studentNumber == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please register your student ID first.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    showMembershipPurchaseModal(
+      context,
+      ref,
+      studentId: studentNumber,
+      campusColor: campusColor,
+    );
   }
 
   void _removeStudentId() {
@@ -536,6 +555,7 @@ class _StudentStatusCard extends StatelessWidget {
   final bool isMember;
   final bool hasValidMembership;
   final String membershipStatus;
+  final DateTime? expiryDate;
   final VoidCallback onCheckMembership;
   final VoidCallback onPurchaseMembership;
   final VoidCallback onRemove;
@@ -548,6 +568,7 @@ class _StudentStatusCard extends StatelessWidget {
     required this.isMember,
     required this.hasValidMembership,
     required this.membershipStatus,
+    required this.expiryDate,
     required this.onCheckMembership,
     required this.onPurchaseMembership,
     required this.onRemove,
@@ -556,6 +577,16 @@ class _StudentStatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    String formatExpiryDate(DateTime date) {
+      const months = [
+        'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
+      ];
+      final d = date.day.toString().padLeft(2, '0');
+      final m = months[date.month - 1];
+      final y = date.year.toString();
+      return '$d $m $y';
+    }
 
     return Card(
       elevation: 4,
@@ -709,6 +740,15 @@ class _StudentStatusCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        if (hasValidMembership && expiryDate != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            'Valid until: ${formatExpiryDate(expiryDate!)}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
                         Text(
                           hasValidMembership 
                             ? 'Access to all premium features and events'
@@ -976,76 +1016,6 @@ class _BenefitItem extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _MembershipCTACard extends StatelessWidget {
-  final Color campusColor;
-  final VoidCallback onPurchase;
-
-  const _MembershipCTACard({
-    required this.campusColor,
-    required this.onPurchase,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            campusColor.withValues(alpha: 0.1),
-            campusColor.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: campusColor.withValues(alpha: 0.3),
-        ),
-      ),
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          Icon(
-            Icons.workspace_premium,
-            color: campusColor,
-            size: 48,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Become a BISO Member',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: campusColor,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Join thousands of BI students and unlock exclusive features, events, and benefits.',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: AppColors.onSurfaceVariant,
-              height: 1.5,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          FilledButton.icon(
-            onPressed: onPurchase,
-            icon: const Icon(Icons.shopping_cart),
-            label: const Text('Purchase Membership'),
-            style: FilledButton.styleFrom(
-              backgroundColor: campusColor,
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

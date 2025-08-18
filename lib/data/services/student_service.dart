@@ -2,16 +2,12 @@ import 'package:appwrite/appwrite.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/app_constants.dart';
 import '../models/student_id_model.dart';
-import 'appwrite_service.dart';
 import 'membership_service.dart';
 import 'robust_document_service.dart';
 import '../../core/logging/app_logger.dart';
 
 class StudentService {
-  // Using simplified global Appwrite instances
-  Account get _account => account;
-  Databases get _databases => databases;
-  Functions get _functions => functions;
+  // Other Appwrite modules (auth/functions) are fine; database access uses RobustDocumentService
 
   /// Initiates OAuth2 flow with Microsoft Azure for BI student account
   /// Returns the student ID extracted from the email
@@ -55,36 +51,19 @@ class StudentService {
         'verified_at': isVerified ? DateTime.now().toIso8601String() : null,
       };
 
-      final doc = await _databases.createDocument(
+      final createdData = await RobustDocumentService.createDocumentRobust(
         databaseId: AppConstants.databaseId,
         collectionId: 'student_id',
-        documentId: ID.unique(),
         data: studentData,
       );
 
-      return StudentIdModel.fromMap(doc.data);
-    } on AppwriteException catch (e) {
-      throw StudentException('Failed to create student ID record: ${e.message}');
+      return StudentIdModel.fromMap(createdData);
+    } catch (e) {
+      throw StudentException('Failed to create student ID record: $e');
     }
   }
 
-  /// Updates the user profile to include student relationship
-  Future<void> _updateUserStudentRelationship(String userId, String studentId) async {
-    try {
-      await RobustDocumentService.updateDocumentRobust(
-        databaseId: AppConstants.databaseId,
-        collectionId: 'user',
-        documentId: userId,
-        data: {
-          'student_id': studentId,
-          'student': studentId, // This creates the relationship
-        },
-      );
-    } catch (e) {
-      AppLogger.error('Failed to update user student relationship', error: e.toString());
-      throw StudentException('Failed to link student ID to user profile');
-    }
-  }
+  // Note: Previously had a helper to update user-student relationship. Keep logic within specific flows to avoid unused function warnings.
 
   /// Checks membership status using the existing MembershipService
   /// Returns true if the student is a member
@@ -111,55 +90,27 @@ class StudentService {
     }
   }
 
-  /// Updates student membership status
-  Future<StudentIdModel> updateMembershipStatus({
-    required String studentId,
-    required bool isMember,
-    DateTime? membershipExpiry,
-    Map<String, dynamic>? membershipDetails,
-  }) async {
-    try {
-      final updateData = {
-        'is_member': isMember,
-        'membership_expiry': membershipExpiry?.toIso8601String(),
-        'membership_details': membershipDetails,
-      };
-
-      final doc = await _databases.updateDocument(
-        databaseId: AppConstants.databaseId,
-        collectionId: 'student_id',
-        documentId: studentId,
-        data: updateData,
-      );
-
-      return StudentIdModel.fromMap(doc.data);
-    } on AppwriteException catch (e) {
-      throw StudentException('Failed to update membership status: ${e.message}');
-    }
-  }
+  // Removed write-based membership status updates. Verification is read-only via MembershipService.
 
   /// Gets student ID record for a user
   Future<StudentIdModel?> getStudentIdRecord(String userId) async {
     try {
-      final documents = await _databases.listDocuments(
+      final documents = await RobustDocumentService.listDocumentsRobust(
         databaseId: AppConstants.databaseId,
         collectionId: 'student_id',
         queries: [
-          Query.equal('user_id', userId),
-          Query.limit(1),
+          Query.equal('user_id', userId).toString(),
+          Query.limit(1).toString(),
         ],
       );
 
-      if (documents.documents.isEmpty) {
+      if (documents.isEmpty) {
         return null;
       }
 
-      return StudentIdModel.fromMap(documents.documents.first.data);
-    } on AppwriteException catch (e) {
-      if (e.code == 404) {
-        return null;
-      }
-      throw StudentException('Failed to get student ID record: ${e.message}');
+      return StudentIdModel.fromMap(documents.first);
+    } catch (e) {
+      throw StudentException('Failed to get student ID record: $e');
     }
   }
 
@@ -174,7 +125,7 @@ class StudentService {
       }
 
       // Remove from student_id collection
-      await _databases.deleteDocument(
+      await RobustDocumentService.deleteDocumentRobust(
         databaseId: AppConstants.databaseId,
         collectionId: 'student_id',
         documentId: studentRecord.id,
@@ -195,8 +146,8 @@ class StudentService {
         'userId': userId,
         'studentNumber': studentRecord.studentNumber,
       });
-    } on AppwriteException catch (e) {
-      throw StudentException('Failed to remove student ID: ${e.message}');
+    } catch (e) {
+      throw StudentException('Failed to remove student ID: $e');
     }
   }
 
