@@ -25,7 +25,6 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   bool _isEditing = false;
   Map<String, String> _userNames = {};
-  bool _loadingUserNames = true;
 
   @override
   void initState() {
@@ -41,11 +40,9 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
       final userNames = await chatService.getUserNames(widget.chat.participants);
       setState(() {
         _userNames = userNames;
-        _loadingUserNames = false;
       });
     } catch (e) {
       setState(() {
-        _loadingUserNames = false;
       });
     }
   }

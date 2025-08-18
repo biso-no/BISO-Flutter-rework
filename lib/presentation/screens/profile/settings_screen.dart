@@ -6,6 +6,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
 import '../../../providers/privacy/privacy_provider.dart';
+import 'settings_screen_chat_tab.dart';
 
 // Settings providers
 final appSettingsProvider = StateNotifierProvider<AppSettingsNotifier, AppSettingsState>((ref) {
@@ -115,7 +116,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 4, // Added Privacy tab
+      length: 5, // Added Privacy and Chat tabs
       vsync: this,
       initialIndex: widget.initialTab,
     );
@@ -145,6 +146,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
             Tab(text: 'General'),
             Tab(text: 'Notifications'),
             Tab(text: 'Privacy'),
+            Tab(text: 'Chat'),
             Tab(text: 'Language'),
           ],
         ),
@@ -155,6 +157,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           _GeneralSettingsTab(),
           _NotificationSettingsTab(),
           _PrivacySettingsTab(),
+          ChatSettingsTab(),
           _LanguageSettingsTab(),
         ],
       ),

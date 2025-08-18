@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/chat_model.dart';
 import 'chat_list_screen.dart';
+import 'chat_conversation_screen.dart';
 
 class MessageSearchScreen extends ConsumerStatefulWidget {
   final ChatModel chat;
@@ -187,7 +188,14 @@ class _MessageSearchScreenState extends ConsumerState<MessageSearchScreen> {
           onTap: () {
             // Navigate back to chat and scroll to message
             context.pop();
-            // TODO: Implement scroll to message functionality
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => ChatConversationScreen(
+                  chat: widget.chat,
+                  scrollToMessageId: message.id,
+                ),
+              ),
+            );
           },
         );
       },

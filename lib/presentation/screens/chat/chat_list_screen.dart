@@ -10,10 +10,13 @@ import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/privacy/privacy_provider.dart';
 import '../../../generated/l10n/app_localizations.dart';
 import '../../widgets/privacy_prompt_dialog.dart';
+import '../../widgets/notification_permission_dialog.dart';
+import '../../../providers/notification/notification_provider.dart';
 import 'chat_conversation_screen.dart';
 import 'chat_info_screen.dart';
 import 'message_search_screen.dart';
 import 'new_chat_screen.dart';
+import '../profile/settings_screen.dart';
 
 // Provider for chat service
 final chatServiceProvider = Provider<ChatService>((ref) {
@@ -69,9 +72,10 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
       });
     });
     
-    // Check privacy settings after the widget is built
+    // Check privacy and notification settings after the widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkPrivacySettings();
+      _checkNotificationPermissions();
     });
   }
 
@@ -147,6 +151,35 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     }
   }
 
+  Future<void> _checkNotificationPermissions() async {
+    final authState = ref.read(authStateProvider);
+    if (authState.user == null) return;
+    
+    try {
+      final notificationService = ref.read(notificationServiceProvider);
+      final isEnabled = await notificationService.areNotificationsEnabled();
+      
+      // Only prompt if notifications are not enabled and user hasn't been asked recently
+      if (!isEnabled && mounted) {
+        // Add a small delay to avoid conflicting with privacy prompt
+        await Future.delayed(const Duration(seconds: 2));
+        if (mounted) {
+          _showNotificationPermissionPrompt();
+        }
+      }
+    } catch (e) {
+      // Silently fail - notification permission is not critical for chat functionality
+    }
+  }
+
+  void _showNotificationPermissionPrompt() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => const NotificationPermissionDialog(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -182,7 +215,11 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
           ),
           IconButton(
             onPressed: () {
-              // TODO: Navigate to chat settings
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SettingsScreen(initialTab: 3), // Chat tab is index 3
+                ),
+              );
             },
             icon: const Icon(Icons.settings),
           ),

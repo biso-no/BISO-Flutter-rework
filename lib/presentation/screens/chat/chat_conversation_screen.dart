@@ -20,10 +20,12 @@ final chatMessagesProvider = StreamProvider.family<List<ChatMessageModel>, Strin
 
 class ChatConversationScreen extends ConsumerStatefulWidget {
   final ChatModel chat;
+  final String? scrollToMessageId;
 
   const ChatConversationScreen({
     super.key,
     required this.chat,
+    this.scrollToMessageId,
   });
 
   @override
@@ -49,6 +51,11 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
     // Mark chat as read when entering
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _markAsRead();
+      
+      // Scroll to specific message if provided
+      if (widget.scrollToMessageId != null) {
+        _scrollToMessage(widget.scrollToMessageId!);
+      }
     });
   }
 
@@ -621,6 +628,38 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
     } catch (e) {
       // Silently fail - not critical
     }
+  }
+
+  void _scrollToMessage(String messageId) {
+    // Wait for messages to load, then scroll to the specific message
+    Future.delayed(const Duration(milliseconds: 500), () {
+      final messagesAsync = ref.read(chatMessagesProvider(widget.chat.id));
+      messagesAsync.whenData((messages) {
+        final messageIndex = messages.indexWhere((msg) => msg.id == messageId);
+        if (messageIndex != -1 && _scrollController.hasClients) {
+          // Calculate approximate position (each message is roughly 60px high)
+          final position = messageIndex * 60.0;
+          _scrollController.animateTo(
+            position,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+          
+          // Highlight the message briefly
+          Future.delayed(const Duration(milliseconds: 600), () {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Message found'),
+                  duration: const Duration(seconds: 1),
+                  backgroundColor: AppColors.defaultBlue,
+                ),
+              );
+            }
+          });
+        }
+      });
+    });
   }
 
   void _showChatInfo() {

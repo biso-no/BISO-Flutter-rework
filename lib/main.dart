@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'core/theme/premium_theme.dart';
 import 'core/logging/logging_config.dart';
@@ -28,12 +30,30 @@ import 'providers/auth/auth_provider.dart';
 import 'presentation/screens/events/large_event_screen.dart';
 import 'data/models/large_event_model.dart';
 import 'data/services/large_event_service.dart';
+import 'data/services/notification_service.dart';
+
+// Background message handler for Firebase
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  // Handle background messages here if needed
+  print('Handling a background message: ${message.messageId}');
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize logging system early
   await LoggingConfig.initialize();
+  
+  // Initialize Firebase
+  await Firebase.initializeApp();
+  
+  // Initialize Firebase Messaging for background notifications
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  
+  // Initialize notification service
+  await NotificationService().initialize();
   
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(

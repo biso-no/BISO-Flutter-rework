@@ -193,29 +193,6 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
 
           const SizedBox(height: 16),
 
-          // Selected users chips (for group chats)
-          if (widget.isGroupChat && _selectedUsers.isNotEmpty) ...[
-            Container(
-              height: 60,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: _selectedUsers.length,
-                separatorBuilder: (context, index) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  final userId = _selectedUsers[index];
-                  return Chip(
-                    label: Text(userId), // TODO: Show actual user name
-                    deleteIcon: const Icon(Icons.close, size: 18),
-                    onDeleted: () => _removeSelectedUser(userId),
-                    backgroundColor: AppColors.subtleBlue,
-                    deleteIconColor: AppColors.defaultBlue,
-                  );
-                },
-              ),
-            ),
-            const Divider(height: 1),
-          ],
 
           // User list
           Expanded(
@@ -286,7 +263,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
               )
             else
               ...contactIds.map((userId) {
-                final isSelected = _selectedUsers.contains(userId);
+                final isSelected = _selectedUserIds.contains(userId);
 
                 return ListTile(
                   leading: CircleAvatar(
@@ -299,28 +276,27 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
                       ),
                     ),
                   ),
-                  title: Text(userId), // TODO: Show actual user name
-                  trailing: widget.isGroupChat
-                      ? Checkbox(
-                          value: isSelected,
-                          onChanged: (value) {
-                            if (value == true) {
-                              _addSelectedUser(userId);
-                            } else {
-                              _removeSelectedUser(userId);
-                            }
-                          },
-                        )
-                      : null,
+                  title: FutureBuilder<String>(
+                    future: ref.read(chatServiceProvider).getUserName(userId),
+                    builder: (context, snapshot) {
+                      return Text(snapshot.data ?? userId);
+                    },
+                  ),
+                  trailing: Checkbox(
+                      value: isSelected,
+                      onChanged: (value) {
+                        if (value == true) {
+                          _addSelectedUser(userId, {'name': userId});
+                        } else {
+                          _removeSelectedUser(userId);
+                        }
+                      },
+                    ),
                   onTap: () {
-                    if (widget.isGroupChat) {
-                      if (isSelected) {
-                        _removeSelectedUser(userId);
-                      } else {
-                        _addSelectedUser(userId);
-                      }
+                    if (isSelected) {
+                      _removeSelectedUser(userId);
                     } else {
-                      _createDirectChat(userId);
+                      _addSelectedUser(userId, {'name': userId});
                     }
                   },
                 );
@@ -385,7 +361,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
         final userId = user['\$id'] ?? '';
         final userName = user['name'] ?? 'Unknown User';
         final userEmail = user['email'] ?? '';
-        final isSelected = _selectedUsers.contains(userId);
+        final isSelected = _selectedUserIds.contains(userId);
 
         return ListTile(
           leading: CircleAvatar(
@@ -400,27 +376,21 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
           ),
           title: Text(userName),
           subtitle: userEmail.isNotEmpty ? Text(userEmail) : null,
-          trailing: widget.isGroupChat
-              ? Checkbox(
-                  value: isSelected,
-                  onChanged: (value) {
-                    if (value == true) {
-                      _addSelectedUser(userId);
-                    } else {
-                      _removeSelectedUser(userId);
-                    }
-                  },
-                )
-              : null,
+          trailing: Checkbox(
+              value: isSelected,
+              onChanged: (value) {
+                if (value == true) {
+                  _addSelectedUser(userId, user);
+                } else {
+                  _removeSelectedUser(userId);
+                }
+              },
+            ),
           onTap: () {
-            if (widget.isGroupChat) {
-              if (isSelected) {
-                _removeSelectedUser(userId);
-              } else {
-                _addSelectedUser(userId);
-              }
+            if (isSelected) {
+              _removeSelectedUser(userId);
             } else {
-              _createDirectChat(userId);
+              _addSelectedUser(userId, user);
             }
           },
         );
@@ -570,26 +540,24 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
     );
   }
 
-  void _addSelectedUser(String userId) {
+  void _addSelectedUser(String userId, Map<String, dynamic> userData) {
     setState(() {
-      if (!_selectedUsers.contains(userId)) {
-        _selectedUsers.add(userId);
+      if (!_selectedUserIds.contains(userId)) {
+        _selectedUserIds.add(userId);
+        _selectedUserData[userId] = userData;
       }
     });
   }
 
   void _removeSelectedUser(String userId) {
     setState(() {
-      _selectedUsers.remove(userId);
+      _selectedUserIds.remove(userId);
+      _selectedUserData.remove(userId);
     });
   }
 
   bool _canCreateChat() {
-    if (widget.isGroupChat) {
-      return _selectedUsers.length >= 2;
-    } else {
-      return false; // Direct chats are created by tapping on a user
-    }
+    return _selectedUserIds.isNotEmpty;
   }
 
   Future<void> _createChat() async {
@@ -603,12 +571,25 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
       final chatService = ref.read(chatServiceProvider);
       final currentUserId = ref.read(authStateProvider).user!.id;
 
-      if (widget.isGroupChat) {
-        final groupName = _groupNameController.text.trim().isNotEmpty
-            ? _groupNameController.text.trim()
-            : 'Group Chat';
+      if (_selectedUserIds.length == 1) {
+        // Create direct chat
+        final chat = await chatService.createDirectChat(
+          participants: [currentUserId, _selectedUserIds.first],
+          createdBy: currentUserId,
+        );
 
-        final participants = [..._selectedUsers, currentUserId];
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatConversationScreen(chat: chat),
+            ),
+          );
+        }
+      } else {
+        // Create group chat with dynamic name
+        final groupName = _generateGroupName();
+        final participants = [..._selectedUserIds, currentUserId];
 
         final chat = await chatService.createGroupChat(
           name: groupName,
@@ -643,45 +624,6 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
     }
   }
 
-  Future<void> _createDirectChat(String userId) async {
-    setState(() {
-      _isCreating = true;
-    });
-
-    try {
-      final chatService = ref.read(chatServiceProvider);
-      final currentUserId = ref.read(authStateProvider).user!.id;
-
-      final chat = await chatService.createDirectChat(
-        participants: [currentUserId, userId],
-        createdBy: currentUserId,
-      );
-
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChatConversationScreen(chat: chat),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to create chat: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isCreating = false;
-        });
-      }
-    }
-  }
 
   Future<void> _createDepartmentChat(String departmentId, String departmentName) async {
     setState(() {
@@ -764,6 +706,28 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
           _isCreating = false;
         });
       }
+    }
+  }
+
+  String _generateGroupName() {
+    if (_selectedUserData.isEmpty) return 'Group Chat';
+    
+    // Get the names of selected users
+    final names = _selectedUserIds.map((userId) {
+      final userData = _selectedUserData[userId];
+      return userData?['name'] ?? userId;
+    }).toList();
+    
+    // Sort names for consistent ordering
+    names.sort();
+    
+    if (names.length <= 3) {
+      return names.join(', ');
+    } else {
+      // For more than 3 users, show first 3 names + "and X others"
+      final firstThree = names.take(3).join(', ');
+      final remaining = names.length - 3;
+      return '$firstThree and $remaining other${remaining > 1 ? 's' : ''}';
     }
   }
 }
