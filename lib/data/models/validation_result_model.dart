@@ -21,12 +21,12 @@ class ValidationResultModel extends Equatable {
     return ValidationResultModel(
       ok: json['ok'] as bool,
       result: json['result'] as String? ?? 'INVALID',
-      member: json['member'] != null 
-        ? MemberInfo.fromJson(json['member'] as Map<String, dynamic>)
-        : null,
+      member: json['member'] != null
+          ? MemberInfo.fromJson(json['member'] as Map<String, dynamic>)
+          : null,
       meta: json['meta'] != null
-        ? ValidationMeta.fromJson(json['meta'] as Map<String, dynamic>)
-        : null,
+          ? ValidationMeta.fromJson(json['meta'] as Map<String, dynamic>)
+          : null,
       error: json['error'] as String?,
       code: json['code'] as String?,
     );
@@ -134,18 +134,10 @@ class ValidationMeta extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'checkedAt': checkedAt,
-      'tokenExp': tokenExp,
-      'jti': jti,
-    };
+    return {'checkedAt': checkedAt, 'tokenExp': tokenExp, 'jti': jti};
   }
 
-  ValidationMeta copyWith({
-    String? checkedAt,
-    String? tokenExp,
-    String? jti,
-  }) {
+  ValidationMeta copyWith({String? checkedAt, String? tokenExp, String? jti}) {
     return ValidationMeta(
       checkedAt: checkedAt ?? this.checkedAt,
       tokenExp: tokenExp ?? this.tokenExp,

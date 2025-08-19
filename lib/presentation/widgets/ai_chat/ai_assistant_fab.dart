@@ -24,29 +24,23 @@ class _AiAssistantFabState extends State<AiAssistantFab>
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.1,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: const Interval(0.0, 0.5, curve: Curves.easeInOut),
-    ));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeInOut),
+      ),
+    );
 
-    _rotationAnimation = Tween<double>(
-      begin: 0.0,
-      end: 0.1,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: const Interval(0.2, 0.7, curve: Curves.easeInOut),
-    ));
+    _rotationAnimation = Tween<double>(begin: 0.0, end: 0.1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.2, 0.7, curve: Curves.easeInOut),
+      ),
+    );
 
-    _pulseAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.2,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _pulseAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
     _animationController.repeat(reverse: true);
   }
@@ -98,10 +92,7 @@ class _AiAssistantFabState extends State<AiAssistantFab>
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.crystalBlue,
-                        AppColors.emeraldGreen,
-                      ],
+                      colors: [AppColors.crystalBlue, AppColors.emeraldGreen],
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -140,7 +131,9 @@ class _AiAssistantFabState extends State<AiAssistantFab>
                       color: AppColors.sunGold,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isDark ? AppColors.backgroundDark : AppColors.white,
+                        color: isDark
+                            ? AppColors.backgroundDark
+                            : AppColors.white,
                         width: 2,
                       ),
                     ),
@@ -162,7 +155,7 @@ class _AiAssistantFabState extends State<AiAssistantFab>
   void _openAiChat(BuildContext context) {
     // Add a small haptic feedback
     // HapticFeedback.lightImpact();
-    
+
     // Navigate to AI chat screen
     context.pushNamed('ai-chat');
   }
@@ -173,11 +166,7 @@ class AiAssistantFabExtended extends StatefulWidget {
   final String? tooltip;
   final VoidCallback? onPressed;
 
-  const AiAssistantFabExtended({
-    super.key,
-    this.tooltip,
-    this.onPressed,
-  });
+  const AiAssistantFabExtended({super.key, this.tooltip, this.onPressed});
 
   @override
   State<AiAssistantFabExtended> createState() => _AiAssistantFabExtendedState();
@@ -189,38 +178,30 @@ class _AiAssistantFabExtendedState extends State<AiAssistantFabExtended>
   late AnimationController _pulseController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _glowAnimation;
-  
+
   bool _isHovered = false;
 
   @override
   void initState() {
     super.initState();
-    
+
     _hoverController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    
+
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.05,
-    ).animate(CurvedAnimation(
-      parent: _hoverController,
-      curve: Curves.easeInOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(parent: _hoverController, curve: Curves.easeInOut),
+    );
 
-    _glowAnimation = Tween<double>(
-      begin: 0.5,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    _glowAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
 
     _pulseController.repeat(reverse: true);
   }
@@ -251,7 +232,9 @@ class _AiAssistantFabExtendedState extends State<AiAssistantFabExtended>
                   borderRadius: BorderRadius.circular(32),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.crystalBlue.withValues(alpha: 0.3 * _glowAnimation.value),
+                      color: AppColors.crystalBlue.withValues(
+                        alpha: 0.3 * _glowAnimation.value,
+                      ),
                       blurRadius: 20 * _glowAnimation.value,
                       offset: const Offset(0, 4),
                     ),
@@ -295,7 +278,7 @@ class _AiAssistantFabExtendedState extends State<AiAssistantFabExtended>
       setState(() {
         _isHovered = hovered;
       });
-      
+
       if (hovered) {
         _hoverController.forward();
       } else {

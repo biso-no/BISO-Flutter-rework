@@ -11,10 +11,7 @@ import 'user_picker_screen.dart';
 class ChatInfoScreen extends ConsumerStatefulWidget {
   final ChatModel chat;
 
-  const ChatInfoScreen({
-    super.key,
-    required this.chat,
-  });
+  const ChatInfoScreen({super.key, required this.chat});
 
   @override
   ConsumerState<ChatInfoScreen> createState() => _ChatInfoScreenState();
@@ -37,13 +34,14 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
   Future<void> _loadUserNames() async {
     try {
       final chatService = ref.read(chatServiceProvider);
-      final userNames = await chatService.getUserNames(widget.chat.participants);
+      final userNames = await chatService.getUserNames(
+        widget.chat.participants,
+      );
       setState(() {
         _userNames = userNames;
       });
     } catch (e) {
-      setState(() {
-      });
+      setState(() {});
     }
   }
 
@@ -90,8 +88,8 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
                   CircleAvatar(
                     radius: 50,
                     backgroundColor: AppColors.subtleBlue,
-                    backgroundImage: widget.chat.avatarUrl != null 
-                        ? NetworkImage(widget.chat.avatarUrl!) 
+                    backgroundImage: widget.chat.avatarUrl != null
+                        ? NetworkImage(widget.chat.avatarUrl!)
                         : null,
                     child: widget.chat.avatarUrl == null
                         ? Icon(
@@ -102,7 +100,7 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
                         : null,
                   ),
                   const SizedBox(height: 16),
-                  
+
                   if (_isEditing)
                     TextField(
                       controller: _nameController,
@@ -177,7 +175,9 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
                       ),
                     ),
                     title: Text(
-                      isCurrentUser ? 'You' : (_userNames[participantId] ?? 'Loading...'),
+                      isCurrentUser
+                          ? 'You'
+                          : (_userNames[participantId] ?? 'Loading...'),
                       style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
                     subtitle: Text(
@@ -190,7 +190,8 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
                     trailing: isOwner && !isCurrentUser
                         ? IconButton(
                             icon: const Icon(Icons.more_vert),
-                            onPressed: () => _showParticipantOptions(participantId),
+                            onPressed: () =>
+                                _showParticipantOptions(participantId),
                           )
                         : null,
                   );
@@ -206,8 +207,14 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
               child: Column(
                 children: [
                   _StatRow('Created', _formatDate(widget.chat.createdAt)),
-                  _StatRow('Last Activity', _formatDate(widget.chat.lastActivityAt)),
-                  _StatRow('Messages', widget.chat.metadata['message_count']?.toString() ?? '0'),
+                  _StatRow(
+                    'Last Activity',
+                    _formatDate(widget.chat.lastActivityAt),
+                  ),
+                  _StatRow(
+                    'Messages',
+                    widget.chat.metadata['message_count']?.toString() ?? '0',
+                  ),
                 ],
               ),
             ),
@@ -223,7 +230,10 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         onPressed: _leaveChat,
-                        icon: const Icon(Icons.exit_to_app, color: AppColors.error),
+                        icon: const Icon(
+                          Icons.exit_to_app,
+                          color: AppColors.error,
+                        ),
                         label: const Text(
                           'Leave Chat',
                           style: TextStyle(color: AppColors.error),
@@ -233,7 +243,7 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
                         ),
                       ),
                     ),
-                  
+
                   if (isOwner) ...[
                     SizedBox(
                       width: double.infinity,
@@ -361,7 +371,7 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
         final chatService = ref.read(chatServiceProvider);
         final currentUserId = ref.read(authStateProvider).user!.id;
         await chatService.removeUserFromChat(widget.chat.id, currentUserId);
-        
+
         if (mounted) {
           context.pop(); // Go back to chat list
           ScaffoldMessenger.of(context).showSnackBar(
@@ -370,9 +380,9 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to leave chat: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to leave chat: $e')));
         }
       }
     }
@@ -382,11 +392,11 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
     try {
       final chatService = ref.read(chatServiceProvider);
       await chatService.removeUserFromChat(widget.chat.id, participantId);
-      
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Participant removed')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Participant removed')));
       }
     } catch (e) {
       if (mounted) {
@@ -411,7 +421,7 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
     if (selectedUserIds != null && selectedUserIds.isNotEmpty) {
       try {
         final chatService = ref.read(chatServiceProvider);
-        
+
         // Add each selected user to the chat
         for (final userId in selectedUserIds) {
           await chatService.addUserToChat(widget.chat.id, userId);
@@ -442,7 +452,9 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Chat'),
-        content: const Text('Are you sure you want to delete this chat? This action cannot be undone.'),
+        content: const Text(
+          'Are you sure you want to delete this chat? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -461,7 +473,7 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
       try {
         final chatService = ref.read(chatServiceProvider);
         await chatService.deleteChat(widget.chat.id);
-        
+
         if (mounted) {
           context.pop(); // Go back to chat list
           ScaffoldMessenger.of(context).showSnackBar(
@@ -470,9 +482,9 @@ class _ChatInfoScreenState extends ConsumerState<ChatInfoScreen> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to delete chat: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to delete chat: $e')));
         }
       }
     }
@@ -483,10 +495,7 @@ class _InfoSection extends StatelessWidget {
   final String title;
   final Widget child;
 
-  const _InfoSection({
-    required this.title,
-    required this.child,
-  });
+  const _InfoSection({required this.title, required this.child});
 
   @override
   Widget build(BuildContext context) {

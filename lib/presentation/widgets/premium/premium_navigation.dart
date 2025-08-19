@@ -4,7 +4,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/premium_theme.dart';
 
 /// Premium Navigation System
-/// 
+///
 /// A sophisticated floating navigation bar that creates an exclusive,
 /// iOS-inspired experience with glass morphism and elegant animations.
 
@@ -13,7 +13,7 @@ class PremiumBottomNav extends StatefulWidget {
   final ValueChanged<int> onTap;
   final List<PremiumNavItem> items;
   final bool floating;
-  
+
   const PremiumBottomNav({
     super.key,
     required this.currentIndex,
@@ -42,18 +42,25 @@ class _PremiumBottomNavState extends State<PremiumBottomNav>
         vsync: this,
       ),
     );
-    
-    _scaleAnimations = _controllers.map((controller) =>
-      Tween<double>(begin: 1.0, end: 1.2).animate(
-        CurvedAnimation(parent: controller, curve: PremiumTheme.premiumCurve),
-      )
-    ).toList();
-    
-    _bounceAnimations = _controllers.map((controller) =>
-      Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: controller, curve: Curves.elasticOut),
-      )
-    ).toList();
+
+    _scaleAnimations = _controllers
+        .map(
+          (controller) => Tween<double>(begin: 1.0, end: 1.2).animate(
+            CurvedAnimation(
+              parent: controller,
+              curve: PremiumTheme.premiumCurve,
+            ),
+          ),
+        )
+        .toList();
+
+    _bounceAnimations = _controllers
+        .map(
+          (controller) => Tween<double>(begin: 0.0, end: 1.0).animate(
+            CurvedAnimation(parent: controller, curve: Curves.elasticOut),
+          ),
+        )
+        .toList();
 
     // Animate the selected item on init
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -82,7 +89,7 @@ class _PremiumBottomNavState extends State<PremiumBottomNav>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    
+
     if (widget.floating) {
       return _buildFloatingNav(isDark, bottomPadding);
     } else {
@@ -102,24 +109,24 @@ class _PremiumBottomNavState extends State<PremiumBottomNav>
           child: Container(
             height: 72,
             decoration: BoxDecoration(
-              color: isDark 
-                  ? AppColors.charcoalBlack.withValues(alpha:0.8)
-                  : Colors.white.withValues(alpha:0.8),
+              color: isDark
+                  ? AppColors.charcoalBlack.withValues(alpha: 0.8)
+                  : Colors.white.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: isDark 
-                    ? Colors.white.withValues(alpha:0.1)
-                    : Colors.black.withValues(alpha:0.1),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.black.withValues(alpha: 0.1),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha:0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
                 BoxShadow(
-                  color: Colors.black.withValues(alpha:0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 30,
                   offset: const Offset(0, 20),
                 ),
@@ -139,7 +146,7 @@ class _PremiumBottomNavState extends State<PremiumBottomNav>
         color: isDark ? AppColors.charcoalBlack : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -160,7 +167,7 @@ class _PremiumBottomNavState extends State<PremiumBottomNav>
         children: List.generate(widget.items.length, (index) {
           final item = widget.items[index];
           final isSelected = index == widget.currentIndex;
-          
+
           return Expanded(
             child: GestureDetector(
               onTap: () => widget.onTap(index),
@@ -190,7 +197,7 @@ class _PremiumNavButton extends StatelessWidget {
   final bool isSelected;
   final bool isDark;
   final Animation<double> bounceAnimation;
-  
+
   const _PremiumNavButton({
     required this.item,
     required this.isSelected,
@@ -201,7 +208,7 @@ class _PremiumNavButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -212,8 +219,8 @@ class _PremiumNavButton extends StatelessWidget {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: isSelected 
-                ? AppColors.biLightBlue.withValues(alpha:0.15)
+            color: isSelected
+                ? AppColors.biLightBlue.withValues(alpha: 0.15)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
@@ -228,12 +235,14 @@ class _PremiumNavButton extends StatelessWidget {
                     width: 48 * (0.8 + 0.2 * bounceAnimation.value),
                     height: 48 * (0.8 + 0.2 * bounceAnimation.value),
                     decoration: BoxDecoration(
-                      color: AppColors.biLightBlue.withValues(alpha:0.1 * bounceAnimation.value),
+                      color: AppColors.biLightBlue.withValues(
+                        alpha: 0.1 * bounceAnimation.value,
+                      ),
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                 ),
-              
+
               // Icon
               AnimatedSwitcher(
                 duration: PremiumTheme.fastAnimation,
@@ -241,40 +250,34 @@ class _PremiumNavButton extends StatelessWidget {
                   isSelected ? item.activeIcon : item.icon,
                   key: ValueKey(isSelected),
                   size: 24,
-                  color: isSelected 
+                  color: isSelected
                       ? AppColors.biLightBlue
                       : (isDark ? AppColors.mist : AppColors.stoneGray),
                 ),
               ),
-              
+
               // Badge if present
               if (item.badge != null)
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: item.badge!,
-                ),
+                Positioned(top: 8, right: 8, child: item.badge!),
             ],
           ),
         ),
-        
+
         const SizedBox(height: 4),
-        
+
         // Label
         AnimatedDefaultTextStyle(
           duration: PremiumTheme.mediumAnimation,
           curve: PremiumTheme.premiumCurve,
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: isSelected 
-                ? AppColors.biLightBlue
-                : (isDark ? AppColors.mist : AppColors.stoneGray),
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-          ) ?? const TextStyle(),
-          child: Text(
-            item.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+          style:
+              theme.textTheme.labelSmall?.copyWith(
+                color: isSelected
+                    ? AppColors.biLightBlue
+                    : (isDark ? AppColors.mist : AppColors.stoneGray),
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ) ??
+              const TextStyle(),
+          child: Text(item.label, maxLines: 1, overflow: TextOverflow.ellipsis),
         ),
       ],
     );
@@ -287,19 +290,14 @@ class PremiumBadge extends StatelessWidget {
   final String? text;
   final bool showDot;
   final Color? color;
-  
-  const PremiumBadge({
-    super.key,
-    this.text,
-    this.showDot = false,
-    this.color,
-  });
+
+  const PremiumBadge({super.key, this.text, this.showDot = false, this.color});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final badgeColor = color ?? AppColors.error;
-    
+
     if (showDot && (text == null || text!.isEmpty)) {
       return Container(
         width: 8,
@@ -309,7 +307,7 @@ class PremiumBadge extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           boxShadow: [
             BoxShadow(
-              color: badgeColor.withValues(alpha:0.3),
+              color: badgeColor.withValues(alpha: 0.3),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -325,7 +323,7 @@ class PremiumBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: badgeColor.withValues(alpha:0.3),
+            color: badgeColor.withValues(alpha: 0.3),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -351,7 +349,7 @@ class PremiumNavItem {
   final IconData activeIcon;
   final String label;
   final Widget? badge;
-  
+
   const PremiumNavItem({
     required this.icon,
     required this.activeIcon,
@@ -367,7 +365,7 @@ class PremiumTabView extends StatefulWidget {
   final int initialIndex;
   final ValueChanged<int>? onChanged;
   final bool isScrollable;
-  
+
   const PremiumTabView({
     super.key,
     required this.tabs,
@@ -408,7 +406,7 @@ class _PremiumTabViewState extends State<PremiumTabView>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Column(
       children: [
         Container(
@@ -438,13 +436,17 @@ class _PremiumTabViewState extends State<PremiumTabView>
             ),
             dividerColor: Colors.transparent,
             overlayColor: WidgetStateProperty.all(Colors.transparent),
-            tabs: widget.tabs.map((tab) => Tab(
-              text: tab.title,
-              icon: tab.icon != null ? Icon(tab.icon, size: 20) : null,
-            )).toList(),
+            tabs: widget.tabs
+                .map(
+                  (tab) => Tab(
+                    text: tab.title,
+                    icon: tab.icon != null ? Icon(tab.icon, size: 20) : null,
+                  ),
+                )
+                .toList(),
           ),
         ),
-        
+
         Expanded(
           child: TabBarView(
             controller: _tabController,
@@ -460,10 +462,6 @@ class PremiumTab {
   final String title;
   final IconData? icon;
   final Widget content;
-  
-  const PremiumTab({
-    required this.title,
-    this.icon,
-    required this.content,
-  });
+
+  const PremiumTab({required this.title, this.icon, required this.content});
 }

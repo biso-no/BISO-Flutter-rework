@@ -38,8 +38,12 @@ class PublicProfileModel extends Equatable {
       avatar: map['avatar'],
       emailVisible: map['email_visible'] ?? false,
       phoneVisible: map['phone_visible'] ?? false,
-      createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
-      updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
+      createdAt: map['\$createdAt'] != null
+          ? DateTime.parse(map['\$createdAt'])
+          : null,
+      updatedAt: map['\$updatedAt'] != null
+          ? DateTime.parse(map['\$updatedAt'])
+          : null,
     );
   }
 
@@ -112,18 +116,18 @@ class PublicProfileModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        name,
-        email,
-        phone,
-        campusId,
-        avatar,
-        emailVisible,
-        phoneVisible,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    userId,
+    name,
+    email,
+    phone,
+    campusId,
+    avatar,
+    emailVisible,
+    phoneVisible,
+    createdAt,
+    updatedAt,
+  ];
 
   @override
   String toString() {

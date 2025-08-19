@@ -47,10 +47,12 @@ class MembershipNotifier extends StateNotifier<MembershipState> {
   /// Verifies membership status for a given student ID
   Future<void> verifyMembership(String studentId) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
-      final verificationResult = await _membershipService.verifyMembership(studentId);
-      
+      final verificationResult = await _membershipService.verifyMembership(
+        studentId,
+      );
+
       state = state.copyWith(
         isLoading: false,
         isVerified: verificationResult.isMember,
@@ -69,20 +71,17 @@ class MembershipNotifier extends StateNotifier<MembershipState> {
   /// Loads user's membership from the database
   Future<void> loadUserMembership(String userId) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final membership = await _membershipService.getUserMembership(userId);
-      
+
       state = state.copyWith(
         isLoading: false,
         membership: membership,
         isVerified: membership?.isActive == true,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -104,7 +103,7 @@ class MembershipNotifier extends StateNotifier<MembershipState> {
     String? phoneNumber,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final checkoutUrl = await _membershipService.initiateMembershipCheckout(
         membershipId: membershipId,
@@ -115,20 +114,14 @@ class MembershipNotifier extends StateNotifier<MembershipState> {
         phoneNumber: phoneNumber,
         paymentMethod: paymentMethod,
       );
-      
+
       if (checkoutUrl != null) {
         // Launch checkout URL
         final uri = Uri.parse(checkoutUrl);
         if (await canLaunchUrl(uri)) {
-          await launchUrl(
-            uri,
-            mode: LaunchMode.externalApplication,
-          );
-          
-          state = state.copyWith(
-            isLoading: false,
-            error: null,
-          );
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+          state = state.copyWith(isLoading: false, error: null);
         } else {
           throw Exception('Could not launch checkout URL');
         }
@@ -136,10 +129,7 @@ class MembershipNotifier extends StateNotifier<MembershipState> {
         throw Exception('No checkout URL received');
       }
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -150,11 +140,13 @@ class MembershipNotifier extends StateNotifier<MembershipState> {
       userId,
       (message) {
         // Handle student ID creation/update
-        if (message.events.contains('databases.app.collections.student_id.documents.*.create')) {
+        if (message.events.contains(
+          'databases.app.collections.student_id.documents.*.create',
+        )) {
           // Student ID was registered, we can now verify membership
           final payload = message.payload;
           final studentNumber = payload['student_number'] as String?;
-          
+
           if (studentNumber != null) {
             verifyMembership(studentNumber);
           }
@@ -170,9 +162,12 @@ class MembershipNotifier extends StateNotifier<MembershipState> {
       userId,
       (message) {
         // Handle membership updates (e.g., successful purchase)
-        if (message.events.contains('databases.app.collections.biso_membership.documents.*.create') ||
-            message.events.contains('databases.app.collections.biso_membership.documents.*.update')) {
-          
+        if (message.events.contains(
+              'databases.app.collections.biso_membership.documents.*.create',
+            ) ||
+            message.events.contains(
+              'databases.app.collections.biso_membership.documents.*.update',
+            )) {
           // Reload membership data
           loadUserMembership(userId);
         }
@@ -206,22 +201,26 @@ final membershipServiceProvider = Provider<MembershipService>((ref) {
   return MembershipService();
 });
 
-final membershipProvider = StateNotifierProvider<MembershipNotifier, MembershipState>((ref) {
-  final membershipService = ref.read(membershipServiceProvider);
-  return MembershipNotifier(membershipService);
-});
+final membershipProvider =
+    StateNotifierProvider<MembershipNotifier, MembershipState>((ref) {
+      final membershipService = ref.read(membershipServiceProvider);
+      return MembershipNotifier(membershipService);
+    });
 
 // Helper provider to combine membership state with student verification
-final membershipStatusProvider = Provider<({bool hasStudentId, bool isMember, MembershipModel? membership})>((ref) {
-  final membershipState = ref.watch(membershipProvider);
-  
-  // You might want to also watch a student ID provider if you have one
-  // For now, we'll determine hasStudentId from the verification result
-  final hasStudentId = membershipState.verificationResult != null;
-  
-  return (
-    hasStudentId: hasStudentId,
-    isMember: membershipState.isVerified,
-    membership: membershipState.membership,
-  );
-});
+final membershipStatusProvider =
+    Provider<({bool hasStudentId, bool isMember, MembershipModel? membership})>(
+      (ref) {
+        final membershipState = ref.watch(membershipProvider);
+
+        // You might want to also watch a student ID provider if you have one
+        // For now, we'll determine hasStudentId from the verification result
+        final hasStudentId = membershipState.verificationResult != null;
+
+        return (
+          hasStudentId: hasStudentId,
+          isMember: membershipState.isVerified,
+          membership: membershipState.membership,
+        );
+      },
+    );

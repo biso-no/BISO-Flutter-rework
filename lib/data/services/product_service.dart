@@ -48,7 +48,7 @@ class ProductService {
       Query.orderDesc('\$createdAt'),
     ];
     if (campusId != null) queries.add(Query.equal('campus_id', campusId));
-    if (category != null && category != 'all') queries.add(Query.equal('category', category));
+    if (category != null && category != 'all') queries.add(Query.equal('category', category));      
     if (status != null) queries.add(Query.equal('status', status));
     if (search != null && search.trim().isNotEmpty) {
       queries.add(Query.search('description', search.trim()));
@@ -86,9 +86,11 @@ class ProductService {
       fileIds.add(fileId);
     }
 
-    final data = product.copyWith(images: imageUrls, imageFileIds: fileIds).toMap();
+    final data = product
+        .copyWith(images: imageUrls, imageFileIds: fileIds)
+        .toMap();
     final docId = ID.unique();
-    
+
     // Use HTTP method directly to avoid SDK creation + fallback double call
     final doc = await RobustDocumentService.createDocumentViaHttpDirect(
       databaseId: AppConstants.databaseId,
@@ -96,7 +98,7 @@ class ProductService {
       documentId: docId,
       data: data,
     );
-    
+
     return ProductModel.fromMap(doc);
   }
 
@@ -143,7 +145,10 @@ class ProductService {
     }
   }
 
-  Future<bool> isFavorited({required String userId, required String productId}) async {
+  Future<bool> isFavorited({
+    required String userId,
+    required String productId,
+  }) async {
     final res = await RobustDocumentService.listDocumentsRobust(
       databaseId: AppConstants.databaseId,
       collectionId: favoritesCollectionId,
@@ -156,7 +161,10 @@ class ProductService {
     return res.isNotEmpty;
   }
 
-  Future<bool> toggleFavorite({required String userId, required String productId}) async {
+  Future<bool> toggleFavorite({
+    required String userId,
+    required String productId,
+  }) async {
     final res = await RobustDocumentService.listDocumentsRobust(
       databaseId: AppConstants.databaseId,
       collectionId: favoritesCollectionId,
@@ -171,10 +179,7 @@ class ProductService {
         databaseId: AppConstants.databaseId,
         collectionId: favoritesCollectionId,
         documentId: ID.unique(),
-        data: {
-          'user_id': userId,
-          'product': productId,
-        },
+        data: {'user_id': userId, 'product': productId},
       );
       await _bumpFavoriteCount(productId, 1);
       return true;
@@ -216,16 +221,20 @@ class ProductService {
       if (productData != null && productData is Map<String, dynamic>) {
         try {
           final product = ProductModel.fromMap(productData);
-          
+
           // Apply campus filter
           if (campusId != null && product.campusId != campusId) continue;
-          
-          // Apply category filter  
-          if (category != null && category != 'all' && product.category != category) continue;
-          
+
+          // Apply category filter
+          if (category != null &&
+              category != 'all' &&
+              product.category != category) {
+            continue;
+          }
+
           // Only include available products
           if (product.status != 'available') continue;
-          
+
           products.add(product);
         } catch (e) {
           // Skip malformed product data
@@ -271,5 +280,3 @@ class ProductService {
     return '$endpoint/storage/buckets/$bucketId/files/$fileId/view?project=$projectId';
   }
 }
-
-

@@ -9,22 +9,27 @@ import '../../../providers/campus/campus_provider.dart';
 import 'chat_conversation_screen.dart';
 import 'chat_list_screen.dart';
 
-final publicUserSearchProvider = FutureProvider.family<List<PublicProfileModel>, String>((ref, query) async {
-  final chatService = ref.read(chatServiceProvider);
-  final selectedCampus = ref.read(selectedCampusProvider);
-  return await chatService.searchUsers(query, campusId: selectedCampus.id);
-});
+final publicUserSearchProvider =
+    FutureProvider.family<List<PublicProfileModel>, String>((ref, query) async {
+      final chatService = ref.read(chatServiceProvider);
+      final selectedCampus = ref.read(selectedCampusProvider);
+      return await chatService.searchUsers(query, campusId: selectedCampus.id);
+    });
 
-final recentPublicContactsProvider = FutureProvider<List<PublicProfileModel>>((ref) async {
+final recentPublicContactsProvider = FutureProvider<List<PublicProfileModel>>((
+  ref,
+) async {
   final chatService = ref.read(chatServiceProvider);
   final authState = ref.read(authStateProvider);
-  
+
   if (authState.user == null) return [];
-  
+
   return await chatService.getRecentContacts(authState.user!.id);
 });
 
-final departmentsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+final departmentsProvider = FutureProvider<List<Map<String, dynamic>>>((
+  ref,
+) async {
   final chatService = ref.read(chatServiceProvider);
   return await chatService.getDepartments();
 });
@@ -43,7 +48,7 @@ class NewChatScreen extends ConsumerStatefulWidget {
 
 class _NewChatScreenState extends ConsumerState<NewChatScreen> {
   final TextEditingController _searchController = TextEditingController();
-  
+
   String _searchQuery = '';
   final List<String> _selectedUserIds = [];
   final Map<String, PublicProfileModel> _selectedUserData = {};
@@ -73,9 +78,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
     final authState = ref.watch(authStateProvider);
 
     if (authState.user == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -95,7 +98,9 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(_selectedUserIds.length == 1 ? 'Message' : 'Create Group'),
+                  : Text(
+                      _selectedUserIds.length == 1 ? 'Message' : 'Create Group',
+                    ),
             ),
         ],
       ),
@@ -117,13 +122,15 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
                       children: _selectedUserIds.map((userId) {
                         final userData = _selectedUserData[userId];
                         final userName = userData?.name ?? userId;
-                        
+
                         return Chip(
                           avatar: CircleAvatar(
                             backgroundColor: AppColors.subtleBlue,
                             radius: 12,
                             child: Text(
-                              userName.isNotEmpty ? userName[0].toUpperCase() : '?',
+                              userName.isNotEmpty
+                                  ? userName[0].toUpperCase()
+                                  : '?',
                               style: const TextStyle(
                                 color: AppColors.defaultBlue,
                                 fontSize: 10,
@@ -141,13 +148,13 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
                     ),
                   ),
                 ],
-                
+
                 // Search bar
                 TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: _selectedUserIds.isEmpty 
-                        ? 'Search for people...' 
+                    hintText: _selectedUserIds.isEmpty
+                        ? 'Search for people...'
                         : 'Add more people...',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
@@ -175,15 +182,21 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
                     child: Container(
                       margin: const EdgeInsets.only(right: 8),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.defaultBlue : Colors.transparent,
+                        color: isSelected
+                            ? AppColors.defaultBlue
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Center(
                         child: Text(
                           _getTabDisplayName(tab),
                           style: TextStyle(
-                            color: isSelected ? Colors.white : AppColors.onSurfaceVariant,
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                            color: isSelected
+                                ? Colors.white
+                                : AppColors.onSurfaceVariant,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
                           ),
                         ),
                       ),
@@ -196,11 +209,8 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
 
           const SizedBox(height: 16),
 
-
           // User list
-          Expanded(
-            child: _buildUserList(),
-          ),
+          Expanded(child: _buildUserList()),
         ],
       ),
     );
@@ -208,10 +218,14 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
 
   String _getTabDisplayName(String tab) {
     switch (tab) {
-      case 'users': return 'People';
-      case 'departments': return 'Departments';
-      case 'teams': return 'Teams';
-      default: return tab;
+      case 'users':
+        return 'People';
+      case 'departments':
+        return 'Departments';
+      case 'teams':
+        return 'Teams';
+      default:
+        return tab;
     }
   }
 
@@ -224,9 +238,8 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
         return usersAsync.when(
           data: (users) => _buildUserListView(users),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => Center(
-            child: Text('Error: ${error.toString()}'),
-          ),
+          error: (error, stack) =>
+              Center(child: Text('Error: ${error.toString()}')),
         );
       }
     } else if (_selectedTab == 'departments') {
@@ -238,7 +251,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
 
   Widget _buildRecentContacts() {
     final recentContactsAsync = ref.watch(recentPublicContactsProvider);
-    
+
     return recentContactsAsync.when(
       data: (contacts) {
         return ListView(
@@ -271,27 +284,35 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
                 return ListTile(
                   leading: CircleAvatar(
                     backgroundColor: AppColors.subtleBlue,
-                    backgroundImage: profile.avatar != null ? NetworkImage(profile.avatar!) : null,
-                    child: profile.avatar == null ? Text(
-                      profile.name.isNotEmpty ? profile.name[0].toUpperCase() : '?',
-                      style: const TextStyle(
-                        color: AppColors.defaultBlue,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ) : null,
+                    backgroundImage: profile.avatar != null
+                        ? NetworkImage(profile.avatar!)
+                        : null,
+                    child: profile.avatar == null
+                        ? Text(
+                            profile.name.isNotEmpty
+                                ? profile.name[0].toUpperCase()
+                                : '?',
+                            style: const TextStyle(
+                              color: AppColors.defaultBlue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        : null,
                   ),
                   title: Text(profile.name),
-                  subtitle: profile.displayEmail != null ? Text(profile.displayEmail!) : null,
+                  subtitle: profile.displayEmail != null
+                      ? Text(profile.displayEmail!)
+                      : null,
                   trailing: Checkbox(
-                      value: isSelected,
-                      onChanged: (value) {
-                        if (value == true) {
-                          _addSelectedUser(profile.userId, profile);
-                        } else {
-                          _removeSelectedUser(profile.userId);
-                        }
-                      },
-                    ),
+                    value: isSelected,
+                    onChanged: (value) {
+                      if (value == true) {
+                        _addSelectedUser(profile.userId, profile);
+                      } else {
+                        _removeSelectedUser(profile.userId);
+                      }
+                    },
+                  ),
                   onTap: () {
                     if (isSelected) {
                       _removeSelectedUser(profile.userId);
@@ -339,11 +360,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.search_off,
-              size: 48,
-              color: AppColors.onSurfaceVariant,
-            ),
+            Icon(Icons.search_off, size: 48, color: AppColors.onSurfaceVariant),
             SizedBox(height: 16),
             Text(
               'No users found',
@@ -363,27 +380,35 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
         return ListTile(
           leading: CircleAvatar(
             backgroundColor: AppColors.subtleBlue,
-            backgroundImage: profile.avatar != null ? NetworkImage(profile.avatar!) : null,
-            child: profile.avatar == null ? Text(
-              profile.name.isNotEmpty ? profile.name[0].toUpperCase() : '?',
-              style: const TextStyle(
-                color: AppColors.defaultBlue,
-                fontWeight: FontWeight.bold,
-              ),
-            ) : null,
+            backgroundImage: profile.avatar != null
+                ? NetworkImage(profile.avatar!)
+                : null,
+            child: profile.avatar == null
+                ? Text(
+                    profile.name.isNotEmpty
+                        ? profile.name[0].toUpperCase()
+                        : '?',
+                    style: const TextStyle(
+                      color: AppColors.defaultBlue,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
           ),
           title: Text(profile.name),
-          subtitle: profile.displayEmail != null ? Text(profile.displayEmail!) : null,
+          subtitle: profile.displayEmail != null
+              ? Text(profile.displayEmail!)
+              : null,
           trailing: Checkbox(
-              value: isSelected,
-              onChanged: (value) {
-                if (value == true) {
-                  _addSelectedUser(profile.userId, profile);
-                } else {
-                  _removeSelectedUser(profile.userId);
-                }
-              },
-            ),
+            value: isSelected,
+            onChanged: (value) {
+              if (value == true) {
+                _addSelectedUser(profile.userId, profile);
+              } else {
+                _removeSelectedUser(profile.userId);
+              }
+            },
+          ),
           onTap: () {
             if (isSelected) {
               _removeSelectedUser(profile.userId);
@@ -398,7 +423,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
 
   Widget _buildDepartmentsList() {
     final departmentsAsync = ref.watch(departmentsProvider);
-    
+
     return departmentsAsync.when(
       data: (departments) {
         if (departments.isEmpty) {
@@ -432,10 +457,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
             return ListTile(
               leading: CircleAvatar(
                 backgroundColor: AppColors.orange9,
-                child: Icon(
-                  Icons.business,
-                  color: Colors.white,
-                ),
+                child: Icon(Icons.business, color: Colors.white),
               ),
               title: Text(departmentName),
               subtitle: description.isNotEmpty ? Text(description) : null,
@@ -450,11 +472,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 48,
-              color: AppColors.error,
-            ),
+            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               'Failed to load departments: $error',
@@ -469,7 +487,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
 
   Widget _buildTeamsList() {
     final teamsAsync = ref.watch(teamsProvider);
-    
+
     return teamsAsync.when(
       data: (teams) {
         if (teams.isEmpty) {
@@ -477,11 +495,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.groups,
-                  size: 48,
-                  color: AppColors.onSurfaceVariant,
-                ),
+                Icon(Icons.groups, size: 48, color: AppColors.onSurfaceVariant),
                 SizedBox(height: 16),
                 Text(
                   'No teams available',
@@ -503,10 +517,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
             return ListTile(
               leading: CircleAvatar(
                 backgroundColor: AppColors.purple9,
-                child: Icon(
-                  Icons.groups,
-                  color: Colors.white,
-                ),
+                child: Icon(Icons.groups, color: Colors.white),
               ),
               title: Text(teamName),
               subtitle: description.isNotEmpty ? Text(description) : null,
@@ -521,11 +532,7 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 48,
-              color: AppColors.error,
-            ),
+            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               'Failed to load teams: $error',
@@ -622,8 +629,10 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
     }
   }
 
-
-  Future<void> _createDepartmentChat(String departmentId, String departmentName) async {
+  Future<void> _createDepartmentChat(
+    String departmentId,
+    String departmentName,
+  ) async {
     setState(() {
       _isCreating = true;
     });
@@ -709,16 +718,16 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
 
   String _generateGroupName() {
     if (_selectedUserData.isEmpty) return 'Group Chat';
-    
+
     // Get the names of selected users
     final names = _selectedUserIds.map((userId) {
       final userData = _selectedUserData[userId];
       return userData?.name ?? userId;
     }).toList();
-    
+
     // Sort names for consistent ordering
     names.sort();
-    
+
     if (names.length <= 3) {
       return names.join(', ');
     } else {

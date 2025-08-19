@@ -41,7 +41,9 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
       );
     }
     final expensesState = ref.watch(expensesStateProvider);
-    final filteredExpenses = ref.watch(filteredExpensesProvider(_selectedStatus));
+    final filteredExpenses = ref.watch(
+      filteredExpensesProvider(_selectedStatus),
+    );
 
     // Show loading state
     if (expensesState.isLoading && expensesState.expenses.isEmpty) {
@@ -59,9 +61,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
             icon: const Icon(Icons.arrow_back),
           ),
         ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -85,11 +85,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.error_outline,
-                size: 64,
-                color: AppColors.error,
-              ),
+              const Icon(Icons.error_outline, size: 64, color: AppColors.error),
               const SizedBox(height: 16),
               Text(
                 'Error loading expenses',
@@ -137,10 +133,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
             },
             icon: const Icon(Icons.refresh),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search),
-          ),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'history') {
@@ -201,11 +194,17 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                   selectedColor: AppColors.subtleBlue,
                   checkmarkColor: AppColors.defaultBlue,
                   labelStyle: TextStyle(
-                    color: isSelected ? AppColors.defaultBlue : AppColors.onSurfaceVariant,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected
+                        ? AppColors.defaultBlue
+                        : AppColors.onSurfaceVariant,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
                   ),
                   side: BorderSide(
-                    color: isSelected ? AppColors.defaultBlue : AppColors.outline,
+                    color: isSelected
+                        ? AppColors.defaultBlue
+                        : AppColors.outline,
                   ),
                 );
               },
@@ -251,7 +250,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                 : ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: filteredExpenses.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final expense = filteredExpenses[index];
                       return _ExpenseCard(
@@ -274,12 +274,18 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
 
   String _getStatusDisplayName(String status) {
     switch (status) {
-      case 'all': return 'All';
-      case 'pending': return 'Pending';
-      case 'approved': return 'Approved';
-      case 'rejected': return 'Rejected';
-      case 'paid': return 'Paid';
-      default: return status;
+      case 'all':
+        return 'All';
+      case 'pending':
+        return 'Pending';
+      case 'approved':
+        return 'Approved';
+      case 'rejected':
+        return 'Rejected';
+      case 'paid':
+        return 'Paid';
+      default:
+        return status;
     }
   }
 
@@ -306,9 +312,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
   void _startNewExpense(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const CreateExpenseScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const CreateExpenseScreen()),
     );
   }
 }
@@ -371,10 +375,7 @@ class _ExpenseCard extends StatelessWidget {
   final ExpenseModel expense;
   final VoidCallback onTap;
 
-  const _ExpenseCard({
-    required this.expense,
-    required this.onTap,
-  });
+  const _ExpenseCard({required this.expense, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -396,7 +397,9 @@ class _ExpenseCard extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: _getCategoryColor(expense.category).withValues(alpha: 0.1),
+                      color: _getCategoryColor(
+                        expense.category,
+                      ).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -445,9 +448,14 @@ class _ExpenseCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(expense.status).withValues(alpha: 0.1),
+                          color: _getStatusColor(
+                            expense.status,
+                          ).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -495,7 +503,10 @@ class _ExpenseCard extends StatelessWidget {
                   if (expense.isPrepayment) ...[
                     const SizedBox(width: 16),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.accentBlue.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
@@ -520,35 +531,54 @@ class _ExpenseCard extends StatelessWidget {
 
   Color _getCategoryColor(String category) {
     switch (category) {
-      case 'event': return AppColors.accentBlue;
-      case 'travel': return AppColors.green9;
-      case 'supplies': return AppColors.purple9;
-      case 'food': return AppColors.orange9;
-      case 'other': return AppColors.onSurfaceVariant;
-      default: return AppColors.onSurfaceVariant;
+      case 'event':
+        return AppColors.accentBlue;
+      case 'travel':
+        return AppColors.green9;
+      case 'supplies':
+        return AppColors.purple9;
+      case 'food':
+        return AppColors.orange9;
+      case 'other':
+        return AppColors.onSurfaceVariant;
+      default:
+        return AppColors.onSurfaceVariant;
     }
   }
 
   IconData _getCategoryIcon(String category) {
     switch (category) {
-      case 'event': return Icons.event;
-      case 'travel': return Icons.directions_car;
-      case 'supplies': return Icons.shopping_cart;
-      case 'food': return Icons.restaurant;
-      case 'other': return Icons.receipt;
-      default: return Icons.receipt;
+      case 'event':
+        return Icons.event;
+      case 'travel':
+        return Icons.directions_car;
+      case 'supplies':
+        return Icons.shopping_cart;
+      case 'food':
+        return Icons.restaurant;
+      case 'other':
+        return Icons.receipt;
+      default:
+        return Icons.receipt;
     }
   }
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'draft': return AppColors.onSurfaceVariant;
-      case 'submitted': return AppColors.accentBlue;
-      case 'under_review': return AppColors.orange9;
-      case 'approved': return AppColors.success;
-      case 'rejected': return AppColors.error;
-      case 'paid': return AppColors.success;
-      default: return AppColors.onSurfaceVariant;
+      case 'draft':
+        return AppColors.onSurfaceVariant;
+      case 'submitted':
+        return AppColors.accentBlue;
+      case 'under_review':
+        return AppColors.orange9;
+      case 'approved':
+        return AppColors.success;
+      case 'rejected':
+        return AppColors.error;
+      case 'paid':
+        return AppColors.success;
+      default:
+        return AppColors.onSurfaceVariant;
     }
   }
 }
@@ -614,9 +644,14 @@ class _ExpenseDetailSheet extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(expense.status).withValues(alpha: 0.1),
+                        color: _getStatusColor(
+                          expense.status,
+                        ).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -664,7 +699,10 @@ class _ExpenseDetailSheet extends StatelessWidget {
                       ),
                       if (expense.isPrepayment)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.defaultBlue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -690,7 +728,9 @@ class _ExpenseDetailSheet extends StatelessWidget {
                     _DetailItem(
                       icon: Icons.calendar_today,
                       label: 'Date',
-                      value: DateFormat('MMMM dd, yyyy').format(expense.expenseDate),
+                      value: DateFormat(
+                        'MMMM dd, yyyy',
+                      ).format(expense.expenseDate),
                     ),
                     _DetailItem(
                       icon: Icons.category,
@@ -747,7 +787,11 @@ class _ExpenseDetailSheet extends StatelessWidget {
                           onPressed: () {
                             // TODO: Open/download file
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Opening ${attachment.fileName} - Coming Soon')),
+                              SnackBar(
+                                content: Text(
+                                  'Opening ${attachment.fileName} - Coming Soon',
+                                ),
+                              ),
                             );
                           },
                           icon: const Icon(Icons.open_in_new),
@@ -760,21 +804,25 @@ class _ExpenseDetailSheet extends StatelessWidget {
                 ],
 
                 // Timeline/Status History
-                if (expense.approvedAt != null || expense.rejectionReason != null) ...[
+                if (expense.approvedAt != null ||
+                    expense.rejectionReason != null) ...[
                   _DetailSection(
                     title: 'Status History',
                     children: [
                       _TimelineItem(
                         icon: Icons.create,
                         title: 'Created',
-                        subtitle: DateFormat('MMM dd, yyyy • HH:mm').format(expense.createdAt!),
+                        subtitle: DateFormat(
+                          'MMM dd, yyyy • HH:mm',
+                        ).format(expense.createdAt!),
                         isCompleted: true,
                       ),
                       if (expense.approvedAt != null)
                         _TimelineItem(
                           icon: Icons.check_circle,
                           title: 'Approved',
-                          subtitle: 'By ${expense.approverName} • ${DateFormat('MMM dd, yyyy • HH:mm').format(expense.approvedAt!)}',
+                          subtitle:
+                              'By ${expense.approverName} • ${DateFormat('MMM dd, yyyy • HH:mm').format(expense.approvedAt!)}',
                           isCompleted: true,
                         ),
                       if (expense.rejectionReason != null)
@@ -807,13 +855,17 @@ class _ExpenseDetailSheet extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: expense.canSubmit ? () {
-                            // TODO: Submit expense
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Expense submitted!')),
-                            );
-                          } : null,
+                          onPressed: expense.canSubmit
+                              ? () {
+                                  // TODO: Submit expense
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Expense submitted!'),
+                                    ),
+                                  );
+                                }
+                              : null,
                           icon: const Icon(Icons.send),
                           label: const Text('Submit'),
                         ),
@@ -831,22 +883,29 @@ class _ExpenseDetailSheet extends StatelessWidget {
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'draft': return AppColors.onSurfaceVariant;
-      case 'submitted': return AppColors.accentBlue;
-      case 'under_review': return AppColors.orange9;
-      case 'approved': return AppColors.success;
-      case 'rejected': return AppColors.error;
-      case 'paid': return AppColors.success;
-      default: return AppColors.onSurfaceVariant;
+      case 'draft':
+        return AppColors.onSurfaceVariant;
+      case 'submitted':
+        return AppColors.accentBlue;
+      case 'under_review':
+        return AppColors.orange9;
+      case 'approved':
+        return AppColors.success;
+      case 'rejected':
+        return AppColors.error;
+      case 'paid':
+        return AppColors.success;
+      default:
+        return AppColors.onSurfaceVariant;
     }
   }
 
   IconData _getFileIcon(String filename) {
     if (filename.toLowerCase().endsWith('.pdf')) {
       return Icons.picture_as_pdf;
-    } else if (filename.toLowerCase().contains('.jpg') || 
-               filename.toLowerCase().contains('.png') ||
-               filename.toLowerCase().contains('.jpeg')) {
+    } else if (filename.toLowerCase().contains('.jpg') ||
+        filename.toLowerCase().contains('.png') ||
+        filename.toLowerCase().contains('.jpeg')) {
       return Icons.image;
     }
     return Icons.attach_file;
@@ -857,10 +916,7 @@ class _DetailSection extends StatelessWidget {
   final String title;
   final List<Widget> children;
 
-  const _DetailSection({
-    required this.title,
-    required this.children,
-  });
+  const _DetailSection({required this.title, required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -946,7 +1002,11 @@ class _TimelineItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = isError ? AppColors.error : isCompleted ? AppColors.success : AppColors.onSurfaceVariant;
+    final color = isError
+        ? AppColors.error
+        : isCompleted
+        ? AppColors.success
+        : AppColors.onSurfaceVariant;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -1009,11 +1069,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 64,
-              color: AppColors.onSurfaceVariant,
-            ),
+            Icon(icon, size: 64, color: AppColors.onSurfaceVariant),
             const SizedBox(height: 16),
             Text(
               title,
@@ -1034,4 +1090,3 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
-

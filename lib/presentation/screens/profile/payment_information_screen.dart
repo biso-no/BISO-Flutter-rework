@@ -11,14 +11,16 @@ class PaymentInformationScreen extends ConsumerStatefulWidget {
   const PaymentInformationScreen({super.key});
 
   @override
-  ConsumerState<PaymentInformationScreen> createState() => _PaymentInformationScreenState();
+  ConsumerState<PaymentInformationScreen> createState() =>
+      _PaymentInformationScreenState();
 }
 
-class _PaymentInformationScreenState extends ConsumerState<PaymentInformationScreen> {
+class _PaymentInformationScreenState
+    extends ConsumerState<PaymentInformationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _bankAccountController = TextEditingController();
   final _swiftController = TextEditingController();
-  
+
   bool _isInternational = false;
   bool _isLoading = false;
 
@@ -52,7 +54,7 @@ class _PaymentInformationScreenState extends ConsumerState<PaymentInformationScr
 
     // Remove spaces and keep only digits
     final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
-    
+
     if (cleanValue.length != 11) {
       return 'Norwegian bank account must be 11 digits';
     }
@@ -70,18 +72,18 @@ class _PaymentInformationScreenState extends ConsumerState<PaymentInformationScr
 
     // MOD11 weights for Norwegian bank account validation
     const weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
-    
+
     int sum = 0;
     for (int i = 0; i < 10; i++) {
       sum += int.parse(accountNumber[i]) * weights[i];
     }
-    
+
     int remainder = sum % 11;
     int checkDigit = remainder == 0 ? 0 : 11 - remainder;
-    
+
     // Check digit cannot be 10
     if (checkDigit == 10) return false;
-    
+
     return checkDigit == int.parse(accountNumber[10]);
   }
 
@@ -89,19 +91,19 @@ class _PaymentInformationScreenState extends ConsumerState<PaymentInformationScr
     if (_isInternational && (value == null || value.isEmpty)) {
       return 'SWIFT code is required for international accounts';
     }
-    
+
     if (value != null && value.isNotEmpty) {
       // SWIFT code validation (8 or 11 characters)
       if (value.length != 8 && value.length != 11) {
         return 'SWIFT code must be 8 or 11 characters';
       }
-      
+
       // Basic format validation (letters and numbers only)
       if (!RegExp(r'^[A-Z0-9]+$').hasMatch(value.toUpperCase())) {
         return 'SWIFT code can only contain letters and numbers';
       }
     }
-    
+
     return null;
   }
 
@@ -114,10 +116,9 @@ class _PaymentInformationScreenState extends ConsumerState<PaymentInformationScr
       final bankAccount = _bankAccountController.text.trim();
       final swift = _isInternational ? _swiftController.text.trim() : null;
 
-      await ref.read(authStateProvider.notifier).updatePaymentInformation(
-        bankAccount: bankAccount,
-        swift: swift,
-      );
+      await ref
+          .read(authStateProvider.notifier)
+          .updatePaymentInformation(bankAccount: bankAccount, swift: swift);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -204,12 +205,20 @@ class _PaymentInformationScreenState extends ConsumerState<PaymentInformationScr
                 child: SwitchListTile(
                   secondary: Icon(
                     _isInternational ? Icons.public : Icons.flag,
-                    color: _isInternational ? AppColors.purple9 : AppColors.defaultBlue,
+                    color: _isInternational
+                        ? AppColors.purple9
+                        : AppColors.defaultBlue,
                   ),
-                  title: Text(_isInternational ? 'International Bank Account' : 'Norwegian Bank Account'),
-                  subtitle: Text(_isInternational 
-                      ? 'Requires SWIFT code for international transfers'
-                      : 'Standard Norwegian bank account with MOD11 validation'),
+                  title: Text(
+                    _isInternational
+                        ? 'International Bank Account'
+                        : 'Norwegian Bank Account',
+                  ),
+                  subtitle: Text(
+                    _isInternational
+                        ? 'Requires SWIFT code for international transfers'
+                        : 'Standard Norwegian bank account with MOD11 validation',
+                  ),
                   value: _isInternational,
                   onChanged: (value) {
                     setState(() {
@@ -240,34 +249,47 @@ class _PaymentInformationScreenState extends ConsumerState<PaymentInformationScr
               TextFormField(
                 controller: _bankAccountController,
                 decoration: InputDecoration(
-                  labelText: _isInternational ? 'International Account Number' : 'Norwegian Account Number',
-                  hintText: _isInternational ? 'Enter your international account number' : '1234 56 78901',
+                  labelText: _isInternational
+                      ? 'International Account Number'
+                      : 'Norwegian Account Number',
+                  hintText: _isInternational
+                      ? 'Enter your international account number'
+                      : '1234 56 78901',
                   prefixIcon: const Icon(Icons.account_balance),
                   border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
-                inputFormatters: _isInternational 
-                    ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9A-Za-z]'))]
+                inputFormatters: _isInternational
+                    ? [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'[0-9A-Za-z]'),
+                        ),
+                      ]
                     : [
                         FilteringTextInputFormatter.digitsOnly,
                         TextInputFormatter.withFunction((oldValue, newValue) {
                           // Auto-format Norwegian bank account (XXXX XX XXXXX)
-                          String text = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+                          String text = newValue.text.replaceAll(
+                            RegExp(r'[^\d]'),
+                            '',
+                          );
                           if (text.length > 11) text = text.substring(0, 11);
-                          
+
                           String formatted = '';
                           for (int i = 0; i < text.length; i++) {
                             if (i == 4 || i == 6) formatted += ' ';
                             formatted += text[i];
                           }
-                          
+
                           return TextEditingValue(
                             text: formatted,
-                            selection: TextSelection.collapsed(offset: formatted.length),
+                            selection: TextSelection.collapsed(
+                              offset: formatted.length,
+                            ),
                           );
                         }),
                       ],
-                validator: _isInternational 
+                validator: _isInternational
                     ? (value) {
                         if (value == null || value.isEmpty) {
                           return 'Account number is required';
@@ -330,7 +352,9 @@ class _PaymentInformationScreenState extends ConsumerState<PaymentInformationScr
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : const Text('Save Payment Information'),
@@ -348,10 +372,7 @@ class _PaymentInformationScreenState extends ConsumerState<PaymentInformationScr
                 ),
                 child: Row(
                   children: [
-                    const Icon(
-                      Icons.security,
-                      color: AppColors.green9,
-                    ),
+                    const Icon(Icons.security, color: AppColors.green9),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(

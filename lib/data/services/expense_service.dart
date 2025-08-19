@@ -14,7 +14,8 @@ import 'robust_document_service.dart';
 
 class ExpenseService {
   static const String expensesCollectionId = AppConstants.expensesCollectionId;
-  static const String attachmentsCollectionId = AppConstants.expenseAttachmentsCollectionId;
+  static const String attachmentsCollectionId =
+      AppConstants.expenseAttachmentsCollectionId;
 
   Future<Map<String, dynamic>> createExpenseDocument({
     required Map<String, dynamic> data,
@@ -57,7 +58,9 @@ class ExpenseService {
     return map;
   }
 
-  Future<List<Map<String, dynamic>>> listDepartmentsForCampus(String campusId) async {
+  Future<List<Map<String, dynamic>>> listDepartmentsForCampus(
+    String campusId,
+  ) async {
     final results = await RobustDocumentService.listDocumentsRobust(
       databaseId: AppConstants.databaseId,
       collectionId: AppConstants.departmentsCollectionId,
@@ -80,10 +83,15 @@ class ExpenseService {
         Query.limit(100),
       ],
     );
-    return results.map((e) => {
-      'id': (e['\$id'] ?? '').toString(),
-      'name': (e['name'] ?? '').toString(),
-    }).where((e) => e['id']!.isNotEmpty && e['name']!.isNotEmpty).toList();
+    return results
+        .map(
+          (e) => {
+            'id': (e['\$id'] ?? '').toString(),
+            'name': (e['name'] ?? '').toString(),
+          },
+        )
+        .where((e) => e['id']!.isNotEmpty && e['name']!.isNotEmpty)
+        .toList();
   }
 
   Future<Map<String, dynamic>> analyzeReceiptText(String ocrText) async {
@@ -91,7 +99,8 @@ class ExpenseService {
     final projectId = client.config['project'];
     final cachedJwt = await RobustDocumentService.getSessionJwt();
     final jwt = cachedJwt ?? (await account.createJWT()).jwt;
-    final url = '$endpoint/functions/${AppConstants.fnParseReceiptId}/executions';
+    final url =
+        '$endpoint/functions/${AppConstants.fnParseReceiptId}/executions';
     final res = await http.post(
       Uri.parse(url),
       headers: {
@@ -119,7 +128,8 @@ class ExpenseService {
     final projectId = client.config['project'];
     final cachedJwt = await RobustDocumentService.getSessionJwt();
     final jwt = cachedJwt ?? (await account.createJWT()).jwt;
-    final url = '$endpoint/functions/${AppConstants.fnSummarizeExpenseId}/executions';
+    final url =
+        '$endpoint/functions/${AppConstants.fnSummarizeExpenseId}/executions';
     final payload = {'descriptions': descriptions};
     final res = await http.post(
       Uri.parse(url),
@@ -153,7 +163,7 @@ class ExpenseService {
   }) async {
     try {
       logPrint('💰 ExpenseService: Fetching user expenses');
-      
+
       // If no userId provided, get current user
       String targetUserId = userId ?? '';
       if (targetUserId.isEmpty) {
@@ -161,16 +171,15 @@ class ExpenseService {
           final user = await account.get();
           targetUserId = user.$id;
         } catch (e) {
-          logPrint('💰 ExpenseService: No authenticated user, returning empty list');
+          logPrint(
+            '💰 ExpenseService: No authenticated user, returning empty list',
+          );
           return [];
         }
       }
 
       // Build queries to filter by user
-      final userQueries = [
-        'equal("userId", "$targetUserId")',
-        ...queries,
-      ];
+      final userQueries = ['equal("userId", "$targetUserId")', ...queries];
 
       final documents = await RobustDocumentService.listDocumentsRobust(
         databaseId: AppConstants.databaseId,
@@ -186,15 +195,19 @@ class ExpenseService {
           // Fetch attachments for each expense
           final expenseId = doc['\$id'];
           final attachments = await _getExpenseAttachments(expenseId);
-          
+
           // Add attachments to document data
           final docWithAttachments = Map<String, dynamic>.from(doc);
-          docWithAttachments['expenseAttachments'] = attachments.map((a) => a.toMap()).toList();
-          
+          docWithAttachments['expenseAttachments'] = attachments
+              .map((a) => a.toMap())
+              .toList();
+
           final expense = ExpenseModel.fromMap(docWithAttachments);
           expenses.add(expense);
         } catch (e) {
-          logPrint('💰 ExpenseService: Failed to parse expense ${doc['\$id']}: $e');
+          logPrint(
+            '💰 ExpenseService: Failed to parse expense ${doc['\$id']}: $e',
+          );
           // Continue with other expenses instead of failing completely
         }
       }
@@ -219,10 +232,12 @@ class ExpenseService {
 
       // Fetch attachments
       final attachments = await _getExpenseAttachments(expenseId);
-      
+
       // Add attachments to document data
       final docWithAttachments = Map<String, dynamic>.from(doc);
-      docWithAttachments['expenseAttachments'] = attachments.map((a) => a.toMap()).toList();
+      docWithAttachments['expenseAttachments'] = attachments
+          .map((a) => a.toMap())
+          .toList();
 
       return ExpenseModel.fromMap(docWithAttachments);
     } catch (e) {
@@ -248,7 +263,7 @@ class ExpenseService {
 
       // Get current user
       final user = await account.get();
-      
+
       final expenseData = {
         'userId': user.$id,
         'campus': campus,
@@ -276,13 +291,14 @@ class ExpenseService {
         try {
           final attachmentData = attachment.toMap();
           attachmentData['expense_id'] = expenseId; // Link to expense
-          
-          final attachmentDoc = await RobustDocumentService.createDocumentRobust(
-            databaseId: AppConstants.databaseId,
-            collectionId: attachmentsCollectionId,
-            data: attachmentData,
-          );
-          
+
+          final attachmentDoc =
+              await RobustDocumentService.createDocumentRobust(
+                databaseId: AppConstants.databaseId,
+                collectionId: attachmentsCollectionId,
+                data: attachmentData,
+              );
+
           createdAttachments.add(ExpenseAttachmentModel.fromMap(attachmentDoc));
         } catch (e) {
           logPrint('💰 ExpenseService: Failed to create attachment: $e');
@@ -292,7 +308,9 @@ class ExpenseService {
 
       // Add attachments to document data and return expense
       final docWithAttachments = Map<String, dynamic>.from(doc);
-      docWithAttachments['expenseAttachments'] = createdAttachments.map((a) => a.toMap()).toList();
+      docWithAttachments['expenseAttachments'] = createdAttachments
+          .map((a) => a.toMap())
+          .toList();
 
       return ExpenseModel.fromMap(docWithAttachments);
     } catch (e) {
@@ -322,7 +340,7 @@ class ExpenseService {
       if (bankAccount != null) updateData['bank_account'] = bankAccount;
       if (description != null) updateData['description'] = description;
       if (total != null) updateData['total'] = total;
-      if (prepaymentAmount != null) updateData['prepayment_amount'] = prepaymentAmount;
+      if (prepaymentAmount != null) updateData['prepayment_amount'] = prepaymentAmount;        
       if (status != null) updateData['status'] = status;
       if (eventName != null) updateData['eventName'] = eventName;
 
@@ -335,10 +353,12 @@ class ExpenseService {
 
       // Fetch attachments
       final attachments = await _getExpenseAttachments(expenseId);
-      
+
       // Add attachments to document data
       final docWithAttachments = Map<String, dynamic>.from(doc);
-      docWithAttachments['expenseAttachments'] = attachments.map((a) => a.toMap()).toList();
+      docWithAttachments['expenseAttachments'] = attachments
+          .map((a) => a.toMap())
+          .toList();
 
       return ExpenseModel.fromMap(docWithAttachments);
     } catch (e) {
@@ -363,7 +383,9 @@ class ExpenseService {
               documentId: attachment.id!,
             );
           } catch (e) {
-            logPrint('💰 ExpenseService: Failed to delete attachment ${attachment.id}: $e');
+            logPrint(
+              '💰 ExpenseService: Failed to delete attachment ${attachment.id}: $e',
+            );
             // Continue with other attachments
           }
         }
@@ -418,9 +440,13 @@ class ExpenseService {
   }
 
   /// Get attachments for a specific expense
-  Future<List<ExpenseAttachmentModel>> _getExpenseAttachments(String expenseId) async {
+  Future<List<ExpenseAttachmentModel>> _getExpenseAttachments(
+    String expenseId,
+  ) async {
     try {
-      logPrint('💰 ExpenseService: Fetching attachments for expense $expenseId');
+      logPrint(
+        '💰 ExpenseService: Fetching attachments for expense $expenseId',
+      );
 
       final documents = await RobustDocumentService.listDocumentsRobust(
         databaseId: AppConstants.databaseId,
@@ -433,7 +459,9 @@ class ExpenseService {
             try {
               return ExpenseAttachmentModel.fromMap(doc);
             } catch (e) {
-              logPrint('💰 ExpenseService: Failed to parse attachment ${doc['\$id']}: $e');
+              logPrint(
+                '💰 ExpenseService: Failed to parse attachment ${doc['\$id']}: $e',
+              );
               return null;
             }
           })
@@ -450,7 +478,10 @@ class ExpenseService {
   }
 
   /// Get expenses filtered by status
-  Future<List<ExpenseModel>> getExpensesByStatus(String status, {String? userId}) async {
+  Future<List<ExpenseModel>> getExpensesByStatus(
+    String status, {
+    String? userId,
+  }) async {
     return getUserExpenses(
       userId: userId,
       queries: ['equal("status", "$status")'],
@@ -458,7 +489,10 @@ class ExpenseService {
   }
 
   /// Get expenses filtered by campus
-  Future<List<ExpenseModel>> getExpensesByCampus(String campus, {String? userId}) async {
+  Future<List<ExpenseModel>> getExpensesByCampus(
+    String campus, {
+    String? userId,
+  }) async {
     return getUserExpenses(
       userId: userId,
       queries: ['equal("campus", "$campus")'],
@@ -466,7 +500,10 @@ class ExpenseService {
   }
 
   /// Get expenses filtered by department
-  Future<List<ExpenseModel>> getExpensesByDepartment(String department, {String? userId}) async {
+  Future<List<ExpenseModel>> getExpensesByDepartment(
+    String department, {
+    String? userId,
+  }) async {
     return getUserExpenses(
       userId: userId,
       queries: ['equal("department", "$department")'],
@@ -477,7 +514,7 @@ class ExpenseService {
   Future<Map<String, dynamic>> getExpenseStatistics({String? userId}) async {
     try {
       final expenses = await getUserExpenses(userId: userId);
-      
+
       final stats = <String, dynamic>{
         'total_count': expenses.length,
         'total_amount': 0.0,
@@ -495,7 +532,7 @@ class ExpenseService {
 
       for (final expense in expenses) {
         stats['total_amount'] += expense.total;
-        
+
         switch (expense.status) {
           case 'pending':
             stats['pending_count']++;
@@ -528,5 +565,3 @@ class ExpenseService {
     }
   }
 }
-
-

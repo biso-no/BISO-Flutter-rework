@@ -47,16 +47,22 @@ class ChatModel extends Equatable {
       teamId: map['team_id'],
       departmentId: map['department_id'],
       avatarUrl: map['avatar_url'],
-      lastMessage: map['last_message'] != null 
-          ? ChatMessageModel.fromMap(map['last_message']) 
+      lastMessage: map['last_message'] != null
+          ? ChatMessageModel.fromMap(map['last_message'])
           : null,
       unreadCount: map['unread_count'] ?? 0,
       isActive: map['is_active'] ?? true,
       isMuted: map['is_muted'] ?? false,
       metadata: Map<String, dynamic>.from(map['metadata'] ?? {}),
-      createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
-      updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
-      lastActivityAt: map['last_activity_at'] != null ? DateTime.parse(map['last_activity_at']) : null,
+      createdAt: map['\$createdAt'] != null
+          ? DateTime.parse(map['\$createdAt'])
+          : null,
+      updatedAt: map['\$updatedAt'] != null
+          ? DateTime.parse(map['\$updatedAt'])
+          : null,
+      lastActivityAt: map['last_activity_at'] != null
+          ? DateTime.parse(map['last_activity_at'])
+          : null,
     );
   }
 
@@ -124,9 +130,22 @@ class ChatModel extends Equatable {
 
   @override
   List<Object?> get props => [
-    id, name, description, type, participants, teamId, departmentId,
-    avatarUrl, lastMessage, unreadCount, isActive, isMuted, metadata,
-    createdAt, updatedAt, lastActivityAt,
+    id,
+    name,
+    description,
+    type,
+    participants,
+    teamId,
+    departmentId,
+    avatarUrl,
+    lastMessage,
+    unreadCount,
+    isActive,
+    isMuted,
+    metadata,
+    createdAt,
+    updatedAt,
+    lastActivityAt,
   ];
 }
 
@@ -181,14 +200,19 @@ class ChatMessageModel extends Equatable {
       isEdited: map['is_edited'] ?? false,
       isDeleted: map['is_deleted'] ?? false,
       replyToId: map['reply_to_id'],
-      replyTo: map['reply_to'] != null ? ChatMessageModel.fromMap(map['reply_to']) : null,
+      replyTo: map['reply_to'] != null
+          ? ChatMessageModel.fromMap(map['reply_to'])
+          : null,
       reactions: Map<String, List<String>>.from(
         (map['reactions'] as Map<String, dynamic>?)?.map(
-          (key, value) => MapEntry(key, List<String>.from(value as List)),
-        ) ?? {},
+              (key, value) => MapEntry(key, List<String>.from(value as List)),
+            ) ??
+            {},
       ),
       timestamp: DateTime.parse(map['timestamp'] ?? map['\$createdAt']),
-      editedAt: map['edited_at'] != null ? DateTime.parse(map['edited_at']) : null,
+      editedAt: map['edited_at'] != null
+          ? DateTime.parse(map['edited_at'])
+          : null,
     );
   }
 
@@ -261,9 +285,22 @@ class ChatMessageModel extends Equatable {
 
   @override
   List<Object?> get props => [
-    id, chatId, senderId, senderName, senderAvatar, content, type,
-    attachments, metadata, isEdited, isDeleted, replyToId, replyTo,
-    reactions, timestamp, editedAt,
+    id,
+    chatId,
+    senderId,
+    senderName,
+    senderAvatar,
+    content,
+    type,
+    attachments,
+    metadata,
+    isEdited,
+    isDeleted,
+    replyToId,
+    replyTo,
+    reactions,
+    timestamp,
+    editedAt,
   ];
 }
 

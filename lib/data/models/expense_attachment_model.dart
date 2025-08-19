@@ -30,8 +30,12 @@ class ExpenseAttachmentModel extends Equatable {
       amount: map['amount'] != null ? (map['amount']).toDouble() : null,
       description: map['description'],
       type: map['type'] ?? '',
-      createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
-      updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
+      createdAt: map['\$createdAt'] != null
+          ? DateTime.parse(map['\$createdAt'])
+          : null,
+      updatedAt: map['\$updatedAt'] != null
+          ? DateTime.parse(map['\$updatedAt'])
+          : null,
     );
   }
 
@@ -96,11 +100,11 @@ class ExpenseAttachmentModel extends Equatable {
     if (url == null) return false;
     final extension = url!.toLowerCase();
     return extension.endsWith('.jpg') ||
-           extension.endsWith('.jpeg') ||
-           extension.endsWith('.png') ||
-           extension.endsWith('.gif') ||
-           extension.endsWith('.webp') ||
-           extension.endsWith('.heic');
+        extension.endsWith('.jpeg') ||
+        extension.endsWith('.png') ||
+        extension.endsWith('.gif') ||
+        extension.endsWith('.webp') ||
+        extension.endsWith('.heic');
   }
 
   bool get isPdf {
@@ -115,6 +119,13 @@ class ExpenseAttachmentModel extends Equatable {
 
   @override
   List<Object?> get props => [
-    id, date, url, amount, description, type, createdAt, updatedAt,
+    id,
+    date,
+    url,
+    amount,
+    description,
+    type,
+    createdAt,
+    updatedAt,
   ];
 }

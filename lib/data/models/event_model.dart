@@ -72,11 +72,16 @@ class EventModel extends Equatable {
       requiresRegistration: map['requires_registration'] ?? false,
       price: map['price']?.toDouble(),
       registrationUrl: map['registration_url'],
-      registrationDeadline: map['registration_deadline'] != null 
-          ? DateTime.parse(map['registration_deadline']) : null,
+      registrationDeadline: map['registration_deadline'] != null
+          ? DateTime.parse(map['registration_deadline'])
+          : null,
       status: map['status'] ?? 'upcoming',
-      createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
-      updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
+      createdAt: map['\$createdAt'] != null
+          ? DateTime.parse(map['\$createdAt'])
+          : null,
+      updatedAt: map['\$updatedAt'] != null
+          ? DateTime.parse(map['\$updatedAt'])
+          : null,
     );
   }
 
@@ -84,21 +89,32 @@ class EventModel extends Equatable {
   factory EventModel.fromWordPress(Map<String, dynamic> map) {
     return EventModel(
       id: (map['id'] ?? map['ID'] ?? '').toString(),
-      title: map['title'] is String ? (map['title'] ?? '') : (map['title']?['rendered'] ?? ''),
+      title: map['title'] is String
+          ? (map['title'] ?? '')
+          : (map['title']?['rendered'] ?? ''),
       description: map['description'] is String
           ? (map['description'] ?? '')
           : (map['content']?['rendered'] ?? map['excerpt']?['rendered'] ?? ''),
       startDate: DateTime.parse(
-          map['start_date'] ?? map['meta']?['start_date'] ?? DateTime.now().toIso8601String()),
+        map['start_date'] ??
+            map['meta']?['start_date'] ??
+            DateTime.now().toIso8601String(),
+      ),
       endDate: (map['end_date'] ?? map['meta']?['end_date']) != null
           ? DateTime.parse(map['end_date'] ?? map['meta']?['end_date'])
           : null,
       venue: map['venue'] ?? map['meta']?['venue'] ?? '',
       location: map['location'] ?? map['meta']?['location'],
-      organizerId: (map['organizer_id'] ?? map['meta']?['organizer_id'] ?? '').toString(),
-      organizerName: map['organizer_name'] ?? map['organizer'] ?? map['meta']?['organizer_name'] ?? '',
+      organizerId: (map['organizer_id'] ?? map['meta']?['organizer_id'] ?? '')
+          .toString(),
+      organizerName:
+          map['organizer_name'] ??
+          map['organizer'] ??
+          map['meta']?['organizer_name'] ??
+          '',
       organizerLogo: map['organizer_logo'] ?? map['meta']?['organizer_logo'],
-      campusId: (map['campus_id'] ?? map['meta']?['campus_id'] ?? '').toString(),
+      campusId: (map['campus_id'] ?? map['meta']?['campus_id'] ?? '')
+          .toString(),
       categories: (() {
         final raw = map['categories'] ?? map['category'] ?? [];
         if (raw is List) {
@@ -117,19 +133,46 @@ class EventModel extends Equatable {
         }
         return <String>[];
       })(),
-      maxAttendees: int.tryParse((map['max_attendees'] ?? map['meta']?['max_attendees'] ?? '0').toString()) ?? 0,
-      currentAttendees: int.tryParse((map['current_attendees'] ?? map['meta']?['current_attendees'] ?? '0').toString()) ?? 0,
-      isPublic: (map['is_public'] ?? map['meta']?['is_public']) == '1' || (map['is_public'] ?? map['meta']?['is_public']) == true,
-      requiresRegistration: (map['requires_registration'] ?? map['meta']?['requires_registration']) == '1' || (map['requires_registration'] ?? map['meta']?['requires_registration']) == true,
+      maxAttendees:
+          int.tryParse(
+            (map['max_attendees'] ?? map['meta']?['max_attendees'] ?? '0')
+                .toString(),
+          ) ??
+          0,
+      currentAttendees:
+          int.tryParse(
+            (map['current_attendees'] ??
+                    map['meta']?['current_attendees'] ??
+                    '0')
+                .toString(),
+          ) ??
+          0,
+      isPublic:
+          (map['is_public'] ?? map['meta']?['is_public']) == '1' ||
+          (map['is_public'] ?? map['meta']?['is_public']) == true,
+      requiresRegistration:
+          (map['requires_registration'] ??
+                  map['meta']?['requires_registration']) ==
+              '1' ||
+          (map['requires_registration'] ??
+                  map['meta']?['requires_registration']) ==
+              true,
       price: (() {
         final raw = map['price'] ?? map['meta']?['price'];
         return raw != null ? double.tryParse(raw.toString()) : null;
       })(),
       registrationUrl: map['registration_url'] ?? map['url'] ?? map['link'],
-      registrationDeadline: (map['registration_deadline'] ?? map['meta']?['registration_deadline']) != null 
-          ? DateTime.parse(map['registration_deadline'] ?? map['meta']?['registration_deadline'])
+      registrationDeadline:
+          (map['registration_deadline'] ??
+                  map['meta']?['registration_deadline']) !=
+              null
+          ? DateTime.parse(
+              map['registration_deadline'] ??
+                  map['meta']?['registration_deadline'],
+            )
           : null,
-      status: (map['status'] ?? map['meta']?['status'] ?? 'upcoming').toString(),
+      status: (map['status'] ?? map['meta']?['status'] ?? 'upcoming')
+          .toString(),
       createdAt: (() {
         final raw = map['date'] ?? map['created_at'] ?? map['createdAt'];
         return raw != null ? DateTime.parse(raw) : null;
@@ -228,13 +271,35 @@ class EventModel extends Equatable {
   bool get isCompleted => status == 'completed';
   bool get isCancelled => status == 'cancelled';
   bool get isFull => maxAttendees > 0 && currentAttendees >= maxAttendees;
-  bool get canRegister => isUpcoming && !isFull && (registrationDeadline?.isAfter(DateTime.now()) ?? true);
+  bool get canRegister =>
+      isUpcoming &&
+      !isFull &&
+      (registrationDeadline?.isAfter(DateTime.now()) ?? true);
 
   @override
   List<Object?> get props => [
-    id, title, description, startDate, endDate, venue, location,
-    organizerId, organizerName, organizerLogo, campusId, categories,
-    images, maxAttendees, currentAttendees, isPublic, requiresRegistration,
-    price, registrationUrl, registrationDeadline, status, createdAt, updatedAt,
+    id,
+    title,
+    description,
+    startDate,
+    endDate,
+    venue,
+    location,
+    organizerId,
+    organizerName,
+    organizerLogo,
+    campusId,
+    categories,
+    images,
+    maxAttendees,
+    currentAttendees,
+    isPublic,
+    requiresRegistration,
+    price,
+    registrationUrl,
+    registrationDeadline,
+    status,
+    createdAt,
+    updatedAt,
   ];
 }

@@ -10,26 +10,36 @@ final privacyServiceProvider = Provider<PrivacyService>((ref) {
 });
 
 // User privacy setting provider
-final userPrivacyProvider = FutureProvider.family<bool?, String>((ref, userId) async {
+final userPrivacyProvider = FutureProvider.family<bool?, String>((
+  ref,
+  userId,
+) async {
   final privacyService = ref.read(privacyServiceProvider);
   return await privacyService.getUserPrivacySetting(userId);
 });
 
 // Privacy prompt check provider
-final shouldPromptPrivacyProvider = FutureProvider.family<bool, String>((ref, userId) async {
+final shouldPromptPrivacyProvider = FutureProvider.family<bool, String>((
+  ref,
+  userId,
+) async {
   final privacyService = ref.read(privacyServiceProvider);
   return await privacyService.shouldPromptForPrivacy(userId);
 });
 
 // Privacy status description provider
-final privacyStatusProvider = FutureProvider.family<String, String>((ref, userId) async {
+final privacyStatusProvider = FutureProvider.family<String, String>((
+  ref,
+  userId,
+) async {
   final privacyService = ref.read(privacyServiceProvider);
   return await privacyService.getPrivacyStatusDescription(userId);
 });
 
 // Update privacy setting notifier
 class PrivacySettingNotifier extends StateNotifier<AsyncValue<bool>> {
-  PrivacySettingNotifier(this._privacyService, this._userId, this._ref) : super(const AsyncValue.loading());
+  PrivacySettingNotifier(this._privacyService, this._userId, this._ref)
+    : super(const AsyncValue.loading());
 
   final PrivacyService _privacyService;
   final String _userId;
@@ -37,7 +47,7 @@ class PrivacySettingNotifier extends StateNotifier<AsyncValue<bool>> {
 
   Future<void> updatePrivacySetting(bool isPublic) async {
     state = const AsyncValue.loading();
-    
+
     try {
       // Get current user data for public profile creation
       final authState = _ref.read(authStateProvider);
@@ -48,11 +58,14 @@ class PrivacySettingNotifier extends StateNotifier<AsyncValue<bool>> {
         isPublic,
         userData: userData,
       );
-      
+
       if (success) {
         state = AsyncValue.data(isPublic);
       } else {
-        state = AsyncValue.error('Failed to update privacy setting', StackTrace.current);
+        state = AsyncValue.error(
+          'Failed to update privacy setting',
+          StackTrace.current,
+        );
       }
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
@@ -74,7 +87,12 @@ class PrivacySettingNotifier extends StateNotifier<AsyncValue<bool>> {
 }
 
 // Privacy setting notifier provider
-final privacySettingProvider = StateNotifierProvider.family<PrivacySettingNotifier, AsyncValue<bool>, String>((ref, userId) {
-  final privacyService = ref.read(privacyServiceProvider);
-  return PrivacySettingNotifier(privacyService, userId, ref);
-});
+final privacySettingProvider =
+    StateNotifierProvider.family<
+      PrivacySettingNotifier,
+      AsyncValue<bool>,
+      String
+    >((ref, userId) {
+      final privacyService = ref.read(privacyServiceProvider);
+      return PrivacySettingNotifier(privacyService, userId, ref);
+    });

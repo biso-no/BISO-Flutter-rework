@@ -25,7 +25,7 @@ import '../auth/login_screen.dart';
 import '../profile/profile_screen.dart';
 
 /// Premium Home Screen
-/// 
+///
 /// A sophisticated, luxury redesign that showcases BI's exclusive nature.
 /// Features glass morphism, elegant animations, and premium visual hierarchy.
 class PremiumHomeScreen extends ConsumerStatefulWidget {
@@ -70,18 +70,18 @@ class _PremiumHomeScreenState extends ConsumerState<PremiumHomeScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final authState = ref.watch(authStateProvider);
-    
+
     final pages = [
       PremiumHomePage(navigateToTab: _navigateToTab),
       const ExploreScreen(),
-      authState.isAuthenticated 
+      authState.isAuthenticated
           ? const ChatListScreen()
           : PremiumAuthRequiredPage(
               title: l10n.chat,
               description: 'Connect with students and organizations across BI',
               icon: Icons.forum_outlined,
             ),
-      authState.isAuthenticated 
+      authState.isAuthenticated
           ? const ProfileScreen()
           : PremiumAuthRequiredPage(
               title: l10n.profile,
@@ -90,19 +90,16 @@ class _PremiumHomeScreenState extends ConsumerState<PremiumHomeScreen>
               navigateToTab: _navigateToTab,
             ),
     ];
-    
+
     return PremiumScaffold(
       extendBodyBehindAppBar: true,
       hasGradientBackground: true,
-      gradientColors: const [
-        AppColors.pearl,
-        Colors.white,
-      ],
+      gradientColors: const [AppColors.pearl, Colors.white],
       body: Stack(
         children: [
           // Main content
           pages[_selectedIndex],
-          
+
           // Floating bottom navigation
           Positioned(
             bottom: 0,
@@ -127,7 +124,9 @@ class _PremiumHomeScreenState extends ConsumerState<PremiumHomeScreen>
                   icon: Icons.forum_outlined,
                   activeIcon: Icons.forum_rounded,
                   label: l10n.chat,
-                  badge: authState.isAuthenticated ? null : const PremiumBadge(showDot: true),
+                  badge: authState.isAuthenticated
+                      ? null
+                      : const PremiumBadge(showDot: true),
                 ),
                 PremiumNavItem(
                   icon: Icons.person_outline_rounded,
@@ -148,28 +147,37 @@ class _PremiumHomeScreenState extends ConsumerState<PremiumHomeScreen>
 
 class PremiumHomePage extends ConsumerWidget {
   final Function(int) navigateToTab;
-  
+
   const PremiumHomePage({super.key, required this.navigateToTab});
 
   // Data providers
-  static final _eventServiceProvider = Provider<EventService>((ref) => EventService());
-  static final _productServiceProvider = Provider<ProductService>((ref) => ProductService());
-  static final _jobServiceProvider = Provider<JobService>((ref) => JobService());
+  static final _eventServiceProvider = Provider<EventService>(
+    (ref) => EventService(),
+  );
+  static final _productServiceProvider = Provider<ProductService>(
+    (ref) => ProductService(),
+  );
+  static final _jobServiceProvider = Provider<JobService>(
+    (ref) => JobService(),
+  );
 
-  static final _latestEventsProvider = FutureProvider.family<List<EventModel>, String>((ref, campusId) async {
-    final service = ref.watch(_eventServiceProvider);
-    return service.getWordPressEvents(campusId: campusId, limit: 6);
-  });
+  static final _latestEventsProvider =
+      FutureProvider.family<List<EventModel>, String>((ref, campusId) async {
+        final service = ref.watch(_eventServiceProvider);
+        return service.getWordPressEvents(campusId: campusId, limit: 6);
+      });
 
-  static final _latestProductsProvider = FutureProvider.family<List<ProductModel>, String>((ref, campusId) async {
-    final service = ref.watch(_productServiceProvider);
-    return service.getLatestProducts(campusId: campusId, limit: 6);
-  });
+  static final _latestProductsProvider =
+      FutureProvider.family<List<ProductModel>, String>((ref, campusId) async {
+        final service = ref.watch(_productServiceProvider);
+        return service.getLatestProducts(campusId: campusId, limit: 6);
+      });
 
-  static final _latestJobsProvider = FutureProvider.family<List<JobModel>, String>((ref, campusId) async {
-    final service = ref.watch(_jobServiceProvider);
-    return service.getLatestJobs(campusId: campusId, limit: 6);
-  });
+  static final _latestJobsProvider =
+      FutureProvider.family<List<JobModel>, String>((ref, campusId) async {
+        final service = ref.watch(_jobServiceProvider);
+        return service.getLatestJobs(campusId: campusId, limit: 6);
+      });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -196,7 +204,7 @@ class PremiumHomePage extends ConsumerWidget {
           ),
         ),
 
-/*
+        /*
         // Quick Actions Grid
         SliverToBoxAdapter(
           child: _PremiumQuickActions(
@@ -214,9 +222,8 @@ class PremiumHomePage extends ConsumerWidget {
           onViewAll: () => context.go('/explore/events'),
           asyncData: eventsAsync,
           campusId: campusId,
-          contentBuilder: (items) => _PremiumEventCarousel(
-            events: items.cast<EventModel>(),
-          ),
+          contentBuilder: (items) =>
+              _PremiumEventCarousel(events: items.cast<EventModel>()),
           ref: ref,
           providerFamily: _latestEventsProvider,
         ),
@@ -229,9 +236,8 @@ class PremiumHomePage extends ConsumerWidget {
           onViewAll: () => context.go('/explore/products'),
           asyncData: productsAsync,
           campusId: campusId,
-          contentBuilder: (items) => _PremiumProductGrid(
-            products: items.cast<ProductModel>(),
-          ),
+          contentBuilder: (items) =>
+              _PremiumProductGrid(products: items.cast<ProductModel>()),
           ref: ref,
           providerFamily: _latestProductsProvider,
         ),
@@ -244,17 +250,14 @@ class PremiumHomePage extends ConsumerWidget {
           onViewAll: () => context.go('/explore/volunteer'),
           asyncData: jobsAsync,
           campusId: campusId,
-          contentBuilder: (items) => _PremiumJobList(
-            jobs: items.cast<JobModel>(),
-          ),
+          contentBuilder: (items) =>
+              _PremiumJobList(jobs: items.cast<JobModel>()),
           ref: ref,
           providerFamily: _latestJobsProvider,
         ),
 
         // Bottom spacing for floating nav
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 120),
-        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 120)),
       ],
     );
   }
@@ -281,8 +284,10 @@ class PremiumHomePage extends ConsumerWidget {
         child: SizedBox(
           height: 320,
           child: asyncData.when(
-            data: (items) => items.isEmpty 
-                ? _PremiumEmptyState(message: 'Nothing here yet. Check back soon!')
+            data: (items) => items.isEmpty
+                ? _PremiumEmptyState(
+                    message: 'Nothing here yet. Check back soon!',
+                  )
                 : contentBuilder(items),
             loading: () => _PremiumLoadingCarousel(),
             error: (error, stackTrace) => _PremiumErrorState(
@@ -303,12 +308,14 @@ class PremiumHomePage extends ConsumerWidget {
         builder: (context, ref, child) {
           final selectedCampus = ref.watch(filterCampusProvider);
           final allCampuses = ref.watch(allCampusesSyncProvider);
-          
+
           return _CampusSwitcherModal(
             selectedCampus: selectedCampus,
             allCampuses: allCampuses,
             onCampusSelected: (campus) {
-              ref.read(filterCampusProvider.notifier).selectFilterCampus(campus);
+              ref
+                  .read(filterCampusProvider.notifier)
+                  .selectFilterCampus(campus);
               Navigator.pop(context);
             },
           );
@@ -367,7 +374,7 @@ class _PremiumHeroSection extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    Colors.white.withValues(alpha:0.1),
+                    Colors.white.withValues(alpha: 0.1),
                     Colors.transparent,
                   ],
                 ),
@@ -385,7 +392,7 @@ class _PremiumHeroSection extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.biLightBlue.withValues(alpha:0.2),
+                    AppColors.biLightBlue.withValues(alpha: 0.2),
                     Colors.transparent,
                   ],
                 ),
@@ -413,10 +420,7 @@ class _PremiumHeroSection extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    _CampusButton(
-                      campus: campus,
-                      onTap: onCampusTap,
-                    ),
+                    _CampusButton(campus: campus, onTap: onCampusTap),
                   ],
                 ),
 
@@ -450,7 +454,7 @@ class _PremiumHeroSection extends StatelessWidget {
                       const SizedBox(height: 32),
 
                       // Campus stats
-                     // _PremiumStatsRow(campus: campus),
+                      // _PremiumStatsRow(campus: campus),
                     ],
                   ),
                 ),
@@ -469,10 +473,7 @@ class _CampusButton extends StatelessWidget {
   final dynamic campus;
   final VoidCallback onTap;
 
-  const _CampusButton({
-    required this.campus,
-    required this.onTap,
-  });
+  const _CampusButton({required this.campus, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -492,11 +493,7 @@ class _CampusButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.location_on_rounded,
-              size: 18,
-              color: Colors.white,
-            ),
+            Icon(Icons.location_on_rounded, size: 18, color: Colors.white),
             const SizedBox(width: 8),
             Text(
               campus.name,
@@ -551,7 +548,7 @@ class _CampusSwitcherModal extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Header
           Padding(
             padding: const EdgeInsets.all(20),
@@ -861,7 +858,11 @@ class _PremiumQuickActions extends StatelessWidget {
             icon: Icons.receipt_long_rounded,
             gradientColors: AppColors.expenseGradient,
             trailing: !authState.isAuthenticated
-                ? Icon(Icons.lock_rounded, size: 16, color: Colors.white.withValues(alpha:0.8))
+                ? Icon(
+                    Icons.lock_rounded,
+                    size: 16,
+                    color: Colors.white.withValues(alpha: 0.8),
+                  )
                 : null,
             onTap: () {
               if (!authState.isAuthenticated) {
@@ -959,7 +960,7 @@ class _PremiumActionCardState extends State<_PremiumActionCard>
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: widget.gradientColors.first.withValues(alpha:0.3),
+                    color: widget.gradientColors.first.withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -972,9 +973,7 @@ class _PremiumActionCardState extends State<_PremiumActionCard>
                   Positioned.fill(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(24),
-                      child: CustomPaint(
-                        painter: _PatternPainter(),
-                      ),
+                      child: CustomPaint(painter: _PatternPainter()),
                     ),
                   ),
 
@@ -989,7 +988,7 @@ class _PremiumActionCardState extends State<_PremiumActionCard>
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha:0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Icon(
@@ -1046,7 +1045,7 @@ class _PatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withValues(alpha:0.1)
+      ..color = Colors.white.withValues(alpha: 0.1)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
@@ -1055,10 +1054,7 @@ class _PatternPainter extends CustomPainter {
 
     for (double i = -spacing; i < size.width + spacing; i += spacing) {
       for (double j = -spacing; j < size.height + spacing; j += spacing) {
-        path.addOval(Rect.fromCircle(
-          center: Offset(i, j),
-          radius: 2,
-        ));
+        path.addOval(Rect.fromCircle(center: Offset(i, j), radius: 2));
       }
     }
 
@@ -1083,13 +1079,10 @@ class _PremiumEventCarousel extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
       itemCount: events.length,
-      separatorBuilder: (_, __) => const SizedBox(width: 16),
+      separatorBuilder: (_, _) => const SizedBox(width: 16),
       itemBuilder: (context, index) {
         final event = events[index];
-        return SizedBox(
-          width: 280,
-          child: _PremiumEventCard(event: event),
-        );
+        return SizedBox(width: 280, child: _PremiumEventCard(event: event));
       },
     );
   }
@@ -1114,10 +1107,10 @@ class _PremiumEventCard extends StatelessWidget {
           Container(
             height: 140,
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-              gradient: LinearGradient(
-                colors: AppColors.eventGradient,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
               ),
+              gradient: LinearGradient(colors: AppColors.eventGradient),
             ),
             child: Stack(
               children: [
@@ -1125,7 +1118,10 @@ class _PremiumEventCard extends StatelessWidget {
                   top: 12,
                   right: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(8),
@@ -1246,9 +1242,7 @@ class _PremiumProductCard extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                gradient: LinearGradient(
-                  colors: AppColors.marketplaceGradient,
-                ),
+                gradient: LinearGradient(colors: AppColors.marketplaceGradient),
               ),
               child: Center(
                 child: Icon(
@@ -1267,33 +1261,33 @@ class _PremiumProductCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                Text(
-                  product.name,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+              Text(
+                product.name,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
 
-                Text(
-                  product.formattedPrice,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: AppColors.biLightBlue,
-                    fontWeight: FontWeight.w700,
-                  ),
+              Text(
+                product.formattedPrice,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: AppColors.biLightBlue,
+                  fontWeight: FontWeight.w700,
                 ),
+              ),
 
-                Text(
-                  'by ${product.sellerName}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.stoneGray,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              Text(
+                'by ${product.sellerName}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppColors.stoneGray,
                 ),
-              ],
-            ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -1312,13 +1306,10 @@ class _PremiumJobList extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
       itemCount: jobs.length,
-      separatorBuilder: (_, __) => const SizedBox(width: 16),
+      separatorBuilder: (_, _) => const SizedBox(width: 16),
       itemBuilder: (context, index) {
         final job = jobs[index];
-        return SizedBox(
-          width: 260,
-          child: _PremiumJobCard(job: job),
-        );
+        return SizedBox(width: 260, child: _PremiumJobCard(job: job));
       },
     );
   }
@@ -1342,7 +1333,7 @@ class _PremiumJobCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.biLightBlue.withValues(alpha:0.1),
+              color: AppColors.biLightBlue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -1385,7 +1376,6 @@ class _PremiumJobCard extends StatelessWidget {
 
           const SizedBox(height: 8),
 
-
           const SizedBox(height: 12),
 
           // Apply button - reduced padding
@@ -1411,16 +1401,14 @@ class _PremiumLoadingCarousel extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       scrollDirection: Axis.horizontal,
       itemCount: 3,
-      separatorBuilder: (_, __) => const SizedBox(width: 16),
-      itemBuilder: (_, __) => Container(
+      separatorBuilder: (_, _) => const SizedBox(width: 16),
+      itemBuilder: (_, _) => Container(
         width: 280,
         decoration: BoxDecoration(
           color: AppColors.cloud,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        child: const Center(child: CircularProgressIndicator()),
       ),
     );
   }
@@ -1439,11 +1427,7 @@ class _PremiumEmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.inbox_outlined,
-            size: 48,
-            color: AppColors.mist,
-          ),
+          Icon(Icons.inbox_outlined, size: 48, color: AppColors.mist),
           const SizedBox(height: 16),
           Text(
             message,
@@ -1471,11 +1455,7 @@ class _PremiumErrorState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline_rounded,
-            size: 48,
-            color: AppColors.error,
-          ),
+          Icon(Icons.error_outline_rounded, size: 48, color: AppColors.error),
           const SizedBox(height: 16),
           Text(
             'Failed to load content',
@@ -1484,11 +1464,7 @@ class _PremiumErrorState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          PremiumButton(
-            text: 'Retry',
-            isSecondary: true,
-            onPressed: onRetry,
-          ),
+          PremiumButton(text: 'Retry', isSecondary: true, onPressed: onRetry),
         ],
       ),
     );
@@ -1527,11 +1503,7 @@ class PremiumAuthRequiredPage extends ConsumerWidget {
                 width: 120,
                 height: 120,
                 isGlass: true,
-                child: Icon(
-                  icon,
-                  size: 48,
-                  color: AppColors.biLightBlue,
-                ),
+                child: Icon(icon, size: 48, color: AppColors.biLightBlue),
               ),
 
               const SizedBox(height: 32),
@@ -1564,7 +1536,9 @@ class PremiumAuthRequiredPage extends ConsumerWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
                   );
                 },
               ),
@@ -1580,9 +1554,10 @@ class PremiumAuthRequiredPage extends ConsumerWidget {
               PremiumButton(
                 text: 'Clear session',
                 isSecondary: true,
-                onPressed: () => ref.read(authStateProvider.notifier).clearSession(),
+                onPressed: () =>
+                    ref.read(authStateProvider.notifier).clearSession(),
                 width: double.infinity,
-              )
+              ),
             ],
           ),
         ),
@@ -1603,19 +1578,13 @@ class _PremiumAuthDialog extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.lock_rounded,
-              size: 48,
-              color: AppColors.biLightBlue,
-            ),
+            Icon(Icons.lock_rounded, size: 48, color: AppColors.biLightBlue),
 
             const SizedBox(height: 16),
 
@@ -1655,7 +1624,9 @@ class _PremiumAuthDialog extends StatelessWidget {
                       Navigator.of(context).pop();
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
                       );
                     },
                   ),

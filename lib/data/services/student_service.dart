@@ -20,13 +20,14 @@ class StudentService {
   Future<String> registerStudentIdViaOAuth() async {
     try {
       AppLogger.info('Starting OAuth student ID registration');
-      
+
       // Microsoft Azure configuration for BI tenant
       const String clientId = '09d8bb72-2cef-4b98-a1d3-2414a7a40873';
       const String tenantId = 'adee44b2-91fc-40f1-abdd-9cc29351b5fd';
-      const String discoveryUrl = 'https://login.microsoftonline.com/$tenantId/v2.0';
+      const String discoveryUrl =
+          'https://login.microsoftonline.com/$tenantId/v2.0';
       const String redirectUrl = 'com.biso.no://oauth/callback';
-      
+
       // OAuth2 request configuration
       final AuthorizationTokenRequest request = AuthorizationTokenRequest(
         clientId,
@@ -38,72 +39,80 @@ class StudentService {
           'response_mode': 'query',
         },
       );
-      
+
       AppLogger.info('Initiating OAuth flow with Microsoft Azure');
-      
+
       // Perform OAuth flow
-      final AuthorizationTokenResponse? response = await _appAuth.authorizeAndExchangeCode(request);
-      
+      // ignore: unnecessary_nullable_for_final_variable_declarations
+      final AuthorizationTokenResponse? response = await _appAuth
+          .authorizeAndExchangeCode(request);
+
       if (response == null) {
         throw StudentException('OAuth flow was cancelled by user');
       }
-      
+
       final AuthorizationTokenResponse result = response;
-      
+
       if (result.accessToken == null) {
         throw StudentException('Failed to obtain access token from Microsoft');
       }
-      
+
       AppLogger.info('OAuth flow completed successfully, fetching user email');
-      
+
       // Fetch user email from Microsoft Graph API
-      final String email = await _fetchUserEmailFromMicrosoft(result.accessToken!);
-      
+      final String email = await _fetchUserEmailFromMicrosoft(
+        result.accessToken!,
+      );
+
       // Validate email domain
       if (!email.endsWith('@bi.no') && !email.endsWith('@biso.no')) {
-        throw StudentException('Please use a valid BI email address ending with @bi.no or @biso.no');
+        throw StudentException(
+          'Please use a valid BI email address ending with @bi.no or @biso.no',
+        );
       }
-      
+
       // Extract student number from email
-      final String studentNumber = email.replaceAll(RegExp(r'@(bi\.no|biso\.no)$'), '');
-      
-      AppLogger.info('Student number extracted from email', extra: {
-        'studentNumber': studentNumber,
-        'email': email,
-      });
-      
+      final String studentNumber = email.replaceAll(
+        RegExp(r'@(bi\.no|biso\.no)$'),
+        '',
+      );
+
+      AppLogger.info(
+        'Student number extracted from email',
+        extra: {'studentNumber': studentNumber, 'email': email},
+      );
+
       // Get current user
       final currentUser = await _authService.getCurrentUser();
       if (currentUser == null) {
         throw StudentException('User not authenticated. Please log in first.');
       }
-      
+
       // Create student ID record
       final studentRecord = await createStudentIdRecord(
         userId: currentUser.id,
         studentNumber: studentNumber,
         isVerified: true, // OAuth verification counts as verified
       );
-      
+
       // Update user profile to link student ID
       await RobustDocumentService.updateDocumentRobust(
         databaseId: AppConstants.databaseId,
         collectionId: 'user',
         documentId: currentUser.id,
-        data: {
-          'student_id': studentNumber,
-          'student': studentRecord.id,
+        data: {'student_id': studentNumber, 'student': studentRecord.id},
+      );
+
+      AppLogger.info(
+        'OAuth student registration completed successfully',
+        extra: {
+          'userId': currentUser.id,
+          'studentNumber': studentNumber,
+          'studentRecordId': studentRecord.id,
         },
       );
-      
-      AppLogger.info('OAuth student registration completed successfully', extra: {
-        'userId': currentUser.id,
-        'studentNumber': studentNumber,
-        'studentRecordId': studentRecord.id,
-      });
-      
+
       return studentNumber;
-      
     } catch (e) {
       AppLogger.error('OAuth student registration failed', error: e.toString());
       if (e is StudentException) {
@@ -112,7 +121,7 @@ class StudentService {
       throw StudentException('OAuth registration failed: $e');
     }
   }
-  
+
   /// Fetches user email from Microsoft Graph API using access token
   Future<String> _fetchUserEmailFromMicrosoft(String accessToken) async {
     try {
@@ -123,22 +132,26 @@ class StudentService {
           'Content-Type': 'application/json',
         },
       );
-      
+
       if (response.statusCode != 200) {
-        throw StudentException('Failed to fetch user email from Microsoft: ${response.statusCode}');
+        throw StudentException(
+          'Failed to fetch user email from Microsoft: ${response.statusCode}',
+        );
       }
-      
+
       final dynamic userData = json.decode(response.body);
       final String? email = userData['email'];
-      
+
       if (email == null || email.isEmpty) {
         throw StudentException('Email not found in Microsoft user profile');
       }
-      
+
       return email;
-      
     } catch (e) {
-      AppLogger.error('Error fetching user email from Microsoft', error: e.toString());
+      AppLogger.error(
+        'Error fetching user email from Microsoft',
+        error: e.toString(),
+      );
       throw StudentException('Failed to fetch user email: $e');
     }
   }
@@ -176,19 +189,25 @@ class StudentService {
   /// Returns true if the student is a member
   Future<bool> checkMembershipStatus(String studentNumber) async {
     try {
-      AppLogger.info('Checking membership status for student', extra: {
-        'studentNumber': studentNumber,
-      });
+      AppLogger.info(
+        'Checking membership status for student',
+        extra: {'studentNumber': studentNumber},
+      );
 
       // Use the existing MembershipService which properly calls verify_biso_membership
       final membershipService = MembershipService();
-      final verificationResult = await membershipService.verifyMembership(studentNumber);
-      
-      AppLogger.info('Membership check completed', extra: {
-        'studentNumber': studentNumber,
-        'isMember': verificationResult.isMember,
-        'membershipName': verificationResult.membership?.name,
-      });
+      final verificationResult = await membershipService.verifyMembership(
+        studentNumber,
+      );
+
+      AppLogger.info(
+        'Membership check completed',
+        extra: {
+          'studentNumber': studentNumber,
+          'isMember': verificationResult.isMember,
+          'membershipName': verificationResult.membership?.name,
+        },
+      );
 
       return verificationResult.isMember;
     } catch (e) {
@@ -221,7 +240,6 @@ class StudentService {
     }
   }
 
-
   /// Removes student ID record
   Future<void> removeStudentId(String userId) async {
     try {
@@ -243,16 +261,13 @@ class StudentService {
         databaseId: AppConstants.databaseId,
         collectionId: 'user',
         documentId: userId,
-        data: {
-          'student_id': null,
-          'student': null,
-        },
+        data: {'student_id': null, 'student': null},
       );
 
-      AppLogger.info('Student ID removed successfully', extra: {
-        'userId': userId,
-        'studentNumber': studentRecord.studentNumber,
-      });
+      AppLogger.info(
+        'Student ID removed successfully',
+        extra: {'userId': userId, 'studentNumber': studentRecord.studentNumber},
+      );
     } catch (e) {
       throw StudentException('Failed to remove student ID: $e');
     }
@@ -263,17 +278,18 @@ class StudentService {
     try {
       // Use the existing membership service to get available memberships
       final membershipService = MembershipService();
-      final availableMemberships = await membershipService.getAvailableMemberships();
-      
+      final availableMemberships = await membershipService
+          .getAvailableMemberships();
+
       if (availableMemberships.isEmpty) {
         throw StudentException('No membership options available at the moment');
       }
-      
+
       // For now, we'll launch the purchase page URL directly
       // In a complete implementation, you would show a membership selection dialog
       // and then call membershipService.initiateMembershipCheckout()
       const membershipUrl = 'https://biso.no/membership';
-      
+
       if (await canLaunchUrl(Uri.parse(membershipUrl))) {
         await launchUrl(
           Uri.parse(membershipUrl),

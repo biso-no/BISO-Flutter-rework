@@ -35,28 +35,20 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
       duration: const Duration(seconds: 20),
       vsync: this,
     )..repeat();
-    
+
     _overlayController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
-    _parallaxAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _parallaxController,
-      curve: Curves.linear,
-    ));
-    
-    _overlayAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _overlayController,
-      curve: Curves.easeInOut,
-    ));
-    
+
+    _parallaxAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _parallaxController, curve: Curves.linear),
+    );
+
+    _overlayAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _overlayController, curve: Curves.easeInOut),
+    );
+
     // Start overlay animation
     _overlayController.forward();
   }
@@ -72,7 +64,7 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final gradientColors = _getCampusGradient(widget.campus.id);
-    
+
     return SliverAppBar(
       expandedHeight: widget.expandedHeight,
       floating: false,
@@ -85,8 +77,11 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
           final double maxExtent = widget.expandedHeight;
           final double minExtent = kToolbarHeight + topPadding;
           final double currentExtent = constraints.biggest.height;
-          final double t = ((maxExtent - currentExtent) / (maxExtent - minExtent))
-              .clamp(0.0, 1.0);
+          final double t =
+              ((maxExtent - currentExtent) / (maxExtent - minExtent)).clamp(
+                0.0,
+                1.0,
+              );
 
           return Stack(
             children: [
@@ -122,7 +117,7 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
                                 color: Colors.black.withValues(alpha: 0.06 * t),
                                 blurRadius: 12 * t,
                                 offset: const Offset(0, 4),
-                              )
+                              ),
                             ]
                           : null,
                     ),
@@ -145,7 +140,7 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
 
   Widget _buildCampusBackground() {
     final imagePath = _getCampusImagePath(widget.campus.id);
-    
+
     return Positioned.fill(
       child: Image.asset(
         imagePath,
@@ -185,13 +180,7 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
                 colors.first.withValues(alpha: 0.8),
                 colors.last.withValues(alpha: 0.9),
               ],
-              stops: [
-                0.0,
-                0.3,
-                0.5,
-                0.8,
-                1.0,
-              ],
+              stops: [0.0, 0.3, 0.5, 0.8, 1.0],
             ),
           ),
         );
@@ -215,7 +204,6 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
     );
   }
 
-
   String _getCampusImagePath(String campusId) {
     switch (campusId.toLowerCase()) {
       case 'oslo':
@@ -231,7 +219,6 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
     }
   }
 
-
   Widget _buildContentOverlay(ThemeData theme) {
     return Positioned(
       bottom: 80,
@@ -241,10 +228,7 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
         animation: _overlayAnimation,
         builder: (context, child) {
           return Transform.translate(
-            offset: Offset(
-              0,
-              (1 - _overlayAnimation.value) * 50,
-            ),
+            offset: Offset(0, (1 - _overlayAnimation.value) * 50),
             child: Opacity(
               opacity: _overlayAnimation.value,
               child: Column(
@@ -285,7 +269,7 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
                     ),
                   ),
                   const SizedBox(height: 12),
-                  
+
                   // Campus description
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -326,10 +310,7 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
         animation: _overlayAnimation,
         builder: (context, child) {
           return Transform.translate(
-            offset: Offset(
-              0,
-              (1 - _overlayAnimation.value) * 30,
-            ),
+            offset: Offset(0, (1 - _overlayAnimation.value) * 30),
             child: Opacity(
               opacity: _overlayAnimation.value * 0.9,
               child: Row(
@@ -338,14 +319,15 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
                   if (widget.campus.weather != null) ...[
                     _buildStatPill(
                       icon: widget.campus.weather!.icon,
-                      value: '${widget.campus.weather!.temperature.toStringAsFixed(0)}°',
+                      value:
+                          '${widget.campus.weather!.temperature.toStringAsFixed(0)}°',
                       label: widget.campus.weather!.condition,
                       theme: theme,
                       isWeather: true,
                     ),
                     const SizedBox(width: 12),
                   ],
-                  
+
                   // Stats
                   Expanded(
                     child: Row(
@@ -353,7 +335,8 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
                       children: [
                         _buildStatPill(
                           icon: '👥',
-                          value: '${(widget.campus.stats.studentCount / 1000).toStringAsFixed(1)}k',
+                          value:
+                              '${(widget.campus.stats.studentCount / 1000).toStringAsFixed(1)}k',
                           label: 'Students',
                           theme: theme,
                         ),
@@ -412,10 +395,7 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
           ? Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  icon,
-                  style: const TextStyle(fontSize: 20),
-                ),
+                Text(icon, style: const TextStyle(fontSize: 20)),
                 const SizedBox(width: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -443,10 +423,7 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
           : Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  icon,
-                  style: const TextStyle(fontSize: 16),
-                ),
+                Text(icon, style: const TextStyle(fontSize: 16)),
                 const SizedBox(height: 2),
                 Text(
                   value,
@@ -490,10 +467,7 @@ class WonderousPatternPainter extends CustomPainter {
   final double animation;
   final CampusModel campus;
 
-  WonderousPatternPainter({
-    required this.animation,
-    required this.campus,
-  });
+  WonderousPatternPainter({required this.animation, required this.campus});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -534,20 +508,25 @@ class WonderousPatternPainter extends CustomPainter {
     }
   }
 
-  void _drawMountainPattern(Canvas canvas, Size size, Paint fill, Paint stroke) {
+  void _drawMountainPattern(
+    Canvas canvas,
+    Size size,
+    Paint fill,
+    Paint stroke,
+  ) {
     // Draw animated mountain silhouettes
     final path = Path();
     path.moveTo(0, size.height);
-    
+
     for (int i = 0; i <= 10; i++) {
       final x = (size.width / 10) * i;
       final y = size.height - (60 + math.sin(animation + i * 0.5) * 30);
       path.lineTo(x, y);
     }
-    
+
     path.lineTo(size.width, size.height);
     path.close();
-    
+
     canvas.drawPath(path, fill);
     canvas.drawPath(path, stroke);
   }
@@ -556,12 +535,12 @@ class WonderousPatternPainter extends CustomPainter {
     // Draw flowing river-like curves
     final path = Path();
     path.moveTo(0, size.height * 0.7);
-    
+
     for (double x = 0; x <= size.width; x += 20) {
       final y = size.height * 0.7 + math.sin((x / 50) + animation * 2) * 20;
       path.lineTo(x, y);
     }
-    
+
     canvas.drawPath(path, stroke);
   }
 
@@ -571,12 +550,12 @@ class WonderousPatternPainter extends CustomPainter {
       final path = Path();
       final yOffset = size.height * 0.8 + (i * 15);
       path.moveTo(0, yOffset);
-      
+
       for (double x = 0; x <= size.width; x += 40) {
         final y = yOffset + math.sin((x / 30) + animation * 3 + i) * 10;
         path.lineTo(x, y);
       }
-      
+
       canvas.drawPath(path, stroke);
     }
   }

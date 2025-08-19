@@ -39,27 +39,25 @@ import 'data/services/notification_service.dart';
 // Background message handler for Firebase
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // Handle background messages here if needed
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize logging system early
   await LoggingConfig.initialize();
-  
+
   // Initialize Firebase
   await Firebase.initializeApp();
-  
+
   // Initialize Firebase Messaging for background notifications
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  
+
   // Initialize notification service
   await NotificationService().initialize();
-  
+
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -69,7 +67,7 @@ void main() async {
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
-  
+
   runApp(const ProviderScope(child: BisoApp()));
 }
 
@@ -80,7 +78,7 @@ class BisoApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch auth state and initialize user data when authenticated
     ref.watch(authStateProvider);
-    
+
     // Auth state listener is now handled internally by AuthProvider
     // No need for external orchestration
 
@@ -96,10 +94,7 @@ class BisoApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('no'),
-      ],
+      supportedLocales: const [Locale('en'), Locale('no')],
       routerConfig: _router,
     );
   }
@@ -118,16 +113,15 @@ final _router = GoRouter(
     GoRoute(
       path: '/auth/verify-otp',
       name: 'verify-otp',
-      builder: (context, state) => OtpVerificationScreen(
-        email: state.extra as String? ?? '',
-      ),
+      builder: (context, state) =>
+          OtpVerificationScreen(email: state.extra as String? ?? ''),
     ),
     GoRoute(
       path: '/onboarding',
       name: 'onboarding',
       builder: (context, state) => const OnboardingScreen(),
     ),
-    
+
     // Main app shell with tab navigation
     ShellRoute(
       builder: (context, state, child) {
@@ -135,23 +129,18 @@ final _router = GoRouter(
       },
       routes: [
         // Main tabs
-        GoRoute(
-          path: '/',
-          redirect: (context, state) => '/home',
-        ),
+        GoRoute(path: '/', redirect: (context, state) => '/home'),
         GoRoute(
           path: '/home',
           name: 'home',
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: _HomePage(),
-          ),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: _HomePage()),
         ),
         GoRoute(
           path: '/explore',
           name: 'explore',
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: _ExplorePage(),
-          ),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: _ExplorePage()),
           routes: [
             // Explore sub-routes - these will now properly return to explore tab
             GoRoute(
@@ -161,7 +150,7 @@ final _router = GoRouter(
             ),
             GoRoute(
               path: '/products',
-              name: 'products', 
+              name: 'products',
               builder: (context, state) => const market.MarketplaceScreen(),
               routes: [
                 GoRoute(
@@ -176,7 +165,7 @@ final _router = GoRouter(
                     productId: state.pathParameters['productId']!,
                   ),
                 ),
-              ],  
+              ],
             ),
             GoRoute(
               path: '/units',
@@ -212,20 +201,18 @@ final _router = GoRouter(
         GoRoute(
           path: '/chat',
           name: 'chat',
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: _ChatPage(),
-          ),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: _ChatPage()),
         ),
         GoRoute(
           path: '/profile',
           name: 'profile',
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: _ProfilePage(),
-          ),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: _ProfilePage()),
         ),
       ],
     ),
-    
+
     // Special routes (outside shell)
     GoRoute(
       path: '/events/large/:slug',
@@ -251,7 +238,7 @@ final _router = GoRouter(
 // App Shell that contains the bottom navigation and manages tab state
 class _AppShell extends ConsumerStatefulWidget {
   final Widget child;
-  
+
   const _AppShell({required this.child});
 
   @override
@@ -265,7 +252,7 @@ class _AppShellState extends ConsumerState<_AppShell> {
     setState(() {
       _selectedIndex = index;
     });
-    
+
     // Navigate to the appropriate tab route
     switch (index) {
       case 0:
@@ -303,7 +290,7 @@ class _AppShellState extends ConsumerState<_AppShell> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final authState = ref.watch(authStateProvider);
-    
+
     return Scaffold(
       body: widget.child,
       bottomNavigationBar: Container(
@@ -411,7 +398,7 @@ class _ChatPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
     final l10n = AppLocalizations.of(context);
-    
+
     if (authState.isAuthenticated) {
       return const ChatListScreen();
     } else {
@@ -431,7 +418,7 @@ class _ProfilePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
     final l10n = AppLocalizations.of(context);
-    
+
     if (authState.isAuthenticated) {
       return const ProfileScreen();
     } else {

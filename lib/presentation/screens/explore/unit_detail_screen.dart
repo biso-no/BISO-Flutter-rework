@@ -7,15 +7,19 @@ import '../../../data/models/department_model.dart';
 import '../../../data/services/department_service.dart';
 import '../../widgets/premium/premium_html_renderer.dart';
 
-final _departmentProvider = FutureProvider.family<DepartmentModel?, String>((ref, id) async {
+final _departmentProvider = FutureProvider.family<DepartmentModel?, String>((
+  ref,
+  id,
+) async {
   final service = DepartmentService();
   return await service.getDepartmentById(id);
 });
 
-final _socialsProvider = FutureProvider.family<List<Map<String, dynamic>>, String>((ref, id) async {
-  final service = DepartmentService();
-  return await service.getDepartmentSocials(id);
-});
+final _socialsProvider =
+    FutureProvider.family<List<Map<String, dynamic>>, String>((ref, id) async {
+      final service = DepartmentService();
+      return await service.getDepartmentSocials(id);
+    });
 
 class UnitDetailScreen extends ConsumerWidget {
   final String departmentId;
@@ -28,9 +32,7 @@ class UnitDetailScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Organization'),
-      ),
+      appBar: AppBar(title: const Text('Organization')),
       body: asyncDept.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Failed to load: $e')),
@@ -43,16 +45,26 @@ class UnitDetailScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AspectRatio(
-                  aspectRatio: 16/9,
+                  aspectRatio: 16 / 9,
                   child: Container(
                     color: AppColors.subtleBlue,
                     child: (dept.logo != null && dept.logo!.isNotEmpty)
                         ? Image.network(
                             dept.logo!,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.image_not_supported_outlined, color: AppColors.defaultBlue)),
+                            errorBuilder: (_, _, _) => const Center(
+                              child: Icon(
+                                Icons.image_not_supported_outlined,
+                                color: AppColors.defaultBlue,
+                              ),
+                            ),
                           )
-                        : const Center(child: Icon(Icons.apartment_rounded, color: AppColors.defaultBlue)),
+                        : const Center(
+                            child: Icon(
+                              Icons.apartment_rounded,
+                              color: AppColors.defaultBlue,
+                            ),
+                          ),
                   ),
                 ),
                 Padding(
@@ -60,7 +72,12 @@ class UnitDetailScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(dept.name, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+                      Text(
+                        dept.name,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       if ((dept.type ?? '').isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Chip(label: Text(dept.type!)),
@@ -72,7 +89,12 @@ class UnitDetailScreen extends ConsumerWidget {
                           padding: const EdgeInsets.only(top: 4),
                         ),
                       const SizedBox(height: 24),
-                      Text('Find us online', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                      Text(
+                        'Find us online',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       asyncSocials.when(
                         loading: () => const Padding(
@@ -95,7 +117,10 @@ class UnitDetailScreen extends ConsumerWidget {
                                 label: Text(_labelForPlatform(platform)),
                                 onPressed: () {
                                   if (link.isNotEmpty) {
-                                    launchUrl(Uri.parse(link), mode: LaunchMode.externalApplication);
+                                    launchUrl(
+                                      Uri.parse(link),
+                                      mode: LaunchMode.externalApplication,
+                                    );
                                   }
                                 },
                               );
@@ -105,7 +130,7 @@ class UnitDetailScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           );
@@ -152,5 +177,3 @@ String _labelForPlatform(String platform) {
       return 'Website';
   }
 }
-
-

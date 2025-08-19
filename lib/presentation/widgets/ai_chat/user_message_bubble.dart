@@ -6,10 +6,7 @@ import '../../../core/constants/app_colors.dart';
 class UserMessageBubble extends StatefulWidget {
   final ChatMessage message;
 
-  const UserMessageBubble({
-    super.key,
-    required this.message,
-  });
+  const UserMessageBubble({super.key, required this.message});
 
   @override
   State<UserMessageBubble> createState() => _UserMessageBubbleState();
@@ -29,21 +26,16 @@ class _UserMessageBubbleState extends State<UserMessageBubble>
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+      ),
+    );
 
     _animationController.forward();
   }
@@ -58,7 +50,7 @@ class _UserMessageBubbleState extends State<UserMessageBubble>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: ScaleTransition(
@@ -92,10 +84,7 @@ class _UserMessageBubbleState extends State<UserMessageBubble>
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: const LinearGradient(
-          colors: [
-            AppColors.crystalBlue,
-            AppColors.skyBlue,
-          ],
+          colors: [AppColors.crystalBlue, AppColors.skyBlue],
         ),
         boxShadow: [
           BoxShadow(
@@ -105,17 +94,13 @@ class _UserMessageBubbleState extends State<UserMessageBubble>
           ),
         ],
       ),
-      child: const Icon(
-        Icons.person_rounded,
-        color: AppColors.white,
-        size: 20,
-      ),
+      child: const Icon(Icons.person_rounded, color: AppColors.white, size: 20),
     );
   }
 
   Widget _buildMessageBubble(ThemeData theme, bool isDark) {
     final textContent = widget.message.textContent;
-    
+
     if (textContent.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -132,10 +117,7 @@ class _UserMessageBubbleState extends State<UserMessageBubble>
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                AppColors.crystalBlue,
-                AppColors.defaultBlue,
-              ],
+              colors: [AppColors.crystalBlue, AppColors.defaultBlue],
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
@@ -196,9 +178,7 @@ class _UserMessageBubbleState extends State<UserMessageBubble>
         content: const Text('Message copied to clipboard'),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         backgroundColor: AppColors.crystalBlue,
       ),
     );

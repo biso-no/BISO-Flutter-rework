@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../core/logging/print_migration.dart';
+
 class UserModel extends Equatable {
   final String id;
   final String name;
@@ -40,8 +41,10 @@ class UserModel extends Equatable {
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     logPrint('🔍 UserModel.fromMap - Raw map keys: ${map.keys.toList()}');
-    logPrint('🔍 UserModel.fromMap - department_ids type: ${map['department_ids'].runtimeType}, value: ${map['department_ids']}');
-    
+    logPrint(
+      '🔍 UserModel.fromMap - department_ids type: ${map['department_ids'].runtimeType}, value: ${map['department_ids']}',
+    );
+
     return UserModel(
       id: map['\$id'] ?? '',
       name: map['name'] ?? '',
@@ -51,14 +54,21 @@ class UserModel extends Equatable {
       city: map['city'],
       zipCode: map['zip'],
       campusId: map['campus_id'],
-      studentId: map['student_id'], // Use the direct string field, not the relationship
-      departments: _parseDepartmentIds(map['department_ids']), // Use department_ids string array
+      studentId:
+          map['student_id'], // Use the direct string field, not the relationship
+      departments: _parseDepartmentIds(
+        map['department_ids'],
+      ), // Use department_ids string array
       avatarUrl: map['avatar'],
       bankAccount: map['bank_account'],
       swift: map['swift'],
       isPublic: map['is_public'], // Can be null for existing users
-      createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
-      updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
+      createdAt: map['\$createdAt'] != null
+          ? DateTime.parse(map['\$createdAt'])
+          : null,
+      updatedAt: map['\$updatedAt'] != null
+          ? DateTime.parse(map['\$updatedAt'])
+          : null,
     );
   }
 
@@ -73,7 +83,10 @@ class UserModel extends Equatable {
   static List<String> _parseDepartmentIds(dynamic departmentIds) {
     if (departmentIds == null) return <String>[];
     if (departmentIds is List) {
-      return departmentIds.map((e) => e?.toString() ?? '').where((e) => e.isNotEmpty).toList();
+      return departmentIds
+          .map((e) => e?.toString() ?? '')
+          .where((e) => e.isNotEmpty)
+          .toList();
     }
     if (departmentIds is String) {
       return [departmentIds];
@@ -139,21 +152,21 @@ class UserModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        email,
-        phone,
-        address,
-        city,
-        zipCode,
-        campusId,
-        studentId,
-        departments,
-        avatarUrl,
-        bankAccount,
-        swift,
-        isPublic,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    name,
+    email,
+    phone,
+    address,
+    city,
+    zipCode,
+    campusId,
+    studentId,
+    departments,
+    avatarUrl,
+    bankAccount,
+    swift,
+    isPublic,
+    createdAt,
+    updatedAt,
+  ];
 }

@@ -7,14 +7,12 @@ class LoggingConfig {
   /// Should be called early in main()
   static Future<void> initialize() async {
     // Initialize core logger
-    await AppLogger.initialize(
-      enableConsole: kDebugMode,
-    );
+    await AppLogger.initialize(enableConsole: kDebugMode);
 
-    AppLogger.info('Logging system initialized', extra: {
-      'debug_mode': kDebugMode,
-      'console_enabled': kDebugMode,
-    });
+    AppLogger.info(
+      'Logging system initialized',
+      extra: {'debug_mode': kDebugMode, 'console_enabled': kDebugMode},
+    );
   }
 
   /// Future: Initialize external service (Sentry, Crashlytics, etc.)
@@ -50,16 +48,18 @@ class LoggingConfig {
   static Future<String> exportLogs() async {
     final history = AppLogger.instance.history;
     final buffer = StringBuffer();
-    
+
     buffer.writeln('BISO App Logs Export');
     buffer.writeln('Generated: ${DateTime.now().toIso8601String()}');
     buffer.writeln('Total entries: ${history.length}');
     buffer.writeln('=' * 50);
-    
+
     for (final log in history) {
-      buffer.writeln('[${log.time}] [${log.logLevel?.toString().toUpperCase() ?? 'LOG'}] ${log.message}');
+      buffer.writeln(
+        '[${log.time}] [${log.logLevel?.toString().toUpperCase() ?? 'LOG'}] ${log.message}',
+      );
     }
-    
+
     return buffer.toString();
   }
 
@@ -73,27 +73,30 @@ class LoggingConfig {
 /// Extension for easier context logging
 extension LogContext on Object {
   void logInfo(String message, {Map<String, dynamic>? extra}) {
-    AppLogger.info(message, extra: {
-      'context': runtimeType.toString(),
-      ...?extra,
-    });
+    AppLogger.info(
+      message,
+      extra: {'context': runtimeType.toString(), ...?extra},
+    );
   }
 
-  void logError(String message, {Object? error, StackTrace? stackTrace, Map<String, dynamic>? extra}) {
-    AppLogger.error(message, 
-      error: error, 
-      stackTrace: stackTrace, 
-      extra: {
-        'context': runtimeType.toString(),
-        ...?extra,
-      },
+  void logError(
+    String message, {
+    Object? error,
+    StackTrace? stackTrace,
+    Map<String, dynamic>? extra,
+  }) {
+    AppLogger.error(
+      message,
+      error: error,
+      stackTrace: stackTrace,
+      extra: {'context': runtimeType.toString(), ...?extra},
     );
   }
 
   void logWarning(String message, {Map<String, dynamic>? extra}) {
-    AppLogger.warning(message, extra: {
-      'context': runtimeType.toString(),
-      ...?extra,
-    });
+    AppLogger.warning(
+      message,
+      extra: {'context': runtimeType.toString(), ...?extra},
+    );
   }
 }

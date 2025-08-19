@@ -15,9 +15,7 @@ class PrivacyPromptDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
         children: [
           Icon(
@@ -29,10 +27,7 @@ class PrivacyPromptDialog extends StatelessWidget {
           const Expanded(
             child: Text(
               'Chat Privacy Settings',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -50,25 +45,23 @@ class PrivacyPromptDialog extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // Public Option
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppColors.subtleBlue,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.defaultBlue.withValues(alpha: 0.3)),
+              border: Border.all(
+                color: AppColors.defaultBlue.withValues(alpha: 0.3),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.public,
-                      color: AppColors.defaultBlue,
-                      size: 20,
-                    ),
+                    Icon(Icons.public, color: AppColors.defaultBlue, size: 20),
                     const SizedBox(width: 8),
                     const Text(
                       'Public Profile',
@@ -94,9 +87,9 @@ class PrivacyPromptDialog extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Private Option
           Container(
             padding: const EdgeInsets.all(16),
@@ -140,9 +133,9 @@ class PrivacyPromptDialog extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           Text(
             'You can change this setting anytime in your profile.',
             style: TextStyle(

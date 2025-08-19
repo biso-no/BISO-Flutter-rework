@@ -6,7 +6,10 @@ class NavigationUtils {
   NavigationUtils._();
 
   /// Safely navigates back, falling back to home if there's nothing to pop
-  static void safeGoBack(BuildContext context, {String fallbackRoute = '/home'}) {
+  static void safeGoBack(
+    BuildContext context, {
+    String fallbackRoute = '/home',
+  }) {
     if (context.canPop()) {
       context.pop();
     } else {
@@ -21,7 +24,8 @@ class NavigationUtils {
     VoidCallback? onPressed,
   }) {
     return IconButton(
-      onPressed: onPressed ?? () => safeGoBack(context, fallbackRoute: fallbackRoute),
+      onPressed:
+          onPressed ?? () => safeGoBack(context, fallbackRoute: fallbackRoute),
       icon: const Icon(Icons.arrow_back),
     );
   }
@@ -50,22 +54,25 @@ class NavigationUtils {
   /// Shows a dialog asking user if they want to navigate back when there are unsaved changes
   static Future<bool> showUnsavedChangesDialog(BuildContext context) async {
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Unsaved Changes'),
-        content: const Text('You have unsaved changes. Are you sure you want to go back?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Stay'),
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Unsaved Changes'),
+            content: const Text(
+              'You have unsaved changes. Are you sure you want to go back?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Stay'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Leave'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Leave'),
-          ),
-        ],
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 
   /// Enhanced back button for forms with unsaved changes

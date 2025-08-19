@@ -9,11 +9,11 @@ class MembershipService {
   factory MembershipService() => _instance;
   MembershipService._internal();
 
-  
-
   /// Verifies if a student ID has an active BISO membership
   /// Returns the actual membership object if found
-  Future<MembershipVerificationResult> verifyMembership(String studentId) async {
+  Future<MembershipVerificationResult> verifyMembership(
+    String studentId,
+  ) async {
     try {
       // The function expects just the student ID as body (string/number)
       final execution = await functions.createExecution(
@@ -23,16 +23,17 @@ class MembershipService {
 
       if (execution.responseStatusCode == 200) {
         final responseBody = execution.responseBody;
-        
+
         // Parse the JSON response
         try {
           final Map<String, dynamic> response = json.decode(responseBody);
-          
+
           // Check if membership was found
           if (response.containsKey('membership')) {
-            final membershipData = response['membership'] as Map<String, dynamic>;
+            final membershipData =
+                response['membership'] as Map<String, dynamic>;
             final membership = MembershipModel.fromMap(membershipData);
-            
+
             return MembershipVerificationResult(
               isMember: true,
               membership: membership,
@@ -57,7 +58,8 @@ class MembershipService {
       } else {
         return MembershipVerificationResult(
           isMember: false,
-          error: 'Failed to verify membership: HTTP ${execution.responseStatusCode}',
+          error:
+              'Failed to verify membership: HTTP ${execution.responseStatusCode}',
         );
       }
     } catch (e) {
@@ -118,29 +120,33 @@ class MembershipService {
 
       if (execution.responseStatusCode == 200) {
         final responseBody = execution.responseBody;
-        
+
         try {
           final Map<String, dynamic> response = json.decode(responseBody);
-          
+
           if (response.containsKey('checkout')) {
             final checkout = response['checkout'];
-            
+
             // The checkout object should contain the redirect URL
-            if (checkout is Map<String, dynamic> && checkout.containsKey('redirectUrl')) {
+            if (checkout is Map<String, dynamic> &&
+                checkout.containsKey('redirectUrl')) {
               return checkout['redirectUrl'] as String;
-            } else if (checkout is Map<String, dynamic> && checkout.containsKey('url')) {
+            } else if (checkout is Map<String, dynamic> &&
+                checkout.containsKey('url')) {
               return checkout['url'] as String;
             }
           } else if (response.containsKey('error')) {
             throw Exception('Checkout error: ${response['error']}');
           }
-          
+
           throw Exception('No checkout URL found in response');
         } catch (parseError) {
           throw Exception('Failed to parse checkout response: $parseError');
         }
       } else {
-        throw Exception('Failed to initiate checkout: HTTP ${execution.responseStatusCode}');
+        throw Exception(
+          'Failed to initiate checkout: HTTP ${execution.responseStatusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error initiating membership checkout: ${e.toString()}');
@@ -163,7 +169,7 @@ class MembershipService {
       if (documents.isNotEmpty) {
         return MembershipModel.fromMap(documents.first);
       }
-      
+
       return null;
     } catch (e) {
       throw Exception('Error fetching user membership: ${e.toString()}');
@@ -171,29 +177,36 @@ class MembershipService {
   }
 
   /// Subscribes to student ID document creation for realtime updates
-  RealtimeSubscription subscribeToStudentIdUpdates(String userId, Function(RealtimeMessage) callback) {
+  RealtimeSubscription subscribeToStudentIdUpdates(
+    String userId,
+    Function(RealtimeMessage) callback,
+  ) {
     return realtime.subscribe([
-      'databases.app.collections.student_id.documents',
-    ])..stream.listen((response) {
-      // Filter for this user's student ID updates
-      final payload = response.payload;
-      if (payload['user_id'] == userId) {
-        callback(response);
-      }
-    });
+        'databases.app.collections.student_id.documents',
+      ])
+      ..stream.listen((response) {
+        // Filter for this user's student ID updates
+        final payload = response.payload;
+        if (payload['user_id'] == userId) {
+          callback(response);
+        }
+      });
   }
 
   /// Subscribes to membership updates for realtime notifications
-  RealtimeSubscription subscribeToMembershipUpdates(String userId, Function(RealtimeMessage) callback) {
+  RealtimeSubscription subscribeToMembershipUpdates(
+    String userId,
+    Function(RealtimeMessage) callback,
+  ) {
     return realtime.subscribe([
-      'databases.app.collections.biso_membership.documents',
-    ])..stream.listen((response) {
-      // Filter for this user's membership updates
-      final payload = response.payload;
-      if (payload['user_id'] == userId) {
-        callback(response);
-      }
-    });
+        'databases.app.collections.biso_membership.documents',
+      ])
+      ..stream.listen((response) {
+        // Filter for this user's membership updates
+        final payload = response.payload;
+        if (payload['user_id'] == userId) {
+          callback(response);
+        }
+      });
   }
-
 }

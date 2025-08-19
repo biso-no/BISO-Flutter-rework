@@ -13,7 +13,10 @@ import '../../../providers/campus/campus_provider.dart';
 final eventServiceProvider = Provider<EventService>((ref) => EventService());
 
 // Provider for events list
-final eventsProvider = FutureProvider.family<List<EventModel>, String?>((ref, campusId) {
+final eventsProvider = FutureProvider.family<List<EventModel>, String?>((
+  ref,
+  campusId,
+) {
   final service = ref.watch(eventServiceProvider);
   return service.getAllEvents(campusId: campusId, limit: 50);
 });
@@ -97,11 +100,17 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                   selectedColor: AppColors.subtleBlue,
                   checkmarkColor: AppColors.defaultBlue,
                   labelStyle: TextStyle(
-                    color: isSelected ? AppColors.defaultBlue : AppColors.onSurfaceVariant,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected
+                        ? AppColors.defaultBlue
+                        : AppColors.onSurfaceVariant,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
                   ),
                   side: BorderSide(
-                    color: isSelected ? AppColors.defaultBlue : AppColors.outline,
+                    color: isSelected
+                        ? AppColors.defaultBlue
+                        : AppColors.outline,
                   ),
                 );
               },
@@ -131,7 +140,8 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                   child: ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: filteredEvents.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final event = filteredEvents[index];
                       return _EventCard(
@@ -145,9 +155,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                   ),
                 );
               },
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => _ErrorState(
                 error: error.toString(),
                 onRetry: () => ref.invalidate(eventsProvider),
@@ -172,14 +180,22 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
 
   String _getCategoryDisplayName(String category) {
     switch (category) {
-      case 'all': return 'All';
-      case 'academic': return 'Academic';
-      case 'social': return 'Social';
-      case 'career': return 'Career';
-      case 'sports': return 'Sports';
-      case 'cultural': return 'Cultural';
-      case 'workshop': return 'Workshop';
-      default: return category;
+      case 'all':
+        return 'All';
+      case 'academic':
+        return 'Academic';
+      case 'social':
+        return 'Social';
+      case 'career':
+        return 'Career';
+      case 'sports':
+        return 'Sports';
+      case 'cultural':
+        return 'Cultural';
+      case 'workshop':
+        return 'Workshop';
+      default:
+        return category;
     }
   }
 
@@ -198,8 +214,8 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
     if (searchQuery.isNotEmpty) {
       filtered = filtered.where((event) {
         return event.title.toLowerCase().contains(searchQuery) ||
-               event.description.toLowerCase().contains(searchQuery) ||
-               event.organizerName.toLowerCase().contains(searchQuery);
+            event.description.toLowerCase().contains(searchQuery) ||
+            event.organizerName.toLowerCase().contains(searchQuery);
       }).toList();
     }
 
@@ -218,10 +234,8 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
         minChildSize: 0.5,
         maxChildSize: 0.95,
         expand: false,
-        builder: (context, scrollController) => _EventDetailSheet(
-          event: event,
-          scrollController: scrollController,
-        ),
+        builder: (context, scrollController) =>
+            _EventDetailSheet(event: event, scrollController: scrollController),
       ),
     );
   }
@@ -231,10 +245,7 @@ class _EventCard extends StatelessWidget {
   final EventModel event;
   final VoidCallback onTap;
 
-  const _EventCard({
-    required this.event,
-    required this.onTap,
-  });
+  const _EventCard({required this.event, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -267,7 +278,10 @@ class _EventCard extends StatelessWidget {
                               event.images.first,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.event, color: AppColors.defaultBlue),
+                                  const Icon(
+                                    Icons.event,
+                                    color: AppColors.defaultBlue,
+                                  ),
                             ),
                           )
                         : const Icon(Icons.event, color: AppColors.defaultBlue),
@@ -288,18 +302,18 @@ class _EventCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        
+
                         const SizedBox(height: 4),
-                        
+
                         Text(
                           event.organizerName,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: AppColors.onSurfaceVariant,
                           ),
                         ),
-                        
+
                         const SizedBox(height: 8),
-                        
+
                         Row(
                           children: [
                             Icon(
@@ -309,16 +323,18 @@ class _EventCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              DateFormat('MMM dd, HH:mm').format(event.startDate),
+                              DateFormat(
+                                'MMM dd, HH:mm',
+                              ).format(event.startDate),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: AppColors.onSurfaceVariant,
                               ),
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 4),
-                        
+
                         Row(
                           children: [
                             Icon(
@@ -345,9 +361,14 @@ class _EventCard extends StatelessWidget {
 
                   // Status Badge
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(event.status).withValues(alpha: 0.1),
+                      color: _getStatusColor(
+                        event.status,
+                      ).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -368,15 +389,15 @@ class _EventCard extends StatelessWidget {
                   runSpacing: 6,
                   children: event.categories.take(3).map((category) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.gray200,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(
-                        category,
-                        style: theme.textTheme.labelSmall,
-                      ),
+                      child: Text(category, style: theme.textTheme.labelSmall),
                     );
                   }).toList(),
                 ),
@@ -401,21 +422,31 @@ class _EventCard extends StatelessWidget {
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'upcoming': return AppColors.accentBlue;
-      case 'ongoing': return AppColors.success;
-      case 'completed': return AppColors.onSurfaceVariant;
-      case 'cancelled': return AppColors.error;
-      default: return AppColors.onSurfaceVariant;
+      case 'upcoming':
+        return AppColors.accentBlue;
+      case 'ongoing':
+        return AppColors.success;
+      case 'completed':
+        return AppColors.onSurfaceVariant;
+      case 'cancelled':
+        return AppColors.error;
+      default:
+        return AppColors.onSurfaceVariant;
     }
   }
 
   String _getStatusText(String status) {
     switch (status) {
-      case 'upcoming': return 'Upcoming';
-      case 'ongoing': return 'Live';
-      case 'completed': return 'Ended';
-      case 'cancelled': return 'Cancelled';
-      default: return status;
+      case 'upcoming':
+        return 'Upcoming';
+      case 'ongoing':
+        return 'Live';
+      case 'completed':
+        return 'Ended';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
     }
   }
 }
@@ -468,10 +499,16 @@ class _EventDetailSheet extends StatelessWidget {
                 // Event Info Row
                 Row(
                   children: [
-                    Icon(Icons.schedule, size: 20, color: AppColors.onSurfaceVariant),
+                    Icon(
+                      Icons.schedule,
+                      size: 20,
+                      color: AppColors.onSurfaceVariant,
+                    ),
                     const SizedBox(width: 8),
                     Text(
-                      DateFormat('EEEE, MMM dd, yyyy • HH:mm').format(event.startDate),
+                      DateFormat(
+                        'EEEE, MMM dd, yyyy • HH:mm',
+                      ).format(event.startDate),
                       style: theme.textTheme.bodyLarge,
                     ),
                   ],
@@ -481,7 +518,11 @@ class _EventDetailSheet extends StatelessWidget {
 
                 Row(
                   children: [
-                    Icon(Icons.location_on, size: 20, color: AppColors.onSurfaceVariant),
+                    Icon(
+                      Icons.location_on,
+                      size: 20,
+                      color: AppColors.onSurfaceVariant,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -496,7 +537,11 @@ class _EventDetailSheet extends StatelessWidget {
 
                 Row(
                   children: [
-                    Icon(Icons.group, size: 20, color: AppColors.onSurfaceVariant),
+                    Icon(
+                      Icons.group,
+                      size: 20,
+                      color: AppColors.onSurfaceVariant,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'Organized by ${event.organizerName}',
@@ -515,10 +560,7 @@ class _EventDetailSheet extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  event.description,
-                  style: theme.textTheme.bodyMedium,
-                ),
+                Text(event.description, style: theme.textTheme.bodyMedium),
 
                 const SizedBox(height: 24),
 
@@ -573,13 +615,17 @@ class _EventDetailSheet extends StatelessWidget {
                     Expanded(
                       flex: 2,
                       child: ElevatedButton.icon(
-                        onPressed: event.canRegister ? () {
-                          // TODO: Register for event
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Registration - Coming Soon')),
-                          );
-                        } : null,
+                        onPressed: event.canRegister
+                            ? () {
+                                // TODO: Register for event
+                                Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Registration - Coming Soon'),
+                                  ),
+                                );
+                              }
+                            : null,
                         icon: const Icon(Icons.event_available),
                         label: Text(event.isFull ? 'Full' : 'Register'),
                       ),
@@ -616,11 +662,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 64,
-              color: AppColors.onSurfaceVariant,
-            ),
+            Icon(icon, size: 64, color: AppColors.onSurfaceVariant),
             const SizedBox(height: 16),
             Text(
               title,
@@ -646,10 +688,7 @@ class _ErrorState extends StatelessWidget {
   final String error;
   final VoidCallback onRetry;
 
-  const _ErrorState({
-    required this.error,
-    required this.onRetry,
-  });
+  const _ErrorState({required this.error, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -661,11 +700,7 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: AppColors.error,
-            ),
+            Icon(Icons.error_outline, size: 64, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               'Something went wrong',

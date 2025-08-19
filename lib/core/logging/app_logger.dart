@@ -13,9 +13,7 @@ class AppLogger {
   static String? _appVersion;
 
   /// Initialize the logging system
-  static Future<void> initialize({
-    bool enableConsole = kDebugMode,
-  }) async {
+  static Future<void> initialize({bool enableConsole = kDebugMode}) async {
     if (_initialized) return;
 
     // Get app version information
@@ -119,12 +117,15 @@ class AppLogger {
     String? action,
     Map<String, dynamic>? extra,
   }) {
-    info('[AUTH] $message', extra: {
-      'feature': 'auth',
-      'user_id': userId,
-      'action': action,
-      ...?extra,
-    });
+    info(
+      '[AUTH] $message',
+      extra: {
+        'feature': 'auth',
+        'user_id': userId,
+        'action': action,
+        ...?extra,
+      },
+    );
   }
 
   /// Log chat events
@@ -135,13 +136,16 @@ class AppLogger {
     String? action,
     Map<String, dynamic>? extra,
   }) {
-    info('[CHAT] $message', extra: {
-      'feature': 'chat',
-      'chat_id': chatId,
-      'user_id': userId,
-      'action': action,
-      ...?extra,
-    });
+    info(
+      '[CHAT] $message',
+      extra: {
+        'feature': 'chat',
+        'chat_id': chatId,
+        'user_id': userId,
+        'action': action,
+        ...?extra,
+      },
+    );
   }
 
   /// Log expense events
@@ -152,13 +156,16 @@ class AppLogger {
     String? action,
     Map<String, dynamic>? extra,
   }) {
-    info('[EXPENSE] $message', extra: {
-      'feature': 'expense',
-      'expense_id': expenseId,
-      'user_id': userId,
-      'action': action,
-      ...?extra,
-    });
+    info(
+      '[EXPENSE] $message',
+      extra: {
+        'feature': 'expense',
+        'expense_id': expenseId,
+        'user_id': userId,
+        'action': action,
+        ...?extra,
+      },
+    );
   }
 
   /// Log API calls
@@ -169,13 +176,16 @@ class AppLogger {
     int? statusCode,
     Map<String, dynamic>? extra,
   }) {
-    info('[API] $message', extra: {
-      'feature': 'api',
-      'endpoint': endpoint,
-      'method': method,
-      'status_code': statusCode,
-      ...?extra,
-    });
+    info(
+      '[API] $message',
+      extra: {
+        'feature': 'api',
+        'endpoint': endpoint,
+        'method': method,
+        'status_code': statusCode,
+        ...?extra,
+      },
+    );
   }
 
   // MARK: - Private helpers
@@ -213,7 +223,7 @@ class _ProductionFormatter extends LoggerFormatter {
     final time = DateTime.now().toIso8601String();
     final level = 'LOG';
     final message = details.message?.toString() ?? '';
-    
+
     return '[$time] [$level] $message';
   }
 }

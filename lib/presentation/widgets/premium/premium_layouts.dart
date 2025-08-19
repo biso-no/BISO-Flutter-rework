@@ -5,7 +5,7 @@ import '../../../core/theme/premium_theme.dart';
 import 'premium_components.dart';
 
 /// Premium Layout Components
-/// 
+///
 /// Sophisticated layout widgets that create beautiful, hierarchical
 /// designs with proper spacing, shadows, and visual flow.
 
@@ -20,7 +20,7 @@ class PremiumScaffold extends StatelessWidget {
   final bool extendBodyBehindAppBar;
   final bool hasGradientBackground;
   final List<Color>? gradientColors;
-  
+
   const PremiumScaffold({
     super.key,
     required this.body,
@@ -37,7 +37,7 @@ class PremiumScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final defaultBgColor = isDark ? AppColors.charcoalBlack : AppColors.pearl;
-    
+
     return Scaffold(
       extendBodyBehindAppBar: extendBodyBehindAppBar,
       backgroundColor: Colors.transparent,
@@ -45,15 +45,19 @@ class PremiumScaffold extends StatelessWidget {
       floatingActionButton: floatingActionButton,
       body: Container(
         decoration: BoxDecoration(
-          color: hasGradientBackground ? null : (backgroundColor ?? defaultBgColor),
+          color: hasGradientBackground
+              ? null
+              : (backgroundColor ?? defaultBgColor),
           gradient: hasGradientBackground
               ? LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: gradientColors ?? [
-                    isDark ? AppColors.charcoalBlack : AppColors.pearl,
-                    isDark ? AppColors.smokeGray : Colors.white,
-                  ],
+                  colors:
+                      gradientColors ??
+                      [
+                        isDark ? AppColors.charcoalBlack : AppColors.pearl,
+                        isDark ? AppColors.smokeGray : Colors.white,
+                      ],
                 )
               : null,
         ),
@@ -77,7 +81,7 @@ class PremiumAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Color? backgroundColor;
   final VoidCallback? onBackPressed;
   final double elevation;
-  
+
   const PremiumAppBar({
     super.key,
     this.title,
@@ -97,25 +101,22 @@ class PremiumAppBar extends StatelessWidget implements PreferredSizeWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final statusBarHeight = MediaQuery.of(context).padding.top;
-    
-    final bgColor = backgroundColor ?? 
-        (isTransparent 
-            ? Colors.transparent 
+
+    final bgColor =
+        backgroundColor ??
+        (isTransparent
+            ? Colors.transparent
             : (isDark ? AppColors.charcoalBlack : Colors.white));
 
     Widget appBarContent = Container(
       height: kToolbarHeight + statusBarHeight,
-      padding: EdgeInsets.only(
-        top: statusBarHeight,
-        left: 4,
-        right: 4,
-      ),
+      padding: EdgeInsets.only(top: statusBarHeight, left: 4, right: 4),
       decoration: BoxDecoration(
-        color: hasBlur ? bgColor.withValues(alpha:0.8) : bgColor,
+        color: hasBlur ? bgColor.withValues(alpha: 0.8) : bgColor,
         boxShadow: elevation > 0
             ? [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha:0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: elevation * 2,
                   offset: Offset(0, elevation),
                 ),
@@ -132,33 +133,35 @@ class PremiumAppBar extends StatelessWidget implements PreferredSizeWidget {
               icon: Icons.arrow_back_ios,
               onPressed: onBackPressed ?? () => Navigator.of(context).pop(),
             ),
-          
+
           // Title
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Align(
-                alignment: centerTitle ? Alignment.center : Alignment.centerLeft,
-                child: titleWidget ?? 
+                alignment: centerTitle
+                    ? Alignment.center
+                    : Alignment.centerLeft,
+                child:
+                    titleWidget ??
                     (title != null
                         ? Text(
                             title!,
                             style: theme.textTheme.headlineSmall?.copyWith(
                               fontWeight: FontWeight.w600,
-                              color: isDark ? AppColors.pearl : AppColors.charcoalBlack,
+                              color: isDark
+                                  ? AppColors.pearl
+                                  : AppColors.charcoalBlack,
                             ),
                           )
                         : const SizedBox.shrink()),
               ),
             ),
           ),
-          
+
           // Actions
           if (actions != null)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: actions!,
-            ),
+            Row(mainAxisSize: MainAxisSize.min, children: actions!),
         ],
       ),
     );
@@ -189,7 +192,7 @@ class PremiumIconButton extends StatefulWidget {
   final double size;
   final bool isGlass;
   final String? tooltip;
-  
+
   const PremiumIconButton({
     super.key,
     required this.icon,
@@ -231,7 +234,7 @@ class _PremiumIconButtonState extends State<PremiumIconButton>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     Widget button = GestureDetector(
       onTapDown: widget.onPressed != null ? (_) => _controller.forward() : null,
       onTapUp: widget.onPressed != null ? (_) => _controller.reverse() : null,
@@ -249,7 +252,8 @@ class _PremiumIconButtonState extends State<PremiumIconButton>
                     borderRadius: BorderRadius.circular(widget.size / 2),
                   )
                 : BoxDecoration(
-                    color: widget.backgroundColor ?? 
+                    color:
+                        widget.backgroundColor ??
                         (isDark ? AppColors.smokeGray : AppColors.cloud),
                     borderRadius: BorderRadius.circular(widget.size / 2),
                     boxShadow: PremiumTheme.softShadow,
@@ -257,7 +261,8 @@ class _PremiumIconButtonState extends State<PremiumIconButton>
             child: Icon(
               widget.icon,
               size: widget.size * 0.45,
-              color: widget.iconColor ?? 
+              color:
+                  widget.iconColor ??
                   (isDark ? AppColors.mist : AppColors.stoneGray),
             ),
           ),
@@ -266,10 +271,7 @@ class _PremiumIconButtonState extends State<PremiumIconButton>
     );
 
     if (widget.tooltip != null) {
-      button = Tooltip(
-        message: widget.tooltip!,
-        child: button,
-      );
+      button = Tooltip(message: widget.tooltip!, child: button);
     }
 
     return button;
@@ -289,7 +291,7 @@ class PremiumSection extends StatelessWidget {
   final IconData? icon;
   final bool hasBackground;
   final Color? backgroundColor;
-  
+
   const PremiumSection({
     super.key,
     this.title,
@@ -307,15 +309,16 @@ class PremiumSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       margin: margin ?? const EdgeInsets.symmetric(vertical: 8),
-      padding: hasBackground 
+      padding: hasBackground
           ? (padding ?? const EdgeInsets.all(20))
           : EdgeInsets.zero,
       decoration: hasBackground
           ? BoxDecoration(
-              color: backgroundColor ?? 
+              color:
+                  backgroundColor ??
                   (isDark ? AppColors.smokeGray : Colors.white),
               borderRadius: BorderRadius.circular(20),
               boxShadow: PremiumTheme.softShadow,
@@ -332,7 +335,7 @@ class PremiumSection extends StatelessWidget {
               onActionTap: onActionTap,
               icon: icon,
             ),
-          
+
           if (!hasBackground)
             Padding(
               padding: padding ?? const EdgeInsets.symmetric(horizontal: 20),
@@ -357,7 +360,7 @@ class PremiumGrid extends StatelessWidget {
   final EdgeInsets? padding;
   final bool shrinkWrap;
   final ScrollPhysics? physics;
-  
+
   const PremiumGrid({
     super.key,
     required this.children,
@@ -394,7 +397,7 @@ class PremiumList extends StatelessWidget {
   final bool shrinkWrap;
   final ScrollPhysics? physics;
   final Axis scrollDirection;
-  
+
   const PremiumList({
     super.key,
     required this.children,
@@ -413,7 +416,7 @@ class PremiumList extends StatelessWidget {
       shrinkWrap: shrinkWrap,
       physics: physics,
       itemCount: children.length,
-      separatorBuilder: (_, __) => scrollDirection == Axis.vertical
+      separatorBuilder: (_, _) => scrollDirection == Axis.vertical
           ? SizedBox(height: spacing)
           : SizedBox(width: spacing),
       itemBuilder: (context, index) => children[index],
@@ -436,7 +439,7 @@ class PremiumContainer extends StatelessWidget {
   final Border? border;
   final double? width;
   final double? height;
-  
+
   const PremiumContainer({
     super.key,
     required this.child,
@@ -457,7 +460,7 @@ class PremiumContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final defaultColor = isDark ? AppColors.smokeGray : Colors.white;
-    
+
     return Container(
       width: width,
       height: height,
@@ -479,11 +482,14 @@ class PremiumContainer extends StatelessWidget {
                   : null,
               borderRadius: BorderRadius.circular(borderRadius),
               border: border,
-              boxShadow: customShadow ?? 
+              boxShadow:
+                  customShadow ??
                   (hasGlow
                       ? [
                           BoxShadow(
-                            color: (color ?? AppColors.biLightBlue).withValues(alpha:0.2),
+                            color: (color ?? AppColors.biLightBlue).withValues(
+                              alpha: 0.2,
+                            ),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -507,7 +513,7 @@ class PremiumHero extends StatelessWidget {
   final double height;
   final Widget? overlay;
   final CrossAxisAlignment alignment;
-  
+
   const PremiumHero({
     super.key,
     required this.title,
@@ -523,7 +529,7 @@ class PremiumHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       height: height,
       width: double.infinity,
@@ -531,17 +537,14 @@ class PremiumHero extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: gradientColors ?? [
-            AppColors.biLightBlue,
-            AppColors.biNavy,
-          ],
+          colors: gradientColors ?? [AppColors.biLightBlue, AppColors.biNavy],
         ),
         image: backgroundImage != null
             ? DecorationImage(
                 image: AssetImage(backgroundImage!),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
-                  Colors.black.withValues(alpha:0.3),
+                  Colors.black.withValues(alpha: 0.3),
                   BlendMode.darken,
                 ),
               )
@@ -562,36 +565,32 @@ class PremiumHero extends StatelessWidget {
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
                   ),
-                  textAlign: alignment == CrossAxisAlignment.center 
-                      ? TextAlign.center 
+                  textAlign: alignment == CrossAxisAlignment.center
+                      ? TextAlign.center
                       : TextAlign.left,
                 ),
-                
+
                 if (subtitle != null) ...[
                   const SizedBox(height: 12),
                   Text(
                     subtitle!,
                     style: theme.textTheme.titleLarge?.copyWith(
-                      color: Colors.white.withValues(alpha:0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       height: 1.4,
                     ),
-                    textAlign: alignment == CrossAxisAlignment.center 
-                        ? TextAlign.center 
+                    textAlign: alignment == CrossAxisAlignment.center
+                        ? TextAlign.center
                         : TextAlign.left,
                   ),
                 ],
-                
-                if (child != null) ...[
-                  const SizedBox(height: 24),
-                  child!,
-                ],
+
+                if (child != null) ...[const SizedBox(height: 24), child!],
               ],
             ),
           ),
-          
+
           // Overlay content
-          if (overlay != null)
-            Positioned.fill(child: overlay!),
+          if (overlay != null) Positioned.fill(child: overlay!),
         ],
       ),
     );

@@ -26,28 +26,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   String? _validateEmail(String? value) {
     final l10n = AppLocalizations.of(context);
-    
+
     if (value == null || value.isEmpty) {
       return l10n.enterValidEmail;
     }
-    
+
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) {
       return l10n.enterValidEmail;
     }
-    
-    
+
     return null;
   }
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() => _isLoading = true);
-    
+
     try {
       await ref.read(authStateProvider.notifier).sendOtp(_emailController.text);
-      
+
       if (mounted) {
         // Navigate to OTP verification
         context.go('/auth/verify-otp', extra: _emailController.text);
@@ -72,7 +71,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -83,7 +82,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 60),
-                
+
                 // Logo/Title Section
                 Column(
                   children: [
@@ -111,9 +110,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 80),
-                
+
                 // Email Input
                 TextFormField(
                   controller: _emailController,
@@ -127,9 +126,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   onFieldSubmitted: (_) => _handleLogin(),
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Login Button
                 ElevatedButton(
                   onPressed: _isLoading ? null : _handleLogin,
@@ -139,14 +138,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : Text(l10n.continueButton),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Clear Session
                 TextButton(
                   onPressed: () async {
@@ -156,7 +157,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     if (mounted) {
                       scaffoldMessenger.showSnackBar(
                         const SnackBar(
-                          content: Text('Session cleared - OTP flow should work now'),
+                          content: Text(
+                            'Session cleared - OTP flow should work now',
+                          ),
                           backgroundColor: AppColors.success,
                         ),
                       );
@@ -164,11 +167,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   },
                   child: const Text('Clear Session'),
                 ),
-                
+
                 const Spacer(),
-                
+
                 const SizedBox(height: 8),
-                
+
                 // Footer
                 Text(
                   'Norwegian Business School (BI)',

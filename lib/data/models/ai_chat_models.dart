@@ -33,10 +33,7 @@ class TextPart extends MessagePart {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      'type': 'text',
-      'text': text,
-    };
+    return {'type': 'text', 'text': text};
   }
 
   TextPart copyWith({String? text}) {
@@ -108,7 +105,14 @@ class ToolPart extends MessagePart {
   }
 
   @override
-  List<Object?> get props => [toolCallId, toolName, args, result, state, isError];
+  List<Object?> get props => [
+    toolCallId,
+    toolName,
+    args,
+    result,
+    state,
+    isError,
+  ];
 }
 
 /// Tool execution states
@@ -134,10 +138,7 @@ class StepStartPart extends MessagePart {
   final String stepId;
   final String? title;
 
-  const StepStartPart({
-    required this.stepId,
-    this.title,
-  });
+  const StepStartPart({required this.stepId, this.title});
 
   factory StepStartPart.fromJson(Map<String, dynamic> json) {
     return StepStartPart(
@@ -148,11 +149,7 @@ class StepStartPart extends MessagePart {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      'type': 'step-start',
-      'stepId': stepId,
-      'title': title,
-    };
+    return {'type': 'step-start', 'stepId': stepId, 'title': title};
   }
 
   @override
@@ -164,10 +161,7 @@ class UnknownPart extends MessagePart {
   final String type;
   final Map<String, dynamic> data;
 
-  const UnknownPart({
-    required this.type,
-    required this.data,
-  });
+  const UnknownPart({required this.type, required this.data});
 
   factory UnknownPart.fromJson(Map<String, dynamic> json) {
     return UnknownPart(
@@ -205,7 +199,7 @@ class ChatMessage extends Equatable {
       parts: partsList
           .map((part) => MessagePart.fromJson(part as Map<String, dynamic>))
           .toList(),
-      timestamp: json['timestamp'] != null 
+      timestamp: json['timestamp'] != null
           ? DateTime.parse(json['timestamp'] as String)
           : null,
     );
@@ -236,10 +230,7 @@ class ChatMessage extends Equatable {
 
   /// Helper to get all text content concatenated
   String get textContent {
-    return parts
-        .whereType<TextPart>()
-        .map((part) => part.text)
-        .join('');
+    return parts.whereType<TextPart>().map((part) => part.text).join('');
   }
 
   /// Helper to get all tool parts
@@ -258,9 +249,7 @@ class ChatRequest extends Equatable {
   const ChatRequest({required this.messages});
 
   Map<String, dynamic> toJson() {
-    return {
-      'messages': messages.map((msg) => msg.toJson()).toList(),
-    };
+    return {'messages': messages.map((msg) => msg.toJson()).toList()};
   }
 
   @override
@@ -277,10 +266,7 @@ class MessagePartReceived extends ConversationEvent {
   final String messageId;
   final MessagePart part;
 
-  const MessagePartReceived({
-    required this.messageId,
-    required this.part,
-  });
+  const MessagePartReceived({required this.messageId, required this.part});
 
   @override
   List<Object?> get props => [messageId, part];
@@ -291,10 +277,7 @@ class TextDeltaReceived extends ConversationEvent {
   final String messageId;
   final String delta;
 
-  const TextDeltaReceived({
-    required this.messageId,
-    required this.delta,
-  });
+  const TextDeltaReceived({required this.messageId, required this.delta});
 
   @override
   List<Object?> get props => [messageId, delta];
@@ -305,10 +288,7 @@ class ToolCallUpdated extends ConversationEvent {
   final String messageId;
   final ToolPart toolPart;
 
-  const ToolCallUpdated({
-    required this.messageId,
-    required this.toolPart,
-  });
+  const ToolCallUpdated({required this.messageId, required this.toolPart});
 
   @override
   List<Object?> get props => [messageId, toolPart];
@@ -329,10 +309,7 @@ class StreamError extends ConversationEvent {
   final String error;
   final String? messageId;
 
-  const StreamError({
-    required this.error,
-    this.messageId,
-  });
+  const StreamError({required this.error, this.messageId});
 
   @override
   List<Object?> get props => [error, messageId];
@@ -373,7 +350,15 @@ class SharePointResult extends Equatable {
   }
 
   @override
-  List<Object?> get props => [text, source, title, site, lastModified, score, documentViewerUrl];
+  List<Object?> get props => [
+    text,
+    source,
+    title,
+    site,
+    lastModified,
+    score,
+    documentViewerUrl,
+  ];
 }
 
 /// SharePoint search response
@@ -398,7 +383,10 @@ class SharePointSearchResponse extends Equatable {
     final resultsList = json['results'] as List<dynamic>? ?? [];
     return SharePointSearchResponse(
       results: resultsList
-          .map((result) => SharePointResult.fromJson(result as Map<String, dynamic>))
+          .map(
+            (result) =>
+                SharePointResult.fromJson(result as Map<String, dynamic>),
+          )
           .toList(),
       totalResults: json['totalResults'] as int,
       query: json['query'] as String,
@@ -409,7 +397,14 @@ class SharePointSearchResponse extends Equatable {
   }
 
   @override
-  List<Object?> get props => [results, totalResults, query, queryLanguage, languageInfo, message];
+  List<Object?> get props => [
+    results,
+    totalResults,
+    query,
+    queryLanguage,
+    languageInfo,
+    message,
+  ];
 }
 
 /// Document stats response
@@ -495,10 +490,7 @@ class WeatherResponse extends Equatable {
   final String location;
   final String temperature;
 
-  const WeatherResponse({
-    required this.location,
-    required this.temperature,
-  });
+  const WeatherResponse({required this.location, required this.temperature});
 
   factory WeatherResponse.fromJson(Map<String, dynamic> json) {
     return WeatherResponse(

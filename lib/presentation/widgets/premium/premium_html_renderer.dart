@@ -79,13 +79,15 @@ class PremiumHtmlRenderer extends StatelessWidget {
     // Enhance quotes with premium styling
     enhanced = enhanced.replaceAllMapped(
       RegExp(r'"([^"]*)"'),
-      (match) => '<span style="color: #BD9E16; font-style: italic; font-weight: 500;">"${match.group(1)}"</span>',
+      (match) =>
+          '<span style="color: #BD9E16; font-style: italic; font-weight: 500;">"${match.group(1)}"</span>',
     );
 
     // Enhance apostrophes and contractions
     enhanced = enhanced.replaceAllMapped(
       RegExp(r"\b(\w+)'(\w+)\b"),
-      (match) => '<span style="color: #1A77E9; font-weight: 500;">${match.group(1)}\'${match.group(2)}</span>',
+      (match) =>
+          '<span style="color: #1A77E9; font-weight: 500;">${match.group(1)}\'${match.group(2)}</span>',
     );
 
     return enhanced;
@@ -154,22 +156,10 @@ class PremiumHtmlRenderer extends StatelessWidget {
       ),
 
       // Premium text styling
-      'strong': Style(
-        fontWeight: FontWeight.w700,
-        color: AppColors.strongBlue,
-      ),
-      'b': Style(
-        fontWeight: FontWeight.w700,
-        color: AppColors.strongBlue,
-      ),
-      'em': Style(
-        fontStyle: FontStyle.italic,
-        color: AppColors.defaultBlue,
-      ),
-      'i': Style(
-        fontStyle: FontStyle.italic,
-        color: AppColors.defaultBlue,
-      ),
+      'strong': Style(fontWeight: FontWeight.w700, color: AppColors.strongBlue),
+      'b': Style(fontWeight: FontWeight.w700, color: AppColors.strongBlue),
+      'em': Style(fontStyle: FontStyle.italic, color: AppColors.defaultBlue),
+      'i': Style(fontStyle: FontStyle.italic, color: AppColors.defaultBlue),
 
       // Links with BI brand colors
       'a': Style(
@@ -198,10 +188,7 @@ class PremiumHtmlRenderer extends StatelessWidget {
         margin: Margins.only(left: 16, right: 16, bottom: 12),
         padding: HtmlPaddings.only(left: 16, top: 8, bottom: 8),
         border: Border(
-          left: BorderSide(
-            color: AppColors.defaultGold,
-            width: 4,
-          ),
+          left: BorderSide(color: AppColors.defaultGold, width: 4),
         ),
         backgroundColor: AppColors.subtleBlue.withValues(alpha: 0.1),
         fontStyle: FontStyle.italic,
@@ -260,21 +247,19 @@ class PremiumHtmlRenderer extends StatelessWidget {
           color: AppColors.accentBlue,
           margin: Margins.only(bottom: 4, top: 2),
         ),
-        'p': Style(
-          margin: Margins.only(bottom: 4),
-        ),
-        'ul': Style(
-          margin: Margins.only(bottom: 4),
-        ),
-        'ol': Style(
-          margin: Margins.only(bottom: 4),
-        ),
+        'p': Style(margin: Margins.only(bottom: 4)),
+        'ul': Style(margin: Margins.only(bottom: 4)),
+        'ol': Style(margin: Margins.only(bottom: 4)),
       },
     };
   }
 
   /// Handle link taps with URL launcher
-  void _handleLinkTap(String? url, Map<String, String> attributes, dynamic element) {
+  void _handleLinkTap(
+    String? url,
+    Map<String, String> attributes,
+    dynamic element,
+  ) {
     if (url != null && url.isNotEmpty) {
       _launchUrl(url);
     }
@@ -284,10 +269,7 @@ class PremiumHtmlRenderer extends StatelessWidget {
     try {
       final uri = Uri.parse(url);
       if (await canLaunchUrl(uri)) {
-        await launchUrl(
-          uri,
-          mode: LaunchMode.externalApplication,
-        );
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
       }
     } catch (e) {
       // Handle error - maybe show a snackbar
@@ -298,7 +280,7 @@ class PremiumHtmlRenderer extends StatelessWidget {
   /// Decode HTML entities as backup
   String _decodeHtmlEntities(String text) {
     if (text.isEmpty) return text;
-    
+
     return text
         .replaceAll('&amp;', '&')
         .replaceAll('&lt;', '<')

@@ -6,8 +6,6 @@ import '../models/event_model.dart';
 import 'appwrite_service.dart';
 
 class EventService {
-  
-  
   Databases get _databases => databases;
 
   // Get events from WordPress API (external events)
@@ -27,9 +25,7 @@ class EventService {
     int offset = 0,
   }) async {
     try {
-      final requestBody = {
-        'campusId': campusId,
-      };
+      final requestBody = {'campusId': campusId};
 
       final execution = await functions.createExecution(
         functionId: AppConstants.fnFetchEventsId,
@@ -37,8 +33,11 @@ class EventService {
       );
 
       if (execution.responseStatusCode == 200) {
-        final Map<String, dynamic> payload = json.decode(execution.responseBody);
-        final List<dynamic> events = (payload['events'] as List<dynamic>? ?? <dynamic>[]);
+        final Map<String, dynamic> payload = json.decode(
+          execution.responseBody,
+        );
+        final List<dynamic> events =
+            (payload['events'] as List<dynamic>? ?? <dynamic>[]);
         final models = events
             .map((e) => EventModel.fromFunctionEvent(e as Map<String, dynamic>))
             .toList();
@@ -46,10 +45,14 @@ class EventService {
         // Sort by start date ascending and apply limit/offset locally
         models.sort((a, b) => a.startDate.compareTo(b.startDate));
         final start = offset < models.length ? offset : models.length;
-        final end = (start + limit) < models.length ? (start + limit) : models.length;
+        final end = (start + limit) < models.length
+            ? (start + limit)
+            : models.length;
         return models.sublist(start, end);
       } else {
-        throw EventException('Failed to fetch events (function): HTTP ${execution.responseStatusCode}');
+        throw EventException(
+          'Failed to fetch events (function): HTTP ${execution.responseStatusCode}',
+        );
       }
     } catch (e) {
       throw EventException('Error fetching events via function: $e');
@@ -109,7 +112,11 @@ class EventService {
   }) async {
     try {
       final futures = await Future.wait([
-        getFunctionEvents(campusId: campusId, limit: limit ~/ 2, offset: offset),
+        getFunctionEvents(
+          campusId: campusId,
+          limit: limit ~/ 2,
+          offset: offset,
+        ),
         getAppwriteEvents(
           campusId: campusId,
           category: category,
@@ -204,9 +211,9 @@ class EventService {
       // Update event attendee count
       final event = await getEventById(eventId);
       if (event != null) {
-        await updateEvent(event.copyWith(
-          currentAttendees: event.currentAttendees + 1,
-        ));
+        await updateEvent(
+          event.copyWith(currentAttendees: event.currentAttendees + 1),
+        );
       }
     } on AppwriteException catch (e) {
       throw EventException('Failed to register for event: ${e.message}');
@@ -237,9 +244,13 @@ class EventService {
         // Update event attendee count
         final event = await getEventById(eventId);
         if (event != null) {
-          await updateEvent(event.copyWith(
-            currentAttendees: (event.currentAttendees - 1).clamp(0, double.infinity).toInt(),
-          ));
+          await updateEvent(
+            event.copyWith(
+              currentAttendees: (event.currentAttendees - 1)
+                  .clamp(0, double.infinity)
+                  .toInt(),
+            ),
+          );
         }
       }
     } on AppwriteException catch (e) {

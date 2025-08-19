@@ -37,7 +37,9 @@ class CampusSwitcher extends ConsumerWidget {
         decoration: BoxDecoration(
           color: AppColors.subtleBlue,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppColors.defaultBlue.withValues(alpha: 0.3)),
+          border: Border.all(
+            color: AppColors.defaultBlue.withValues(alpha: 0.3),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -69,11 +71,7 @@ class CampusSwitcher extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 4),
-            Icon(
-              Icons.expand_more,
-              size: 16,
-              color: AppColors.defaultBlue,
-            ),
+            Icon(Icons.expand_more, size: 16, color: AppColors.defaultBlue),
           ],
         ),
       ),
@@ -89,12 +87,14 @@ class CampusSwitcher extends ConsumerWidget {
         builder: (context, ref, child) {
           final selectedCampus = ref.watch(filterCampusProvider);
           final allCampuses = ref.watch(allCampusesSyncProvider);
-          
+
           return _CampusSwitcherModal(
             selectedCampus: selectedCampus,
             allCampuses: allCampuses,
             onCampusSelected: (campus) {
-              ref.read(filterCampusProvider.notifier).selectFilterCampus(campus);
+              ref
+                  .read(filterCampusProvider.notifier)
+                  .selectFilterCampus(campus);
               Navigator.pop(context);
               onCampusChanged?.call();
             },
@@ -152,7 +152,9 @@ class _FullScreenCampusSwitcher extends StatelessWidget {
                 campus: campus,
                 isSelected: isSelected,
                 onTap: () {
-                  ref.read(filterCampusProvider.notifier).selectFilterCampus(campus);
+                  ref
+                      .read(filterCampusProvider.notifier)
+                      .selectFilterCampus(campus);
                   Navigator.pop(context);
                   onCampusChanged?.call();
                 },
@@ -196,7 +198,7 @@ class _CampusSwitcherModal extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Header
           Padding(
             padding: const EdgeInsets.all(20),
@@ -326,7 +328,10 @@ class _CampusCard extends StatelessWidget {
                         const Spacer(),
                         if (isSelected)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.defaultBlue,
                               borderRadius: BorderRadius.circular(12),
@@ -342,9 +347,9 @@ class _CampusCard extends StatelessWidget {
                           ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     Text(
                       campus.name,
                       style: theme.textTheme.headlineSmall?.copyWith(
@@ -352,9 +357,9 @@ class _CampusCard extends StatelessWidget {
                         color: _getCampusColor(campus.id),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 4),
-                    
+
                     Text(
                       campus.description,
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -369,7 +374,8 @@ class _CampusCard extends StatelessWidget {
                       children: [
                         _StatBadge(
                           icon: Icons.people,
-                          value: '${(campus.stats.studentCount / 1000).toStringAsFixed(1)}k',
+                          value:
+                              '${(campus.stats.studentCount / 1000).toStringAsFixed(1)}k',
                           label: 'Students',
                         ),
                         const SizedBox(width: 16),
@@ -588,10 +594,7 @@ class _StatBadge extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               value,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
           ],
         ),

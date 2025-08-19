@@ -30,16 +30,22 @@ class StudentIdModel extends Equatable {
       studentNumber: map['student_number'] ?? map['studentNumber'] ?? '',
       isVerified: map['verified'] ?? map['isVerified'] ?? false,
       isMember: map['is_member'] ?? map['isMember'] ?? false,
-      membershipExpiry: map['membership_expiry'] != null 
+      membershipExpiry: map['membership_expiry'] != null
           ? DateTime.parse(map['membership_expiry'])
-          : (map['membershipExpiry'] != null ? DateTime.parse(map['membershipExpiry']) : null),
+          : (map['membershipExpiry'] != null
+                ? DateTime.parse(map['membershipExpiry'])
+                : null),
       membershipDetails: map['membership_details'] as Map<String, dynamic>?,
-      createdAt: map['\$createdAt'] != null 
-          ? DateTime.parse(map['\$createdAt']) 
-          : (map['createdAt'] != null ? DateTime.parse(map['createdAt']) : DateTime.now()),
-      verifiedAt: map['verified_at'] != null 
+      createdAt: map['\$createdAt'] != null
+          ? DateTime.parse(map['\$createdAt'])
+          : (map['createdAt'] != null
+                ? DateTime.parse(map['createdAt'])
+                : DateTime.now()),
+      verifiedAt: map['verified_at'] != null
           ? DateTime.parse(map['verified_at'])
-          : (map['verifiedAt'] != null ? DateTime.parse(map['verifiedAt']) : null),
+          : (map['verifiedAt'] != null
+                ? DateTime.parse(map['verifiedAt'])
+                : null),
     );
   }
 

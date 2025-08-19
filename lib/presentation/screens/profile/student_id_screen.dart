@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:async';
@@ -19,7 +20,8 @@ class StudentIdScreen extends ConsumerStatefulWidget {
   ConsumerState<StudentIdScreen> createState() => _StudentIdScreenState();
 }
 
-class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerProviderStateMixin {
+class _StudentIdScreenState extends ConsumerState<StudentIdScreen>
+    with TickerProviderStateMixin {
   Timer? _tokenRefreshTimer;
   Timer? _animationTimer;
   Timer? _countdownUpdateTimer;
@@ -29,13 +31,13 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerPr
   bool _isLoadingToken = false;
   String? _tokenError;
   int _remainingSeconds = 0;
-  
+
   // Animation controllers
   late AnimationController _watermarkController;
   late AnimationController _pulseController;
   late AnimationController _countdownController;
   late AnimationController _gradientController;
-  
+
   // Animation values
   late Animation<double> _watermarkAnimation;
   late Animation<double> _pulseAnimation;
@@ -110,17 +112,17 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerPr
   void _startTokenRefresh() {
     // Initial token fetch
     _fetchNewToken();
-    
+
     // Set up timer for token refresh every 30 seconds
     _tokenRefreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       _fetchNewToken();
     });
-    
+
     // Set up timer for watermark animation every 10 seconds
     _animationTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
       _watermarkController.forward(from: 0);
     });
-    
+
     // Set up countdown update timer (updates every second)
     _countdownUpdateTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _updateCountdown();
@@ -131,7 +133,7 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerPr
     if (_tokenExpiry != null) {
       final now = DateTime.now();
       final timeUntilExpiry = _tokenExpiry!.difference(now).inSeconds;
-      
+
       if (mounted) {
         setState(() {
           _remainingSeconds = timeUntilExpiry > 0 ? timeUntilExpiry : 0;
@@ -142,7 +144,7 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerPr
 
   Future<void> _fetchNewToken() async {
     if (_isLoadingToken) return;
-    
+
     setState(() {
       _isLoadingToken = true;
       _tokenError = null;
@@ -150,41 +152,46 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerPr
 
     try {
       final result = await _validatorService.issuePassToken();
-      
+
       if (result.ok) {
         setState(() {
           _currentToken = result.token;
-          _tokenExpiry = DateTime.now().add(Duration(seconds: result.ttlSeconds));
+          _tokenExpiry = DateTime.now().add(
+            Duration(seconds: result.ttlSeconds),
+          );
           _serverTime = result.serverTime;
           _remainingSeconds = result.ttlSeconds;
           _isLoadingToken = false;
         });
-        
+
         // Reset countdown animation
         _countdownController.reset();
         _countdownController.forward();
       } else {
         setState(() {
-          _tokenError = result.error ?? 'Failed to generate verification token.';
+          _tokenError =
+              result.error ?? 'Failed to generate verification token.';
           _isLoadingToken = false;
         });
       }
-      
     } catch (e) {
       String userFriendlyError;
-      
+
       if (e.toString().contains('NO_ACTIVE_MEMBERSHIP')) {
-        userFriendlyError = 'No active membership found. Please purchase a BISO membership first.';
+        userFriendlyError =
+            'No active membership found. Please purchase a BISO membership first.';
       } else if (e.toString().contains('NO_STUDENT_ID')) {
-        userFriendlyError = 'Student ID not found. Please verify your student status first.';
+        userFriendlyError =
+            'Student ID not found. Please verify your student status first.';
       } else if (e.toString().contains('UNAUTHENTICATED')) {
         userFriendlyError = 'Authentication required. Please log in again.';
       } else if (e.toString().contains('FAILED_TO_VERIFY_MEMBERSHIP')) {
-        userFriendlyError = 'Unable to verify membership status. Please try again.';
+        userFriendlyError =
+            'Unable to verify membership status. Please try again.';
       } else {
         userFriendlyError = 'Network error: ${e.toString()}';
       }
-      
+
       setState(() {
         _tokenError = userFriendlyError;
         _isLoadingToken = false;
@@ -202,10 +209,8 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerPr
     final membershipStatus = authState.membershipStatus;
     final selectedCampus = ref.watch(selectedCampusProvider);
     final campusColor = _getCampusColor(selectedCampus.id);
-    
+
     // Use the continuously updated countdown
-    final isExpired = _remainingSeconds <= 0;
-    final isExpiringSoon = _remainingSeconds <= 10;
 
     return Scaffold(
       appBar: AppBar(
@@ -235,7 +240,8 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerPr
             else if (authState.error != null)
               _ErrorCard(
                 error: authState.error!,
-                onRetry: () => ref.read(authStateProvider.notifier).refreshProfile(),
+                onRetry: () =>
+                    ref.read(authStateProvider.notifier).refreshProfile(),
                 campusColor: campusColor,
               )
             else if (!hasStudentId)
@@ -251,7 +257,8 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerPr
                 isVerified: isStudentVerified,
                 hasValidMembership: hasValidMembership,
                 membershipStatus: membershipStatus,
-                expiryDate: authState.membershipVerification?.membership?.expiryDate,
+                expiryDate:
+                    authState.membershipVerification?.membership?.expiryDate,
                 currentToken: _currentToken,
                 tokenExpiry: _tokenExpiry,
                 serverTime: _serverTime,
@@ -283,8 +290,6 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerPr
       ),
     );
   }
-
-  
 
   Color _getCampusColor(String campusId) {
     switch (campusId) {
@@ -340,7 +345,9 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerPr
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Remove Student ID'),
-        content: const Text('Are you sure you want to remove your student ID? This will remove your verified status and access to student benefits.'),
+        content: const Text(
+          'Are you sure you want to remove your student ID? This will remove your verified status and access to student benefits.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -362,17 +369,17 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen> with TickerPr
   void _copyTokenToClipboard() {
     if (_currentToken != null) {
       final qrData = 'bisoapp://verify?token=$_currentToken';
-      // TODO: Implement clipboard functionality
-      // For now, just show a snackbar
+      Clipboard.setData(ClipboardData(text: qrData));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('QR data copied to clipboard: ${qrData.substring(0, 40)}...'),
+          content: Text(
+            'QR data copied to clipboard: ${qrData.substring(0, 40)}...',
+          ),
           backgroundColor: AppColors.success,
         ),
       );
     }
   }
-
 }
 
 // Premium UI Components
@@ -389,14 +396,11 @@ class _PremiumHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            campusColor,
-            campusColor.withValues(alpha: 0.8),
-          ],
+          colors: [campusColor, campusColor.withValues(alpha: 0.8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -538,7 +542,10 @@ class _ErrorCard extends StatelessWidget {
               label: const Text('Try Again'),
               style: FilledButton.styleFrom(
                 backgroundColor: campusColor,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
             ),
           ],
@@ -649,7 +656,10 @@ class _RegisterStudentIdSection extends StatelessWidget {
                     style: FilledButton.styleFrom(
                       backgroundColor: campusColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 32,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -667,15 +677,13 @@ class _RegisterStudentIdSection extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.blue1.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.blue6.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: AppColors.blue6.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.security,
-                    color: AppColors.blue9,
-                    size: 20,
-                  ),
+                  Icon(Icons.security, color: AppColors.blue9, size: 20),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -711,18 +719,16 @@ class _RegisterStudentIdSection extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.green1.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.green6.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: AppColors.green6.withValues(alpha: 0.3),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.star,
-                        color: AppColors.green9,
-                        size: 20,
-                      ),
+                      Icon(Icons.star, color: AppColors.green9, size: 20),
                       const SizedBox(width: 8),
                       Text(
                         'Unlock After Verification',
@@ -751,12 +757,14 @@ class _RegisterStudentIdSection extends StatelessWidget {
   }
 }
 
-
 class _AnimatedBackgroundPainter extends CustomPainter {
   final Color campusColor;
   final double animationValue;
 
-  _AnimatedBackgroundPainter({required this.campusColor, required this.animationValue});
+  _AnimatedBackgroundPainter({
+    required this.campusColor,
+    required this.animationValue,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -783,10 +791,9 @@ class _AnimatedBackgroundPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     if (oldDelegate is! _AnimatedBackgroundPainter) return true;
     return oldDelegate.campusColor != campusColor ||
-           oldDelegate.animationValue != animationValue;
+        oldDelegate.animationValue != animationValue;
   }
 }
-
 
 class _AnimatedStudentIdCard extends StatelessWidget {
   final StudentIdModel studentRecord;
@@ -876,7 +883,7 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                 },
               ),
             ),
-            
+
             // Floating particles
             Positioned.fill(
               child: AnimatedBuilder(
@@ -921,9 +928,10 @@ class _AnimatedStudentIdCard extends StatelessWidget {
               child: AnimatedBuilder(
                 animation: watermarkAnimation,
                 builder: (context, child) {
-                  final glyphIndex = ((watermarkAnimation.value * 10).floor() % 3).toInt();
+                  final glyphIndex =
+                      ((watermarkAnimation.value * 10).floor() % 3).toInt();
                   final glyph = _getNowGlyph(glyphIndex);
-                  
+
                   return Transform.rotate(
                     angle: watermarkAnimation.value * math.pi * 0.05,
                     child: Container(
@@ -933,11 +941,7 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                         color: campusColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Icon(
-                        glyph,
-                        size: 16,
-                        color: campusColor,
-                      ),
+                      child: Icon(glyph, size: 16, color: campusColor),
                     ),
                   );
                 },
@@ -988,9 +992,9 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                           );
                         },
                       ),
-                      
+
                       const SizedBox(width: 20),
-                      
+
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1081,10 +1085,11 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                                 children: [
                                   Text(
                                     'Verification Code',
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[800],
-                                    ),
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey[800],
+                                        ),
                                   ),
                                   Text(
                                     'Show this to validators',
@@ -1097,9 +1102,9 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // Enhanced QR Code with countdown ring
                         GestureDetector(
                           onTap: () => _showQRDialog(context, campusColor),
@@ -1123,7 +1128,7 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                                   },
                                 ),
                               ),
-                              
+
                               // QR Code container with enhanced styling
                               Container(
                                 width: 150,
@@ -1146,12 +1151,17 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(18),
-                                  child: _buildQRCodeContent(context, campusColor),
+                                  child: _buildQRCodeContent(
+                                    context,
+                                    campusColor,
+                                  ),
                                 ),
                               ),
-                              
+
                               // Tap indicator
-                              if (currentToken != null && !isLoadingToken && tokenError == null)
+                              if (currentToken != null &&
+                                  !isLoadingToken &&
+                                  tokenError == null)
                                 Positioned(
                                   bottom: 8,
                                   right: 8,
@@ -1162,7 +1172,9 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(12),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: campusColor.withValues(alpha: 0.3),
+                                          color: campusColor.withValues(
+                                            alpha: 0.3,
+                                          ),
                                           blurRadius: 8,
                                         ),
                                       ],
@@ -1196,10 +1208,10 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                                 Text(
                                   '${remainingSeconds}s',
                                   style: theme.textTheme.titleMedium?.copyWith(
-                                    color: isExpired 
-                                      ? AppColors.error 
-                                      : isExpiringSoon 
-                                        ? AppColors.orange9 
+                                    color: isExpired
+                                        ? AppColors.error
+                                        : isExpiringSoon
+                                        ? AppColors.orange9
                                         : campusColor,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -1213,7 +1225,10 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                               style: FilledButton.styleFrom(
                                 backgroundColor: campusColor,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                 ),
@@ -1226,7 +1241,9 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                                 icon: const Icon(Icons.copy, size: 18),
                                 tooltip: 'Copy token for testing',
                                 style: IconButton.styleFrom(
-                                  backgroundColor: campusColor.withValues(alpha: 0.1),
+                                  backgroundColor: campusColor.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   foregroundColor: campusColor,
                                 ),
                               ),
@@ -1271,7 +1288,10 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: campusColor,
                         side: BorderSide(color: campusColor),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1280,7 +1300,6 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                   ],
 
                   const SizedBox(height: 16),
-
                 ],
               ),
             ),
@@ -1315,7 +1334,7 @@ class _AnimatedStudentIdCard extends StatelessWidget {
 
   Widget _buildQRCodeContent(BuildContext context, Color campusColor) {
     final theme = Theme.of(context);
-    
+
     if (isLoadingToken) {
       return Center(
         child: Column(
@@ -1341,17 +1360,13 @@ class _AnimatedStudentIdCard extends StatelessWidget {
         ),
       );
     }
-    
+
     if (tokenError != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              color: AppColors.error,
-              size: 32,
-            ),
+            Icon(Icons.error_outline, color: AppColors.error, size: 32),
             const SizedBox(height: 8),
             Text(
               'QR Error',
@@ -1364,7 +1379,7 @@ class _AnimatedStudentIdCard extends StatelessWidget {
         ),
       );
     }
-    
+
     if (currentToken != null) {
       return Stack(
         children: [
@@ -1390,7 +1405,7 @@ class _AnimatedStudentIdCard extends StatelessWidget {
         ],
       );
     }
-    
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1415,7 +1430,7 @@ class _AnimatedStudentIdCard extends StatelessWidget {
 
   void _showQRDialog(BuildContext context, Color campusColor) {
     if (currentToken == null) return;
-    
+
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -1455,11 +1470,7 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.qr_code_2,
-                      color: campusColor,
-                      size: 24,
-                    ),
+                    Icon(Icons.qr_code_2, color: campusColor, size: 24),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -1472,15 +1483,12 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: Icon(
-                        Icons.close,
-                        color: campusColor,
-                      ),
+                      icon: Icon(Icons.close, color: campusColor),
                     ),
                   ],
                 ),
               ),
-              
+
               // Large QR Code
               Expanded(
                 child: Padding(
@@ -1512,18 +1520,14 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               // Footer with timer
               Container(
                 padding: const EdgeInsets.all(24),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.timer,
-                      color: campusColor,
-                      size: 16,
-                    ),
+                    Icon(Icons.timer, color: campusColor, size: 16),
                     const SizedBox(width: 8),
                     Text(
                       'Expires in ${remainingSeconds}s',
@@ -1541,9 +1545,7 @@ class _AnimatedStudentIdCard extends StatelessWidget {
       ),
     );
   }
-
 }
-
 
 class _PremiumStatusBadge extends StatelessWidget {
   final bool isVerified;
@@ -1624,7 +1626,9 @@ class _PremiumBenefitsSection extends StatelessWidget {
 
         Card(
           elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -1702,9 +1706,9 @@ class _BenefitItem extends StatelessWidget {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: isUnlocked 
-              ? campusColor.withValues(alpha: 0.15)
-              : AppColors.gray100,
+            color: isUnlocked
+                ? campusColor.withValues(alpha: 0.15)
+                : AppColors.gray100,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
@@ -1729,11 +1733,7 @@ class _BenefitItem extends StatelessWidget {
                   ),
                   if (isUnlocked) ...[
                     const SizedBox(width: 8),
-                    Icon(
-                      Icons.check_circle,
-                      color: AppColors.green9,
-                      size: 16,
-                    ),
+                    Icon(Icons.check_circle, color: AppColors.green9, size: 16),
                   ],
                 ],
               ),
@@ -1741,7 +1741,9 @@ class _BenefitItem extends StatelessWidget {
               Text(
                 description,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: isUnlocked ? AppColors.onSurfaceVariant : AppColors.gray500,
+                  color: isUnlocked
+                      ? AppColors.onSurfaceVariant
+                      : AppColors.gray500,
                 ),
               ),
             ],
@@ -1756,10 +1758,7 @@ class _QRCodePlaceholder extends StatelessWidget {
   final String qrData;
   final Color campusColor;
 
-  const _QRCodePlaceholder({
-    required this.qrData,
-    required this.campusColor,
-  });
+  const _QRCodePlaceholder({required this.qrData, required this.campusColor});
 
   @override
   Widget build(BuildContext context) {
@@ -1774,10 +1773,7 @@ class _QRCodePlaceholder extends StatelessWidget {
           dataModuleShape: QrDataModuleShape.square,
           color: campusColor,
         ),
-        eyeStyle: QrEyeStyle(
-          eyeShape: QrEyeShape.square,
-          color: campusColor,
-        ),
+        eyeStyle: QrEyeStyle(eyeShape: QrEyeShape.square, color: campusColor),
         errorCorrectionLevel: QrErrorCorrectLevel.M,
         padding: const EdgeInsets.all(8),
       ),
@@ -1785,20 +1781,15 @@ class _QRCodePlaceholder extends StatelessWidget {
   }
 }
 
-
 class _ParticlePainter extends CustomPainter {
   final Color campusColor;
   final double animationValue;
 
-  _ParticlePainter({
-    required this.campusColor,
-    required this.animationValue,
-  });
+  _ParticlePainter({required this.campusColor, required this.animationValue});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.fill;
+    final paint = Paint()..style = PaintingStyle.fill;
 
     // Create 8 floating particles
     for (int i = 0; i < 8; i++) {
@@ -1806,10 +1797,10 @@ class _ParticlePainter extends CustomPainter {
       final radius = 80 + math.sin(animationValue * 4 + i) * 20;
       final x = size.width / 2 + math.cos(angle) * radius;
       final y = size.height / 2 + math.sin(angle) * radius;
-      
+
       final opacity = 0.1 + 0.05 * math.sin(animationValue * 3 + i);
       final particleSize = 2 + math.sin(animationValue * 2 + i) * 1;
-      
+
       paint.color = campusColor.withValues(alpha: opacity);
       canvas.drawCircle(Offset(x, y), particleSize, paint);
     }
@@ -1818,11 +1809,10 @@ class _ParticlePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return oldDelegate is! _ParticlePainter ||
-           oldDelegate.campusColor != campusColor ||
-           oldDelegate.animationValue != animationValue;
+        oldDelegate.campusColor != campusColor ||
+        oldDelegate.animationValue != animationValue;
   }
 }
-
 
 class _PremiumCountdownRingPainter extends CustomPainter {
   final double progress;
@@ -1846,10 +1836,7 @@ class _PremiumCountdownRingPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..shader = LinearGradient(
-        colors: [
-          color.withValues(alpha: 0.08),
-          color.withValues(alpha: 0.12),
-        ],
+        colors: [color.withValues(alpha: 0.08), color.withValues(alpha: 0.12)],
       ).createShader(Rect.fromCircle(center: center, radius: radius));
 
     canvas.drawCircle(center, radius, backgroundPaint);
@@ -1901,9 +1888,9 @@ class _PremiumCountdownRingPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return oldDelegate is! _PremiumCountdownRingPainter ||
-           oldDelegate.progress != progress ||
-           oldDelegate.color != color ||
-           oldDelegate.strokeWidth != strokeWidth;
+        oldDelegate.progress != progress ||
+        oldDelegate.color != color ||
+        oldDelegate.strokeWidth != strokeWidth;
   }
 }
 
@@ -1922,8 +1909,9 @@ class _EnhancedShimmerPainter extends CustomPainter {
 
     // Create multiple shimmer waves
     final shimmerWidth = size.width * 0.25;
-    final shimmerPosition = (animationValue * (size.width + shimmerWidth)) - shimmerWidth;
-    
+    final shimmerPosition =
+        (animationValue * (size.width + shimmerWidth)) - shimmerWidth;
+
     // Primary shimmer
     final primaryGradient = LinearGradient(
       colors: [
@@ -1975,7 +1963,7 @@ class _EnhancedShimmerPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return oldDelegate is! _EnhancedShimmerPainter ||
-           oldDelegate.campusColor != campusColor ||
-           oldDelegate.animationValue != animationValue;
+        oldDelegate.campusColor != campusColor ||
+        oldDelegate.animationValue != animationValue;
   }
 }

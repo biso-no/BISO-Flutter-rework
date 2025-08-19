@@ -10,28 +10,31 @@ import '../../../data/services/product_service.dart';
 import '../../../providers/campus/campus_provider.dart';
 import '../../../providers/auth/auth_provider.dart';
 
-final _productServiceProvider = Provider<ProductService>((ref) => ProductService());
+final _productServiceProvider = Provider<ProductService>(
+  (ref) => ProductService(),
+);
 
-final productsProvider = FutureProvider.autoDispose.family<List<ProductModel>, _ProductQuery>((ref, query) async {
-  final service = ref.watch(_productServiceProvider);
-  
-  if (query.showFavorites && query.userId != null) {
-    return service.getUserFavoriteProducts(
-      userId: query.userId!,
-      campusId: query.campusId,
-      category: query.category,
-      limit: 50,
-    );
-  } else {
-    return service.listProducts(
-      campusId: query.campusId,
-      category: query.category,
-      status: query.status,
-      search: query.search,
-      limit: 50,
-    );
-  }
-});
+final productsProvider = FutureProvider.autoDispose
+    .family<List<ProductModel>, _ProductQuery>((ref, query) async {
+      final service = ref.watch(_productServiceProvider);
+
+      if (query.showFavorites && query.userId != null) {
+        return service.getUserFavoriteProducts(
+          userId: query.userId!,
+          campusId: query.campusId,
+          category: query.category,
+          limit: 50,
+        );
+      } else {
+        return service.listProducts(
+          campusId: query.campusId,
+          category: query.category,
+          status: query.status,
+          search: query.search,
+          limit: 50,
+        );
+      }
+    });
 
 class MarketplaceScreen extends ConsumerStatefulWidget {
   const MarketplaceScreen({super.key});
@@ -98,7 +101,8 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
         elevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
-          onPressed: () => context.canPop() ? context.pop() : context.go('/home'),
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/home'),
           icon: const Icon(Icons.arrow_back, color: AppColors.charcoalBlack),
         ),
         actions: [
@@ -116,9 +120,13 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
               },
               icon: Icon(
                 _showFavorites ? Icons.favorite : Icons.favorite_border,
-                color: _showFavorites ? AppColors.error : AppColors.charcoalBlack,
+                color: _showFavorites
+                    ? AppColors.error
+                    : AppColors.charcoalBlack,
               ),
-              tooltip: _showFavorites ? 'Show all products' : 'Show favorites only',
+              tooltip: _showFavorites
+                  ? 'Show all products'
+                  : 'Show favorites only',
             ),
         ],
       ),
@@ -132,15 +140,23 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
               onChanged: _showFavorites ? null : _onSearchChanged,
               enabled: !_showFavorites,
               decoration: InputDecoration(
-                hintText: _showFavorites ? 'Search disabled in favorites' : 'Search marketplace',
-                prefixIcon: const Icon(Icons.search, color: AppColors.onSurfaceVariant),
+                hintText: _showFavorites
+                    ? 'Search disabled in favorites'
+                    : 'Search marketplace',
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: AppColors.onSurfaceVariant,
+                ),
                 suffixIcon: _search != null
                     ? IconButton(
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _search = null);
                         },
-                        icon: const Icon(Icons.clear, color: AppColors.onSurfaceVariant),
+                        icon: const Icon(
+                          Icons.clear,
+                          color: AppColors.onSurfaceVariant,
+                        ),
                       )
                     : null,
                 filled: true,
@@ -155,7 +171,10 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.defaultBlue, width: 2),
+                  borderSide: const BorderSide(
+                    color: AppColors.defaultBlue,
+                    width: 2,
+                  ),
                 ),
               ),
               textInputAction: TextInputAction.search,
@@ -175,17 +194,26 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                   onTap: () => setState(() => _selectedCategory = cat),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: selected ? AppColors.subtleBlue : Colors.white,
-                      border: Border.all(color: selected ? AppColors.defaultBlue : AppColors.outlineVariant),
+                      border: Border.all(
+                        color: selected
+                            ? AppColors.defaultBlue
+                            : AppColors.outlineVariant,
+                      ),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Center(
                       child: Text(
                         _getCategoryDisplayName(cat),
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: selected ? AppColors.defaultBlue : AppColors.charcoalBlack,
+                          color: selected
+                              ? AppColors.defaultBlue
+                              : AppColors.charcoalBlack,
                           fontWeight: FontWeight.w600,
                           height: 1.0,
                         ),
@@ -194,7 +222,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                   ),
                 );
               },
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              separatorBuilder: (_, _) => const SizedBox(width: 10),
               itemCount: _categories.length,
             ),
           ),
@@ -210,21 +238,27 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            _showFavorites ? Icons.favorite_border : Icons.shopping_bag_outlined,
+                            _showFavorites
+                                ? Icons.favorite_border
+                                : Icons.shopping_bag_outlined,
                             size: 64,
                             color: AppColors.onSurfaceVariant,
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            _showFavorites ? 'No favorites yet' : 'No items found',
+                            _showFavorites
+                                ? 'No favorites yet'
+                                : 'No items found',
                             style: theme.textTheme.titleLarge,
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            _showFavorites 
+                            _showFavorites
                                 ? 'Heart items you like to see them here!'
                                 : 'Try changing your filter or check back later',
-                            style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: AppColors.onSurfaceVariant,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -232,27 +266,37 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                     )
                   : GridView.builder(
                       padding: const EdgeInsets.all(16),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 14,
-                        mainAxisSpacing: 14,
-                        childAspectRatio: 0.72,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 14,
+                            mainAxisSpacing: 14,
+                            childAspectRatio: 0.72,
+                          ),
                       itemCount: products.length,
-                      itemBuilder: (context, index) => _PremiumProductCard(
-                        product: products[index],
-                      ),
+                      itemBuilder: (context, index) =>
+                          _PremiumProductCard(product: products[index]),
                     ),
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, st) => Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.error_outline, color: AppColors.error, size: 48),
+                    const Icon(
+                      Icons.error_outline,
+                      color: AppColors.error,
+                      size: 48,
+                    ),
                     const SizedBox(height: 8),
                     Text('Failed to load', style: theme.textTheme.titleMedium),
                     const SizedBox(height: 8),
-                    Text(e.toString(), style: theme.textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant), textAlign: TextAlign.center),
+                    Text(
+                      e.toString(),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
                       onPressed: () => ref.invalidate(productsProvider(query)),
@@ -277,28 +321,34 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
 
   String _getCategoryDisplayName(String category) {
     switch (category) {
-      case 'all': return 'All';
-      case 'books': return 'Books';
-      case 'electronics': return 'Electronics';
-      case 'furniture': return 'Furniture';
-      case 'clothes': return 'Clothes';
-      case 'sports': return 'Sports';
-      case 'other': return 'Other';
-      default: return category;
+      case 'all':
+        return 'All';
+      case 'books':
+        return 'Books';
+      case 'electronics':
+        return 'Electronics';
+      case 'furniture':
+        return 'Furniture';
+      case 'clothes':
+        return 'Clothes';
+      case 'sports':
+        return 'Sports';
+      case 'other':
+        return 'Other';
+      default:
+        return category;
     }
   }
-
 }
 
 class _PremiumProductCard extends ConsumerStatefulWidget {
   final ProductModel product;
 
-  const _PremiumProductCard({
-    required this.product,
-  });
+  const _PremiumProductCard({required this.product});
 
   @override
-  ConsumerState<_PremiumProductCard> createState() => _PremiumProductCardState();
+  ConsumerState<_PremiumProductCard> createState() =>
+      _PremiumProductCardState();
 }
 
 class _PremiumProductCardState extends ConsumerState<_PremiumProductCard> {
@@ -364,7 +414,9 @@ class _PremiumProductCardState extends ConsumerState<_PremiumProductCard> {
         // Show subtle feedback
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(newState ? 'Added to favorites' : 'Removed from favorites'),
+            content: Text(
+              newState ? 'Added to favorites' : 'Removed from favorites',
+            ),
             duration: const Duration(milliseconds: 800),
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
@@ -394,7 +446,11 @@ class _PremiumProductCardState extends ConsumerState<_PremiumProductCard> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
-            BoxShadow(color: AppColors.shadowLight, blurRadius: 16, offset: Offset(0, 10)),
+            BoxShadow(
+              color: AppColors.shadowLight,
+              blurRadius: 16,
+              offset: Offset(0, 10),
+            ),
           ],
           border: Border.all(color: AppColors.gray100),
         ),
@@ -408,16 +464,25 @@ class _PremiumProductCardState extends ConsumerState<_PremiumProductCard> {
                 children: [
                   Positioned.fill(
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
                       child: widget.product.images.isNotEmpty
                           ? Image.network(
                               widget.product.images.first,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(color: AppColors.gray100, child: const Icon(Icons.image_outlined)),
+                              errorBuilder: (_, _, _) => Container(
+                                color: AppColors.gray100,
+                                child: const Icon(Icons.image_outlined),
+                              ),
                             )
                           : Container(
                               color: AppColors.gray100,
-                              child: Icon(_getCategoryIcon(widget.product.category), size: 48, color: AppColors.onSurfaceVariant),
+                              child: Icon(
+                                _getCategoryIcon(widget.product.category),
+                                size: 48,
+                                color: AppColors.onSurfaceVariant,
+                              ),
                             ),
                     ),
                   ),
@@ -426,14 +491,20 @@ class _PremiumProductCardState extends ConsumerState<_PremiumProductCard> {
                     top: 10,
                     right: 10,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
                         'NOK ${widget.product.price.toStringAsFixed(0)}',
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
@@ -450,17 +521,29 @@ class _PremiumProductCardState extends ConsumerState<_PremiumProductCard> {
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.9),
                             shape: BoxShape.circle,
-                            boxShadow: const [BoxShadow(color: AppColors.shadowLight, blurRadius: 12)],
+                            boxShadow: const [
+                              BoxShadow(
+                                color: AppColors.shadowLight,
+                                blurRadius: 12,
+                              ),
+                            ],
                           ),
                           child: _favoriteLoading
                               ? const SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.defaultBlue),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppColors.defaultBlue,
+                                  ),
                                 )
                               : Icon(
-                                  _isFavorited ? Icons.favorite : Icons.favorite_border,
-                                  color: _isFavorited ? AppColors.error : AppColors.defaultBlue,
+                                  _isFavorited
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: _isFavorited
+                                      ? AppColors.error
+                                      : AppColors.defaultBlue,
                                   size: 20,
                                 ),
                         ),
@@ -477,38 +560,52 @@ class _PremiumProductCardState extends ConsumerState<_PremiumProductCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                  Text(
-                    widget.product.name,
-                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.product.sellerName,
-                          style: theme.textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                    Text(
+                      widget.product.name,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
                       ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: _getConditionColor(widget.product.condition).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(999),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.product.sellerName,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        child: Text(
-                          widget.product.displayCondition,
-                          style: theme.textTheme.labelSmall?.copyWith(color: _getConditionColor(widget.product.condition), fontWeight: FontWeight.w600),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getConditionColor(
+                              widget.product.condition,
+                            ).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            widget.product.displayCondition,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: _getConditionColor(
+                                widget.product.condition,
+                              ),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -520,23 +617,35 @@ class _PremiumProductCardState extends ConsumerState<_PremiumProductCard> {
 
   IconData _getCategoryIcon(String category) {
     switch (category) {
-      case 'books': return Icons.book;
-      case 'electronics': return Icons.devices;
-      case 'furniture': return Icons.chair;
-      case 'clothes': return Icons.checkroom;
-      case 'sports': return Icons.sports;
-      default: return Icons.shopping_bag;
+      case 'books':
+        return Icons.book;
+      case 'electronics':
+        return Icons.devices;
+      case 'furniture':
+        return Icons.chair;
+      case 'clothes':
+        return Icons.checkroom;
+      case 'sports':
+        return Icons.sports;
+      default:
+        return Icons.shopping_bag;
     }
   }
 
   Color _getConditionColor(String condition) {
     switch (condition) {
-      case 'new': return AppColors.success;
-      case 'like_new': return AppColors.accentBlue;
-      case 'good': return AppColors.defaultGold;
-      case 'fair': return AppColors.orange9;
-      case 'poor': return AppColors.error;
-      default: return AppColors.onSurfaceVariant;
+      case 'new':
+        return AppColors.success;
+      case 'like_new':
+        return AppColors.accentBlue;
+      case 'good':
+        return AppColors.defaultGold;
+      case 'fair':
+        return AppColors.orange9;
+      case 'poor':
+        return AppColors.error;
+      default:
+        return AppColors.onSurfaceVariant;
     }
   }
 }
@@ -548,7 +657,7 @@ class _ProductQuery {
   final String? search;
   final bool showFavorites;
   final String? userId;
-  
+
   const _ProductQuery({
     required this.campusId,
     this.category,
@@ -571,5 +680,6 @@ class _ProductQuery {
   }
 
   @override
-  int get hashCode => Object.hash(campusId, category, status, search, showFavorites, userId);
+  int get hashCode =>
+      Object.hash(campusId, category, status, search, showFavorites, userId);
 }

@@ -82,7 +82,12 @@ class _PremiumPillSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: theme.textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant)),
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: AppColors.onSurfaceVariant,
+          ),
+        ),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -95,19 +100,26 @@ class _PremiumPillSelector extends StatelessWidget {
                 text: 'None',
                 onTap: () => onChanged(''),
               ),
-            ...options.map((o) => _pill(
-                  context,
-                  selected: value == o,
-                  text: display(o),
-                  onTap: () => onChanged(o),
-                )),
+            ...options.map(
+              (o) => _pill(
+                context,
+                selected: value == o,
+                text: display(o),
+                onTap: () => onChanged(o),
+              ),
+            ),
           ],
         ),
       ],
     );
   }
 
-  Widget _pill(BuildContext context, {required bool selected, required String text, required VoidCallback onTap}) {
+  Widget _pill(
+    BuildContext context, {
+    required bool selected,
+    required String text,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -116,14 +128,16 @@ class _PremiumPillSelector extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? AppColors.subtleBlue : Colors.white,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: selected ? AppColors.defaultBlue : AppColors.outlineVariant),
+          border: Border.all(
+            color: selected ? AppColors.defaultBlue : AppColors.outlineVariant,
+          ),
         ),
         child: Text(
           text,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: selected ? AppColors.defaultBlue : AppColors.charcoalBlack,
-                fontWeight: FontWeight.w600,
-              ),
+            color: selected ? AppColors.defaultBlue : AppColors.charcoalBlack,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -146,7 +160,14 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
   bool _isNegotiable = false;
   String? _contactMethod; // 'message' | 'phone' | 'email'
 
-  final _categories = const ['books', 'electronics', 'furniture', 'clothes', 'sports', 'other'];
+  final _categories = const [
+    'books',
+    'electronics',
+    'furniture',
+    'clothes',
+    'sports',
+    'other',
+  ];
   final _conditions = const ['new', 'like_new', 'good', 'fair', 'poor'];
   final _contactMethods = const ['message', 'phone', 'email'];
 
@@ -163,7 +184,9 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final auth = ref.watch(authStateProvider);
-    final _ = ref.watch(filterCampusProvider); // keep reactive to campus changes
+    final _ = ref.watch(
+      filterCampusProvider,
+    ); // keep reactive to campus changes
 
     if (!auth.isAuthenticated || auth.user == null) {
       return Scaffold(
@@ -174,9 +197,16 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.lock_outline, size: 64, color: AppColors.onSurfaceVariant),
+                const Icon(
+                  Icons.lock_outline,
+                  size: 64,
+                  color: AppColors.onSurfaceVariant,
+                ),
                 const SizedBox(height: 16),
-                Text('Please sign in to sell items', style: theme.textTheme.titleMedium),
+                Text(
+                  'Please sign in to sell items',
+                  style: theme.textTheme.titleMedium,
+                ),
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: () => context.go('/auth/login'),
@@ -196,24 +226,30 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
-          leading: IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: _handleCancel,
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: _handleCancel,
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
             child: FilledButton(
               onPressed: _submitting ? null : _submit,
-              style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 16)),
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
               child: _submitting
-                  ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Text('Publish'),
             ),
           ),
         ],
       ),
-        body: Form(
+      body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -227,7 +263,8 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
               controller: _nameController,
               label: 'Title',
               hint: 'e.g., MacBook Pro 13"',
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Title is required' : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Title is required' : null,
             ),
 
             const SizedBox(height: 12),
@@ -236,7 +273,9 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
               controller: _descriptionController,
               label: 'Description',
               maxLines: 5,
-              validator: (v) => (v == null || v.trim().length < 10) ? 'Please add a bit more detail' : null,
+              validator: (v) => (v == null || v.trim().length < 10)
+                  ? 'Please add a bit more detail'
+                  : null,
             ),
 
             const SizedBox(height: 12),
@@ -247,11 +286,15 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
                   child: _PremiumField(
                     controller: _priceController,
                     label: 'Price (NOK)',
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) return 'Required';
                       final num? val = num.tryParse(v.replaceAll(',', '.'));
-                      if (val == null || val <= 0) return 'Enter a valid amount';
+                      if (val == null || val <= 0) {
+                        return 'Enter a valid amount';
+                      }
                       return null;
                     },
                   ),
@@ -263,9 +306,25 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
 
             Row(
               children: [
-                Expanded(child: _PremiumPillSelector(value: _category, label: 'Category', options: _categories, display: _categoryLabel, onChanged: (v) => setState(() => _category = v))),
+                Expanded(
+                  child: _PremiumPillSelector(
+                    value: _category,
+                    label: 'Category',
+                    options: _categories,
+                    display: _categoryLabel,
+                    onChanged: (v) => setState(() => _category = v),
+                  ),
+                ),
                 const SizedBox(width: 12),
-                Expanded(child: _PremiumPillSelector(value: _condition, label: 'Condition', options: _conditions, display: _conditionLabel, onChanged: (v) => setState(() => _condition = v))),
+                Expanded(
+                  child: _PremiumPillSelector(
+                    value: _condition,
+                    label: 'Condition',
+                    options: _conditions,
+                    display: _conditionLabel,
+                    onChanged: (v) => setState(() => _condition = v),
+                  ),
+                ),
               ],
             ),
 
@@ -291,7 +350,10 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
 
             const SizedBox(height: 12),
 
-            _PremiumField(controller: _contactInfoController, label: 'Contact info (optional)'),
+            _PremiumField(
+              controller: _contactInfoController,
+              label: 'Contact info (optional)',
+            ),
 
             const SizedBox(height: 32),
 
@@ -302,8 +364,8 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
             ),
           ],
         ),
-        ),
-      );
+      ),
+    );
   }
 
   Widget _buildImagesPicker(ThemeData theme) {
@@ -316,35 +378,41 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            ..._images.map((x) => Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.file(
-                        File(x.path),
-                        width: 96,
-                        height: 96,
-                        fit: BoxFit.cover,
-                      ),
+            ..._images.map(
+              (x) => Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(
+                      File(x.path),
+                      width: 96,
+                      height: 96,
+                      fit: BoxFit.cover,
                     ),
-                    Positioned(
-                      top: 6,
-                      right: 6,
-                      child: InkWell(
-                        onTap: () => setState(() => _images.remove(x)),
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.6),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.close, color: Colors.white, size: 14),
+                  ),
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: InkWell(
+                      onTap: () => setState(() => _images.remove(x)),
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 14,
                         ),
                       ),
                     ),
-                  ],
-                )),
+                  ),
+                ],
+              ),
+            ),
             InkWell(
               onTap: _pickImages,
               child: Container(
@@ -357,7 +425,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
                 ),
                 child: const Center(child: Icon(Icons.add_a_photo)),
               ),
-            )
+            ),
           ],
         ),
       ],
@@ -390,11 +458,12 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
   }
 
   Future<void> _handleCancel() async {
-    if (_hasChanges()) {
-      final discard = await _showDiscardDialog();
-      if (!discard) return;
+    if (!_hasChanges()) {
+      context.go('/explore/products');
+      return;
     }
-    // Simple direct navigation
+    final discard = await _showDiscardDialog();
+    if (!mounted || !discard) return;
     context.go('/explore/products');
   }
 
@@ -403,7 +472,9 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Discard changes?'),
-        content: const Text('If you leave now, your changes will not be saved.'),
+        content: const Text(
+          'If you leave now, your changes will not be saved.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -424,7 +495,9 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_images.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please add at least one photo')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please add at least one photo')),
+      );
       return;
     }
 
@@ -433,7 +506,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
     final user = auth.user!;
 
     setState(() => _submitting = true);
-    
+
     try {
       final price = double.parse(_priceController.text.replaceAll(',', '.'));
       final product = ProductModel(
@@ -452,7 +525,9 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
         status: 'available',
         isNegotiable: _isNegotiable,
         contactMethod: _contactMethod,
-        contactInfo: _contactInfoController.text.trim().isEmpty ? null : _contactInfoController.text.trim(),
+        contactInfo: _contactInfoController.text.trim().isEmpty
+            ? null
+            : _contactInfoController.text.trim(),
       );
 
       final service = ProductService();
@@ -462,21 +537,20 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
       );
 
       if (!mounted) return;
-      
+
       // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Your item is now live!')),
-      );
-      
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Your item is now live!')));
+
       // Navigate directly to the new product details screen
       context.go('/explore/products/${createdProduct.id}');
-      
     } catch (e) {
       if (!mounted) return;
       setState(() => _submitting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to publish: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to publish: $e')));
     }
   }
 
@@ -527,5 +601,3 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
     }
   }
 }
-
-

@@ -68,8 +68,12 @@ class ProductModel extends Equatable {
       contactInfo: map['contact_info'],
       viewCount: map['view_count'] ?? 0,
       favoriteCount: map['favorite_count'] ?? 0,
-      createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
-      updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
+      createdAt: map['\$createdAt'] != null
+          ? DateTime.parse(map['\$createdAt'])
+          : null,
+      updatedAt: map['\$updatedAt'] != null
+          ? DateTime.parse(map['\$updatedAt'])
+          : null,
     );
   }
 
@@ -150,20 +154,43 @@ class ProductModel extends Equatable {
   String get formattedPrice => '${price.toStringAsFixed(0)} $currency';
   String get displayCondition {
     switch (condition) {
-      case 'new': return 'Brand New';
-      case 'like_new': return 'Like New';
-      case 'good': return 'Good';
-      case 'fair': return 'Fair';
-      case 'poor': return 'Poor';
-      default: return condition;
+      case 'new':
+        return 'Brand New';
+      case 'like_new':
+        return 'Like New';
+      case 'good':
+        return 'Good';
+      case 'fair':
+        return 'Fair';
+      case 'poor':
+        return 'Poor';
+      default:
+        return condition;
     }
   }
 
   @override
   List<Object?> get props => [
-    id, name, description, price, currency, sellerId, sellerName,
-    sellerAvatar, campusId, category, images, imageFileIds, condition, status,
-    isNegotiable, contactMethod, contactInfo, viewCount,
-    favoriteCount, createdAt, updatedAt,
+    id,
+    name,
+    description,
+    price,
+    currency,
+    sellerId,
+    sellerName,
+    sellerAvatar,
+    campusId,
+    category,
+    images,
+    imageFileIds,
+    condition,
+    status,
+    isNegotiable,
+    contactMethod,
+    contactInfo,
+    viewCount,
+    favoriteCount,
+    createdAt,
+    updatedAt,
   ];
 }

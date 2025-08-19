@@ -4,39 +4,46 @@ import 'dart:convert';
 import 'appwrite_service.dart';
 
 import '../../core/logging/print_migration.dart';
+
 /// Robust document service that uses HTTP-only requests for database operations
-/// 
+///
 /// This service bypasses the Appwrite SDK for database queries due to known
 /// deserialization issues where system fields like $sequence are returned as
 /// String instead of int, causing type errors.
-/// 
+///
 /// Uses direct HTTP calls for better performance and reliability.
 /// Other Appwrite modules (auth, storage, etc.) can still use the SDK safely.
 class RobustDocumentService {
   // JWT cache with 15-minute expiration
   static String? _cachedJwt;
   static DateTime? _jwtExpiration;
-  static const Duration _jwtDuration = Duration(minutes: 14); // Use 14 mins to be safe
+  static const Duration _jwtDuration = Duration(
+    minutes: 14,
+  ); // Use 14 mins to be safe
 
   /// Gets cached JWT or creates a new one if expired/missing
   static Future<String?> _getCachedJwt() async {
     final now = DateTime.now();
-    
+
     // Check if cached JWT is still valid
-    if (_cachedJwt != null && 
-        _jwtExpiration != null && 
+    if (_cachedJwt != null &&
+        _jwtExpiration != null &&
         now.isBefore(_jwtExpiration!)) {
-      logPrint('🛡️ RobustDocumentService: Using cached JWT (expires at $_jwtExpiration)');
+      logPrint(
+        '🛡️ RobustDocumentService: Using cached JWT (expires at $_jwtExpiration)',
+      );
       return _cachedJwt;
     }
-    
+
     // JWT expired or doesn't exist, create new one
     try {
       logPrint('🛡️ RobustDocumentService: Creating new JWT token');
       final jwt = await account.createJWT();
       _cachedJwt = jwt.jwt;
       _jwtExpiration = now.add(_jwtDuration);
-      logPrint('🛡️ RobustDocumentService: New JWT cached until $_jwtExpiration');
+      logPrint(
+        '🛡️ RobustDocumentService: New JWT cached until $_jwtExpiration',
+      );
       return _cachedJwt;
     } catch (e) {
       logPrint('🛡️ RobustDocumentService: Failed to create JWT: $e');
@@ -70,9 +77,9 @@ class RobustDocumentService {
   /// Checks if we have a valid cached JWT
   static bool hasValidJwt() {
     final now = DateTime.now();
-    return _cachedJwt != null && 
-           _jwtExpiration != null && 
-           now.isBefore(_jwtExpiration!);
+    return _cachedJwt != null &&
+        _jwtExpiration != null &&
+        now.isBefore(_jwtExpiration!);
   }
 
   /// Fetches a document using direct HTTP call to bypass SDK deserialization issues
@@ -81,8 +88,10 @@ class RobustDocumentService {
     required String collectionId,
     required String documentId,
   }) async {
-    logPrint('🛡️ RobustDocumentService: Using HTTP-only fetch for document $documentId');
-    
+    logPrint(
+      '🛡️ RobustDocumentService: Using HTTP-only fetch for document $documentId',
+    );
+
     return await _getDocumentViaHttp(
       databaseId: databaseId,
       collectionId: collectionId,
@@ -100,8 +109,10 @@ class RobustDocumentService {
   }) async {
     // Skip SDK entirely for database operations due to deserialization bugs
     // Use HTTP-only approach for reliability
-    logPrint('🛡️ RobustDocumentService: Using HTTP-only create for collection $collectionId');
-    
+    logPrint(
+      '🛡️ RobustDocumentService: Using HTTP-only create for collection $collectionId',
+    );
+
     return await _createDocumentViaHttp(
       databaseId: databaseId,
       collectionId: collectionId,
@@ -121,8 +132,10 @@ class RobustDocumentService {
   }) async {
     // Skip SDK entirely for database operations due to deserialization bugs
     // Use HTTP-only approach for reliability
-    logPrint('🛡️ RobustDocumentService: Using HTTP-only update for document $documentId');
-    
+    logPrint(
+      '🛡️ RobustDocumentService: Using HTTP-only update for document $documentId',
+    );
+
     return await _updateDocumentViaHttp(
       databaseId: databaseId,
       collectionId: collectionId,
@@ -140,8 +153,10 @@ class RobustDocumentService {
   }) async {
     // Skip SDK entirely for database operations due to deserialization bugs
     // Use HTTP-only approach for reliability
-    logPrint('🛡️ RobustDocumentService: Using HTTP-only delete for document $documentId');
-    
+    logPrint(
+      '🛡️ RobustDocumentService: Using HTTP-only delete for document $documentId',
+    );
+
     await _deleteDocumentViaHttp(
       databaseId: databaseId,
       collectionId: collectionId,
@@ -158,40 +173,41 @@ class RobustDocumentService {
     try {
       final endpoint = client.endPoint;
       final projectId = client.config['project'];
-      
+
       // Get cached JWT token
       final sessionToken = await _getCachedJwt();
-      
-      final url = '$endpoint/databases/$databaseId/collections/$collectionId/documents/$documentId';
-      
+
+      final url =
+          '$endpoint/databases/$databaseId/collections/$collectionId/documents/$documentId';
+
       final headers = <String, String>{
         'content-type': 'application/json',
         'X-Appwrite-Project': projectId ?? '',
       };
-      
+
       // Add session token if available
       if (sessionToken != null) {
         headers['X-Appwrite-JWT'] = sessionToken;
       }
-      
+
       logPrint('🛡️ RobustDocumentService: Making HTTP request to: $url');
-      
+
       final response = await http.get(Uri.parse(url), headers: headers);
-      
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as Map<String, dynamic>;
         logPrint('🛡️ RobustDocumentService: HTTP fetch successful');
-        
+
         // Clean up system fields that might cause issues
         final cleanedData = _cleanSystemFields(data);
         return cleanedData;
-        
       } else {
-        logPrint('🛡️ RobustDocumentService: HTTP request failed with status: ${response.statusCode}');
+        logPrint(
+          '🛡️ RobustDocumentService: HTTP request failed with status: ${response.statusCode}',
+        );
         logPrint('🛡️ RobustDocumentService: Response body: ${response.body}');
         throw AppwriteException('HTTP request failed: ${response.statusCode}');
       }
-      
     } catch (e) {
       logPrint('🛡️ RobustDocumentService: HTTP fallback failed: $e');
       rethrow;
@@ -227,7 +243,8 @@ class RobustDocumentService {
       final endpoint = client.endPoint;
       final projectId = client.config['project'];
       final sessionToken = await _getCachedJwt();
-      final url = '$endpoint/databases/$databaseId/collections/$collectionId/documents';
+      final url =
+          '$endpoint/databases/$databaseId/collections/$collectionId/documents';
       final headers = <String, String>{
         'content-type': 'application/json',
         'X-Appwrite-Project': projectId ?? '',
@@ -240,7 +257,9 @@ class RobustDocumentService {
         'data': data,
         if (permissions != null) 'permissions': permissions,
       };
-      logPrint('🛡️ RobustDocumentService: Making HTTP create request to: $url');
+      logPrint(
+        '🛡️ RobustDocumentService: Making HTTP create request to: $url',
+      );
       final response = await http.post(
         Uri.parse(url),
         headers: headers,
@@ -251,9 +270,13 @@ class RobustDocumentService {
         logPrint('🛡️ RobustDocumentService: HTTP create successful');
         return _cleanSystemFields(created);
       } else {
-        logPrint('🛡️ RobustDocumentService: HTTP create failed with status: ${response.statusCode}');
+        logPrint(
+          '🛡️ RobustDocumentService: HTTP create failed with status: ${response.statusCode}',
+        );
         logPrint('🛡️ RobustDocumentService: Response body: ${response.body}');
-        throw AppwriteException('HTTP create request failed: ${response.statusCode}');
+        throw AppwriteException(
+          'HTTP create request failed: ${response.statusCode}',
+        );
       }
     } catch (e) {
       logPrint('🛡️ RobustDocumentService: HTTP create fallback failed: $e');
@@ -273,7 +296,8 @@ class RobustDocumentService {
       final endpoint = client.endPoint;
       final projectId = client.config['project'];
       final sessionToken = await _getCachedJwt();
-      final url = '$endpoint/databases/$databaseId/collections/$collectionId/documents/$documentId';
+      final url =
+          '$endpoint/databases/$databaseId/collections/$collectionId/documents/$documentId';
       final headers = <String, String>{
         'content-type': 'application/json',
         'X-Appwrite-Project': projectId ?? '',
@@ -285,7 +309,9 @@ class RobustDocumentService {
         'data': data,
         if (permissions != null) 'permissions': permissions,
       };
-      logPrint('🛡️ RobustDocumentService: Making HTTP update request to: $url');
+      logPrint(
+        '🛡️ RobustDocumentService: Making HTTP update request to: $url',
+      );
       final response = await http.patch(
         Uri.parse(url),
         headers: headers,
@@ -296,9 +322,13 @@ class RobustDocumentService {
         logPrint('🛡️ RobustDocumentService: HTTP update successful');
         return _cleanSystemFields(updated);
       } else {
-        logPrint('🛡️ RobustDocumentService: HTTP update failed with status: ${response.statusCode}');
+        logPrint(
+          '🛡️ RobustDocumentService: HTTP update failed with status: ${response.statusCode}',
+        );
         logPrint('🛡️ RobustDocumentService: Response body: ${response.body}');
-        throw AppwriteException('HTTP update request failed: ${response.statusCode}');
+        throw AppwriteException(
+          'HTTP update request failed: ${response.statusCode}',
+        );
       }
     } catch (e) {
       logPrint('🛡️ RobustDocumentService: HTTP update fallback failed: $e');
@@ -316,7 +346,8 @@ class RobustDocumentService {
       final endpoint = client.endPoint;
       final projectId = client.config['project'];
       final sessionToken = await _getCachedJwt();
-      final url = '$endpoint/databases/$databaseId/collections/$collectionId/documents/$documentId';
+      final url =
+          '$endpoint/databases/$databaseId/collections/$collectionId/documents/$documentId';
       final headers = <String, String>{
         'content-type': 'application/json',
         'X-Appwrite-Project': projectId ?? '',
@@ -324,15 +355,21 @@ class RobustDocumentService {
       if (sessionToken != null) {
         headers['X-Appwrite-JWT'] = sessionToken;
       }
-      logPrint('🛡️ RobustDocumentService: Making HTTP delete request to: $url');
+      logPrint(
+        '🛡️ RobustDocumentService: Making HTTP delete request to: $url',
+      );
       final response = await http.delete(Uri.parse(url), headers: headers);
       if (response.statusCode == 204) {
         logPrint('🛡️ RobustDocumentService: HTTP delete successful');
         return;
       } else {
-        logPrint('🛡️ RobustDocumentService: HTTP delete failed with status: ${response.statusCode}');
+        logPrint(
+          '🛡️ RobustDocumentService: HTTP delete failed with status: ${response.statusCode}',
+        );
         logPrint('🛡️ RobustDocumentService: Response body: ${response.body}');
-        throw AppwriteException('HTTP delete request failed: ${response.statusCode}');
+        throw AppwriteException(
+          'HTTP delete request failed: ${response.statusCode}',
+        );
       }
     } catch (e) {
       logPrint('🛡️ RobustDocumentService: HTTP delete fallback failed: $e');
@@ -343,19 +380,23 @@ class RobustDocumentService {
   /// Cleans problematic system fields from document data
   static Map<String, dynamic> _cleanSystemFields(Map<String, dynamic> data) {
     final cleaned = Map<String, dynamic>.from(data);
-    
+
     // Fix $sequence field if it's a String
     if (cleaned['\$sequence'] is String) {
       try {
         cleaned['\$sequence'] = int.parse(cleaned['\$sequence']);
-        logPrint('🛡️ RobustDocumentService: Fixed \$sequence field from String to int');
+        logPrint(
+          '🛡️ RobustDocumentService: Fixed \$sequence field from String to int',
+        );
       } catch (e) {
         // If parsing fails, remove the field entirely
         cleaned.remove('\$sequence');
-        logPrint('🛡️ RobustDocumentService: Removed problematic \$sequence field');
+        logPrint(
+          '🛡️ RobustDocumentService: Removed problematic \$sequence field',
+        );
       }
     }
-    
+
     // Fix other potential numeric fields that might be strings
     final numericFields = ['\$internalId', '\$permissions'];
     for (final field in numericFields) {
@@ -364,14 +405,16 @@ class RobustDocumentService {
           if (field == '\$internalId') {
             cleaned[field] = int.parse(cleaned[field]);
           }
-          logPrint('🛡️ RobustDocumentService: Fixed $field field from String to int');
+          logPrint(
+            '🛡️ RobustDocumentService: Fixed $field field from String to int',
+          );
         } catch (e) {
           // If parsing fails, leave as string or remove
           logPrint('🛡️ RobustDocumentService: Could not fix $field field: $e');
         }
       }
     }
-    
+
     return cleaned;
   }
 
@@ -381,8 +424,10 @@ class RobustDocumentService {
     required String collectionId,
     List<String> queries = const [],
   }) async {
-    logPrint('🛡️ RobustDocumentService: Using HTTP-only list for collection $collectionId');
-    
+    logPrint(
+      '🛡️ RobustDocumentService: Using HTTP-only list for collection $collectionId',
+    );
+
     return await _listDocumentsViaHttp(
       databaseId: databaseId,
       collectionId: collectionId,
@@ -399,49 +444,56 @@ class RobustDocumentService {
     try {
       final endpoint = client.endPoint;
       final projectId = client.config['project'];
-      
+
       // Get cached JWT token
       final sessionToken = await _getCachedJwt();
-      
-      var url = '$endpoint/databases/$databaseId/collections/$collectionId/documents';
-      
+
+      var url =
+          '$endpoint/databases/$databaseId/collections/$collectionId/documents';
+
       // Add query parameters
       if (queries.isNotEmpty) {
-        final queryParams = queries.map((q) => 'queries[]=${Uri.encodeComponent(q)}').join('&');
+        final queryParams = queries
+            .map((q) => 'queries[]=${Uri.encodeComponent(q)}')
+            .join('&');
         url += '?$queryParams';
       }
-      
+
       final headers = <String, String>{
         'content-type': 'application/json',
         'X-Appwrite-Project': projectId ?? '',
       };
-      
+
       if (sessionToken != null) {
         headers['X-Appwrite-JWT'] = sessionToken;
       }
-      
+
       logPrint('🛡️ RobustDocumentService: Making HTTP list request to: $url');
-      
+
       final response = await http.get(Uri.parse(url), headers: headers);
-      
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as Map<String, dynamic>;
         final documents = data['documents'] as List<dynamic>;
-        
-        logPrint('🛡️ RobustDocumentService: HTTP list successful, found ${documents.length} documents');
-        
+
+        logPrint(
+          '🛡️ RobustDocumentService: HTTP list successful, found ${documents.length} documents',
+        );
+
         // Clean up system fields for each document
         return documents
             .cast<Map<String, dynamic>>()
             .map((doc) => _cleanSystemFields(doc))
             .toList();
-            
       } else {
-        logPrint('🛡️ RobustDocumentService: HTTP list failed with status: ${response.statusCode}');
+        logPrint(
+          '🛡️ RobustDocumentService: HTTP list failed with status: ${response.statusCode}',
+        );
         logPrint('🛡️ RobustDocumentService: Response body: ${response.body}');
-        throw AppwriteException('HTTP list request failed: ${response.statusCode}');
+        throw AppwriteException(
+          'HTTP list request failed: ${response.statusCode}',
+        );
       }
-      
     } catch (e) {
       logPrint('🛡️ RobustDocumentService: HTTP list fallback failed: $e');
       rethrow;

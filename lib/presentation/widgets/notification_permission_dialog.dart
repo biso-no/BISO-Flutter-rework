@@ -10,9 +10,7 @@ class NotificationPermissionDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
         children: [
           Container(
@@ -31,10 +29,7 @@ class NotificationPermissionDialog extends ConsumerWidget {
           const Expanded(
             child: Text(
               'Enable Notifications',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -45,10 +40,7 @@ class NotificationPermissionDialog extends ConsumerWidget {
         children: [
           const Text(
             'Get notified when you receive new messages in chat.',
-            style: TextStyle(
-              fontSize: 16,
-              height: 1.4,
-            ),
+            style: TextStyle(fontSize: 16, height: 1.4),
           ),
           const SizedBox(height: 16),
           Container(
@@ -86,9 +78,7 @@ class NotificationPermissionDialog extends ConsumerWidget {
           },
           child: const Text(
             'Not Now',
-            style: TextStyle(
-              color: AppColors.onSurfaceVariant,
-            ),
+            style: TextStyle(color: AppColors.onSurfaceVariant),
           ),
         ),
         ElevatedButton(
@@ -96,12 +86,13 @@ class NotificationPermissionDialog extends ConsumerWidget {
             try {
               final service = ref.read(notificationServiceProvider);
               final granted = await service.requestPermission();
-              
+
               if (granted) {
                 // Enable chat notifications by default
-                await ref.read(notificationPreferencesProvider.notifier)
+                await ref
+                    .read(notificationPreferencesProvider.notifier)
                     .updateChatNotifications(true);
-                
+
                 if (context.mounted) {
                   Navigator.of(context).pop(true);
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -116,7 +107,9 @@ class NotificationPermissionDialog extends ConsumerWidget {
                   Navigator.of(context).pop(false);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Please enable notifications in system settings'),
+                      content: Text(
+                        'Please enable notifications in system settings',
+                      ),
                       backgroundColor: AppColors.error,
                     ),
                   );

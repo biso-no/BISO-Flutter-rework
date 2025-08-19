@@ -18,20 +18,17 @@ class CreateExpenseScreen extends ConsumerStatefulWidget {
   final String? eventId;
   final String? eventName;
 
-  const CreateExpenseScreen({
-    super.key,
-    this.eventId,
-    this.eventName,
-  });
+  const CreateExpenseScreen({super.key, this.eventId, this.eventName});
 
   @override
-  ConsumerState<CreateExpenseScreen> createState() => _CreateExpenseScreenState();
+  ConsumerState<CreateExpenseScreen> createState() =>
+      _CreateExpenseScreenState();
 }
 
 class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
   final PageController _pageController = PageController();
   int _currentStep = 0;
-  
+
   // Form data
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
@@ -39,7 +36,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
   final _overallDescriptionController = TextEditingController();
   final _bankAccountController = TextEditingController();
   final _accountHolderController = TextEditingController();
-  
+
   String? _selectedDepartmentId;
   String _selectedDepartmentName = '';
   final bool _isPrepayment = false;
@@ -54,9 +51,9 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
   List<Map<String, String>> _departments = [];
   final ExpenseService _expenseService = ExpenseService();
   List<String> _favoriteDepartmentIds = [];
-  
+
   // categories removed per new flow
-  
+
   @override
   void initState() {
     super.initState();
@@ -68,16 +65,17 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
       try {
         _campuses = await _expenseService.listCampuses();
       } catch (_) {}
-      _favoriteDepartmentIds = await FavoritesStorage.getFavoriteDepartmentIds();
-    if (user != null) {
-      _accountHolderController.text = user.name;
-      _selectedCampusId = user.campusId;
+      _favoriteDepartmentIds =
+          await FavoritesStorage.getFavoriteDepartmentIds();
+      if (user != null) {
+        _accountHolderController.text = user.name;
+        _selectedCampusId = user.campusId;
         _selectedCampusName = _campuses.firstWhere(
           (c) => c['id'] == _selectedCampusId,
           orElse: () => {'id': '', 'name': ''},
         )['name'];
-      await _loadDepartments();
-    }
+        await _loadDepartments();
+      }
       _maybePromptForMissingProfile();
     });
   }
@@ -102,9 +100,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: isSelected 
-                      ? AppColors.defaultBlue 
-                      : AppColors.gray200,
+                  color: isSelected ? AppColors.defaultBlue : AppColors.gray200,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -125,25 +121,36 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
               ),
               IconButton(
                 onPressed: () async {
-                  final favored = await FavoritesStorage.toggleFavoriteDepartment(dept['id']!);
-                  final updated = await FavoritesStorage.getFavoriteDepartmentIds();
+                  final favored =
+                      await FavoritesStorage.toggleFavoriteDepartment(
+                        dept['id']!,
+                      );
+                  final updated =
+                      await FavoritesStorage.getFavoriteDepartmentIds();
                   setState(() => _favoriteDepartmentIds = updated);
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(favored ? 'Added to favorites' : 'Removed from favorites')),
+                      SnackBar(
+                        content: Text(
+                          favored
+                              ? 'Added to favorites'
+                              : 'Removed from favorites',
+                        ),
+                      ),
                     );
                   }
                 },
                 icon: Icon(
-                  _favoriteDepartmentIds.contains(dept['id']) ? Icons.star_rounded : Icons.star_border_rounded,
-                  color: _favoriteDepartmentIds.contains(dept['id']) ? AppColors.orange9 : AppColors.onSurfaceVariant,
+                  _favoriteDepartmentIds.contains(dept['id'])
+                      ? Icons.star_rounded
+                      : Icons.star_border_rounded,
+                  color: _favoriteDepartmentIds.contains(dept['id'])
+                      ? AppColors.orange9
+                      : AppColors.onSurfaceVariant,
                 ),
               ),
               if (isSelected)
-                const Icon(
-                  Icons.check_circle,
-                  color: AppColors.defaultBlue,
-                ),
+                const Icon(Icons.check_circle, color: AppColors.defaultBlue),
             ],
           ),
         ),
@@ -255,9 +262,14 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
       if (_receiptDrafts.isNotEmpty) {
         total = _receiptDrafts.fold(0, (p, e) => p + (e.amount ?? 0));
         if (_useAi) {
-          final descs = _receiptDrafts.map((e) => e.description ?? '').where((e) => e.isNotEmpty).toList();
+          final descs = _receiptDrafts
+              .map((e) => e.description ?? '')
+              .where((e) => e.isNotEmpty)
+              .toList();
           if (descs.isNotEmpty) {
-            description = await _expenseService.summarizeExpenseDescriptions(descs);
+            description = await _expenseService.summarizeExpenseDescriptions(
+              descs,
+            );
           } else {
             description = _descriptionController.text.trim();
           }
@@ -311,7 +323,6 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Expense'),
@@ -321,10 +332,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
         ),
         actions: [
           if (_currentStep > 0)
-            TextButton(
-              onPressed: _previousStep,
-              child: const Text('Back'),
-            ),
+            TextButton(onPressed: _previousStep, child: const Text('Back')),
         ],
       ),
       body: Column(
@@ -336,7 +344,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
             onClose: () => Navigator.pop(context),
             title: _getStepTitle(),
           ),
-          
+
           // Content
           Expanded(
             child: Form(
@@ -361,11 +369,16 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
 
   String _getStepTitle() {
     switch (_currentStep) {
-      case 0: return 'Campus & Department';
-      case 1: return 'Receipts';
-      case 2: return 'Details & Summary';
-      case 3: return 'Review & Submit';
-      default: return '';
+      case 0:
+        return 'Campus & Department';
+      case 1:
+        return 'Receipts';
+      case 2:
+        return 'Details & Summary';
+      case 3:
+        return 'Review & Submit';
+      default:
+        return '';
     }
   }
 
@@ -377,16 +390,18 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
         children: [
           Text(
             'Add context (optional)',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           CheckboxListTile(
             value: widget.eventName != null,
             onChanged: (_) {},
             title: const Text('Relates to an event'),
-            subtitle: widget.eventName != null ? Text(widget.eventName!) : const Text('No event selected'),
+            subtitle: widget.eventName != null
+                ? Text(widget.eventName!)
+                : const Text('No event selected'),
             controlAffinity: ListTileControlAffinity.leading,
           ),
 
@@ -410,19 +425,19 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
             ),
 
           const SizedBox(height: 24),
-          PrimaryButton(
-            enabled: true,
-            label: 'Continue',
-            onPressed: _nextStep,
-          ),
+          PrimaryButton(enabled: true, label: 'Continue', onPressed: _nextStep),
         ],
       ),
     );
   }
 
   Widget _buildDepartmentSelectionStep() {
-    final favoritesList = _departments.where((d) => _favoriteDepartmentIds.contains(d['id'])).toList();
-    final othersList = _departments.where((d) => !_favoriteDepartmentIds.contains(d['id'])).toList();
+    final favoritesList = _departments
+        .where((d) => _favoriteDepartmentIds.contains(d['id']))
+        .toList();
+    final othersList = _departments
+        .where((d) => !_favoriteDepartmentIds.contains(d['id']))
+        .toList();
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -430,16 +445,16 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
         children: [
           Text(
             'Campus and department',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             'Choose your campus and the department responsible for this expense',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.onSurfaceVariant,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
           ),
           const SizedBox(height: 24),
 
@@ -450,14 +465,18 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
               labelText: 'Campus',
               prefixIcon: Icon(Icons.location_city),
             ),
-            items: _campuses.map((c) => DropdownMenuItem(
-              value: c['id'],
-              child: Text(c['name']!),
-            )).toList(),
+            items: _campuses
+                .map(
+                  (c) =>
+                      DropdownMenuItem(value: c['id'], child: Text(c['name']!)),
+                )
+                .toList(),
             onChanged: (value) async {
               setState(() {
                 _selectedCampusId = value;
-                _selectedCampusName = _campuses.firstWhere((c) => c['id'] == value)['name'];
+                _selectedCampusName = _campuses.firstWhere(
+                  (c) => c['id'] == value,
+                )['name'];
                 _selectedDepartmentId = null;
                 _selectedDepartmentName = '';
               });
@@ -467,14 +486,24 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
           const SizedBox(height: 16),
 
           if (favoritesList.isNotEmpty) ...[
-            Text('Favorites', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+            Text(
+              'Favorites',
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            ),
             const SizedBox(height: 8),
             ...favoritesList.map<Widget>((dept) {
               final isSelected = _selectedDepartmentId == dept['id'];
               return _buildDepartmentTile(dept, isSelected);
             }),
             const SizedBox(height: 16),
-            Text('All departments', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+            Text(
+              'All departments',
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            ),
             const SizedBox(height: 8),
           ],
 
@@ -503,25 +532,27 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
         children: [
           Text(
             'Upload receipts and documents',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            _isPrepayment 
+            _isPrepayment
                 ? 'For prepayments, you can upload quotes or estimates'
                 : 'Upload photos or scans of your receipts',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.onSurfaceVariant,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
           ),
           const SizedBox(height: 24),
 
           // AI toggle
           SwitchListTile(
             title: const Text('Use AI to extract details'),
-            subtitle: const Text('Auto-fill date, amount and description from receipts'),
+            subtitle: const Text(
+              'Auto-fill date, amount and description from receipts',
+            ),
             value: _useAi,
             onChanged: (value) async {
               setState(() => _useAi = value);
@@ -571,9 +602,9 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
           if (_attachedFiles.isNotEmpty) ...[
             Text(
               'Attached Files',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
 
@@ -613,7 +644,10 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
                                 }
                               });
                             },
-                            icon: const Icon(Icons.delete, color: AppColors.error),
+                            icon: const Icon(
+                              Icons.delete,
+                              color: AppColors.error,
+                            ),
                           ),
                         ],
                       ),
@@ -621,7 +655,9 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
                         const SizedBox(height: 8),
                         _AiFieldsEditor(
                           key: ValueKey('ai-editor-${file.path}-$index'),
-                          draft: index < _receiptDrafts.length ? _receiptDrafts[index] : _ReceiptDraft(),
+                          draft: index < _receiptDrafts.length
+                              ? _receiptDrafts[index]
+                              : _ReceiptDraft(),
                           onChanged: (d) {
                             if (index >= _receiptDrafts.length) {
                               _receiptDrafts.add(d);
@@ -635,7 +671,9 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
                         const SizedBox(height: 8),
                         _ManualFieldsEditor(
                           key: ValueKey('manual-editor-${file.path}-$index'),
-                          initial: index < _receiptDrafts.length ? _receiptDrafts[index] : _ReceiptDraft(),
+                          initial: index < _receiptDrafts.length
+                              ? _receiptDrafts[index]
+                              : _ReceiptDraft(),
                           onChanged: (d) {
                             if (index >= _receiptDrafts.length) {
                               _receiptDrafts.add(d);
@@ -645,14 +683,17 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
                           },
                         ),
                         const SizedBox(height: 4),
-                        Text(_getFileSizeText(file), style: Theme.of(context).textTheme.bodySmall),
+                        Text(
+                          _getFileSizeText(file),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       ],
                     ],
                   ),
                 ),
               );
             })),
-            
+
             const SizedBox(height: 24),
           ],
 
@@ -660,7 +701,10 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.outline, style: BorderStyle.solid),
+                border: Border.all(
+                  color: AppColors.outline,
+                  style: BorderStyle.solid,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -704,7 +748,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
     final amount = _receiptDrafts.isNotEmpty
         ? _receiptDrafts.fold(0.0, (p, e) => p + (e.amount ?? 0.0))
         : 0.0;
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -712,16 +756,16 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
         children: [
           Text(
             'Review your expense',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             'Please review all information before submitting',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.onSurfaceVariant,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
           ),
           const SizedBox(height: 24),
 
@@ -751,7 +795,10 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
                 if (_isPrepayment) ...[
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.defaultBlue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -776,10 +823,12 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
             title: 'Expense Details',
             children: [
               TextFormField(
-                controller: _useAi ? _overallDescriptionController : _descriptionController,
+                controller: _useAi
+                    ? _overallDescriptionController
+                    : _descriptionController,
                 decoration: const InputDecoration(
                   labelText: 'Overall description',
-                  hintText: 'What was this expense for? (you can edit)'
+                  hintText: 'What was this expense for? (you can edit)',
                 ),
                 maxLines: 3,
               ),
@@ -794,21 +843,24 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
           const SizedBox(height: 16),
 
           // Payment info is implicitly from profile; no manual entry step required
-
           const SizedBox(height: 16),
 
           _ReviewSection(
             title: 'Attachments',
             children: [
               _ReviewItem(
-                label: 'Files', 
+                label: 'Files',
                 value: '${_attachedFiles.length} file(s) attached',
               ),
               if (_receiptDrafts.isNotEmpty)
-                ..._receiptDrafts.asMap().entries.map((e) => _ReviewItem(
-                  label: '• ${e.value.date != null ? _formatDate(e.value.date!) : 'Date'}',
-                  value: 'NOK ${(e.value.amount ?? 0).toStringAsFixed(2)} — ${e.value.description ?? ''}',
-                )),
+                ..._receiptDrafts.asMap().entries.map(
+                  (e) => _ReviewItem(
+                    label:
+                        '• ${e.value.date != null ? _formatDate(e.value.date!) : 'Date'}',
+                    value:
+                        'NOK ${(e.value.amount ?? 0).toStringAsFixed(2)} — ${e.value.description ?? ''}',
+                  ),
+                ),
             ],
           ),
 
@@ -818,7 +870,9 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
           ElevatedButton.icon(
             onPressed: _submitExpense,
             icon: const Icon(Icons.send),
-            label: Text(_isPrepayment ? 'Request Prepayment' : 'Submit for Approval'),
+            label: Text(
+              _isPrepayment ? 'Request Prepayment' : 'Submit for Approval',
+            ),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
@@ -828,9 +882,9 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
 
           Text(
             'By submitting, you confirm that all information is accurate and you have appropriate receipts.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.onSurfaceVariant,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
             textAlign: TextAlign.center,
           ),
         ],
@@ -847,9 +901,9 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
   IconData _getFileIcon(String path) {
     if (path.toLowerCase().endsWith('.pdf')) {
       return Icons.picture_as_pdf;
-    } else if (path.toLowerCase().contains('jpg') || 
-               path.toLowerCase().contains('png') ||
-               path.toLowerCase().contains('jpeg')) {
+    } else if (path.toLowerCase().contains('jpg') ||
+        path.toLowerCase().contains('png') ||
+        path.toLowerCase().contains('jpeg')) {
       return Icons.image;
     }
     return Icons.attach_file;
@@ -890,7 +944,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
       allowedExtensions: ['pdf'],
       allowMultiple: false,
     );
-    
+
     if (result != null && result.files.isNotEmpty) {
       final file = File(result.files.first.path!);
       setState(() {
@@ -903,13 +957,17 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
   Future<void> _loadDepartments() async {
     if (_selectedCampusId == null) return;
     try {
-      final list = await _expenseService.listDepartmentsForCampus(_selectedCampusId!);
+      final list = await _expenseService.listDepartmentsForCampus(
+        _selectedCampusId!,
+      );
       setState(() {
         _departments = list
-            .map((e) => {
-                  'id': (e['Id'] ?? '').toString(),
-                  'name': (e['Name'] ?? '').toString(),
-                })
+            .map(
+              (e) => {
+                'id': (e['Id'] ?? '').toString(),
+                'name': (e['Name'] ?? '').toString(),
+              },
+            )
             .where((e) => e['id']!.isNotEmpty && e['name']!.isNotEmpty)
             .toList();
       });
@@ -957,7 +1015,10 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
 
   Future<void> _refreshOverallSummary() async {
     if (!_useAi) return;
-    final descs = _receiptDrafts.map((e) => e.description ?? '').where((e) => e.isNotEmpty).toList();
+    final descs = _receiptDrafts
+        .map((e) => e.description ?? '')
+        .where((e) => e.isNotEmpty)
+        .toList();
     if (descs.isEmpty) return;
     final summary = await _expenseService.summarizeExpenseDescriptions(descs);
     if (summary.trim().isNotEmpty) {
@@ -971,7 +1032,9 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
     final user = ref.read(currentUserProvider);
     if (user == null) return;
     final hasProfile = ref.read(hasProfileProvider);
-    final name = _accountHolderController.text.trim().isEmpty ? user.name : _accountHolderController.text.trim();
+    final name = _accountHolderController.text.trim().isEmpty
+        ? user.name
+        : _accountHolderController.text.trim();
     final phone = user.phone;
     final address = user.address;
     final city = user.city;
@@ -980,26 +1043,30 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
     final bank = _bankAccountController.text.replaceAll(' ', '');
     try {
       if (hasProfile) {
-        await ref.read(authServiceProvider).updateUserProfile(
-          name: name,
-          phone: phone,
-          address: address,
-          city: city,
-          zipCode: zip,
-          campusId: campusId,
-          bankAccount: bank,
-        );
+        await ref
+            .read(authServiceProvider)
+            .updateUserProfile(
+              name: name,
+              phone: phone,
+              address: address,
+              city: city,
+              zipCode: zip,
+              campusId: campusId,
+              bankAccount: bank,
+            );
       } else {
-        await ref.read(authServiceProvider).createUserProfile(
-          name: name,
-          phone: phone,
-          address: address,
-          city: city,
-          zipCode: zip,
-          campusId: campusId,
-          departments: const [],
-          bankAccount: bank,
-        );
+        await ref
+            .read(authServiceProvider)
+            .createUserProfile(
+              name: name,
+              phone: phone,
+              address: address,
+              city: city,
+              zipCode: zip,
+              campusId: campusId,
+              departments: const [],
+              bankAccount: bank,
+            );
       }
       await ref.read(authStateProvider.notifier).refreshProfile();
     } catch (_) {}
@@ -1027,10 +1094,15 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
           await for (final page in Printing.raster(bytes, dpi: 170)) {
             if (processed >= 3) break; // safety cap
             final uiImage = await page.toImage();
-            final byteData = await uiImage.toByteData(format: ui.ImageByteFormat.png);
+            final byteData = await uiImage.toByteData(
+              format: ui.ImageByteFormat.png,
+            );
             if (byteData != null) {
               final tmp = File('${file.path}.p$processed.png');
-              await tmp.writeAsBytes(byteData.buffer.asUint8List(), flush: true);
+              await tmp.writeAsBytes(
+                byteData.buffer.asUint8List(),
+                flush: true,
+              );
               try {
                 final inputImage = InputImage.fromFile(tmp);
                 final text = await recognizer.processImage(inputImage);
@@ -1077,10 +1149,7 @@ class _ReviewSection extends StatelessWidget {
   final String title;
   final List<Widget> children;
 
-  const _ReviewSection({
-    required this.title,
-    required this.children,
-  });
+  const _ReviewSection({required this.title, required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -1089,9 +1158,9 @@ class _ReviewSection extends StatelessWidget {
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         Container(
@@ -1116,10 +1185,7 @@ class _ReviewItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const _ReviewItem({
-    required this.label,
-    required this.value,
-  });
+  const _ReviewItem({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -1140,9 +1206,9 @@ class _ReviewItem extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -1160,14 +1226,21 @@ class _ReceiptDraft {
 
   _ReceiptDraft({this.amount, this.description, this.date});
 
-  bool get isEmpty => (amount == null || amount == 0) && (description == null || description!.isEmpty) && date == null;
+  bool get isEmpty =>
+      (amount == null || amount == 0) &&
+      (description == null || description!.isEmpty) &&
+      date == null;
 }
 
 class _ManualFieldsEditor extends StatefulWidget {
   final _ReceiptDraft initial;
   final void Function(_ReceiptDraft) onChanged;
 
-  const _ManualFieldsEditor({super.key, required this.initial, required this.onChanged});
+  const _ManualFieldsEditor({
+    super.key,
+    required this.initial,
+    required this.onChanged,
+  });
 
   @override
   State<_ManualFieldsEditor> createState() => _ManualFieldsEditorState();
@@ -1181,15 +1254,21 @@ class _ManualFieldsEditorState extends State<_ManualFieldsEditor> {
   @override
   void initState() {
     super.initState();
-    _amountController = TextEditingController(text: widget.initial.amount?.toStringAsFixed(2) ?? '');
-    _descriptionController = TextEditingController(text: widget.initial.description ?? '');
+    _amountController = TextEditingController(
+      text: widget.initial.amount?.toStringAsFixed(2) ?? '',
+    );
+    _descriptionController = TextEditingController(
+      text: widget.initial.description ?? '',
+    );
     _date = widget.initial.date;
   }
 
   @override
   void didUpdateWidget(covariant _ManualFieldsEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final newAmount = widget.initial.amount != null ? widget.initial.amount!.toStringAsFixed(2) : '';
+    final newAmount = widget.initial.amount != null
+        ? widget.initial.amount!.toStringAsFixed(2)
+        : '';
     if (_amountController.text != newAmount) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -1221,7 +1300,9 @@ class _ManualFieldsEditorState extends State<_ManualFieldsEditor> {
 
   @override
   Widget build(BuildContext context) {
-    final dateText = _date != null ? '${_date!.day}/${_date!.month}/${_date!.year}' : '';
+    final dateText = _date != null
+        ? '${_date!.day}/${_date!.month}/${_date!.year}'
+        : '';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1231,13 +1312,17 @@ class _ManualFieldsEditorState extends State<_ManualFieldsEditor> {
               child: TextFormField(
                 controller: _amountController,
                 decoration: const InputDecoration(labelText: 'Amount (NOK)'),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 textDirection: TextDirection.ltr,
-                onChanged: (v) => widget.onChanged(_ReceiptDraft(
-                  amount: double.tryParse(v),
-                  description: _descriptionController.text,
-                  date: _date,
-                )),
+                onChanged: (v) => widget.onChanged(
+                  _ReceiptDraft(
+                    amount: double.tryParse(v),
+                    description: _descriptionController.text,
+                    date: _date,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -1253,11 +1338,13 @@ class _ManualFieldsEditorState extends State<_ManualFieldsEditor> {
                   );
                   if (picked != null) {
                     setState(() => _date = picked);
-                    widget.onChanged(_ReceiptDraft(
-                      amount: double.tryParse(_amountController.text),
-                      description: _descriptionController.text,
-                      date: picked,
-                    ));
+                    widget.onChanged(
+                      _ReceiptDraft(
+                        amount: double.tryParse(_amountController.text),
+                        description: _descriptionController.text,
+                        date: picked,
+                      ),
+                    );
                   }
                 },
                 child: InputDecorator(
@@ -1273,22 +1360,30 @@ class _ManualFieldsEditorState extends State<_ManualFieldsEditor> {
           controller: _descriptionController,
           decoration: const InputDecoration(labelText: 'Description'),
           textDirection: TextDirection.ltr,
-          onChanged: (v) => widget.onChanged(_ReceiptDraft(
-            amount: double.tryParse(_amountController.text),
-            description: v,
-            date: _date,
-          )),
+          onChanged: (v) => widget.onChanged(
+            _ReceiptDraft(
+              amount: double.tryParse(_amountController.text),
+              description: v,
+              date: _date,
+            ),
+          ),
         ),
       ],
     );
   }
 }
+
 class _AiFieldsEditor extends StatefulWidget {
   final _ReceiptDraft draft;
   final void Function(_ReceiptDraft) onChanged;
   final Future<void> Function() onRetry;
 
-  const _AiFieldsEditor({super.key, required this.draft, required this.onChanged, required this.onRetry});
+  const _AiFieldsEditor({
+    super.key,
+    required this.draft,
+    required this.onChanged,
+    required this.onRetry,
+  });
 
   @override
   State<_AiFieldsEditor> createState() => _AiFieldsEditorState();
@@ -1301,14 +1396,20 @@ class _AiFieldsEditorState extends State<_AiFieldsEditor> {
   @override
   void initState() {
     super.initState();
-    _amountController = TextEditingController(text: widget.draft.amount?.toStringAsFixed(2) ?? '');
-    _descriptionController = TextEditingController(text: widget.draft.description ?? '');
+    _amountController = TextEditingController(
+      text: widget.draft.amount?.toStringAsFixed(2) ?? '',
+    );
+    _descriptionController = TextEditingController(
+      text: widget.draft.description ?? '',
+    );
   }
 
   @override
   void didUpdateWidget(covariant _AiFieldsEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final newAmountText = widget.draft.amount != null ? widget.draft.amount!.toStringAsFixed(2) : '';
+    final newAmountText = widget.draft.amount != null
+        ? widget.draft.amount!.toStringAsFixed(2)
+        : '';
     if (_amountController.text != newAmountText) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -1339,7 +1440,9 @@ class _AiFieldsEditorState extends State<_AiFieldsEditor> {
 
   @override
   Widget build(BuildContext context) {
-    final dateText = widget.draft.date != null ? '${widget.draft.date!.day}/${widget.draft.date!.month}/${widget.draft.date!.year}' : '';
+    final dateText = widget.draft.date != null
+        ? '${widget.draft.date!.day}/${widget.draft.date!.month}/${widget.draft.date!.year}'
+        : '';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1349,13 +1452,17 @@ class _AiFieldsEditorState extends State<_AiFieldsEditor> {
               child: TextFormField(
                 controller: _amountController,
                 decoration: const InputDecoration(labelText: 'Amount (NOK)'),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 textDirection: TextDirection.ltr,
-                onChanged: (v) => widget.onChanged(_ReceiptDraft(
-                  amount: double.tryParse(v),
-                  description: _descriptionController.text,
-                  date: widget.draft.date,
-                )),
+                onChanged: (v) => widget.onChanged(
+                  _ReceiptDraft(
+                    amount: double.tryParse(v),
+                    description: _descriptionController.text,
+                    date: widget.draft.date,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -1370,11 +1477,13 @@ class _AiFieldsEditorState extends State<_AiFieldsEditor> {
                     lastDate: now,
                   );
                   if (picked != null) {
-                    widget.onChanged(_ReceiptDraft(
-                      amount: double.tryParse(_amountController.text),
-                      description: _descriptionController.text,
-                      date: picked,
-                    ));
+                    widget.onChanged(
+                      _ReceiptDraft(
+                        amount: double.tryParse(_amountController.text),
+                        description: _descriptionController.text,
+                        date: picked,
+                      ),
+                    );
                   }
                 },
                 child: InputDecorator(
@@ -1390,11 +1499,13 @@ class _AiFieldsEditorState extends State<_AiFieldsEditor> {
           controller: _descriptionController,
           decoration: const InputDecoration(labelText: 'Description'),
           textDirection: TextDirection.ltr,
-          onChanged: (v) => widget.onChanged(_ReceiptDraft(
-            amount: double.tryParse(_amountController.text),
-            description: v,
-            date: widget.draft.date,
-          )),
+          onChanged: (v) => widget.onChanged(
+            _ReceiptDraft(
+              amount: double.tryParse(_amountController.text),
+              description: v,
+              date: widget.draft.date,
+            ),
+          ),
         ),
         Align(
           alignment: Alignment.centerRight,
@@ -1403,7 +1514,7 @@ class _AiFieldsEditorState extends State<_AiFieldsEditor> {
             icon: const Icon(Icons.refresh),
             label: const Text('Re-run AI'),
           ),
-        )
+        ),
       ],
     );
   }
@@ -1414,7 +1525,10 @@ class _PrimaryButtonPainter extends CustomPainter {
   _PrimaryButtonPainter(this.color);
   @override
   void paint(Canvas canvas, Size size) {
-    final r = RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(14));
+    final r = RRect.fromRectAndRadius(
+      Offset.zero & size,
+      const Radius.circular(14),
+    );
     final paint = Paint()
       ..shader = LinearGradient(
         colors: [color.withValues(alpha: 0.95), color.withValues(alpha: 0.85)],
@@ -1424,8 +1538,10 @@ class _PrimaryButtonPainter extends CustomPainter {
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
     canvas.drawRRect(r, paint);
   }
+
   @override
-  bool shouldRepaint(covariant _PrimaryButtonPainter oldDelegate) => oldDelegate.color != color;
+  bool shouldRepaint(covariant _PrimaryButtonPainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class PrimaryButton extends StatelessWidget {
@@ -1433,7 +1549,13 @@ class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
-  const PrimaryButton({super.key, this.enabled = true, required this.label, this.onPressed, this.icon});
+  const PrimaryButton({
+    super.key,
+    this.enabled = true,
+    required this.label,
+    this.onPressed,
+    this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1458,7 +1580,10 @@ class PrimaryButton extends StatelessWidget {
                 ],
                 Text(
                   label,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -1515,7 +1640,9 @@ class _PremiumHeader extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 10),
           ClipRRect(

@@ -5,7 +5,8 @@ import '../models/public_profile_model.dart';
 import 'robust_document_service.dart';
 
 class PublicProfileService {
-  static final PublicProfileService _instance = PublicProfileService._internal();
+  static final PublicProfileService _instance =
+      PublicProfileService._internal();
   factory PublicProfileService() => _instance;
   PublicProfileService._internal();
 
@@ -43,7 +44,9 @@ class PublicProfileService {
 
       return PublicProfileModel.fromMap(document);
     } on AppwriteException catch (e) {
-      throw PublicProfileException('Failed to create public profile: ${e.message}');
+      throw PublicProfileException(
+        'Failed to create public profile: ${e.message}',
+      );
     } catch (e) {
       throw PublicProfileException('Network error occurred');
     }
@@ -55,10 +58,7 @@ class PublicProfileService {
       final documents = await RobustDocumentService.listDocumentsRobust(
         databaseId: AppConstants.databaseId,
         collectionId: 'public_profiles',
-        queries: [
-          Query.equal('user_id', userId),
-          Query.limit(1),
-        ],
+        queries: [Query.equal('user_id', userId), Query.limit(1)],
       );
 
       if (documents.isEmpty) {
@@ -67,7 +67,9 @@ class PublicProfileService {
 
       return PublicProfileModel.fromMap(documents.first);
     } on AppwriteException catch (e) {
-      throw PublicProfileException('Failed to get public profile: ${e.message}');
+      throw PublicProfileException(
+        'Failed to get public profile: ${e.message}',
+      );
     } catch (e) {
       throw PublicProfileException('Network error occurred');
     }
@@ -109,7 +111,9 @@ class PublicProfileService {
 
       return PublicProfileModel.fromMap(document);
     } on AppwriteException catch (e) {
-      throw PublicProfileException('Failed to update public profile: ${e.message}');
+      throw PublicProfileException(
+        'Failed to update public profile: ${e.message}',
+      );
     } catch (e) {
       throw PublicProfileException('Network error occurred');
     }
@@ -129,7 +133,9 @@ class PublicProfileService {
         documentId: currentProfile.id,
       );
     } on AppwriteException catch (e) {
-      throw PublicProfileException('Failed to delete public profile: ${e.message}');
+      throw PublicProfileException(
+        'Failed to delete public profile: ${e.message}',
+      );
     } catch (e) {
       throw PublicProfileException('Network error occurred');
     }
@@ -161,18 +167,20 @@ class PublicProfileService {
         queries: queries,
       );
 
-      return documents
-          .map((doc) => PublicProfileModel.fromMap(doc))
-          .toList();
+      return documents.map((doc) => PublicProfileModel.fromMap(doc)).toList();
     } on AppwriteException catch (e) {
-      throw PublicProfileException('Failed to search public profiles: ${e.message}');
+      throw PublicProfileException(
+        'Failed to search public profiles: ${e.message}',
+      );
     } catch (e) {
       throw PublicProfileException('Network error occurred');
     }
   }
 
   /// Get public profiles for multiple user IDs
-  Future<List<PublicProfileModel>> getMultiplePublicProfiles(List<String> userIds) async {
+  Future<List<PublicProfileModel>> getMultiplePublicProfiles(
+    List<String> userIds,
+  ) async {
     try {
       if (userIds.isEmpty) return [];
 
@@ -185,11 +193,11 @@ class PublicProfileService {
         ],
       );
 
-      return documents
-          .map((doc) => PublicProfileModel.fromMap(doc))
-          .toList();
+      return documents.map((doc) => PublicProfileModel.fromMap(doc)).toList();
     } on AppwriteException catch (e) {
-      throw PublicProfileException('Failed to get multiple public profiles: ${e.message}');
+      throw PublicProfileException(
+        'Failed to get multiple public profiles: ${e.message}',
+      );
     } catch (e) {
       throw PublicProfileException('Network error occurred');
     }
@@ -253,11 +261,11 @@ class PublicProfileService {
         ],
       );
 
-      return documents
-          .map((doc) => PublicProfileModel.fromMap(doc))
-          .toList();
+      return documents.map((doc) => PublicProfileModel.fromMap(doc)).toList();
     } on AppwriteException catch (e) {
-      throw PublicProfileException('Failed to get campus public profiles: ${e.message}');
+      throw PublicProfileException(
+        'Failed to get campus public profiles: ${e.message}',
+      );
     } catch (e) {
       throw PublicProfileException('Network error occurred');
     }

@@ -8,8 +8,13 @@ class MembershipPurchaseModal extends StatefulWidget {
   final String studentId;
   final Color campusColor;
   final List<MembershipPurchaseOption> membershipOptions;
-  final Function(MembershipPurchaseOption option, String paymentMethod, String? phoneNumber) onPurchase;
-  
+  final Function(
+    MembershipPurchaseOption option,
+    String paymentMethod,
+    String? phoneNumber,
+  )
+  onPurchase;
+
   const MembershipPurchaseModal({
     super.key,
     required this.studentId,
@@ -19,7 +24,8 @@ class MembershipPurchaseModal extends StatefulWidget {
   });
 
   @override
-  State<MembershipPurchaseModal> createState() => _MembershipPurchaseModalState();
+  State<MembershipPurchaseModal> createState() =>
+      _MembershipPurchaseModalState();
 }
 
 class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
@@ -29,27 +35,24 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
   String? phoneNumber;
   bool isProcessing = false;
   final _phoneController = TextEditingController();
-  
+
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
-    
+
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
-    
+
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
+
     _slideController.forward();
   }
 
@@ -249,10 +252,13 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
     return Column(
       children: widget.membershipOptions.map((option) {
         final isSelected = selectedOption?.membershipId == option.membershipId;
-        final isPopular = option.priceNok == widget.membershipOptions
-            .map((o) => o.priceNok)
-            .reduce((a, b) => a > b ? a : b) ~/ 2; // Roughly middle option
-        
+        final isPopular =
+            option.priceNok ==
+            widget.membershipOptions
+                    .map((o) => o.priceNok)
+                    .reduce((a, b) => a > b ? a : b) ~/
+                2; // Roughly middle option
+
         return GestureDetector(
           onTap: () {
             setState(() {
@@ -266,12 +272,10 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isSelected 
-                    ? widget.campusColor 
-                    : AppColors.gray300,
+                color: isSelected ? widget.campusColor : AppColors.gray300,
                 width: isSelected ? 2 : 1,
               ),
-              color: isSelected 
+              color: isSelected
                   ? widget.campusColor.withValues(alpha: 0.05)
                   : theme.colorScheme.surface,
             ),
@@ -300,7 +304,7 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
                       ),
                     ),
                   ),
-                
+
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -316,8 +320,8 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
                                   option.displayName,
                                   style: theme.textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: isSelected 
-                                        ? widget.campusColor 
+                                    color: isSelected
+                                        ? widget.campusColor
                                         : null,
                                   ),
                                 ),
@@ -341,7 +345,8 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
                                   color: widget.campusColor,
                                 ),
                               ),
-                              if (option.priceNok > 1000) // Assuming expensive memberships are "special"
+                              if (option.priceNok >
+                                  1000) // Assuming expensive memberships are "special"
                                 Text(
                                   '~450 NOK/year',
                                   style: theme.textTheme.bodySmall?.copyWith(
@@ -364,7 +369,7 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: isSelected 
+                              color: isSelected
                                   ? widget.campusColor.withValues(alpha: 0.1)
                                   : AppColors.gray100,
                               borderRadius: BorderRadius.circular(8),
@@ -375,8 +380,8 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
                                 Icon(
                                   Icons.check,
                                   size: 14,
-                                  color: isSelected 
-                                      ? widget.campusColor 
+                                  color: isSelected
+                                      ? widget.campusColor
                                       : AppColors.green9,
                                 ),
                                 const SizedBox(width: 4),
@@ -449,7 +454,7 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
     String subtitle,
   ) {
     final isSelected = selectedPaymentMethod == method;
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -463,12 +468,10 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected 
-                ? widget.campusColor 
-                : AppColors.gray300,
+            color: isSelected ? widget.campusColor : AppColors.gray300,
             width: isSelected ? 2 : 1,
           ),
-          color: isSelected 
+          color: isSelected
               ? widget.campusColor.withValues(alpha: 0.05)
               : theme.colorScheme.surface,
         ),
@@ -477,8 +480,8 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
             Icon(
               icon,
               size: 32,
-              color: isSelected 
-                  ? widget.campusColor 
+              color: isSelected
+                  ? widget.campusColor
                   : AppColors.onSurfaceVariant,
             ),
             const SizedBox(height: 8),
@@ -547,10 +550,7 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Selected Plan',
-                    style: theme.textTheme.bodyMedium,
-                  ),
+                  Text('Selected Plan', style: theme.textTheme.bodyMedium),
                   Text(
                     selectedOption!.displayName,
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -563,13 +563,10 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Text('Payment Method', style: theme.textTheme.bodyMedium),
                   Text(
-                    'Payment Method',
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                  Text(
-                    selectedPaymentMethod == 'VIPPS' 
-                        ? 'Vipps/MobilePay' 
+                    selectedPaymentMethod == 'VIPPS'
+                        ? 'Vipps/MobilePay'
                         : 'Card Payment',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
@@ -599,9 +596,9 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
             ],
           ),
         ),
-        
+
         const SizedBox(height: 20),
-        
+
         // Purchase button following Vipps guidelines
         SizedBox(
           width: double.infinity,
@@ -611,7 +608,7 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
             child: FilledButton(
               onPressed: isProcessing ? null : _handlePurchase,
               style: FilledButton.styleFrom(
-                backgroundColor: selectedPaymentMethod == 'VIPPS' 
+                backgroundColor: selectedPaymentMethod == 'VIPPS'
                     ? const Color(0xFF6D3EFF) // Vipps purple
                     : widget.campusColor,
                 foregroundColor: Colors.white,
@@ -666,9 +663,9 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
             ),
           ),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         Text(
           'Secure payment powered by Vipps MobilePay',
           style: theme.textTheme.bodySmall?.copyWith(
@@ -682,17 +679,17 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
 
   void _handlePurchase() async {
     if (selectedOption == null) return;
-    
+
     setState(() {
       isProcessing = true;
     });
-    
+
     try {
       // Add a small delay to show loading state
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       widget.onPurchase(selectedOption!, selectedPaymentMethod, phoneNumber);
-      
+
       if (mounted) {
         Navigator.of(context).pop();
       }
@@ -700,7 +697,7 @@ class _MembershipPurchaseModalState extends State<MembershipPurchaseModal>
       setState(() {
         isProcessing = false;
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -11,14 +11,12 @@ import '../chat/chat_conversation_screen.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final String productId;
-  
-  const ProductDetailScreen({
-    required this.productId,
-    super.key,
-  });
+
+  const ProductDetailScreen({required this.productId, super.key});
 
   @override
-  ConsumerState<ProductDetailScreen> createState() => _ProductDetailScreenState();
+  ConsumerState<ProductDetailScreen> createState() =>
+      _ProductDetailScreenState();
 }
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
@@ -44,7 +42,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
       final service = ProductService();
       final product = await service.getProductById(widget.productId);
-      
+
       if (product == null) {
         setState(() {
           _error = 'Product not found';
@@ -96,14 +94,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     if (mounted) {
       setState(() => _favoriteLoading = true);
     }
-    
+
     try {
       final service = ProductService();
       final newState = await service.toggleFavorite(
         userId: auth.user!.id,
         productId: widget.productId,
       );
-      
+
       if (mounted) {
         setState(() {
           _isFavorited = newState;
@@ -112,7 +110,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(newState ? 'Added to favorites' : 'Removed from favorites'),
+            content: Text(
+              newState ? 'Added to favorites' : 'Removed from favorites',
+            ),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -130,7 +130,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   void _contactSeller() async {
     final auth = ref.read(authStateProvider);
     final product = _product;
-    
+
     if (!auth.isAuthenticated || auth.user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please sign in to contact seller')),
@@ -154,7 +154,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
     // Show dialog to compose initial message
     final messageController = TextEditingController(
-      text: 'Hi! I\'m interested in your ${product.name}. Is it still available?',
+      text:
+          'Hi! I\'m interested in your ${product.name}. Is it still available?',
     );
 
     final shouldSend = await showDialog<bool>(
@@ -169,7 +170,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 height: 48,
                 child: product.images.isNotEmpty
                     ? Image.network(
-                        product.images.first, 
+                        product.images.first,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
@@ -242,15 +243,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
     if (shouldSend == true && messageController.text.trim().isNotEmpty) {
       if (!mounted) return;
-      
+
       try {
         // Show loading
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => const Center(
-            child: CircularProgressIndicator(),
-          ),
+          builder: (context) =>
+              const Center(child: CircularProgressIndicator()),
         );
 
         final chatService = ChatService();
@@ -261,13 +261,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           sellerName: product.sellerName,
           productId: product.id,
           productName: product.name,
-          productImageUrl: product.images.isNotEmpty ? product.images.first : '',
+          productImageUrl: product.images.isNotEmpty
+              ? product.images.first
+              : '',
           productPrice: product.price,
           userMessage: messageController.text.trim(),
         );
 
         if (!mounted) return;
-        
+
         // Hide loading dialog
         Navigator.of(context).pop();
 
@@ -283,13 +285,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         );
       } catch (e) {
         if (!mounted) return;
-        
+
         // Hide loading dialog
         Navigator.of(context).pop();
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to send message: $e')),
-        );
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to send message: $e')));
       }
     }
 
@@ -304,7 +306,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           title: const Text('Product Details'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => NavigationUtils.safeGoBack(context, fallbackRoute: '/explore/products'),
+            onPressed: () => NavigationUtils.safeGoBack(
+              context,
+              fallbackRoute: '/explore/products',
+            ),
           ),
         ),
         body: const Center(child: CircularProgressIndicator()),
@@ -317,7 +322,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           title: const Text('Product Details'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => NavigationUtils.safeGoBack(context, fallbackRoute: '/explore/products'),
+            onPressed: () => NavigationUtils.safeGoBack(
+              context,
+              fallbackRoute: '/explore/products',
+            ),
           ),
         ),
         body: Center(
@@ -326,7 +334,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: AppColors.error,
+                ),
                 const SizedBox(height: 16),
                 Text(_error!, textAlign: TextAlign.center),
                 const SizedBox(height: 16),
@@ -363,7 +375,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 ),
                 child: const Icon(Icons.arrow_back, color: Colors.white),
               ),
-              onPressed: () => NavigationUtils.safeGoBack(context, fallbackRoute: '/explore/products'),
+              onPressed: () => NavigationUtils.safeGoBack(
+                context,
+                fallbackRoute: '/explore/products',
+              ),
             ),
             actions: [
               IconButton(
@@ -378,7 +393,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       ? const SizedBox(
                           width: 20,
                           height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : Icon(
                           _isFavorited ? Icons.favorite : Icons.favorite_border,
@@ -393,7 +411,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               background: _buildImageGallery(product),
             ),
           ),
-          
+
           // Product details content
           SliverToBoxAdapter(
             child: Padding(
@@ -428,7 +446,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       ),
                       if (product.isNegotiable)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.accentGold.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -444,36 +465,44 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Category and condition chips
                   Row(
                     children: [
-                      _buildChip(_categoryLabel(product.category), AppColors.subtleBlue),
+                      _buildChip(
+                        _categoryLabel(product.category),
+                        AppColors.subtleBlue,
+                      ),
                       const SizedBox(width: 8),
-                      _buildChip(_conditionLabel(product.condition), AppColors.gray100),
+                      _buildChip(
+                        _conditionLabel(product.condition),
+                        AppColors.gray100,
+                      ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Description
                   Text(
                     'Description',
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     product.description,
                     style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Seller info
                   _buildSellerInfo(product, theme),
-                  
+
                   const SizedBox(height: 80), // Space for fixed bottom button
                 ],
               ),
@@ -481,7 +510,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           ),
         ],
       ),
-      
+
       // Fixed contact button
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
@@ -533,14 +562,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 return Container(
                   color: AppColors.gray100,
                   child: const Center(
-                    child: Icon(Icons.broken_image, size: 64, color: AppColors.onSurfaceVariant),
+                    child: Icon(
+                      Icons.broken_image,
+                      size: 64,
+                      color: AppColors.onSurfaceVariant,
+                    ),
                   ),
                 );
               },
             );
           },
         ),
-        
+
         // Image indicator
         if (product.images.length > 1)
           Positioned(
@@ -549,7 +582,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             right: 0,
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(20),
@@ -575,9 +611,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       ),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-          fontWeight: FontWeight.w500,
-        ),
+        style: Theme.of(
+          context,
+        ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w500),
       ),
     );
   }
@@ -595,7 +631,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         children: [
           Text(
             'Seller Information',
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 12),
           Row(
@@ -603,12 +641,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: AppColors.subtleBlue,
-                backgroundImage: product.sellerAvatar != null 
+                backgroundImage: product.sellerAvatar != null
                     ? NetworkImage(product.sellerAvatar!)
                     : null,
                 child: product.sellerAvatar == null
                     ? Text(
-                        product.sellerName.isNotEmpty 
+                        product.sellerName.isNotEmpty
                             ? product.sellerName[0].toUpperCase()
                             : 'U',
                         style: theme.textTheme.titleMedium?.copyWith(
@@ -649,32 +687,48 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
   String _categoryLabel(String category) {
     switch (category) {
-      case 'books': return 'Books';
-      case 'electronics': return 'Electronics';
-      case 'furniture': return 'Furniture';
-      case 'clothes': return 'Clothes';
-      case 'sports': return 'Sports';
-      default: return 'Other';
+      case 'books':
+        return 'Books';
+      case 'electronics':
+        return 'Electronics';
+      case 'furniture':
+        return 'Furniture';
+      case 'clothes':
+        return 'Clothes';
+      case 'sports':
+        return 'Sports';
+      default:
+        return 'Other';
     }
   }
 
   String _conditionLabel(String condition) {
     switch (condition) {
-      case 'new': return 'Brand New';
-      case 'like_new': return 'Like New';
-      case 'good': return 'Good';
-      case 'fair': return 'Fair';
-      case 'poor': return 'Poor';
-      default: return condition;
+      case 'new':
+        return 'Brand New';
+      case 'like_new':
+        return 'Like New';
+      case 'good':
+        return 'Good';
+      case 'fair':
+        return 'Fair';
+      case 'poor':
+        return 'Poor';
+      default:
+        return condition;
     }
   }
 
   String _contactMethodLabel(String method) {
     switch (method) {
-      case 'message': return 'In-app message';
-      case 'phone': return 'Phone';
-      case 'email': return 'Email';
-      default: return method;
+      case 'message':
+        return 'In-app message';
+      case 'phone':
+        return 'Phone';
+      case 'email':
+        return 'Email';
+      default:
+        return method;
     }
   }
 }

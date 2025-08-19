@@ -34,8 +34,8 @@ class LargeEventState {
 
 final largeEventProvider =
     StateNotifierProvider<LargeEventNotifier, LargeEventState>((ref) {
-  return LargeEventNotifier(ref);
-});
+      return LargeEventNotifier(ref);
+    });
 
 class LargeEventNotifier extends StateNotifier<LargeEventState> {
   final Ref _ref;
@@ -51,7 +51,9 @@ class LargeEventNotifier extends StateNotifier<LargeEventState> {
   Future<void> loadActive() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final events = await _ref.read(largeEventServiceProvider).fetchActiveEvents();
+      final events = await _ref
+          .read(largeEventServiceProvider)
+          .fetchActiveEvents();
       state = state.copyWith(activeEvents: events, isLoading: false);
     } catch (e) {
       state = state.copyWith(error: e.toString(), isLoading: false);
@@ -62,8 +64,11 @@ class LargeEventNotifier extends StateNotifier<LargeEventState> {
     final now = DateTime.now();
     final eligible = state.activeEvents
         .where((e) => e.isActiveForCampus(campusId, now))
-        .where((e) => e.heroOverrideEnabled &&
-            (e.campusConfig(campusId)?.heroOverrideEnabled ?? true))
+        .where(
+          (e) =>
+              e.heroOverrideEnabled &&
+              (e.campusConfig(campusId)?.heroOverrideEnabled ?? true),
+        )
         .toList();
     if (eligible.isEmpty) return null;
     eligible.sort((a, b) => b.priority.compareTo(a.priority));
@@ -78,12 +83,13 @@ final featuredLargeEventProvider = Provider<LargeEventModel?>((ref) {
   final now = DateTime.now();
   final eligible = state.activeEvents
       .where((e) => e.isActiveForCampus(campus.id, now))
-      .where((e) => e.heroOverrideEnabled &&
-          (e.campusConfig(campus.id)?.heroOverrideEnabled ?? true))
+      .where(
+        (e) =>
+            e.heroOverrideEnabled &&
+            (e.campusConfig(campus.id)?.heroOverrideEnabled ?? true),
+      )
       .toList();
   if (eligible.isEmpty) return null;
   eligible.sort((a, b) => b.priority.compareTo(a.priority));
   return eligible.first;
 });
-
-

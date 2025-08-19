@@ -66,8 +66,11 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
     try {
       final chatService = ref.read(chatServiceProvider);
       final selectedCampus = ref.read(selectedCampusProvider);
-      final results = await chatService.searchUsers(query, campusId: selectedCampus.id);
-      
+      final results = await chatService.searchUsers(
+        query,
+        campusId: selectedCampus.id,
+      );
+
       // Filter out excluded users
       final filteredResults = results.where((profile) {
         return !widget.excludeUserIds.contains(profile.userId);
@@ -82,11 +85,11 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
         _searchResults = [];
         _isLoading = false;
       });
-      
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Search failed: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Search failed: $e')));
       }
     }
   }
@@ -125,7 +128,9 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
             TextButton(
               onPressed: _onDone,
               child: Text(
-                widget.multiSelect ? 'Done (${_selectedUserIds.length})' : 'Select',
+                widget.multiSelect
+                    ? 'Done (${_selectedUserIds.length})'
+                    : 'Select',
                 style: const TextStyle(color: AppColors.defaultBlue),
               ),
             ),
@@ -163,9 +168,13 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
                 children: _selectedUserIds.map((userId) {
                   final profile = _searchResults.firstWhere(
                     (p) => p.userId == userId,
-                    orElse: () => PublicProfileModel(id: '', userId: userId, name: 'Selected User'),
+                    orElse: () => PublicProfileModel(
+                      id: '',
+                      userId: userId,
+                      name: 'Selected User',
+                    ),
                   );
-                  
+
                   return Chip(
                     label: Text(profile.name),
                     onDeleted: () => _toggleUser(userId),
@@ -178,9 +187,7 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
           const SizedBox(height: 16),
 
           // Search results
-          Expanded(
-            child: _buildSearchResults(),
-          ),
+          Expanded(child: _buildSearchResults()),
         ],
       ),
     );
@@ -192,18 +199,11 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.search,
-              size: 64,
-              color: AppColors.onSurfaceVariant,
-            ),
+            Icon(Icons.search, size: 64, color: AppColors.onSurfaceVariant),
             SizedBox(height: 16),
             Text(
               'Start typing to search users',
-              style: TextStyle(
-                color: AppColors.onSurfaceVariant,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 16),
             ),
           ],
         ),
@@ -219,18 +219,11 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.person_off,
-              size: 64,
-              color: AppColors.onSurfaceVariant,
-            ),
+            Icon(Icons.person_off, size: 64, color: AppColors.onSurfaceVariant),
             SizedBox(height: 16),
             Text(
               'No users found',
-              style: TextStyle(
-                color: AppColors.onSurfaceVariant,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 16),
             ),
           ],
         ),
@@ -246,32 +239,37 @@ class _UserPickerScreenState extends ConsumerState<UserPickerScreen> {
         return ListTile(
           leading: CircleAvatar(
             backgroundColor: AppColors.subtleBlue,
-            backgroundImage: profile.avatar != null ? NetworkImage(profile.avatar!) : null,
-            child: profile.avatar == null ? Text(
-              profile.name.isNotEmpty ? profile.name[0].toUpperCase() : '?',
-              style: const TextStyle(
-                color: AppColors.defaultBlue,
-                fontWeight: FontWeight.bold,
-              ),
-            ) : null,
+            backgroundImage: profile.avatar != null
+                ? NetworkImage(profile.avatar!)
+                : null,
+            child: profile.avatar == null
+                ? Text(
+                    profile.name.isNotEmpty
+                        ? profile.name[0].toUpperCase()
+                        : '?',
+                    style: const TextStyle(
+                      color: AppColors.defaultBlue,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
           ),
           title: Text(
             profile.name,
             style: const TextStyle(fontWeight: FontWeight.w500),
           ),
-          subtitle: profile.displayEmail != null ? Text(profile.displayEmail!) : null,
+          subtitle: profile.displayEmail != null
+              ? Text(profile.displayEmail!)
+              : null,
           trailing: isSelected
-              ? const Icon(
-                  Icons.check_circle,
-                  color: AppColors.defaultBlue,
-                )
+              ? const Icon(Icons.check_circle, color: AppColors.defaultBlue)
               : const Icon(
                   Icons.radio_button_unchecked,
                   color: AppColors.onSurfaceVariant,
                 ),
           onTap: () {
             _toggleUser(profile.userId);
-            
+
             // If single select, immediately return
             if (!widget.multiSelect && _selectedUserIds.isNotEmpty) {
               _onDone();

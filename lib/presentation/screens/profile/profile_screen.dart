@@ -105,7 +105,7 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                         child: CircleAvatar(
                           radius: 38,
-                          backgroundImage: user?.avatarUrl != null 
+                          backgroundImage: user?.avatarUrl != null
                               ? NetworkImage(user!.avatarUrl!)
                               : null,
                           backgroundColor: Colors.white,
@@ -247,7 +247,6 @@ class ProfileScreen extends ConsumerWidget {
 
                   const SizedBox(height: 24),
 
-
                   const SizedBox(height: 24),
 
                   // Profile Information Section
@@ -319,7 +318,8 @@ class ProfileScreen extends ConsumerWidget {
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const PaymentInformationScreen(),
+                            builder: (context) =>
+                                const PaymentInformationScreen(),
                           ),
                         ),
                       ),
@@ -329,7 +329,8 @@ class ProfileScreen extends ConsumerWidget {
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SettingsScreen(initialTab: 1),
+                            builder: (context) =>
+                                const SettingsScreen(initialTab: 1),
                           ),
                         ),
                       ),
@@ -339,7 +340,8 @@ class ProfileScreen extends ConsumerWidget {
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SettingsScreen(initialTab: 2),
+                            builder: (context) =>
+                                const SettingsScreen(initialTab: 2),
                           ),
                         ),
                       ),
@@ -369,9 +371,6 @@ class ProfileScreen extends ConsumerWidget {
       ),
     );
   }
-
-
-
 
   String _formatAddress(UserModel user) {
     final parts = [
@@ -479,10 +478,7 @@ class _ProfileSection extends StatelessWidget {
   final String title;
   final List<Widget> children;
 
-  const _ProfileSection({
-    required this.title,
-    required this.children,
-  });
+  const _ProfileSection({required this.title, required this.children});
 
   @override
   Widget build(BuildContext context) {

@@ -25,10 +25,14 @@ class PrivacyService {
   }
 
   /// Update user's privacy setting and manage public profile
-  Future<bool> setUserPrivacySetting(String userId, bool isPublic, {UserModel? userData}) async {
+  Future<bool> setUserPrivacySetting(
+    String userId,
+    bool isPublic, {
+    UserModel? userData,
+  }) async {
     try {
       final publicProfileService = PublicProfileService();
-      
+
       if (isPublic) {
         // Create public profile if making user public
         await _createPublicProfileIfNeeded(userId, userData);
@@ -61,7 +65,7 @@ class PrivacyService {
   /// Get a user's current privacy status with helpful description
   Future<String> getPrivacyStatusDescription(String userId) async {
     final isPublic = await getUserPrivacySetting(userId);
-    
+
     if (isPublic == null) {
       return 'Privacy setting not configured';
     } else if (isPublic) {
@@ -78,7 +82,8 @@ class PrivacyService {
   }
 
   /// Create public profile with user data
-  Future<void> createPublicProfileFromUserData(UserModel userData, {
+  Future<void> createPublicProfileFromUserData(
+    UserModel userData, {
     bool emailVisible = false,
     bool phoneVisible = false,
   }) async {
@@ -109,10 +114,13 @@ class PrivacyService {
   }
 
   /// Private helper to create public profile if needed
-  Future<void> _createPublicProfileIfNeeded(String userId, UserModel? userData) async {
+  Future<void> _createPublicProfileIfNeeded(
+    String userId,
+    UserModel? userData,
+  ) async {
     final publicProfileService = PublicProfileService();
     final hasProfile = await publicProfileService.hasPublicProfile(userId);
-    
+
     if (hasProfile) {
       // Profile already exists, sync with current user data if provided
       if (userData != null) {

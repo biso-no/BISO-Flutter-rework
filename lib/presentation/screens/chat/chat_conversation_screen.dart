@@ -13,10 +13,11 @@ import '../../../providers/auth/auth_provider.dart';
 import 'chat_list_screen.dart';
 import 'chat_info_screen.dart';
 
-final chatMessagesProvider = StreamProvider.family<List<ChatMessageModel>, String>((ref, chatId) {
-  final chatService = ref.read(chatServiceProvider);
-  return chatService.messagesStream;
-});
+final chatMessagesProvider =
+    StreamProvider.family<List<ChatMessageModel>, String>((ref, chatId) {
+      final chatService = ref.read(chatServiceProvider);
+      return chatService.messagesStream;
+    });
 
 class ChatConversationScreen extends ConsumerStatefulWidget {
   final ChatModel chat;
@@ -29,10 +30,12 @@ class ChatConversationScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ChatConversationScreen> createState() => _ChatConversationScreenState();
+  ConsumerState<ChatConversationScreen> createState() =>
+      _ChatConversationScreenState();
 }
 
-class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen> {
+class _ChatConversationScreenState
+    extends ConsumerState<ChatConversationScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _messageFocusNode = FocusNode();
@@ -47,11 +50,11 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
   void initState() {
     super.initState();
     _messageController.addListener(_onMessageChanged);
-    
+
     // Mark chat as read when entering
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _markAsRead();
-      
+
       // Scroll to specific message if provided
       if (widget.scrollToMessageId != null) {
         _scrollToMessage(widget.scrollToMessageId!);
@@ -73,11 +76,16 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
       setState(() {
         _isTyping = hasText;
       });
-      
+
       final chatService = ref.read(chatServiceProvider);
       final currentUserId = ref.read(authStateProvider).user!.id;
       final userName = ref.read(authStateProvider).user?.name ?? 'Unknown';
-      chatService.sendTypingIndicator(widget.chat.id, currentUserId, userName, hasText);
+      chatService.sendTypingIndicator(
+        widget.chat.id,
+        currentUserId,
+        userName,
+        hasText,
+      );
     }
   }
 
@@ -87,9 +95,7 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
     final messagesAsync = ref.watch(chatMessagesProvider(widget.chat.id));
 
     if (authState.user == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -105,10 +111,15 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
               _getChatDisplayName(authState.user!.id),
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
-            if (widget.chat.isGroup || widget.chat.isTeam || widget.chat.isDepartment)
+            if (widget.chat.isGroup ||
+                widget.chat.isTeam ||
+                widget.chat.isDepartment)
               Text(
                 '${widget.chat.participants.length} members',
-                style: const TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.onSurfaceVariant,
+                ),
               ),
           ],
         ),
@@ -139,15 +150,23 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final message = messages[index];
-                    final previousMessage = index < messages.length - 1 ? messages[index + 1] : null;
-                    final showDateSeparator = _shouldShowDateSeparator(message, previousMessage);
-                    final showAvatar = _shouldShowAvatar(message, previousMessage);
+                    final previousMessage = index < messages.length - 1
+                        ? messages[index + 1]
+                        : null;
+                    final showDateSeparator = _shouldShowDateSeparator(
+                      message,
+                      previousMessage,
+                    );
+                    final showAvatar = _shouldShowAvatar(
+                      message,
+                      previousMessage,
+                    );
 
                     return Column(
                       children: [
                         if (showDateSeparator)
                           _DateSeparator(date: message.timestamp),
-                        
+
                         _MessageBubble(
                           message: message,
                           currentUserId: authState.user!.id,
@@ -167,12 +186,17 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: AppColors.error,
+                    ),
                     const SizedBox(height: 16),
                     Text('Failed to load messages: ${error.toString()}'),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () => ref.refresh(chatMessagesProvider(widget.chat.id)),
+                      onPressed: () =>
+                          ref.refresh(chatMessagesProvider(widget.chat.id)),
                       child: const Text('Retry'),
                     ),
                   ],
@@ -183,10 +207,7 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
 
           // Reply banner
           if (_replyingTo != null)
-            _ReplyBanner(
-              message: _replyingTo!,
-              onCancel: () => _cancelReply(),
-            ),
+            _ReplyBanner(message: _replyingTo!, onCancel: () => _cancelReply()),
 
           // Edit banner
           if (_editingMessage != null)
@@ -253,7 +274,9 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
                   // Send button
                   Container(
                     decoration: BoxDecoration(
-                      color: _canSendMessage() ? AppColors.defaultBlue : AppColors.gray300,
+                      color: _canSendMessage()
+                          ? AppColors.defaultBlue
+                          : AppColors.gray300,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -285,13 +308,15 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            widget.chat.isDirect ? Icons.chat_bubble_outline : Icons.group_outlined,
+            widget.chat.isDirect
+                ? Icons.chat_bubble_outline
+                : Icons.group_outlined,
             size: 64,
             color: AppColors.onSurfaceVariant,
           ),
           const SizedBox(height: 16),
           Text(
-            widget.chat.isDirect 
+            widget.chat.isDirect
                 ? 'Start your conversation'
                 : 'Welcome to ${widget.chat.name}',
             style: Theme.of(context).textTheme.titleLarge,
@@ -302,9 +327,9 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
             widget.chat.isDirect
                 ? 'Send a message to get started'
                 : 'Be the first to send a message',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.onSurfaceVariant,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
             textAlign: TextAlign.center,
           ),
         ],
@@ -314,8 +339,10 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
 
   String _getChatDisplayName(String currentUserId) {
     if (widget.chat.isDirect) {
-      final otherParticipant = widget.chat.participants
-          .firstWhere((id) => id != currentUserId, orElse: () => '');
+      final otherParticipant = widget.chat.participants.firstWhere(
+        (id) => id != currentUserId,
+        orElse: () => '',
+      );
       return otherParticipant.isNotEmpty ? otherParticipant : widget.chat.name;
     }
     return widget.chat.name;
@@ -331,9 +358,12 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
     }
   }
 
-  bool _shouldShowDateSeparator(ChatMessageModel message, ChatMessageModel? previousMessage) {
+  bool _shouldShowDateSeparator(
+    ChatMessageModel message,
+    ChatMessageModel? previousMessage,
+  ) {
     if (previousMessage == null) return true;
-    
+
     final messageDate = DateTime(
       message.timestamp.year,
       message.timestamp.month,
@@ -344,20 +374,27 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
       previousMessage.timestamp.month,
       previousMessage.timestamp.day,
     );
-    
+
     return !messageDate.isAtSameMomentAs(previousDate);
   }
 
-  bool _shouldShowAvatar(ChatMessageModel message, ChatMessageModel? previousMessage) {
+  bool _shouldShowAvatar(
+    ChatMessageModel message,
+    ChatMessageModel? previousMessage,
+  ) {
     if (previousMessage == null) return true;
     if (previousMessage.senderId != message.senderId) return true;
-    
-    final timeDifference = message.timestamp.difference(previousMessage.timestamp);
+
+    final timeDifference = message.timestamp.difference(
+      previousMessage.timestamp,
+    );
     return timeDifference.inMinutes > 5;
   }
 
   bool _canSendMessage() {
-    return (_messageController.text.trim().isNotEmpty || _attachments.isNotEmpty) && !_isSending;
+    return (_messageController.text.trim().isNotEmpty ||
+            _attachments.isNotEmpty) &&
+        !_isSending;
   }
 
   void _setReplyingTo(ChatMessageModel message) {
@@ -511,7 +548,7 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
     try {
       final chatService = ref.read(chatServiceProvider);
       final currentUserId = ref.read(authStateProvider).user!.id;
-      
+
       await chatService.reactToMessage(
         messageId: message.id,
         userId: currentUserId,
@@ -542,7 +579,10 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_camera, color: AppColors.defaultBlue),
+              leading: const Icon(
+                Icons.photo_camera,
+                color: AppColors.defaultBlue,
+              ),
               title: const Text('Camera'),
               onTap: () {
                 Navigator.pop(context);
@@ -575,7 +615,7 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
     try {
       final picker = ImagePicker();
       final image = await picker.pickImage(source: source);
-      
+
       if (image != null) {
         setState(() {
           _attachments.add(File(image.path));
@@ -596,7 +636,7 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
   Future<void> _pickFile() async {
     try {
       final result = await FilePicker.platform.pickFiles();
-      
+
       if (result != null && result.files.single.path != null) {
         setState(() {
           _attachments.add(File(result.files.single.path!));
@@ -644,7 +684,7 @@ class _ChatConversationScreenState extends ConsumerState<ChatConversationScreen>
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
           );
-          
+
           // Highlight the message briefly
           Future.delayed(const Duration(milliseconds: 600), () {
             if (mounted) {
@@ -719,12 +759,14 @@ class _MessageBubble extends StatelessWidget {
             _buildAvatar()
           else if (!isMe)
             const SizedBox(width: 40),
-          
+
           if (!isMe) const SizedBox(width: 8),
-          
+
           Expanded(
             child: Column(
-              crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: isMe
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 if (!isMe && showAvatar)
                   Padding(
@@ -738,11 +780,14 @@ class _MessageBubble extends StatelessWidget {
                       ),
                     ),
                   ),
-                
+
                 GestureDetector(
                   onLongPress: () => _showMessageOptions(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: isMe ? AppColors.defaultBlue : AppColors.gray100,
                       borderRadius: BorderRadius.only(
@@ -755,9 +800,8 @@ class _MessageBubble extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (message.replyTo != null)
-                          _buildReplyPreview(),
-                        
+                        if (message.replyTo != null) _buildReplyPreview(),
+
                         if (message.isEdited)
                           const Padding(
                             padding: EdgeInsets.only(bottom: 4),
@@ -770,7 +814,7 @@ class _MessageBubble extends StatelessWidget {
                               ),
                             ),
                           ),
-                        
+
                         Text(
                           message.content,
                           style: TextStyle(
@@ -778,17 +822,15 @@ class _MessageBubble extends StatelessWidget {
                             fontSize: 16,
                           ),
                         ),
-                        
-                        if (message.attachments.isNotEmpty)
-                          _buildAttachments(),
+
+                        if (message.attachments.isNotEmpty) _buildAttachments(),
                       ],
                     ),
                   ),
                 ),
-                
-                if (message.reactions.isNotEmpty)
-                  _buildReactions(),
-                
+
+                if (message.reactions.isNotEmpty) _buildReactions(),
+
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(
@@ -802,9 +844,9 @@ class _MessageBubble extends StatelessWidget {
               ],
             ),
           ),
-          
+
           if (isMe) const SizedBox(width: 8),
-          
+
           if (isMe && showAvatar)
             _buildAvatar()
           else if (isMe)
@@ -829,7 +871,11 @@ class _MessageBubble extends StatelessWidget {
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.delete_outline, size: 16, color: AppColors.onSurfaceVariant),
+                  Icon(
+                    Icons.delete_outline,
+                    size: 16,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   SizedBox(width: 8),
                   Text(
                     'This message was deleted',
@@ -848,10 +894,11 @@ class _MessageBubble extends StatelessWidget {
   }
 
   Widget _buildProductMessage(BuildContext context) {
-    final productName = message.metadata['product_name'] as String? ?? 'Product';
+    final productName =
+        message.metadata['product_name'] as String? ?? 'Product';
     final productPrice = message.metadata['product_price'] as double? ?? 0.0;
     final productImage = message.metadata['product_image'] as String? ?? '';
-    
+
     return Container(
       margin: EdgeInsets.symmetric(
         vertical: showAvatar ? 8 : 2,
@@ -864,12 +911,14 @@ class _MessageBubble extends StatelessWidget {
             _buildAvatar()
           else if (!isMe)
             const SizedBox(width: 40),
-          
+
           if (!isMe) const SizedBox(width: 8),
-          
+
           Expanded(
             child: Column(
-              crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: isMe
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 if (!isMe && showAvatar)
                   Padding(
@@ -883,7 +932,7 @@ class _MessageBubble extends StatelessWidget {
                       ),
                     ),
                   ),
-                
+
                 Container(
                   constraints: const BoxConstraints(maxWidth: 300),
                   decoration: BoxDecoration(
@@ -903,8 +952,12 @@ class _MessageBubble extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: isMe ? Colors.white.withValues(alpha: 0.1) : AppColors.gray50,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                          color: isMe
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : AppColors.gray50,
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
                         ),
                         child: Row(
                           children: [
@@ -917,7 +970,7 @@ class _MessageBubble extends StatelessWidget {
                                     ? Image.network(
                                         productImage,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => Container(
+                                        errorBuilder: (_, _, _) => Container(
                                           color: AppColors.gray200,
                                           child: const Icon(Icons.shopping_bag),
                                         ),
@@ -938,7 +991,9 @@ class _MessageBubble extends StatelessWidget {
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 14,
-                                      color: isMe ? Colors.white : AppColors.onSurface,
+                                      color: isMe
+                                          ? Colors.white
+                                          : AppColors.onSurface,
                                     ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
@@ -949,7 +1004,9 @@ class _MessageBubble extends StatelessWidget {
                                     style: TextStyle(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 16,
-                                      color: isMe ? Colors.white : AppColors.defaultBlue,
+                                      color: isMe
+                                          ? Colors.white
+                                          : AppColors.defaultBlue,
                                     ),
                                   ),
                                 ],
@@ -958,7 +1015,7 @@ class _MessageBubble extends StatelessWidget {
                           ],
                         ),
                       ),
-                      
+
                       // User message
                       if (message.content.isNotEmpty)
                         Padding(
@@ -974,10 +1031,9 @@ class _MessageBubble extends StatelessWidget {
                     ],
                   ),
                 ),
-                
-                if (message.reactions.isNotEmpty)
-                  _buildReactions(),
-                
+
+                if (message.reactions.isNotEmpty) _buildReactions(),
+
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(
@@ -991,9 +1047,9 @@ class _MessageBubble extends StatelessWidget {
               ],
             ),
           ),
-          
+
           if (isMe) const SizedBox(width: 8),
-          
+
           if (isMe && showAvatar)
             _buildAvatar()
           else if (isMe)
@@ -1029,15 +1085,16 @@ class _MessageBubble extends StatelessWidget {
   Widget _buildAvatar() {
     return CircleAvatar(
       radius: 16,
-      backgroundImage: message.senderAvatar != null 
+      backgroundImage: message.senderAvatar != null
           ? NetworkImage(message.senderAvatar!)
           : null,
       backgroundColor: AppColors.gray300,
       child: message.senderAvatar == null
           ? Text(
-              (message.senderName.isNotEmpty 
-                  ? message.senderName[0] 
-                  : message.senderId[0]).toUpperCase(),
+              (message.senderName.isNotEmpty
+                      ? message.senderName[0]
+                      : message.senderId[0])
+                  .toUpperCase(),
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
@@ -1070,7 +1127,9 @@ class _MessageBubble extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: isMe ? Colors.white.withValues(alpha: 0.8) : AppColors.defaultBlue,
+              color: isMe
+                  ? Colors.white.withValues(alpha: 0.8)
+                  : AppColors.defaultBlue,
             ),
           ),
           const SizedBox(height: 2),
@@ -1078,7 +1137,9 @@ class _MessageBubble extends StatelessWidget {
             message.replyTo!.content,
             style: TextStyle(
               fontSize: 12,
-              color: isMe ? Colors.white.withValues(alpha: 0.7) : AppColors.onSurfaceVariant,
+              color: isMe
+                  ? Colors.white.withValues(alpha: 0.7)
+                  : AppColors.onSurfaceVariant,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -1128,14 +1189,14 @@ class _MessageBubble extends StatelessWidget {
         children: message.reactions.entries.map((entry) {
           final emoji = entry.key;
           final users = entry.value;
-          
+
           return GestureDetector(
             onTap: () => onReact(emoji),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: users.contains(currentUserId) 
-                    ? AppColors.subtleBlue 
+                color: users.contains(currentUserId)
+                    ? AppColors.subtleBlue
                     : AppColors.gray200,
                 borderRadius: BorderRadius.circular(12),
                 border: users.contains(currentUserId)
@@ -1212,7 +1273,10 @@ class _MessageBubble extends StatelessWidget {
               ),
             ],
             ListTile(
-              leading: const Icon(Icons.copy, color: AppColors.onSurfaceVariant),
+              leading: const Icon(
+                Icons.copy,
+                color: AppColors.onSurfaceVariant,
+              ),
               title: const Text('Copy'),
               onTap: () {
                 Navigator.pop(context);
@@ -1230,7 +1294,7 @@ class _MessageBubble extends StatelessWidget {
 
   void _showReactionPicker(BuildContext context) {
     final reactions = ['👍', '❤️', '😂', '😮', '😢', '😡'];
-    
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -1243,10 +1307,7 @@ class _MessageBubble extends StatelessWidget {
           children: [
             const Text(
               'React to message',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 16),
             Row(
@@ -1265,10 +1326,7 @@ class _MessageBubble extends StatelessWidget {
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: Center(
-                      child: Text(
-                        emoji,
-                        style: const TextStyle(fontSize: 24),
-                      ),
+                      child: Text(emoji, style: const TextStyle(fontSize: 24)),
                     ),
                   ),
                 );
@@ -1341,10 +1399,7 @@ class _ReplyBanner extends StatelessWidget {
   final ChatMessageModel message;
   final VoidCallback onCancel;
 
-  const _ReplyBanner({
-    required this.message,
-    required this.onCancel,
-  });
+  const _ReplyBanner({required this.message, required this.onCancel});
 
   @override
   Widget build(BuildContext context) {
@@ -1352,9 +1407,7 @@ class _ReplyBanner extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: const BoxDecoration(
         color: AppColors.subtleBlue,
-        border: Border(
-          top: BorderSide(color: AppColors.outline, width: 0.5),
-        ),
+        border: Border(top: BorderSide(color: AppColors.outline, width: 0.5)),
       ),
       child: Row(
         children: [
@@ -1408,10 +1461,7 @@ class _EditBanner extends StatelessWidget {
   final ChatMessageModel message;
   final VoidCallback onCancel;
 
-  const _EditBanner({
-    required this.message,
-    required this.onCancel,
-  });
+  const _EditBanner({required this.message, required this.onCancel});
 
   @override
   Widget build(BuildContext context) {
@@ -1419,9 +1469,7 @@ class _EditBanner extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: const BoxDecoration(
         color: AppColors.subtleBlue,
-        border: Border(
-          top: BorderSide(color: AppColors.outline, width: 0.5),
-        ),
+        border: Border(top: BorderSide(color: AppColors.outline, width: 0.5)),
       ),
       child: Row(
         children: [
@@ -1465,9 +1513,7 @@ class _AttachmentsPreview extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: const BoxDecoration(
         color: AppColors.gray50,
-        border: Border(
-          top: BorderSide(color: AppColors.outline, width: 0.5),
-        ),
+        border: Border(top: BorderSide(color: AppColors.outline, width: 0.5)),
       ),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
@@ -1489,10 +1535,7 @@ class _AttachmentsPreview extends StatelessWidget {
                 child: isImage
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          file,
-                          fit: BoxFit.cover,
-                        ),
+                        child: Image.file(file, fit: BoxFit.cover),
                       )
                     : const Icon(
                         Icons.insert_drive_file,

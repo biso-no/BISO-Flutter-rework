@@ -3,7 +3,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/premium_theme.dart';
 
 /// Premium UI Components Collection
-/// 
+///
 /// A comprehensive set of luxury UI components designed to replace
 /// Material Design elements with sophisticated, exclusive alternatives.
 
@@ -20,7 +20,7 @@ class PremiumButton extends StatefulWidget {
   final EdgeInsets? padding;
   final double? width;
   final double borderRadius;
-  
+
   const PremiumButton({
     super.key,
     required this.text,
@@ -70,10 +70,12 @@ class _PremiumButtonState extends State<PremiumButton>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isEnabled = widget.onPressed != null && !widget.isLoading;
-    
-    final backgroundColor = widget.customColor ?? 
+
+    final backgroundColor =
+        widget.customColor ??
         (widget.isSecondary ? Colors.transparent : AppColors.biLightBlue);
-    final textColor = widget.customTextColor ?? 
+    final textColor =
+        widget.customTextColor ??
         (widget.isSecondary ? AppColors.biLightBlue : Colors.white);
 
     return GestureDetector(
@@ -89,12 +91,13 @@ class _PremiumButtonState extends State<PremiumButton>
             opacity: _opacityAnimation.value,
             child: Container(
               width: widget.width,
-              padding: widget.padding ?? 
+              padding:
+                  widget.padding ??
                   const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
               decoration: BoxDecoration(
                 color: backgroundColor,
                 borderRadius: BorderRadius.circular(widget.borderRadius),
-                border: widget.isSecondary 
+                border: widget.isSecondary
                     ? Border.all(color: AppColors.biLightBlue, width: 2)
                     : null,
                 gradient: !widget.isSecondary && widget.customColor == null
@@ -103,14 +106,14 @@ class _PremiumButtonState extends State<PremiumButton>
                         end: Alignment.bottomRight,
                         colors: [
                           AppColors.biLightBlue,
-                          AppColors.biLightBlue.withValues(alpha:0.8),
+                          AppColors.biLightBlue.withValues(alpha: 0.8),
                         ],
                       )
                     : null,
-                boxShadow: !widget.isSecondary && isEnabled 
+                boxShadow: !widget.isSecondary && isEnabled
                     ? [
                         BoxShadow(
-                          color: backgroundColor.withValues(alpha:0.3),
+                          color: backgroundColor.withValues(alpha: 0.3),
                           blurRadius: 12,
                           offset: const Offset(0, 6),
                         ),
@@ -132,14 +135,10 @@ class _PremiumButtonState extends State<PremiumButton>
                       ),
                     )
                   else if (widget.icon != null) ...[
-                    Icon(
-                      widget.icon,
-                      color: textColor,
-                      size: 20,
-                    ),
+                    Icon(widget.icon, color: textColor, size: 20),
                     const SizedBox(width: 12),
                   ],
-                  
+
                   Text(
                     widget.text,
                     style: theme.textTheme.labelLarge?.copyWith(
@@ -169,7 +168,7 @@ class PremiumCard extends StatelessWidget {
   final bool isGlass;
   final List<Color>? gradientColors;
   final double borderRadius;
-  
+
   const PremiumCard({
     super.key,
     required this.child,
@@ -186,7 +185,7 @@ class PremiumCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     Widget card = Container(
       margin: margin,
       padding: padding ?? const EdgeInsets.all(20),
@@ -196,7 +195,9 @@ class PremiumCard extends StatelessWidget {
               gradientColors: gradientColors,
             )
           : BoxDecoration(
-              color: backgroundColor ?? (isDark ? AppColors.smokeGray : Colors.white),
+              color:
+                  backgroundColor ??
+                  (isDark ? AppColors.smokeGray : Colors.white),
               borderRadius: BorderRadius.circular(borderRadius),
               gradient: gradientColors != null
                   ? LinearGradient(
@@ -208,7 +209,8 @@ class PremiumCard extends StatelessWidget {
               boxShadow: hasGlow
                   ? [
                       BoxShadow(
-                        color: (backgroundColor ?? AppColors.biLightBlue).withValues(alpha:0.2),
+                        color: (backgroundColor ?? AppColors.biLightBlue)
+                            .withValues(alpha: 0.2),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -217,7 +219,7 @@ class PremiumCard extends StatelessWidget {
                   : PremiumTheme.softShadow,
               border: isGlass
                   ? Border.all(
-                      color: Colors.white.withValues(alpha:0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       width: 1,
                     )
                   : null,
@@ -244,7 +246,7 @@ class PremiumInkWell extends StatefulWidget {
   final VoidCallback onTap;
   final BorderRadius? borderRadius;
   final Color? splashColor;
-  
+
   const PremiumInkWell({
     super.key,
     required this.child,
@@ -291,10 +293,8 @@ class _PremiumInkWellState extends State<PremiumInkWell>
       onTapCancel: () => _controller.reverse(),
       child: AnimatedBuilder(
         animation: _scaleAnimation,
-        builder: (context, child) => Transform.scale(
-          scale: _scaleAnimation.value,
-          child: widget.child,
-        ),
+        builder: (context, child) =>
+            Transform.scale(scale: _scaleAnimation.value, child: widget.child),
       ),
     );
   }
@@ -315,7 +315,7 @@ class PremiumTextField extends StatefulWidget {
   final String? errorText;
   final bool isGlass;
   final int? maxLines;
-  
+
   const PremiumTextField({
     super.key,
     this.label,
@@ -350,14 +350,14 @@ class _PremiumTextFieldState extends State<PremiumTextField>
       duration: PremiumTheme.mediumAnimation,
       vsync: this,
     );
-    _borderColorAnimation = ColorTween(
-      begin: AppColors.cloud,
-      end: AppColors.biLightBlue,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: PremiumTheme.premiumCurve,
-    ));
-    
+    _borderColorAnimation =
+        ColorTween(begin: AppColors.cloud, end: AppColors.biLightBlue).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: PremiumTheme.premiumCurve,
+          ),
+        );
+
     _textController = TextEditingController(text: widget.initialValue);
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
@@ -396,7 +396,7 @@ class _PremiumTextFieldState extends State<PremiumTextField>
             ),
           ),
         ],
-        
+
         AnimatedBuilder(
           animation: _borderColorAnimation,
           builder: (context, child) => Container(
@@ -411,10 +411,12 @@ class _PremiumTextFieldState extends State<PremiumTextField>
                           : (_borderColorAnimation.value ?? AppColors.cloud),
                       width: _focusNode.hasFocus ? 2 : 1,
                     ),
-                    boxShadow: _focusNode.hasFocus 
+                    boxShadow: _focusNode.hasFocus
                         ? [
                             BoxShadow(
-                              color: AppColors.biLightBlue.withValues(alpha:0.1),
+                              color: AppColors.biLightBlue.withValues(
+                                alpha: 0.1,
+                              ),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -462,7 +464,7 @@ class _PremiumTextFieldState extends State<PremiumTextField>
             ),
           ),
         ),
-        
+
         if (widget.errorText != null) ...[
           const SizedBox(height: 8),
           Padding(
@@ -488,7 +490,7 @@ class PremiumChip extends StatelessWidget {
   final VoidCallback? onTap;
   final IconData? icon;
   final Color? selectedColor;
-  
+
   const PremiumChip({
     super.key,
     required this.label,
@@ -502,7 +504,7 @@ class PremiumChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     final backgroundColor = isSelected
         ? (selectedColor ?? AppColors.biLightBlue)
         : (isDark ? AppColors.smokeGray : AppColors.cloud);
@@ -527,7 +529,7 @@ class PremiumChip extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: backgroundColor.withValues(alpha:0.3),
+                    color: backgroundColor.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -538,11 +540,7 @@ class PremiumChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(
-                icon,
-                size: 16,
-                color: textColor,
-              ),
+              Icon(icon, size: 16, color: textColor),
               const SizedBox(width: 6),
             ],
             Text(
@@ -565,7 +563,7 @@ class PremiumSwitch extends StatefulWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
   final Color? activeColor;
-  
+
   const PremiumSwitch({
     super.key,
     required this.value,
@@ -590,18 +588,21 @@ class _PremiumSwitchState extends State<PremiumSwitch>
       duration: PremiumTheme.mediumAnimation,
       vsync: this,
     );
-    
+
     _positionAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: PremiumTheme.premiumCurve),
     );
-    
-    _colorAnimation = ColorTween(
-      begin: AppColors.cloud,
-      end: widget.activeColor ?? AppColors.biLightBlue,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: PremiumTheme.premiumCurve,
-    ));
+
+    _colorAnimation =
+        ColorTween(
+          begin: AppColors.cloud,
+          end: widget.activeColor ?? AppColors.biLightBlue,
+        ).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: PremiumTheme.premiumCurve,
+          ),
+        );
 
     if (widget.value) {
       _controller.value = 1.0;
@@ -660,7 +661,7 @@ class _PremiumSwitchState extends State<PremiumSwitch>
                   borderRadius: BorderRadius.circular(thumbSize / 2),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha:0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -683,7 +684,7 @@ class PremiumSectionHeader extends StatelessWidget {
   final String? actionText;
   final VoidCallback? onActionTap;
   final IconData? icon;
-  
+
   const PremiumSectionHeader({
     super.key,
     required this.title,
@@ -707,18 +708,14 @@ class PremiumSectionHeader extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.biLightBlue.withValues(alpha:0.1),
+                color: AppColors.biLightBlue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
-                icon,
-                size: 16,
-                color: AppColors.biLightBlue,
-              ),
+              child: Icon(icon, size: 16, color: AppColors.biLightBlue),
             ),
             const SizedBox(width: 12),
           ],
-          
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -742,7 +739,7 @@ class PremiumSectionHeader extends StatelessWidget {
               ],
             ),
           ),
-          
+
           if (actionText != null && onActionTap != null)
             PremiumInkWell(
               onTap: onActionTap!,

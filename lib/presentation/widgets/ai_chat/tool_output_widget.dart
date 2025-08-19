@@ -35,7 +35,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       parent: _animationController,
       curve: Curves.easeInOut,
     );
-    
+
     // Start shimmer animation for loading states
     if (widget.toolPart.state == ToolPartState.inputStreaming ||
         widget.toolPart.state == ToolPartState.inputAvailable) {
@@ -46,7 +46,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
   @override
   void didUpdateWidget(ToolOutputWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // Handle state changes
     if (oldWidget.toolPart.state != widget.toolPart.state) {
       if (widget.toolPart.state == ToolPartState.inputStreaming ||
@@ -67,7 +67,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -84,8 +84,11 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
             ),
             boxShadow: [
               BoxShadow(
-                color: (widget.isDark ? AppColors.shadowHeavy : AppColors.shadowLight)
-                    .withValues(alpha: 0.1),
+                color:
+                    (widget.isDark
+                            ? AppColors.shadowHeavy
+                            : AppColors.shadowLight)
+                        .withValues(alpha: 0.1),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -145,9 +148,9 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
           ),
           const SizedBox(height: 12),
           _buildLoadingProgress(theme),
-          if (widget.toolPart.toolName == 'searchSharePoint' && 
+          if (widget.toolPart.toolName == 'searchSharePoint' &&
               (widget.toolPart.state == ToolPartState.inputStreaming ||
-               widget.toolPart.state == ToolPartState.inputAvailable))
+                  widget.toolPart.state == ToolPartState.inputAvailable))
             ..._buildSharePointSearchPreview(theme),
         ],
       ),
@@ -166,10 +169,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               gradient: const LinearGradient(
-                colors: [
-                  AppColors.crystalBlue,
-                  AppColors.emeraldGreen,
-                ],
+                colors: [AppColors.crystalBlue, AppColors.emeraldGreen],
               ),
             ),
             child: const Icon(
@@ -189,17 +189,11 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       decoration: BoxDecoration(
         color: AppColors.crystalBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.crystalBlue.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.crystalBlue.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
-          Icon(
-            _getToolIcon(),
-            color: AppColors.crystalBlue,
-            size: 16,
-          ),
+          Icon(_getToolIcon(), color: AppColors.crystalBlue, size: 16),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -306,7 +300,10 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
 
   List<Widget> _buildSearchSteps(ThemeData theme) {
     final steps = [
-      ('🔍', 'Analyzing query: "${widget.toolPart.args?['query'] ?? 'vedtekter'}"'),
+      (
+        '🔍',
+        'Analyzing query: "${widget.toolPart.args?['query'] ?? 'vedtekter'}"',
+      ),
       ('🧠', 'Converting to vector embeddings'),
       ('📊', 'Searching Pinecone database'),
       ('📄', 'Fetching relevant documents'),
@@ -316,7 +313,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       final index = entry.key;
       final (emoji, description) = entry.value;
       final isActive = index <= 1; // Simulate progress
-      
+
       return Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: Row(
@@ -326,15 +323,14 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
               width: 6,
               height: 6,
               decoration: BoxDecoration(
-                color: isActive ? AppColors.emeraldGreen : AppColors.outline.withValues(alpha: 0.3),
+                color: isActive
+                    ? AppColors.emeraldGreen
+                    : AppColors.outline.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
             const SizedBox(width: 12),
-            Text(
-              emoji,
-              style: TextStyle(fontSize: 14),
-            ),
+            Text(emoji, style: TextStyle(fontSize: 14)),
             const SizedBox(width: 8),
             Expanded(
               child: AnimatedOpacity(
@@ -343,8 +339,10 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
                 child: Text(
                   description,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: isActive 
-                        ? (widget.isDark ? AppColors.onSurfaceDark : AppColors.onSurface)
+                    color: isActive
+                        ? (widget.isDark
+                              ? AppColors.onSurfaceDark
+                              : AppColors.onSurface)
                         : AppColors.outline,
                     fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
                   ),
@@ -357,7 +355,9 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
                 height: 12,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.crystalBlue),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.crystalBlue,
+                  ),
                 ),
               ),
           ],
@@ -370,7 +370,8 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: (widget.isDark ? AppColors.surfaceDark : AppColors.white).withValues(alpha: 0.5),
+        color: (widget.isDark ? AppColors.surfaceDark : AppColors.white)
+            .withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.outline.withValues(alpha: 0.2),
@@ -382,11 +383,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
         children: [
           Row(
             children: [
-              Icon(
-                Icons.preview_rounded,
-                size: 16,
-                color: AppColors.outline,
-              ),
+              Icon(Icons.preview_rounded, size: 16, color: AppColors.outline),
               const SizedBox(width: 8),
               Text(
                 'Content Preview',
@@ -399,13 +396,16 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
           ),
           const SizedBox(height: 12),
           // Animated skeleton loading bars
-          ...List.generate(3, (index) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: _buildSkeletonLine(
-              width: [0.9, 0.7, 0.5][index],
-              delay: Duration(milliseconds: index * 200),
+          ...List.generate(
+            3,
+            (index) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _buildSkeletonLine(
+                width: [0.9, 0.7, 0.5][index],
+                delay: Duration(milliseconds: index * 200),
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );
@@ -416,7 +416,8 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       animation: _animationController,
       builder: (context, child) {
         // Create shimmer effect
-        final shimmerValue = (_animationController.value + delay.inMilliseconds / 1000) % 1.0;
+        final shimmerValue =
+            (_animationController.value + delay.inMilliseconds / 1000) % 1.0;
         return Container(
           height: 12,
           width: MediaQuery.of(context).size.width * width,
@@ -493,11 +494,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Icon(
-            Icons.error_outline_rounded,
-            color: AppColors.error,
-            size: 24,
-          ),
+          Icon(Icons.error_outline_rounded, color: AppColors.error, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -527,7 +524,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
   Widget _buildSharePointResults(ThemeData theme, Map<String, dynamic> result) {
     try {
       final response = SharePointSearchResponse.fromJson(result);
-      
+
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -629,17 +626,11 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       decoration: BoxDecoration(
         color: AppColors.crystalBlue.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.crystalBlue.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: AppColors.crystalBlue.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.analytics_rounded,
-            color: AppColors.crystalBlue,
-            size: 16,
-          ),
+          Icon(Icons.analytics_rounded, color: AppColors.crystalBlue, size: 16),
           const SizedBox(width: 8),
           Text(
             'Query: "${response.query}" (${response.queryLanguage.toUpperCase()})',
@@ -660,17 +651,11 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       decoration: BoxDecoration(
         color: AppColors.sunGold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.sunGold.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.sunGold.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.expand_more_rounded,
-            color: AppColors.sunGold,
-            size: 20,
-          ),
+          Icon(Icons.expand_more_rounded, color: AppColors.sunGold, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -695,7 +680,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
 
   Widget _buildSearchResultCard(ThemeData theme, SharePointResult result) {
     final scoreColor = _getScoreColor(result.score);
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
@@ -718,7 +703,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: result.documentViewerUrl != null 
+          onTap: result.documentViewerUrl != null
               ? () => _launchUrl(result.documentViewerUrl!)
               : null,
           child: Padding(
@@ -760,8 +745,11 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: (widget.isDark ? AppColors.stoneGray : AppColors.surfaceVariant)
-                        .withValues(alpha: 0.3),
+                    color:
+                        (widget.isDark
+                                ? AppColors.stoneGray
+                                : AppColors.surfaceVariant)
+                            .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -824,7 +812,9 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
                             color: AppColors.crystalBlue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: AppColors.crystalBlue.withValues(alpha: 0.2),
+                              color: AppColors.crystalBlue.withValues(
+                                alpha: 0.2,
+                              ),
                             ),
                           ),
                           child: Row(
@@ -864,18 +854,12 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       decoration: BoxDecoration(
         color: scoreColor.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: scoreColor.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: scoreColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            _getScoreIcon(score),
-            color: scoreColor,
-            size: 12,
-          ),
+          Icon(_getScoreIcon(score), color: scoreColor, size: 12),
           const SizedBox(width: 4),
           Text(
             '${(score * 100).toInt()}%',
@@ -908,7 +892,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
       final date = DateTime.parse(dateString);
       final now = DateTime.now();
       final difference = now.difference(date);
-      
+
       if (difference.inDays == 0) {
         return 'Today';
       } else if (difference.inDays == 1) {
@@ -930,7 +914,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
   Widget _buildDocumentStats(ThemeData theme, Map<String, dynamic> result) {
     try {
       final response = DocumentStatsResponse.fromJson(result);
-      
+
       return Column(
         children: [
           _buildToolHeader(theme, 'Document Statistics'),
@@ -975,23 +959,22 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
     }
   }
 
-  Widget _buildStatCard(ThemeData theme, String label, String value, IconData icon) {
+  Widget _buildStatCard(
+    ThemeData theme,
+    String label,
+    String value,
+    IconData icon,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.crystalBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.crystalBlue.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.crystalBlue.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: AppColors.crystalBlue,
-            size: 24,
-          ),
+          Icon(icon, color: AppColors.crystalBlue, size: 24),
           const SizedBox(height: 8),
           Text(
             value,
@@ -1014,7 +997,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
   Widget _buildSharePointSites(ThemeData theme, Map<String, dynamic> result) {
     try {
       final response = SharePointSitesResponse.fromJson(result);
-      
+
       return Column(
         children: [
           _buildToolHeader(theme, '${response.sites.length} SharePoint Sites'),
@@ -1032,10 +1015,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
                   size: 20,
                 ),
               ),
-              title: Text(
-                site.displayName,
-                style: theme.textTheme.titleSmall,
-              ),
+              title: Text(site.displayName, style: theme.textTheme.titleSmall),
               subtitle: Text(
                 site.name,
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -1058,7 +1038,7 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
   Widget _buildWeatherWidget(ThemeData theme, Map<String, dynamic> result) {
     try {
       final response = WeatherResponse.fromJson(result);
-      
+
       return Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -1126,12 +1106,18 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: (widget.isDark ? AppColors.stoneGray : AppColors.surfaceVariant)
-                    .withValues(alpha: 0.3),
+                color:
+                    (widget.isDark
+                            ? AppColors.stoneGray
+                            : AppColors.surfaceVariant)
+                        .withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: (widget.isDark ? AppColors.outlineDark : AppColors.outline)
-                      .withValues(alpha: 0.2),
+                  color:
+                      (widget.isDark
+                              ? AppColors.outlineDark
+                              : AppColors.outline)
+                          .withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -1221,18 +1207,14 @@ class _ToolOutputWidgetState extends State<ToolOutputWidget>
   Widget _buildToolIcon() {
     final icon = _getToolIcon();
     final color = _getToolIconColor();
-    
+
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Icon(
-        icon,
-        color: color,
-        size: 20,
-      ),
+      child: Icon(icon, color: color, size: 20),
     );
   }
 

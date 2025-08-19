@@ -17,11 +17,11 @@ class CampusService {
           Query.select(['\$id', 'name']),
         ],
       );
-      
+
       final campuses = results.map((doc) {
         return CampusModel.fromMap(doc);
       }).toList();
-      
+
       return campuses;
     } catch (e) {
       // Fallback to static data if Appwrite fails
@@ -36,7 +36,7 @@ class CampusService {
         collectionId: collectionId,
         documentId: campusId,
       );
-      
+
       return CampusModel.fromMap(document);
     } catch (e) {
       // Fallback to static data

@@ -11,13 +11,11 @@ import 'chat_conversation_screen.dart';
 class MessageSearchScreen extends ConsumerStatefulWidget {
   final ChatModel chat;
 
-  const MessageSearchScreen({
-    super.key,
-    required this.chat,
-  });
+  const MessageSearchScreen({super.key, required this.chat});
 
   @override
-  ConsumerState<MessageSearchScreen> createState() => _MessageSearchScreenState();
+  ConsumerState<MessageSearchScreen> createState() =>
+      _MessageSearchScreenState();
 }
 
 class _MessageSearchScreenState extends ConsumerState<MessageSearchScreen> {
@@ -78,9 +76,9 @@ class _MessageSearchScreenState extends ConsumerState<MessageSearchScreen> {
       });
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Search failed: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Search failed: $e')));
       }
     }
   }
@@ -119,9 +117,7 @@ class _MessageSearchScreenState extends ConsumerState<MessageSearchScreen> {
           ),
 
           // Search results
-          Expanded(
-            child: _buildSearchResults(),
-          ),
+          Expanded(child: _buildSearchResults()),
         ],
       ),
     );
@@ -133,18 +129,11 @@ class _MessageSearchScreenState extends ConsumerState<MessageSearchScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.search,
-              size: 64,
-              color: AppColors.onSurfaceVariant,
-            ),
+            Icon(Icons.search, size: 64, color: AppColors.onSurfaceVariant),
             SizedBox(height: 16),
             Text(
               'Start typing to search messages',
-              style: TextStyle(
-                color: AppColors.onSurfaceVariant,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 16),
             ),
           ],
         ),
@@ -168,10 +157,7 @@ class _MessageSearchScreenState extends ConsumerState<MessageSearchScreen> {
             SizedBox(height: 16),
             Text(
               'No messages found',
-              style: TextStyle(
-                color: AppColors.onSurfaceVariant,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 16),
             ),
           ],
         ),
@@ -220,7 +206,9 @@ class _MessageSearchResult extends StatelessWidget {
       leading: CircleAvatar(
         backgroundColor: AppColors.subtleBlue,
         child: Text(
-          message.senderName.isNotEmpty ? message.senderName[0].toUpperCase() : '?',
+          message.senderName.isNotEmpty
+              ? message.senderName[0].toUpperCase()
+              : '?',
           style: const TextStyle(
             color: AppColors.defaultBlue,
             fontWeight: FontWeight.bold,
@@ -229,10 +217,7 @@ class _MessageSearchResult extends StatelessWidget {
       ),
       title: Text(
         message.senderName,
-        style: const TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: 14,
-        ),
+        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,7 +244,7 @@ class _MessageSearchResult extends StatelessWidget {
 
   String _highlightSearchTerm(String text, String searchTerm) {
     if (searchTerm.isEmpty) return text;
-    
+
     // For now, just return the text
     // In a full implementation, you'd use RichText with highlighted spans
     return text;

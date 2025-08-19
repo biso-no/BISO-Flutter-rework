@@ -30,7 +30,8 @@ class LargeEventScreen extends ConsumerWidget {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  if (event.backgroundImageUrl != null && event.backgroundImageUrl!.isNotEmpty)
+                  if (event.backgroundImageUrl != null &&
+                      event.backgroundImageUrl!.isNotEmpty)
                     Image.network(event.backgroundImageUrl!, fit: BoxFit.cover)
                   else
                     Container(
@@ -50,7 +51,7 @@ class LargeEventScreen extends ConsumerWidget {
                         colors: [Colors.transparent, Colors.black54],
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -75,7 +76,10 @@ class LargeEventScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: AppColors.outlineVariant),
                           ),
-                          child: Image.network(event.logoUrl!, fit: BoxFit.contain),
+                          child: Image.network(
+                            event.logoUrl!,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       if (event.logoUrl != null && event.logoUrl!.isNotEmpty)
                         const SizedBox(width: 12),
@@ -83,7 +87,11 @@ class LargeEventScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(event.name, style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+                            Text(
+                              event.name,
+                              style: Theme.of(context).textTheme.headlineMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
                             const SizedBox(height: 6),
                             Text(event.description),
                           ],
@@ -93,20 +101,34 @@ class LargeEventScreen extends ConsumerWidget {
                   ),
 
                   const SizedBox(height: 16),
-                  _DatePills(from: event.startDate, to: event.endDate, color: event.primaryColor),
+                  _DatePills(
+                    from: event.startDate,
+                    to: event.endDate,
+                    color: event.primaryColor,
+                  ),
 
                   const SizedBox(height: 24),
-                  if (cfg != null) _TicketingSection(cfg: cfg, accent: event.primaryColor),
+                  if (cfg != null)
+                    _TicketingSection(cfg: cfg, accent: event.primaryColor),
 
                   const SizedBox(height: 24),
                   // Prefer subevents from collection; fallback to embedded schedule
-                  Consumer(builder: (context, ref, _) {
-                    final state = ref.watch(largeEventItemsProvider((eventId: event.id, campusId: campus.id)));
-                    final hasItems = state.items.isNotEmpty;
-                    final items = hasItems ? state.items : (cfg?.schedule ?? []);
-                    if (items.isEmpty) return const SizedBox.shrink();
-                    return _ScheduleList(items: items);
-                  }),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final state = ref.watch(
+                        largeEventItemsProvider((
+                          eventId: event.id,
+                          campusId: campus.id,
+                        )),
+                      );
+                      final hasItems = state.items.isNotEmpty;
+                      final items = hasItems
+                          ? state.items
+                          : (cfg?.schedule ?? []);
+                      if (items.isEmpty) return const SizedBox.shrink();
+                      return _ScheduleList(items: items);
+                    },
+                  ),
                 ],
               ),
             ),
@@ -125,12 +147,18 @@ class _DatePills extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.white, fontWeight: FontWeight.w600);
+    final style = Theme.of(context).textTheme.bodyMedium?.copyWith(
+      color: AppColors.white,
+      fontWeight: FontWeight.w600,
+    );
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(24)),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(24),
+          ),
           child: Text('${from.day}.${from.month}.${from.year}', style: style),
         ),
         const SizedBox(width: 8),
@@ -138,7 +166,10 @@ class _DatePills extends StatelessWidget {
         const SizedBox(width: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(24)),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(24),
+          ),
           child: Text('${to.day}.${to.month}.${to.year}', style: style),
         ),
       ],
@@ -168,7 +199,8 @@ class _TicketingSection extends StatelessWidget {
                 const SizedBox(height: 12),
                 if (cfg.allAccessPassUrl != null)
                   FilledButton(
-                    onPressed: () => launchUrl(Uri.parse(cfg.allAccessPassUrl!)),
+                    onPressed: () =>
+                        launchUrl(Uri.parse(cfg.allAccessPassUrl!)),
                     style: FilledButton.styleFrom(backgroundColor: accent),
                     child: const Text('Buy Pass'),
                   ),
@@ -197,8 +229,11 @@ class _TicketingSection extends StatelessWidget {
                       subtitle: Text(_formatScheduleSubtitle(item)),
                       trailing: item.ticketUrl != null
                           ? FilledButton(
-                              onPressed: () => launchUrl(Uri.parse(item.ticketUrl!)),
-                              style: FilledButton.styleFrom(backgroundColor: accent),
+                              onPressed: () =>
+                                  launchUrl(Uri.parse(item.ticketUrl!)),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: accent,
+                              ),
                               child: const Text('Tickets'),
                             )
                           : null,
@@ -215,7 +250,9 @@ class _TicketingSection extends StatelessWidget {
     final start = item.startTime;
     final end = item.endTime;
     final date = '${start.day}.${start.month}.${start.year}';
-    final time = end != null ? '${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')} - ${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')}' : '${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')}';
+    final time = end != null
+        ? '${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')} - ${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')}'
+        : '${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')}';
     final loc = item.location != null ? ' • ${item.location}' : '';
     return '$date • $time$loc';
   }
@@ -244,5 +281,3 @@ class _ScheduleList extends StatelessWidget {
     );
   }
 }
-
-

@@ -3,7 +3,7 @@
 
 // Appwrite Console Steps:
 // 1. Go to Database > app > user collection
-// 2. Click "Add Attribute"  
+// 2. Click "Add Attribute"
 // 3. Select "Boolean"
 // 4. Set Key: "is_public"
 // 5. Set Default: false (or leave unset for nullable)

@@ -32,32 +32,24 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
   @override
   void initState() {
     super.initState();
-    
+
     // Shimmer animation for verified badge
     _shimmerController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
     );
-    _shimmerAnimation = Tween<double>(
-      begin: -1.0,
-      end: 2.0,
-    ).animate(CurvedAnimation(
-      parent: _shimmerController,
-      curve: Curves.linear,
-    ));
+    _shimmerAnimation = Tween<double>(begin: -1.0, end: 2.0).animate(
+      CurvedAnimation(parent: _shimmerController, curve: Curves.linear),
+    );
 
     // Pulse animation for active membership
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    _pulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.1,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
 
     if (widget.membership?.isActive == true) {
       _shimmerController.repeat();
@@ -141,7 +133,10 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
     );
   }
 
-  Widget _buildActiveMembershipCard(ThemeData theme, MembershipModel membership) {
+  Widget _buildActiveMembershipCard(
+    ThemeData theme,
+    MembershipModel membership,
+  ) {
     return AnimatedBuilder(
       animation: _pulseAnimation,
       builder: (context, child) {
@@ -229,7 +224,9 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
                                 ),
                               ),
                               Text(
-                                membership.expiryDate != null ? _formatDate(membership.expiryDate!) : 'No expiry',
+                                membership.expiryDate != null
+                                    ? _formatDate(membership.expiryDate!)
+                                    : 'No expiry',
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -247,7 +244,9 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
                                 ),
                               ),
                               Text(
-                                membership.createdAt != null ? _formatDate(membership.createdAt!) : 'Unknown',
+                                membership.createdAt != null
+                                    ? _formatDate(membership.createdAt!)
+                                    : 'Unknown',
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -275,7 +274,10 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
     );
   }
 
-  Widget _buildExpiredMembershipCard(ThemeData theme, MembershipModel membership) {
+  Widget _buildExpiredMembershipCard(
+    ThemeData theme,
+    MembershipModel membership,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -339,10 +341,7 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                widget.campusColor,
-                AppColors.defaultGold,
-              ],
+              colors: [widget.campusColor, AppColors.defaultGold],
             ),
             borderRadius: BorderRadius.circular(16),
           ),
@@ -389,7 +388,7 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
   Widget _buildVerificationCode(MembershipModel membership) {
     // Generate a unique verification pattern based on membership data
     final verificationCode = _generateVerificationCode(membership);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -403,11 +402,7 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.security,
-            size: 16,
-            color: AppColors.onSurfaceVariant,
-          ),
+          Icon(Icons.security, size: 16, color: AppColors.onSurfaceVariant),
           const SizedBox(width: 8),
           Text(
             'ID: $verificationCode',
@@ -455,11 +450,7 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
         children: [
           Row(
             children: [
-              Icon(
-                Icons.check_circle,
-                color: AppColors.green9,
-                size: 20,
-              ),
+              Icon(Icons.check_circle, color: AppColors.green9, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Member Benefits Active',
@@ -484,21 +475,34 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
 
   String _generateVerificationCode(MembershipModel membership) {
     // Create a deterministic but hard-to-reverse verification code
-    final dataString = '${membership.id}${membership.category}${membership.expiryDate?.millisecondsSinceEpoch ?? 0}';
+    final dataString =
+        '${membership.id}${membership.category}${membership.expiryDate?.millisecondsSinceEpoch ?? 0}';
     var hash = 0;
-    
+
     for (int i = 0; i < dataString.length; i++) {
       hash = ((hash << 5) - hash + dataString.codeUnitAt(i)) & 0xffffffff;
     }
-    
+
     // Convert to a readable format with letters and numbers
     final code = (hash.abs() % 100000000).toString().padLeft(8, '0');
     return '${code.substring(0, 4)}-${code.substring(4)}';
   }
 
   String _formatDate(DateTime date) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 }

@@ -1,7 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart' as permission_handler;
+import 'package:permission_handler/permission_handler.dart'
+    as permission_handler;
 import 'package:appwrite/appwrite.dart';
 
 import 'appwrite_service.dart';
@@ -11,9 +12,10 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  static final FirebaseMessaging _firebaseMessaging =
+      FirebaseMessaging.instance;
   static final Account _account = account;
-  
+
   String? _fcmToken;
   bool _isInitialized = false;
 
@@ -24,10 +26,10 @@ class NotificationService {
     try {
       // Configure Firebase Messaging
       await _configureFirebaseMessaging();
-      
+
       // Get FCM token
       await _getFCMToken();
-      
+
       _isInitialized = true;
       debugPrint('NotificationService initialized successfully');
     } catch (e) {
@@ -46,7 +48,7 @@ class NotificationService {
 
     // Listen to foreground messages
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
-    
+
     // Listen to when user taps notification to open app
     FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
 
@@ -62,13 +64,13 @@ class NotificationService {
     try {
       _fcmToken = await _firebaseMessaging.getToken();
       debugPrint('FCM Token: $_fcmToken');
-      
+
       // Listen for token refresh
       _firebaseMessaging.onTokenRefresh.listen((newToken) {
         _fcmToken = newToken;
         _updateTokenInAppwrite(newToken);
       });
-      
+
       return _fcmToken;
     } catch (e) {
       debugPrint('Failed to get FCM token: $e');
@@ -80,7 +82,8 @@ class NotificationService {
   Future<bool> requestPermission() async {
     try {
       // First check system permission
-      final systemPermission = await permission_handler.Permission.notification.request();
+      final systemPermission = await permission_handler.Permission.notification
+          .request();
       if (systemPermission != permission_handler.PermissionStatus.granted) {
         debugPrint('System notification permission denied');
         return false;
@@ -97,15 +100,18 @@ class NotificationService {
         sound: true,
       );
 
-      final isGranted = settings.authorizationStatus == AuthorizationStatus.authorized ||
-                       settings.authorizationStatus == AuthorizationStatus.provisional;
+      final isGranted =
+          settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional;
 
-      debugPrint('Firebase notification permission: ${settings.authorizationStatus}');
-      
+      debugPrint(
+        'Firebase notification permission: ${settings.authorizationStatus}',
+      );
+
       if (isGranted && _fcmToken != null) {
         await _updateTokenInAppwrite(_fcmToken!);
       }
-      
+
       return isGranted;
     } catch (e) {
       debugPrint('Failed to request notification permission: $e');
@@ -118,7 +124,7 @@ class NotificationService {
     try {
       final settings = await _firebaseMessaging.getNotificationSettings();
       return settings.authorizationStatus == AuthorizationStatus.authorized ||
-             settings.authorizationStatus == AuthorizationStatus.provisional;
+          settings.authorizationStatus == AuthorizationStatus.provisional;
     } catch (e) {
       debugPrint('Failed to check notification status: $e');
       return false;
@@ -130,12 +136,12 @@ class NotificationService {
     try {
       // Get current user preferences
       final prefs = await _account.getPrefs();
-      
+
       // Update with new FCM token
       final updatedPrefs = Map<String, dynamic>.from(prefs.data);
       updatedPrefs['fcm_token'] = token;
       updatedPrefs['fcm_token_updated_at'] = DateTime.now().toIso8601String();
-      
+
       // Save updated preferences
       await _account.updatePrefs(prefs: updatedPrefs);
       debugPrint('FCM token stored in Appwrite preferences');
@@ -149,12 +155,13 @@ class NotificationService {
     try {
       // Get current user preferences
       final prefs = await _account.getPrefs();
-      
+
       // Update chat notification preference
       final updatedPrefs = Map<String, dynamic>.from(prefs.data);
       updatedPrefs['chat_notifications'] = enabled;
-      updatedPrefs['chat_notifications_updated_at'] = DateTime.now().toIso8601String();
-      
+      updatedPrefs['chat_notifications_updated_at'] = DateTime.now()
+          .toIso8601String();
+
       // Save updated preferences
       await _account.updatePrefs(prefs: updatedPrefs);
       debugPrint('Chat notification preference updated: $enabled');
@@ -183,12 +190,12 @@ class NotificationService {
   void _handleForegroundMessage(RemoteMessage message) {
     debugPrint('Received foreground message: ${message.messageId}');
     debugPrint('Message data: ${message.data}');
-    
+
     if (message.notification != null) {
       debugPrint('Message notification: ${message.notification!.title}');
       debugPrint('Message body: ${message.notification!.body}');
     }
-    
+
     // You can show custom in-app notification here
     // For now, just log it
   }
@@ -197,7 +204,7 @@ class NotificationService {
   void _handleNotificationTap(RemoteMessage message) {
     debugPrint('Notification tapped: ${message.messageId}');
     debugPrint('Message data: ${message.data}');
-    
+
     // Handle navigation based on message data
     final data = message.data;
     if (data.containsKey('chat_id')) {
@@ -212,13 +219,13 @@ class NotificationService {
     try {
       await _firebaseMessaging.deleteToken();
       _fcmToken = null;
-      
+
       // Remove from Appwrite preferences
       final prefs = await _account.getPrefs();
       final updatedPrefs = Map<String, dynamic>.from(prefs.data);
       updatedPrefs.remove('fcm_token');
       updatedPrefs.remove('fcm_token_updated_at');
-      
+
       await _account.updatePrefs(prefs: updatedPrefs);
       debugPrint('FCM token cleared');
     } catch (e) {

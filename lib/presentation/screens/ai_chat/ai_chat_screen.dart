@@ -11,6 +11,7 @@ import '../../widgets/ai_chat/chat_input_field.dart';
 import '../../widgets/ai_chat/typing_indicator.dart';
 
 import '../../../core/logging/print_migration.dart';
+
 class AiChatScreen extends ConsumerStatefulWidget {
   const AiChatScreen({super.key});
 
@@ -24,11 +25,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
-  
+
   bool _isStreaming = false;
   String? _currentStreamingMessageId;
   String? _errorMessage;
-  
+
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
@@ -50,23 +51,16 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.elasticOut,
-    ));
-    
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
+
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.elasticOut),
+        );
+
     _fadeController.forward();
     _slideController.forward();
   }
@@ -79,19 +73,20 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
       });
       return;
     }
-    
+
     // Add welcome message
     final welcomeMessage = ChatMessage(
       id: 'welcome',
       role: 'assistant',
       parts: [
         const TextPart(
-          text: '👋 Hei! Jeg er din AI-assistent for BISO. Jeg kan hjelpe deg med å finne informasjon om vedtekter, retningslinjer og andre dokumenter. Spør meg om hva som helst!\n\nHello! I\'m your AI assistant for BISO. I can help you find information about bylaws, guidelines, and other documents. Ask me anything!',
+          text:
+              '👋 Hei! Jeg er din AI-assistent for BISO. Jeg kan hjelpe deg med å finne informasjon om vedtekter, retningslinjer og andre dokumenter. Spør meg om hva som helst!\n\nHello! I\'m your AI assistant for BISO. I can help you find information about bylaws, guidelines, and other documents. Ask me anything!',
         ),
       ],
       timestamp: DateTime.now(),
     );
-    
+
     setState(() {
       _messages.add(welcomeMessage);
     });
@@ -103,7 +98,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
 
     final userMessage = _chatService.createUserMessage(text);
     _textController.clear();
-    
+
     setState(() {
       _messages.add(userMessage);
       _isStreaming = true;
@@ -114,31 +109,40 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
 
     try {
       logPrint('🚀 [AI_CHAT] Starting stream for ${_messages.length} messages');
-      
+
       // Use the new streamChatMessages method with flutter_client_sse
-      await for (final event in _chatService.streamChatMessages(messages: _messages, useSSE: true)) {
+      await for (final event in _chatService.streamChatMessages(
+        messages: _messages,
+        useSSE: true,
+      )) {
         logPrint('📥 [AI_CHAT] Received event: ${event.runtimeType}');
-        
+
         switch (event) {
           case MessagePartReceived(:final messageId, :final part):
-            logPrint('📝 [AI_CHAT] MessagePart received for $messageId: ${part.runtimeType}');
+            logPrint(
+              '📝 [AI_CHAT] MessagePart received for $messageId: ${part.runtimeType}',
+            );
             // Handle new message part
             break;
-            
+
           case TextDeltaReceived(:final messageId, :final delta):
             logPrint('✍️ [AI_CHAT] TextDelta for $messageId: "$delta"');
             _ensureAssistantMessage(messageId);
             _updateMessageWithTextDelta(messageId, delta);
             break;
-            
+
           case ToolCallUpdated(:final messageId, :final toolPart):
-            logPrint('🔧 [AI_CHAT] ToolCall updated for $messageId: ${toolPart.toolName} (${toolPart.state})');
+            logPrint(
+              '🔧 [AI_CHAT] ToolCall updated for $messageId: ${toolPart.toolName} (${toolPart.state})',
+            );
             logPrint('🔧 [AI_CHAT] ToolCall args: ${toolPart.args}');
-            logPrint('🔧 [AI_CHAT] ToolCall result: ${toolPart.result != null ? 'has result' : 'no result'}');
+            logPrint(
+              '🔧 [AI_CHAT] ToolCall result: ${toolPart.result != null ? 'has result' : 'no result'}',
+            );
             _ensureAssistantMessage(messageId);
             _updateMessageWithTool(messageId, toolPart);
             break;
-            
+
           case StreamCompleted(:final messageId):
             logPrint('✅ [AI_CHAT] Stream completed for $messageId');
             setState(() {
@@ -146,7 +150,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
               _currentStreamingMessageId = null;
             });
             break;
-            
+
           case StreamError(:final error):
             logPrint('❌ [AI_CHAT] Stream error: $error');
             setState(() {
@@ -155,12 +159,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
               _errorMessage = error;
             });
             break;
-
         }
-        
+
         _scrollToBottom();
       }
-      
+
       logPrint('🏁 [AI_CHAT] Stream finished');
     } catch (e) {
       logPrint('💥 [AI_CHAT] Stream exception: $e');
@@ -176,7 +179,9 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
     // Only create assistant message if we don't have one yet
     if (_currentStreamingMessageId == null) {
       logPrint('🤖 [AI_CHAT] Creating assistant message with ID: $messageId');
-      final assistantMessage = _chatService.createAssistantMessage(id: messageId);
+      final assistantMessage = _chatService.createAssistantMessage(
+        id: messageId,
+      );
       setState(() {
         _messages.add(assistantMessage);
         _currentStreamingMessageId = messageId;
@@ -187,71 +192,91 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
 
   void _updateMessageWithTextDelta(String messageId, String delta) {
     logPrint('🔄 [AI_CHAT] Updating message $messageId with delta: "$delta"');
-    
+
     setState(() {
       var messageIndex = _messages.indexWhere((msg) => msg.id == messageId);
-      logPrint('📍 [AI_CHAT] Message index: $messageIndex (total messages: ${_messages.length})');
-      
+      logPrint(
+        '📍 [AI_CHAT] Message index: $messageIndex (total messages: ${_messages.length})',
+      );
+
       // If message not found by server ID, try to find the current streaming message
       if (messageIndex < 0 && _currentStreamingMessageId != null) {
-        messageIndex = _messages.indexWhere((msg) => msg.id == _currentStreamingMessageId);
+        messageIndex = _messages.indexWhere(
+          (msg) => msg.id == _currentStreamingMessageId,
+        );
         if (messageIndex >= 0) {
-          logPrint('🔄 [AI_CHAT] Updating current streaming message ID from $_currentStreamingMessageId to $messageId');
+          logPrint(
+            '🔄 [AI_CHAT] Updating current streaming message ID from $_currentStreamingMessageId to $messageId',
+          );
           // Update the message ID to match the server's ID
-          _messages[messageIndex] = _messages[messageIndex].copyWith(id: messageId);
+          _messages[messageIndex] = _messages[messageIndex].copyWith(
+            id: messageId,
+          );
           _currentStreamingMessageId = messageId;
         }
       }
-      
+
       if (messageIndex >= 0) {
         final oldMessage = _messages[messageIndex];
         logPrint('📝 [AI_CHAT] Old message parts: ${oldMessage.parts.length}');
-        
+
         _messages[messageIndex] = _chatService.updateMessageWithText(
           _messages[messageIndex],
           delta,
         );
-        
+
         final newMessage = _messages[messageIndex];
         logPrint('📝 [AI_CHAT] New message parts: ${newMessage.parts.length}');
-        logPrint('📄 [AI_CHAT] Current text content: "${newMessage.textContent}"');
+        logPrint(
+          '📄 [AI_CHAT] Current text content: "${newMessage.textContent}"',
+        );
       } else {
         logPrint('❌ [AI_CHAT] Message not found for ID: $messageId');
-        logPrint('📋 [AI_CHAT] Available message IDs: ${_messages.map((m) => m.id).toList()}');
+        logPrint(
+          '📋 [AI_CHAT] Available message IDs: ${_messages.map((m) => m.id).toList()}',
+        );
       }
     });
   }
 
   void _updateMessageWithTool(String messageId, ToolPart toolPart) {
-    logPrint('🔧 [AI_CHAT] Updating message $messageId with tool: ${toolPart.toolName} (${toolPart.state})');
-    
+    logPrint(
+      '🔧 [AI_CHAT] Updating message $messageId with tool: ${toolPart.toolName} (${toolPart.state})',
+    );
+
     setState(() {
       var messageIndex = _messages.indexWhere((msg) => msg.id == messageId);
       logPrint('📍 [AI_CHAT] Tool message index: $messageIndex');
-      
+
       // If message not found by tool message ID, try to find the current streaming message
       if (messageIndex < 0 && _currentStreamingMessageId != null) {
-        messageIndex = _messages.indexWhere((msg) => msg.id == _currentStreamingMessageId);
+        messageIndex = _messages.indexWhere(
+          (msg) => msg.id == _currentStreamingMessageId,
+        );
         if (messageIndex >= 0) {
-          logPrint('🔄 [AI_CHAT] Updating tool message ID from $_currentStreamingMessageId to $messageId');
+          logPrint(
+            '🔄 [AI_CHAT] Updating tool message ID from $_currentStreamingMessageId to $messageId',
+          );
           // Update the message ID to match the tool event's ID
-          _messages[messageIndex] = _messages[messageIndex].copyWith(id: messageId);
+          _messages[messageIndex] = _messages[messageIndex].copyWith(
+            id: messageId,
+          );
           _currentStreamingMessageId = messageId;
         }
       }
-      
+
       if (messageIndex >= 0) {
         final oldMessage = _messages[messageIndex];
         logPrint('🔧 [AI_CHAT] Old tool parts: ${oldMessage.toolParts.length}');
-        
+
         _messages[messageIndex] = _chatService.updateMessageWithTool(
           _messages[messageIndex],
           toolPart,
         );
-        
+
         final newMessage = _messages[messageIndex];
         logPrint('🔧 [AI_CHAT] New tool parts: ${newMessage.toolParts.length}');
-        
+
         // Add haptic feedback when tool completes
         if (toolPart.state == ToolPartState.outputAvailable) {
           logPrint('✅ [AI_CHAT] Tool completed: ${toolPart.toolName}');
@@ -260,7 +285,9 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
         }
       } else {
         logPrint('❌ [AI_CHAT] Tool message not found for ID: $messageId');
-        logPrint('📋 [AI_CHAT] Available message IDs: ${_messages.map((m) => m.id).toList()}');
+        logPrint(
+          '📋 [AI_CHAT] Available message IDs: ${_messages.map((m) => m.id).toList()}',
+        );
       }
     });
   }
@@ -291,12 +318,12 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
     if (_messages.isNotEmpty && _messages.last.role == 'user') {
       final lastUserMessage = _messages.last;
       final textContent = lastUserMessage.textContent;
-      
+
       // Remove any trailing assistant messages that failed
       while (_messages.isNotEmpty && _messages.last.role == 'assistant') {
         _messages.removeLast();
       }
-      
+
       setState(() {
         _textController.text = textContent;
         _errorMessage = null;
@@ -313,11 +340,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
       }
       return 'Thinking...';
     }
-    
+
     if (_errorMessage != null) {
       return 'Error occurred';
     }
-    
+
     return 'Ready to help';
   }
 
@@ -329,24 +356,26 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
       }
       return AppColors.crystalBlue;
     }
-    
+
     if (_errorMessage != null) {
       return AppColors.error;
     }
-    
+
     return AppColors.crystalBlue;
   }
 
   List<String> _getRunningTools() {
     if (_messages.isEmpty) return [];
-    
+
     final lastMessage = _messages.last;
     if (lastMessage.role != 'assistant') return [];
-    
+
     return lastMessage.toolParts
-        .where((tool) => 
-            tool.state == ToolPartState.inputStreaming || 
-            tool.state == ToolPartState.inputAvailable)
+        .where(
+          (tool) =>
+              tool.state == ToolPartState.inputStreaming ||
+              tool.state == ToolPartState.inputAvailable,
+        )
         .map((tool) => _getToolDisplayName(tool.toolName))
         .toList();
   }
@@ -380,7 +409,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
@@ -399,9 +428,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
                       height: constraints.maxHeight,
                       child: Column(
                         children: [
-                          Expanded(
-                            child: _buildMessagesList(),
-                          ),
+                          Expanded(child: _buildMessagesList()),
                           if (_errorMessage != null) _buildErrorBar(),
                           _buildChatInput(theme, isDark),
                         ],
@@ -421,10 +448,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      leading: NavigationUtils.buildBackButton(
-        context,
-        fallbackRoute: '/home',
-      ),
+      leading: NavigationUtils.buildBackButton(context, fallbackRoute: '/home'),
       flexibleSpace: ClipRRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -534,15 +558,24 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
 
         final message = _messages[index];
         final isUser = message.role == 'user';
-        final isStreamingThisMessage = _isStreaming && message.id == _currentStreamingMessageId;
-        
-        logPrint('🎯 [AI_CHAT] Rendering message ${message.id} (${message.role})');
+        final isStreamingThisMessage =
+            _isStreaming && message.id == _currentStreamingMessageId;
+
+        logPrint(
+          '🎯 [AI_CHAT] Rendering message ${message.id} (${message.role})',
+        );
         if (!isUser) {
-          logPrint('🔄 [AI_CHAT] AI message - isStreaming: $_isStreaming, currentStreamingId: $_currentStreamingMessageId');
-          logPrint('📊 [AI_CHAT] isStreamingThisMessage: $isStreamingThisMessage');
-          logPrint('📝 [AI_CHAT] Message text content: "${message.textContent}"');
+          logPrint(
+            '🔄 [AI_CHAT] AI message - isStreaming: $_isStreaming, currentStreamingId: $_currentStreamingMessageId',
+          );
+          logPrint(
+            '📊 [AI_CHAT] isStreamingThisMessage: $isStreamingThisMessage',
+          );
+          logPrint(
+            '📝 [AI_CHAT] Message text content: "${message.textContent}"',
+          );
         }
-        
+
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: isUser
@@ -570,25 +603,15 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen>
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.error_outline_rounded,
-            color: AppColors.error,
-            size: 20,
-          ),
+          Icon(Icons.error_outline_rounded, color: AppColors.error, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               _errorMessage!,
-              style: TextStyle(
-                color: AppColors.error,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: AppColors.error, fontSize: 14),
             ),
           ),
-          TextButton(
-            onPressed: _retryLastMessage,
-            child: const Text('Retry'),
-          ),
+          TextButton(onPressed: _retryLastMessage, child: const Text('Retry')),
         ],
       ),
     );

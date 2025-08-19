@@ -29,8 +29,12 @@ class MembershipModel extends Equatable {
       price: map['price'] ?? 0,
       category: map['category']?.toString() ?? '',
       status: map['status'] ?? false,
-      expiryDate: map['expiryDate'] != null ? DateTime.parse(map['expiryDate']) : null,
-      createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
+      expiryDate: map['expiryDate'] != null
+          ? DateTime.parse(map['expiryDate'])
+          : null,
+      createdAt: map['\$createdAt'] != null
+          ? DateTime.parse(map['\$createdAt'])
+          : null,
     );
   }
 
@@ -64,22 +68,24 @@ class MembershipModel extends Equatable {
     );
   }
 
-  bool get isActive => status && (expiryDate == null || expiryDate!.isAfter(DateTime.now()));
-  bool get isExpired => !status || (expiryDate != null && expiryDate!.isBefore(DateTime.now()));
+  bool get isActive =>
+      status && (expiryDate == null || expiryDate!.isAfter(DateTime.now()));
+  bool get isExpired =>
+      !status || (expiryDate != null && expiryDate!.isBefore(DateTime.now()));
 
   String get displayName => name;
   int get priceNok => price;
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        price,
-        category,
-        status,
-        expiryDate,
-        createdAt,
-      ];
+    id,
+    name,
+    price,
+    category,
+    status,
+    expiryDate,
+    createdAt,
+  ];
 }
 
 class MembershipVerificationResult extends Equatable {
@@ -126,16 +132,25 @@ class MembershipPurchaseOption extends Equatable {
       priceNok: membership.price,
       category: membership.category,
       description: description ?? 'BISO membership - ${membership.name}',
-      benefits: benefits ?? [
-        'Access to all events',
-        'Expense reimbursements', 
-        'Marketplace discounts',
-        'Student chat access',
-        'Priority support',
-      ],
+      benefits:
+          benefits ??
+          [
+            'Access to all events',
+            'Expense reimbursements',
+            'Marketplace discounts',
+            'Student chat access',
+            'Priority support',
+          ],
     );
   }
 
   @override
-  List<Object?> get props => [membershipId, displayName, priceNok, description, benefits, category];
+  List<Object?> get props => [
+    membershipId,
+    displayName,
+    priceNok,
+    description,
+    benefits,
+    category,
+  ];
 }

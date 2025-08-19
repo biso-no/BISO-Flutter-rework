@@ -7,13 +7,18 @@ import '../../../data/models/large_event_model.dart';
 class LargeEventHero extends StatefulWidget {
   final LargeEventModel event;
   final double expandedHeight;
-  const LargeEventHero({super.key, required this.event, this.expandedHeight = 350});
+  const LargeEventHero({
+    super.key,
+    required this.event,
+    this.expandedHeight = 350,
+  });
 
   @override
   State<LargeEventHero> createState() => _LargeEventHeroState();
 }
 
-class _LargeEventHeroState extends State<LargeEventHero> with TickerProviderStateMixin {
+class _LargeEventHeroState extends State<LargeEventHero>
+    with TickerProviderStateMixin {
   late AnimationController _overlayController;
 
   @override
@@ -48,18 +53,23 @@ class _LargeEventHeroState extends State<LargeEventHero> with TickerProviderStat
           final double maxExtent = widget.expandedHeight;
           final double minExtent = kToolbarHeight + topPadding;
           final double currentExtent = constraints.biggest.height;
-          final double t = ((maxExtent - currentExtent) / (maxExtent - minExtent)).clamp(0.0, 1.0);
+          final double t =
+              ((maxExtent - currentExtent) / (maxExtent - minExtent)).clamp(
+                0.0,
+                1.0,
+              );
 
           return Stack(
             fit: StackFit.expand,
             children: [
               // Background image or gradient
-              if (widget.event.backgroundImageUrl != null && widget.event.backgroundImageUrl!.isNotEmpty)
+              if (widget.event.backgroundImageUrl != null &&
+                  widget.event.backgroundImageUrl!.isNotEmpty)
                 Positioned.fill(
                   child: Image.network(
                     widget.event.backgroundImageUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _gradientBackground(gradient),
+                    errorBuilder: (_, _, _) => _gradientBackground(gradient),
                   ),
                 )
               else
@@ -101,7 +111,7 @@ class _LargeEventHeroState extends State<LargeEventHero> with TickerProviderStat
                                 color: Colors.black.withValues(alpha: 0.06 * t),
                                 blurRadius: 12 * t,
                                 offset: const Offset(0, 4),
-                              )
+                              ),
                             ]
                           : null,
                     ),
@@ -116,12 +126,17 @@ class _LargeEventHeroState extends State<LargeEventHero> with TickerProviderStat
         Padding(
           padding: const EdgeInsets.only(right: 8),
           child: FilledButton.icon(
-            onPressed: () => context.push('/events/large/${widget.event.slug}', extra: widget.event),
+            onPressed: () => context.push(
+              '/events/large/${widget.event.slug}',
+              extra: widget.event,
+            ),
             icon: const Icon(Icons.info_outline),
             label: const Text('Details'),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.crystalBlue),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.crystalBlue,
+            ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -149,12 +164,17 @@ class _LargeEventHeroState extends State<LargeEventHero> with TickerProviderStat
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.event.logoUrl != null && widget.event.logoUrl!.isNotEmpty)
+            if (widget.event.logoUrl != null &&
+                widget.event.logoUrl!.isNotEmpty)
               SizedBox(
                 height: 48,
-                child: Image.network(widget.event.logoUrl!, fit: BoxFit.contain),
+                child: Image.network(
+                  widget.event.logoUrl!,
+                  fit: BoxFit.contain,
+                ),
               ),
-            if (widget.event.logoUrl != null && widget.event.logoUrl!.isNotEmpty)
+            if (widget.event.logoUrl != null &&
+                widget.event.logoUrl!.isNotEmpty)
               const SizedBox(height: 8),
             Text(
               widget.event.name,
@@ -179,5 +199,3 @@ class _LargeEventHeroState extends State<LargeEventHero> with TickerProviderStat
     );
   }
 }
-
-

@@ -54,7 +54,8 @@ class DefaultFirebaseOptions {
     appId: '1:633338868564:android:48eea6bc9a6606bd248ec1',
     messagingSenderId: '633338868564',
     projectId: 'fsbiso',
-    databaseURL: 'https://fsbiso-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://fsbiso-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'fsbiso.appspot.com',
   );
 
@@ -63,7 +64,8 @@ class DefaultFirebaseOptions {
     appId: '1:633338868564:ios:c9fe7577ca37dff1248ec1',
     messagingSenderId: '633338868564',
     projectId: 'fsbiso',
-    databaseURL: 'https://fsbiso-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://fsbiso-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'fsbiso.appspot.com',
     iosBundleId: 'com.biso.no',
   );

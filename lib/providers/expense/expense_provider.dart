@@ -4,24 +4,34 @@ import '../../data/services/expense_service_v2.dart';
 import '../../core/logging/print_migration.dart';
 
 // Service provider
-final expenseServiceProvider = Provider<ExpenseServiceV2>((ref) => ExpenseServiceV2());
+final expenseServiceProvider = Provider<ExpenseServiceV2>(
+  (ref) => ExpenseServiceV2(),
+);
 
 // Expenses state provider
-final expensesStateProvider = StateNotifierProvider<ExpensesNotifier, ExpensesState>((ref) {
-  return ExpensesNotifier(ref.watch(expenseServiceProvider));
-});
+final expensesStateProvider =
+    StateNotifierProvider<ExpensesNotifier, ExpensesState>((ref) {
+      return ExpensesNotifier(ref.watch(expenseServiceProvider));
+    });
 
 // Filtered expenses provider
-final filteredExpensesProvider = Provider.family<List<ExpenseModel>, String>((ref, status) {
+final filteredExpensesProvider = Provider.family<List<ExpenseModel>, String>((
+  ref,
+  status,
+) {
   final expensesState = ref.watch(expensesStateProvider);
   if (status == 'all') {
     return expensesState.expenses;
   }
-  return expensesState.expenses.where((expense) => expense.status == status).toList();
+  return expensesState.expenses
+      .where((expense) => expense.status == status)
+      .toList();
 });
 
 // Expense statistics provider
-final expenseStatisticsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+final expenseStatisticsProvider = FutureProvider<Map<String, dynamic>>((
+  ref,
+) async {
   final service = ref.watch(expenseServiceProvider);
   return service.getExpenseStatistics();
 });
@@ -54,21 +64,17 @@ class ExpensesState {
   }
 
   // Calculate totals by status
-  double get totalPendingAmount => expenses
-      .where((e) => e.isPending)
-      .fold(0.0, (sum, e) => sum + e.total);
+  double get totalPendingAmount =>
+      expenses.where((e) => e.isPending).fold(0.0, (sum, e) => sum + e.total);
 
-  double get totalApprovedAmount => expenses
-      .where((e) => e.isApproved)
-      .fold(0.0, (sum, e) => sum + e.total);
+  double get totalApprovedAmount =>
+      expenses.where((e) => e.isApproved).fold(0.0, (sum, e) => sum + e.total);
 
-  double get totalRejectedAmount => expenses
-      .where((e) => e.isRejected)
-      .fold(0.0, (sum, e) => sum + e.total);
+  double get totalRejectedAmount =>
+      expenses.where((e) => e.isRejected).fold(0.0, (sum, e) => sum + e.total);
 
-  double get totalPaidAmount => expenses
-      .where((e) => e.isPaid)
-      .fold(0.0, (sum, e) => sum + e.total);
+  double get totalPaidAmount =>
+      expenses.where((e) => e.isPaid).fold(0.0, (sum, e) => sum + e.total);
 
   // Count by status
   int get pendingCount => expenses.where((e) => e.isPending).length;
@@ -91,13 +97,9 @@ class ExpensesNotifier extends StateNotifier<ExpensesState> {
       state = state.copyWith(isLoading: true, error: null);
 
       final expenses = await _service.getUserExpenses(userId: userId);
-      
+
       logPrint('💰 ExpensesNotifier: Loaded ${expenses.length} expenses');
-      state = state.copyWith(
-        expenses: expenses,
-        isLoading: false,
-        error: null,
-      );
+      state = state.copyWith(expenses: expenses, isLoading: false, error: null);
     } catch (e) {
       logPrint('💰 ExpensesNotifier: Failed to load expenses: $e');
       state = state.copyWith(
@@ -113,13 +115,12 @@ class ExpensesNotifier extends StateNotifier<ExpensesState> {
       logPrint('💰 ExpensesNotifier: Loading expenses with status: $status');
       state = state.copyWith(isLoading: true, error: null);
 
-      final expenses = await _service.getExpensesByStatus(status, userId: userId);
-      
-      state = state.copyWith(
-        expenses: expenses,
-        isLoading: false,
-        error: null,
+      final expenses = await _service.getExpensesByStatus(
+        status,
+        userId: userId,
       );
+
+      state = state.copyWith(expenses: expenses, isLoading: false, error: null);
     } catch (e) {
       logPrint('💰 ExpensesNotifier: Failed to load expenses by status: $e');
       state = state.copyWith(
@@ -133,17 +134,17 @@ class ExpensesNotifier extends StateNotifier<ExpensesState> {
   Future<void> loadExpense(String expenseId) async {
     try {
       logPrint('💰 ExpensesNotifier: Loading expense $expenseId');
-      
+
       final expense = await _service.getExpense(expenseId);
-      
+
       if (expense != null) {
         state = state.copyWith(selectedExpense: expense);
-        
+
         // Also update the expense in the list if it exists
         final updatedExpenses = state.expenses.map((e) {
           return e.id == expenseId ? expense : e;
         }).toList();
-        
+
         state = state.copyWith(expenses: updatedExpenses);
       }
     } catch (e) {
@@ -259,11 +260,15 @@ class ExpensesNotifier extends StateNotifier<ExpensesState> {
       await _service.deleteExpense(expenseId);
 
       // Remove from the list
-      final updatedExpenses = state.expenses.where((e) => e.id != expenseId).toList();
-      
+      final updatedExpenses = state.expenses
+          .where((e) => e.id != expenseId)
+          .toList();
+
       state = state.copyWith(
         expenses: updatedExpenses,
-        selectedExpense: state.selectedExpense?.id == expenseId ? null : state.selectedExpense,
+        selectedExpense: state.selectedExpense?.id == expenseId
+            ? null
+            : state.selectedExpense,
         isLoading: false,
         error: null,
       );

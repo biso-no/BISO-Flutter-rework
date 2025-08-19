@@ -10,16 +10,15 @@ import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/auth/auth_provider.dart';
 
 import '../../../core/logging/print_migration.dart';
+
 class OtpVerificationScreen extends ConsumerStatefulWidget {
   final String email;
 
-  const OtpVerificationScreen({
-    super.key,
-    required this.email,
-  });
+  const OtpVerificationScreen({super.key, required this.email});
 
   @override
-  ConsumerState<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
+  ConsumerState<OtpVerificationScreen> createState() =>
+      _OtpVerificationScreenState();
 }
 
 class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
@@ -88,7 +87,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
     // Build complete OTP code
     _otpCode = _controllers.map((c) => c.text).join();
-    
+
     // Auto-verify when all digits are entered
     if (_otpCode.length == AppConstants.otpLength) {
       _verifyOtp();
@@ -103,20 +102,28 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
     try {
       final authState = ref.read(authStateProvider);
-      logPrint('🔥 DEBUG: Current auth state - pendingUserId: ${authState.pendingUserId}');
-      
+      logPrint(
+        '🔥 DEBUG: Current auth state - pendingUserId: ${authState.pendingUserId}',
+      );
+
       if (authState.pendingUserId == null) {
         logPrint('🔥 DEBUG: No pending userId found!');
         throw Exception('No pending OTP verification');
       }
-      
-      logPrint('🔥 DEBUG: Calling verifyOtp with userId: ${authState.pendingUserId}, code: $_otpCode');
-      await ref.read(authStateProvider.notifier).verifyOtp(authState.pendingUserId!, _otpCode);
-      
+
+      logPrint(
+        '🔥 DEBUG: Calling verifyOtp with userId: ${authState.pendingUserId}, code: $_otpCode',
+      );
+      await ref
+          .read(authStateProvider.notifier)
+          .verifyOtp(authState.pendingUserId!, _otpCode);
+
       if (mounted) {
         final updatedAuthState = ref.read(authStateProvider);
-        logPrint('🔥 DEBUG: OTP verification completed, user: ${updatedAuthState.user?.email}');
-        
+        logPrint(
+          '🔥 DEBUG: OTP verification completed, user: ${updatedAuthState.user?.email}',
+        );
+
         // Always redirect to home after successful authentication
         logPrint('🔥 DEBUG: Authentication successful, going to home');
         context.go('/home');
@@ -130,7 +137,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
             backgroundColor: AppColors.error,
           ),
         );
-        
+
         // Clear OTP fields
         for (final controller in _controllers) {
           controller.clear();
@@ -261,10 +268,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
               const Spacer(),
 
               // Loading Indicator
-              if (_isLoading)
-                const Center(
-                  child: CircularProgressIndicator(),
-                ),
+              if (_isLoading) const Center(child: CircularProgressIndicator()),
             ],
           ),
         ),
@@ -303,16 +307,11 @@ class _OtpDigitField extends StatelessWidget {
         focusNode: focusNode,
         enabled: !isLoading,
         textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.w600,
-        ),
+        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
         keyboardType: TextInputType.number,
         maxLength: 1,
         onChanged: onChanged,
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
-        ],
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         decoration: const InputDecoration(
           counterText: '',
           border: InputBorder.none,

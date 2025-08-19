@@ -23,14 +23,17 @@ final chatServiceProvider = Provider<ChatService>((ref) {
   return ChatService();
 });
 
-// Provider for user chats  
-final userChatsProvider = FutureProvider.family<List<ChatModel>, String>((ref, userId) async {
+// Provider for user chats
+final userChatsProvider = FutureProvider.family<List<ChatModel>, String>((
+  ref,
+  userId,
+) async {
   final chatService = ref.read(chatServiceProvider);
-  
+
   try {
     // Subscribe to real-time updates
     chatService.subscribeToUpdates(userId);
-    
+
     // Get initial chats
     final chats = await chatService.getUserChats(userId);
     return chats;
@@ -38,7 +41,6 @@ final userChatsProvider = FutureProvider.family<List<ChatModel>, String>((ref, u
     return <ChatModel>[]; // Return empty list on error
   }
 });
-
 
 class ChatListScreen extends ConsumerStatefulWidget {
   const ChatListScreen({super.key});
@@ -71,7 +73,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
         _searchQuery = _searchController.text.toLowerCase();
       });
     });
-    
+
     // Check privacy and notification settings after the widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkPrivacySettings();
@@ -90,10 +92,12 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   Future<void> _checkPrivacySettings() async {
     final authState = ref.read(authStateProvider);
     if (authState.user == null) return;
-    
+
     final userId = authState.user!.id;
-    final shouldPrompt = await ref.read(shouldPromptPrivacyProvider(userId).future);
-    
+    final shouldPrompt = await ref.read(
+      shouldPromptPrivacyProvider(userId).future,
+    );
+
     if (shouldPrompt && mounted) {
       _showPrivacyPrompt();
     }
@@ -102,7 +106,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   void _showPrivacyPrompt() {
     final authState = ref.read(authStateProvider);
     if (authState.user == null) return;
-    
+
     showDialog(
       context: context,
       barrierDismissible: false, // User must make a choice
@@ -122,18 +126,18 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   Future<void> _setPrivacySetting(bool isPublic) async {
     final authState = ref.read(authStateProvider);
     if (authState.user == null) return;
-    
+
     try {
       final privacyService = ref.read(privacyServiceProvider);
       await privacyService.setUserPrivacySetting(authState.user!.id, isPublic);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              isPublic 
-                ? 'Profile set to public - others can find and message you'
-                : 'Profile set to private - others cannot find you in search',
+              isPublic
+                  ? 'Profile set to public - others can find and message you'
+                  : 'Profile set to private - others cannot find you in search',
             ),
             backgroundColor: AppColors.defaultBlue,
           ),
@@ -154,11 +158,11 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   Future<void> _checkNotificationPermissions() async {
     final authState = ref.read(authStateProvider);
     if (authState.user == null) return;
-    
+
     try {
       final notificationService = ref.read(notificationServiceProvider);
       final isEnabled = await notificationService.areNotificationsEnabled();
-      
+
       // Only prompt if notifications are not enabled and user hasn't been asked recently
       if (!isEnabled && mounted) {
         // Add a small delay to avoid conflicting with privacy prompt
@@ -184,11 +188,9 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final authState = ref.watch(authStateProvider);
-    
+
     if (authState.user == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final userId = authState.user!.id;
@@ -217,7 +219,9 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => const SettingsScreen(initialTab: 3), // Chat tab is index 3
+                  builder: (context) => const SettingsScreen(
+                    initialTab: 3,
+                  ), // Chat tab is index 3
                 ),
               );
             },
@@ -252,11 +256,17 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                   selectedColor: AppColors.subtleBlue,
                   checkmarkColor: AppColors.defaultBlue,
                   labelStyle: TextStyle(
-                    color: isSelected ? AppColors.defaultBlue : AppColors.onSurfaceVariant,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected
+                        ? AppColors.defaultBlue
+                        : AppColors.onSurfaceVariant,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
                   ),
                   side: BorderSide(
-                    color: isSelected ? AppColors.defaultBlue : AppColors.outline,
+                    color: isSelected
+                        ? AppColors.defaultBlue
+                        : AppColors.outline,
                   ),
                 );
               },
@@ -270,21 +280,23 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
             child: chatsAsync.when(
               data: (chats) {
                 final filteredChats = _filterChats(chats);
-                
+
                 if (filteredChats.isEmpty) {
                   return _EmptyState(
                     icon: Icons.chat_bubble_outline,
-                    title: _searchQuery.isNotEmpty 
+                    title: _searchQuery.isNotEmpty
                         ? 'No chats found'
                         : 'No conversations yet',
                     subtitle: _searchQuery.isNotEmpty
                         ? 'Try a different search term'
                         : 'Start a conversation with your team',
-                    action: _searchQuery.isEmpty ? TextButton.icon(
-                      onPressed: () => _startNewDirectChat(context),
-                      icon: const Icon(Icons.add),
-                      label: const Text('Start Chat'),
-                    ) : null,
+                    action: _searchQuery.isEmpty
+                        ? TextButton.icon(
+                            onPressed: () => _startNewDirectChat(context),
+                            icon: const Icon(Icons.add),
+                            label: const Text('Start Chat'),
+                          )
+                        : null,
                   );
                 }
 
@@ -295,10 +307,8 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: filteredChats.length,
-                    separatorBuilder: (context, index) => const Divider(
-                      height: 1,
-                      indent: 72,
-                    ),
+                    separatorBuilder: (context, index) =>
+                        const Divider(height: 1, indent: 72),
                     itemBuilder: (context, index) {
                       final chat = filteredChats[index];
                       return _ChatListItem(
@@ -358,12 +368,18 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
 
   String _getFilterDisplayName(String filter) {
     switch (filter) {
-      case 'all': return 'All';
-      case 'direct': return 'Direct';
-      case 'group': return 'Groups';
-      case 'team': return 'Teams';
-      case 'department': return 'Departments';
-      default: return filter;
+      case 'all':
+        return 'All';
+      case 'direct':
+        return 'Direct';
+      case 'group':
+        return 'Groups';
+      case 'team':
+        return 'Teams';
+      case 'department':
+        return 'Departments';
+      default:
+        return filter;
     }
   }
 
@@ -372,14 +388,17 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
 
     // Apply type filter
     if (_selectedFilter != 'all') {
-      filteredChats = filteredChats.where((chat) => chat.type == _selectedFilter).toList();
+      filteredChats = filteredChats
+          .where((chat) => chat.type == _selectedFilter)
+          .toList();
     }
 
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
       filteredChats = filteredChats.where((chat) {
         return chat.name.toLowerCase().contains(_searchQuery) ||
-               (chat.lastMessage?.content.toLowerCase().contains(_searchQuery) ?? false);
+            (chat.lastMessage?.content.toLowerCase().contains(_searchQuery) ??
+                false);
       }).toList();
     }
 
@@ -438,12 +457,9 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   void _startNewDirectChat(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const NewChatScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const NewChatScreen()),
     );
   }
-
 }
 
 class _ChatListItem extends StatelessWidget {
@@ -508,8 +524,12 @@ class _ChatListItem extends StatelessWidget {
                         ? 'This message was deleted'
                         : _getLastMessagePreview(lastMessage),
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: hasUnread ? theme.colorScheme.onSurface : AppColors.onSurfaceVariant,
-                      fontWeight: hasUnread ? FontWeight.w500 : FontWeight.normal,
+                      color: hasUnread
+                          ? theme.colorScheme.onSurface
+                          : AppColors.onSurfaceVariant,
+                      fontWeight: hasUnread
+                          ? FontWeight.w500
+                          : FontWeight.normal,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -531,7 +551,9 @@ class _ChatListItem extends StatelessWidget {
             Text(
               _formatTimestamp(lastMessage.timestamp),
               style: theme.textTheme.labelSmall?.copyWith(
-                color: hasUnread ? AppColors.defaultBlue : AppColors.onSurfaceVariant,
+                color: hasUnread
+                    ? AppColors.defaultBlue
+                    : AppColors.onSurfaceVariant,
                 fontWeight: hasUnread ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -573,19 +595,17 @@ class _ChatListItem extends StatelessWidget {
     return CircleAvatar(
       radius: 24,
       backgroundColor: _getChatColor(),
-      child: Icon(
-        _getChatIcon(),
-        color: Colors.white,
-        size: 20,
-      ),
+      child: Icon(_getChatIcon(), color: Colors.white, size: 20),
     );
   }
 
   String _getChatDisplayName() {
     if (chat.isDirect) {
       // For direct chats, show the other participant's name
-      final otherParticipant = chat.participants
-          .firstWhere((id) => id != currentUserId, orElse: () => '');
+      final otherParticipant = chat.participants.firstWhere(
+        (id) => id != currentUserId,
+        orElse: () => '',
+      );
       return otherParticipant.isNotEmpty ? otherParticipant : chat.name;
     }
     return chat.name;
@@ -647,9 +667,10 @@ class _ChatListItem extends StatelessWidget {
       case 'system':
         return message.content;
       case 'product':
-        final productName = message.metadata['product_name'] as String? ?? 'Product';
+        final productName =
+            message.metadata['product_name'] as String? ?? 'Product';
         final hasMessage = message.content.isNotEmpty;
-        return hasMessage 
+        return hasMessage
             ? '🛍️ $productName: ${message.content}'
             : '🛍️ Shared $productName';
       default:
@@ -696,7 +717,7 @@ class _ChatOptionsSheet extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           ListTile(
             leading: Icon(
               chat.isMuted ? Icons.volume_up : Icons.volume_off,
@@ -708,27 +729,36 @@ class _ChatOptionsSheet extends ConsumerWidget {
               try {
                 final chatService = ref.read(chatServiceProvider);
                 await chatService.muteChat(chat.id, !chat.isMuted);
-                
+
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(chat.isMuted ? 'Chat unmuted' : 'Chat muted'),
+                      content: Text(
+                        chat.isMuted ? 'Chat unmuted' : 'Chat muted',
+                      ),
                     ),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to ${chat.isMuted ? 'unmute' : 'mute'} chat')),
+                    SnackBar(
+                      content: Text(
+                        'Failed to ${chat.isMuted ? 'unmute' : 'mute'} chat',
+                      ),
+                    ),
                   );
                 }
               }
             },
           ),
-          
+
           if (chat.isGroup || chat.isTeam || chat.isDepartment)
             ListTile(
-              leading: const Icon(Icons.info_outline, color: AppColors.onSurfaceVariant),
+              leading: const Icon(
+                Icons.info_outline,
+                color: AppColors.onSurfaceVariant,
+              ),
               title: const Text('Chat Info'),
               onTap: () {
                 Navigator.pop(context);
@@ -739,9 +769,12 @@ class _ChatOptionsSheet extends ConsumerWidget {
                 );
               },
             ),
-          
+
           ListTile(
-            leading: const Icon(Icons.search, color: AppColors.onSurfaceVariant),
+            leading: const Icon(
+              Icons.search,
+              color: AppColors.onSurfaceVariant,
+            ),
             title: const Text('Search Messages'),
             onTap: () {
               Navigator.pop(context);
@@ -752,9 +785,9 @@ class _ChatOptionsSheet extends ConsumerWidget {
               );
             },
           ),
-          
+
           const Divider(),
-          
+
           if (!chat.isDepartment && !chat.isTeam)
             ListTile(
               leading: const Icon(Icons.delete_outline, color: AppColors.error),
@@ -775,7 +808,9 @@ class _ChatOptionsSheet extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Chat'),
-        content: const Text('Are you sure you want to delete this chat? This action cannot be undone.'),
+        content: const Text(
+          'Are you sure you want to delete this chat? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -787,7 +822,7 @@ class _ChatOptionsSheet extends ConsumerWidget {
               try {
                 final chatService = ChatService();
                 await chatService.deleteChat(chat.id);
-                
+
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Chat deleted successfully')),
@@ -833,11 +868,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 64,
-              color: AppColors.onSurfaceVariant,
-            ),
+            Icon(icon, size: 64, color: AppColors.onSurfaceVariant),
             const SizedBox(height: 16),
             Text(
               title,
@@ -852,10 +883,7 @@ class _EmptyState extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            if (action != null) ...[
-              const SizedBox(height: 24),
-              action!,
-            ],
+            if (action != null) ...[const SizedBox(height: 24), action!],
           ],
         ),
       ),

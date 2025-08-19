@@ -32,8 +32,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   // Fetched from Appwrite
   final ExpenseService _expenseService = ExpenseService();
-  List<Map<String, String>> _campuses = [];// [{id,name}]
-  List<Map<String, String>> _departments = [];// [{id (Id), name (Name)}]
+  List<Map<String, String>> _campuses = []; // [{id,name}]
+  List<Map<String, String>> _departments = []; // [{id (Id), name (Name)}]
 
   @override
   void initState() {
@@ -69,10 +69,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     try {
       final docs = await _expenseService.listDepartmentsForCampus(campusId);
       setState(() {
-        _departments = docs.map((e) => {
-          'id': (e['Id'] ?? '').toString(),
-          'name': (e['Name'] ?? '').toString(),
-        }).where((e) => e['id']!.isNotEmpty && e['name']!.isNotEmpty).toList();
+        _departments = docs
+            .map(
+              (e) => {
+                'id': (e['Id'] ?? '').toString(),
+                'name': (e['Name'] ?? '').toString(),
+              },
+            )
+            .where((e) => e['id']!.isNotEmpty && e['name']!.isNotEmpty)
+            .toList();
       });
     } catch (_) {}
   }
@@ -81,7 +86,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final favored = await FavoritesStorage.toggleFavoriteDepartment(deptId);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(favored ? 'Added to favorites' : 'Removed from favorites')),
+        SnackBar(
+          content: Text(
+            favored ? 'Added to favorites' : 'Removed from favorites',
+          ),
+        ),
       );
     }
   }
@@ -153,16 +162,26 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(authStateProvider.notifier).updateProfile(
-        name: _nameController.text.trim(),
-        phone: _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
-        address: _addressController.text.trim().isNotEmpty ? _addressController.text.trim() : null,
-        city: _cityController.text.trim().isNotEmpty ? _cityController.text.trim() : null,
-        zipCode: _zipController.text.trim().isNotEmpty ? _zipController.text.trim() : null,
-        campusId: _selectedCampusId,
-        departments: _selectedDepartments,
-        avatarFile: _selectedImage,
-      );
+      await ref
+          .read(authStateProvider.notifier)
+          .updateProfile(
+            name: _nameController.text.trim(),
+            phone: _phoneController.text.trim().isNotEmpty
+                ? _phoneController.text.trim()
+                : null,
+            address: _addressController.text.trim().isNotEmpty
+                ? _addressController.text.trim()
+                : null,
+            city: _cityController.text.trim().isNotEmpty
+                ? _cityController.text.trim()
+                : null,
+            zipCode: _zipController.text.trim().isNotEmpty
+                ? _zipController.text.trim()
+                : null,
+            campusId: _selectedCampusId,
+            departments: _selectedDepartments,
+            avatarFile: _selectedImage,
+          );
 
       if (mounted) {
         Navigator.pop(context);
@@ -235,18 +254,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       child: CircleAvatar(
                         radius: 48,
                         backgroundImage: _selectedImage != null
-                            ? FileImage(File(_selectedImage!.path)) as ImageProvider
+                            ? FileImage(File(_selectedImage!.path))
+                                  as ImageProvider
                             : (authState.user?.avatarUrl != null
-                                ? NetworkImage(authState.user!.avatarUrl!)
-                                : null),
+                                  ? NetworkImage(authState.user!.avatarUrl!)
+                                  : null),
                         backgroundColor: AppColors.gray200,
-                          child: (_selectedImage == null && authState.user?.avatarUrl == null)
-                              ? const Icon(
-                                  Icons.person,
-                                  size: 50,
-                                  color: AppColors.defaultBlue,
-                                )
-                              : null,
+                        child:
+                            (_selectedImage == null &&
+                                authState.user?.avatarUrl == null)
+                            ? const Icon(
+                                Icons.person,
+                                size: 50,
+                                color: AppColors.defaultBlue,
+                              )
+                            : null,
                       ),
                     ),
                     Positioned(
@@ -258,7 +280,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                             color: AppColors.defaultBlue,
+                            color: AppColors.defaultBlue,
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 2),
                           ),
@@ -367,14 +389,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       controller: _zipController,
                       decoration: InputDecoration(
                         labelText: l10n.zipCode,
-                        prefixIcon: const Icon(Icons.local_post_office_outlined),
+                        prefixIcon: const Icon(
+                          Icons.local_post_office_outlined,
+                        ),
                       ),
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.done,
                       validator: (value) {
                         if (value != null && value.isNotEmpty) {
                           // Norwegian postal code validation (4 digits)
-                          if (value.length != 4 || !RegExp(r'^\d{4}$').hasMatch(value)) {
+                          if (value.length != 4 ||
+                              !RegExp(r'^\d{4}$').hasMatch(value)) {
                             return 'Invalid zip code';
                           }
                         }
@@ -401,7 +426,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               _DepartmentPicker(
                 departments: _departments,
                 initiallySelectedIds: _selectedDepartments,
-                onSelectionChanged: (ids) => setState(() => _selectedDepartments = ids),
+                onSelectionChanged: (ids) =>
+                    setState(() => _selectedDepartments = ids),
                 onToggleFavorite: _toggleFavorite,
               ),
 
@@ -433,7 +459,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       const SizedBox(height: 16),
                       ..._campuses.map((campus) {
                         final isSelected = _selectedCampusId == campus['id'];
-                        
+
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: InkWell(
@@ -451,10 +477,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: isSelected ? AppColors.defaultBlue : AppColors.outline,
+                                  color: isSelected
+                                      ? AppColors.defaultBlue
+                                      : AppColors.outline,
                                   width: isSelected ? 2 : 1,
                                 ),
-                                color: isSelected ? AppColors.defaultBlue.withValues(alpha: 0.1) : null,
+                                color: isSelected
+                                    ? AppColors.defaultBlue.withValues(
+                                        alpha: 0.1,
+                                      )
+                                    : null,
                               ),
                               child: Row(
                                 children: [
@@ -474,15 +506,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           campus['name']!,
-                                          style: theme.textTheme.titleMedium?.copyWith(
-                                            fontWeight: isSelected
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                          ),
+                                          style: theme.textTheme.titleMedium
+                                              ?.copyWith(
+                                                fontWeight: isSelected
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
+                                              ),
                                         ),
                                       ],
                                     ),
@@ -564,10 +598,20 @@ class _DepartmentPickerState extends State<_DepartmentPicker> {
     final lower = _search.trim().toLowerCase();
     final filtered = lower.isEmpty
         ? widget.departments
-        : widget.departments.where((d) => d['name']!.toLowerCase().contains(lower) || d['id']!.toLowerCase().contains(lower)).toList();
+        : widget.departments
+              .where(
+                (d) =>
+                    d['name']!.toLowerCase().contains(lower) ||
+                    d['id']!.toLowerCase().contains(lower),
+              )
+              .toList();
 
-    final favoriteItems = filtered.where((d) => _favorites.contains(d['id'])).toList();
-    final otherItems = filtered.where((d) => !_favorites.contains(d['id'])).toList();
+    final favoriteItems = filtered
+        .where((d) => _favorites.contains(d['id']))
+        .toList();
+    final otherItems = filtered
+        .where((d) => !_favorites.contains(d['id']))
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -582,11 +626,16 @@ class _DepartmentPickerState extends State<_DepartmentPicker> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
             children: [
-              const Icon(Icons.search_rounded, color: AppColors.onSurfaceVariant),
+              const Icon(
+                Icons.search_rounded,
+                color: AppColors.onSurfaceVariant,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: TextField(
-                  decoration: const InputDecoration.collapsed(hintText: 'Search departments by name or ID'),
+                  decoration: const InputDecoration.collapsed(
+                    hintText: 'Search departments by name or ID',
+                  ),
                   onChanged: (v) => setState(() => _search = v),
                 ),
               ),
@@ -594,20 +643,30 @@ class _DepartmentPickerState extends State<_DepartmentPicker> {
                 InkWell(
                   onTap: () => setState(() => _search = ''),
                   child: const Icon(Icons.close_rounded, size: 18),
-                )
+                ),
             ],
           ),
         ),
         const SizedBox(height: 12),
 
         if (favoriteItems.isNotEmpty) ...[
-          Text('Favorites', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+          Text(
+            'Favorites',
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const SizedBox(height: 8),
           _buildWrap(theme, favoriteItems),
           const SizedBox(height: 16),
         ],
 
-        Text('All departments', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+        Text(
+          'All departments',
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         const SizedBox(height: 8),
         _buildWrap(theme, otherItems),
       ],
@@ -627,9 +686,13 @@ class _DepartmentPickerState extends State<_DepartmentPicker> {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: selected ? AppColors.defaultBlue.withValues(alpha: 0.12) : AppColors.gray50,
+            color: selected
+                ? AppColors.defaultBlue.withValues(alpha: 0.12)
+                : AppColors.gray50,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: selected ? AppColors.defaultBlue : AppColors.outline),
+            border: Border.all(
+              color: selected ? AppColors.defaultBlue : AppColors.outline,
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -642,7 +705,9 @@ class _DepartmentPickerState extends State<_DepartmentPicker> {
                 child: Icon(
                   favored ? Icons.star_rounded : Icons.star_border_rounded,
                   size: 18,
-                  color: favored ? AppColors.orange9 : AppColors.onSurfaceVariant,
+                  color: favored
+                      ? AppColors.orange9
+                      : AppColors.onSurfaceVariant,
                 ),
               ),
               const SizedBox(width: 6),
@@ -651,9 +716,19 @@ class _DepartmentPickerState extends State<_DepartmentPicker> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (selected) const Icon(Icons.check_rounded, size: 16, color: AppColors.defaultBlue),
+                    if (selected)
+                      const Icon(
+                        Icons.check_rounded,
+                        size: 16,
+                        color: AppColors.defaultBlue,
+                      ),
                     if (selected) const SizedBox(width: 6),
-                    Text(name, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                    Text(
+                      name,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
               ),

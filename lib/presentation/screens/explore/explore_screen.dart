@@ -19,12 +19,7 @@ class ExploreScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.explore),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search),
-          ),
-        ],
+        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.search))],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -32,11 +27,15 @@ class ExploreScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Featured Large Event banner
-            Consumer(builder: (context, ref, _) {
-              final LargeEventModel? event = ref.watch(featuredLargeEventProvider);
-              if (event == null) return const SizedBox.shrink();
-              return _LargeEventBanner(event: event);
-            }),
+            Consumer(
+              builder: (context, ref, _) {
+                final LargeEventModel? event = ref.watch(
+                  featuredLargeEventProvider,
+                );
+                if (event == null) return const SizedBox.shrink();
+                return _LargeEventBanner(event: event);
+              },
+            ),
 
             const SizedBox(height: 16),
             Text(
@@ -96,7 +95,7 @@ class ExploreScreen extends StatelessWidget {
                   title: 'AI Assistant',
                   subtitle: 'Get help & information',
                   color: AppColors.defaultGold,
-                  onTap: () => context.go('/explore/ai-chat')
+                  onTap: () => context.go('/explore/ai-chat'),
                 ),
               ],
             ),
@@ -118,33 +117,48 @@ class ExploreScreen extends StatelessWidget {
                   ListTile(
                     leading: const CircleAvatar(
                       backgroundColor: AppColors.subtleBlue,
-                      child: Icon(Icons.calendar_today, color: AppColors.defaultBlue),
+                      child: Icon(
+                        Icons.calendar_today,
+                        color: AppColors.defaultBlue,
+                      ),
                     ),
                     title: const Text('Academic Calendar'),
                     subtitle: const Text('View important dates'),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
-                      launchUrl(Uri.parse('https://www.bi.no/en/study-at-bi/international-students/practical-info/academic-calendar/'));
+                      launchUrl(
+                        Uri.parse(
+                          'https://www.bi.no/en/study-at-bi/international-students/practical-info/academic-calendar/',
+                        ),
+                      );
                     },
                   ),
                   const Divider(height: 1),
                   ListTile(
                     leading: const CircleAvatar(
                       backgroundColor: AppColors.subtleBlue,
-                      child: Icon(Icons.library_books, color: AppColors.defaultBlue),
+                      child: Icon(
+                        Icons.library_books,
+                        color: AppColors.defaultBlue,
+                      ),
                     ),
                     title: const Text('Library Services'),
                     subtitle: const Text('Book rooms & resources'),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
-                      launchUrl(Uri.parse('https://www.bi.no/en/research/library'));
+                      launchUrl(
+                        Uri.parse('https://www.bi.no/en/research/library'),
+                      );
                     },
                   ),
                   const Divider(height: 1),
                   ListTile(
                     leading: const CircleAvatar(
                       backgroundColor: AppColors.subtleBlue,
-                      child: Icon(Icons.support_agent, color: AppColors.defaultBlue),
+                      child: Icon(
+                        Icons.support_agent,
+                        color: AppColors.defaultBlue,
+                      ),
                     ),
                     title: const Text('Student Support'),
                     subtitle: const Text('Get help & guidance'),
@@ -174,7 +188,10 @@ class ExploreScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.location_on, color: AppColors.defaultBlue),
+                        const Icon(
+                          Icons.location_on,
+                          color: AppColors.defaultBlue,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Oslo Campus',
@@ -307,9 +324,9 @@ class _LargeEventBanner extends StatelessWidget {
                   Text(
                     event.name,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: event.textColor,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: event.textColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -317,8 +334,8 @@ class _LargeEventBanner extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: event.textColor.withValues(alpha: 0.9),
-                        ),
+                      color: event.textColor.withValues(alpha: 0.9),
+                    ),
                   ),
                 ],
               ),

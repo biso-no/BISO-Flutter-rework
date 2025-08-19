@@ -13,7 +13,10 @@ import '../../widgets/premium/premium_html_renderer.dart';
 
 // Providers
 final _jobServiceProvider = Provider<JobService>((ref) => JobService());
-final jobsProvider = FutureProvider.family<List<JobModel>, String?>((ref, campusId) {
+final jobsProvider = FutureProvider.family<List<JobModel>, String?>((
+  ref,
+  campusId,
+) {
   final service = ref.watch(_jobServiceProvider);
   return service.getLatestJobs(campusId: campusId, limit: 50);
 });
@@ -28,12 +31,7 @@ class JobsScreen extends ConsumerStatefulWidget {
 class _JobsScreenState extends ConsumerState<JobsScreen> {
   String _selectedType = 'all';
 
-  final List<String> _jobTypes = [
-    'all',
-    'volunteer',
-    'paid',
-    'internship',
-  ];
+  final List<String> _jobTypes = ['all', 'volunteer', 'paid', 'internship'];
 
   @override
   Widget build(BuildContext context) {
@@ -57,14 +55,8 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
           icon: const Icon(Icons.arrow_back),
         ),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.bookmark_border),
-          ),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.bookmark_border)),
         ],
       ),
       body: Column(
@@ -94,11 +86,17 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                   selectedColor: AppColors.subtleBlue,
                   checkmarkColor: AppColors.defaultBlue,
                   labelStyle: TextStyle(
-                    color: isSelected ? AppColors.defaultBlue : AppColors.onSurfaceVariant,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected
+                        ? AppColors.defaultBlue
+                        : AppColors.onSurfaceVariant,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
                   ),
                   side: BorderSide(
-                    color: isSelected ? AppColors.defaultBlue : AppColors.outline,
+                    color: isSelected
+                        ? AppColors.defaultBlue
+                        : AppColors.outline,
                   ),
                 );
               },
@@ -151,7 +149,8 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                   child: ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: filtered.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final job = filtered[index];
                       return _JobCard(
@@ -192,7 +191,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                         onPressed: () => ref.invalidate(jobsProvider(campusId)),
                         icon: const Icon(Icons.refresh),
                         label: const Text('Try Again'),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -206,11 +205,16 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
 
   String _getTypeDisplayName(String type) {
     switch (type) {
-      case 'all': return 'All';
-      case 'volunteer': return 'Volunteer';
-      case 'paid': return 'Paid';
-      case 'internship': return 'Internship';
-      default: return type;
+      case 'all':
+        return 'All';
+      case 'volunteer':
+        return 'Volunteer';
+      case 'paid':
+        return 'Paid';
+      case 'internship':
+        return 'Internship';
+      default:
+        return type;
     }
   }
 
@@ -226,10 +230,8 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
         minChildSize: 0.5,
         maxChildSize: 0.95,
         expand: false,
-        builder: (context, scrollController) => _JobDetailSheet(
-          job: job,
-          scrollController: scrollController,
-        ),
+        builder: (context, scrollController) =>
+            _JobDetailSheet(job: job, scrollController: scrollController),
       ),
     );
   }
@@ -239,10 +241,7 @@ class _JobCard extends StatelessWidget {
   final JobModel job;
   final VoidCallback onTap;
 
-  const _JobCard({
-    required this.job,
-    required this.onTap,
-  });
+  const _JobCard({required this.job, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -294,7 +293,10 @@ class _JobCard extends StatelessWidget {
                             ),
                             if (job.isUrgent == true)
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppColors.error.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8),
@@ -324,9 +326,14 @@ class _JobCard extends StatelessWidget {
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
-                                color: _getTypeColor(job.type).withValues(alpha: 0.1),
+                                color: _getTypeColor(
+                                  job.type,
+                                ).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -378,15 +385,15 @@ class _JobCard extends StatelessWidget {
                   runSpacing: 6,
                   children: job.skills.take(3).map((skill) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.gray200,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(
-                        skill,
-                        style: theme.textTheme.labelSmall,
-                      ),
+                      child: Text(skill, style: theme.textTheme.labelSmall),
                     );
                   }).toList(),
                 ),
@@ -432,28 +439,40 @@ class _JobCard extends StatelessWidget {
 
   String _getTypeDisplayName(String type) {
     switch (type) {
-      case 'volunteer': return 'Volunteer';
-      case 'paid': return 'Paid';
-      case 'internship': return 'Internship';
-      default: return type;
+      case 'volunteer':
+        return 'Volunteer';
+      case 'paid':
+        return 'Paid';
+      case 'internship':
+        return 'Internship';
+      default:
+        return type;
     }
   }
 
   Color _getTypeColor(String type) {
     switch (type) {
-      case 'volunteer': return AppColors.success;
-      case 'paid': return AppColors.defaultBlue;
-      case 'internship': return AppColors.purple9;
-      default: return AppColors.onSurfaceVariant;
+      case 'volunteer':
+        return AppColors.success;
+      case 'paid':
+        return AppColors.defaultBlue;
+      case 'internship':
+        return AppColors.purple9;
+      default:
+        return AppColors.onSurfaceVariant;
     }
   }
 
   IconData _getTypeIcon(String type) {
     switch (type) {
-      case 'volunteer': return Icons.volunteer_activism;
-      case 'paid': return Icons.work;
-      case 'internship': return Icons.school;
-      default: return Icons.work_outline;
+      case 'volunteer':
+        return Icons.volunteer_activism;
+      case 'paid':
+        return Icons.work;
+      case 'internship':
+        return Icons.school;
+      default:
+        return Icons.work_outline;
     }
   }
 }
@@ -462,10 +481,7 @@ class _JobDetailSheet extends StatelessWidget {
   final JobModel job;
   final ScrollController scrollController;
 
-  const _JobDetailSheet({
-    required this.job,
-    required this.scrollController,
-  });
+  const _JobDetailSheet({required this.job, required this.scrollController});
 
   @override
   Widget build(BuildContext context) {
@@ -528,7 +544,9 @@ class _JobDetailSheet extends StatelessWidget {
                       child: _InfoCard(
                         icon: Icons.schedule,
                         label: 'Deadline',
-                        value: DateFormat('MMM dd, yyyy').format(job.applicationDeadline),
+                        value: DateFormat(
+                          'MMM dd, yyyy',
+                        ).format(job.applicationDeadline),
                       ),
                     ),
                   ],
@@ -601,7 +619,10 @@ class _JobDetailSheet extends StatelessWidget {
                     runSpacing: 8,
                     children: job.skills.map((skill) {
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.subtleBlue,
                           borderRadius: BorderRadius.circular(12),

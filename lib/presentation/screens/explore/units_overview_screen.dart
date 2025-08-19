@@ -8,10 +8,11 @@ import '../../../data/services/department_service.dart';
 import '../../../data/models/department_model.dart';
 import '../../widgets/premium/premium_html_renderer.dart';
 
-final _departmentsProvider = FutureProvider.family<List<DepartmentModel>, String>((ref, campusId) async {
-  final service = DepartmentService();
-  return await service.getActiveDepartmentsForCampus(campusId);
-});
+final _departmentsProvider =
+    FutureProvider.family<List<DepartmentModel>, String>((ref, campusId) async {
+      final service = DepartmentService();
+      return await service.getActiveDepartmentsForCampus(campusId);
+    });
 
 class UnitsOverviewScreen extends ConsumerWidget {
   const UnitsOverviewScreen({super.key});
@@ -24,9 +25,7 @@ class UnitsOverviewScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Clubs & Departments'),
-      ),
+      appBar: AppBar(title: const Text('Clubs & Departments')),
       body: asyncDepts.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Failed to load: $e')),
@@ -36,11 +35,23 @@ class UnitsOverviewScreen extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.groups_outlined, size: 48, color: AppColors.onSurfaceVariant),
+                  const Icon(
+                    Icons.groups_outlined,
+                    size: 48,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   const SizedBox(height: 8),
-                  Text('No active clubs here yet', style: theme.textTheme.titleMedium),
+                  Text(
+                    'No active clubs here yet',
+                    style: theme.textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 4),
-                  Text('Check back later or switch campus', style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant)),
+                  Text(
+                    'Check back later or switch campus',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
                 ],
               ),
             );
@@ -53,7 +64,9 @@ class UnitsOverviewScreen extends ConsumerWidget {
                 sliver: SliverToBoxAdapter(
                   child: Text(
                     'Discover student-driven organizations at ${campus.name}',
-                    style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -67,13 +80,10 @@ class UnitsOverviewScreen extends ConsumerWidget {
                     mainAxisSpacing: 12,
                     childAspectRatio: 0.75,
                   ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final d = depts[index];
-                      return _DepartmentCard(dept: d);
-                    },
-                    childCount: depts.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final d = depts[index];
+                    return _DepartmentCard(dept: d);
+                  }, childCount: depts.length),
                 ),
               ),
             ],
@@ -94,22 +104,31 @@ class _DepartmentCard extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.push('/explore/units/${dept.id}')
-            ,
+        onTap: () => context.push('/explore/units/${dept.id}'),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AspectRatio(
-              aspectRatio: 16/9,
+              aspectRatio: 16 / 9,
               child: Container(
                 color: AppColors.subtleBlue,
                 child: dept.logo != null && dept.logo!.isNotEmpty
                     ? Image.network(
                         dept.logo!,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.image_not_supported_outlined, color: AppColors.defaultBlue)),
+                        errorBuilder: (_, _, _) => const Center(
+                          child: Icon(
+                            Icons.image_not_supported_outlined,
+                            color: AppColors.defaultBlue,
+                          ),
+                        ),
                       )
-                    : const Center(child: Icon(Icons.apartment_rounded, color: AppColors.defaultBlue)),
+                    : const Center(
+                        child: Icon(
+                          Icons.apartment_rounded,
+                          color: AppColors.defaultBlue,
+                        ),
+                      ),
               ),
             ),
             Expanded(
@@ -122,7 +141,9 @@ class _DepartmentCard extends StatelessWidget {
                       dept.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     if ((dept.type ?? '').isNotEmpty) ...[
                       const SizedBox(height: 4),
@@ -130,7 +151,9 @@ class _DepartmentCard extends StatelessWidget {
                         dept.type!,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                        ),
                       ),
                     ],
                     if ((dept.description ?? '').isNotEmpty) ...[
@@ -147,12 +170,10 @@ class _DepartmentCard extends StatelessWidget {
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 }
-
-

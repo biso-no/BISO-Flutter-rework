@@ -10,34 +10,31 @@ class OAuthService {
   factory OAuthService() => _instance;
   OAuthService._internal();
 
-  
-
   // Microsoft Azure AD configuration for BI
-  static const String _authority = 'https://login.microsoftonline.com/adee44b2-91fc-40f1-abdd-9cc29351b5fd';
+  static const String _authority =
+      'https://login.microsoftonline.com/adee44b2-91fc-40f1-abdd-9cc29351b5fd';
   static const String _clientId = '09d8bb72-2cef-4b98-a1d3-2414a7a40873';
   static const String _scope = 'openid email';
   static const String _redirectUri = 'com.biso.no://oauth/callback';
 
   /// Generates PKCE code verifier and challenge for secure OAuth
   Map<String, String> _generatePKCE() {
-    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+    const charset =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
     final random = Random.secure();
-    
+
     // Generate code verifier (43-128 characters)
     final codeVerifier = List.generate(
       128,
-      (i) => charset[random.nextInt(charset.length)]
+      (i) => charset[random.nextInt(charset.length)],
     ).join();
-    
+
     // Generate code challenge (base64url-encoded SHA256 hash)
     final bytes = utf8.encode(codeVerifier);
     final digest = sha256.convert(bytes);
     final codeChallenge = base64Url.encode(digest.bytes).replaceAll('=', '');
-    
-    return {
-      'codeVerifier': codeVerifier,
-      'codeChallenge': codeChallenge,
-    };
+
+    return {'codeVerifier': codeVerifier, 'codeChallenge': codeChallenge};
   }
 
   /// Builds the Microsoft OAuth authorization URL
@@ -55,14 +52,20 @@ class OAuthService {
     };
 
     final query = params.entries
-        .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .map(
+          (e) =>
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+        )
         .join('&');
 
     return '$_authority/oauth2/v2.0/authorize?$query';
   }
 
   /// Exchanges authorization code for access token
-  Future<String?> _exchangeCodeForToken(String code, String codeVerifier) async {
+  Future<String?> _exchangeCodeForToken(
+    String code,
+    String codeVerifier,
+  ) async {
     try {
       final body = {
         'client_id': _clientId,
@@ -74,11 +77,12 @@ class OAuthService {
 
       final response = await http.post(
         Uri.parse('$_authority/oauth2/v2.0/token'),
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: body.entries
-            .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+            .map(
+              (e) =>
+                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+            )
             .join('&'),
       );
 
@@ -98,9 +102,7 @@ class OAuthService {
     try {
       final response = await http.get(
         Uri.parse('https://graph.microsoft.com/oidc/userinfo'),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-        },
+        headers: {'Authorization': 'Bearer $accessToken'},
       );
 
       if (response.statusCode == 200) {
@@ -170,7 +172,7 @@ class OAuthService {
       // Validate BI domain
       if (!email.endsWith('@bi.no') && !email.endsWith('@biso.no')) {
         throw Exception(
-          'Please use a valid email address ending with @bi.no or @biso.no'
+          'Please use a valid email address ending with @bi.no or @biso.no',
         );
       }
 
@@ -197,10 +199,7 @@ class OAuthService {
         databaseId: 'app',
         collectionId: 'student_id',
         documentId: studentId, // Use student ID as document ID
-        data: {
-          'student_id': studentId,
-          'user_id': userId,
-        },
+        data: {'student_id': studentId, 'user_id': userId},
       );
     } catch (e) {
       throw Exception('Failed to create student ID document: $e');
@@ -219,10 +218,7 @@ class OAuthService {
         throw Exception('Cannot launch OAuth URL');
       }
 
-      await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
 
       // Return session info for callback handling
       // Note: In a real implementation, you'd need to handle the callback
@@ -233,17 +229,18 @@ class OAuthService {
         message: 'OAuth flow initiated. Complete the login in your browser.',
       );
     } catch (e) {
-      return StudentIdRegistrationResult(
-        success: false,
-        error: e.toString(),
-      );
+      return StudentIdRegistrationResult(success: false, error: e.toString());
     }
   }
 
   String _generateRandomString(int length) {
-    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charset =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     final random = Random.secure();
-    return List.generate(length, (i) => charset[random.nextInt(charset.length)]).join();
+    return List.generate(
+      length,
+      (i) => charset[random.nextInt(charset.length)],
+    ).join();
   }
 }
 

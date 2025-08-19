@@ -7,6 +7,7 @@ import '../../data/services/membership_service.dart';
 import '../../data/services/robust_document_service.dart';
 
 import '../../core/logging/print_migration.dart';
+
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 
 final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
@@ -50,7 +51,8 @@ class AuthState {
     return AuthState(
       user: user ?? this.user,
       studentRecord: studentRecord ?? this.studentRecord,
-      membershipVerification: membershipVerification ?? this.membershipVerification,
+      membershipVerification:
+          membershipVerification ?? this.membershipVerification,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
@@ -74,6 +76,7 @@ class AuthState {
     if (membershipVerification!.isMember) return 'Active Member';
     return 'Not a Member';
   }
+
   bool get needsOnboarding => isAuthenticated && !isProfileComplete;
   bool get needsStudentId => isAuthenticated && !hasStudentId;
 }
@@ -88,10 +91,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> _checkAuthState() async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final user = await _authService.getCurrentUser();
-      
+
       // If user exists, also load their complete profile
       if (user != null) {
         await _loadCompleteProfile(user.id);
@@ -119,7 +122,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> _loadCompleteProfile(String userId) async {
     try {
       logPrint('🔐 AuthProvider: Loading complete profile for userId: $userId');
-      
+
       // Use RobustDocumentService to handle SDK issues
       final documentData = await RobustDocumentService.getDocumentRobust(
         databaseId: 'app',
@@ -129,11 +132,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       final profile = UserModel.fromMap(documentData);
       logPrint('🔐 AuthProvider: Profile loaded successfully: ${profile.name}');
-      
+
       // Check if user has student_id in their profile
       StudentIdModel? studentRecord;
       MembershipVerificationResult? membershipVerification;
-      
+
       if (profile.studentId != null && profile.studentId!.isNotEmpty) {
         // Create StudentIdModel from user profile data
         studentRecord = StudentIdModel(
@@ -143,22 +146,29 @@ class AuthNotifier extends StateNotifier<AuthState> {
           isVerified: true, // Assume verified since it's in their profile
           createdAt: profile.createdAt ?? DateTime.now(),
         );
-        logPrint('🔐 AuthProvider: Student ID found in profile: ${studentRecord.studentNumber}');
-        
+        logPrint(
+          '🔐 AuthProvider: Student ID found in profile: ${studentRecord.studentNumber}',
+        );
+
         // Check membership status using the student number
         try {
-          membershipVerification = await _membershipService.verifyMembership(studentRecord.studentNumber);
-          logPrint('🔐 AuthProvider: Membership verified: ${membershipVerification.isMember}');
+          membershipVerification = await _membershipService.verifyMembership(
+            studentRecord.studentNumber,
+          );
+          logPrint(
+            '🔐 AuthProvider: Membership verified: ${membershipVerification.isMember}',
+          );
         } catch (e) {
           logPrint('🔐 AuthProvider: Error verifying membership: $e');
         }
       } else {
         logPrint('🔐 AuthProvider: No student ID found in user profile');
       }
-      
+
       final hasProfile = true;
-      final isProfileComplete = profile.campusId != null && profile.campusId!.isNotEmpty;
-      
+      final isProfileComplete =
+          profile.campusId != null && profile.campusId!.isNotEmpty;
+
       state = state.copyWith(
         user: profile,
         studentRecord: studentRecord,
@@ -168,15 +178,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
         hasProfile: hasProfile,
         isProfileComplete: isProfileComplete,
       );
-      
     } catch (e) {
       if (e.toString().contains('404')) {
         // Profile doesn't exist yet - user needs onboarding
-        logPrint('🔐 AuthProvider: Profile not found (404) - user needs onboarding');
-        
+        logPrint(
+          '🔐 AuthProvider: Profile not found (404) - user needs onboarding',
+        );
+
         // Get basic user info from auth service
         final basicUser = await _authService.getCurrentUser();
-        
+
         state = state.copyWith(
           user: basicUser,
           isAuthenticated: true,
@@ -193,7 +204,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> sendOtp(String email) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final userId = await _authService.sendOtp(email);
       state = state.copyWith(isLoading: false, pendingUserId: userId);
@@ -208,24 +219,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> verifyOtp(String userId, String secret) async {
-    logPrint('🔥 DEBUG: Starting verifyOtp with userId: $userId, secret: $secret');
+    logPrint(
+      '🔥 DEBUG: Starting verifyOtp with userId: $userId, secret: $secret',
+    );
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final user = await _authService.verifyOtp(userId, secret);
       logPrint('🔥 DEBUG: OTP verification successful, user: ${user.email}');
-      
+
       // After successful OTP verification, load complete profile
       await _loadCompleteProfile(user.id);
-      
+
       // Clear pending userId
       state = state.copyWith(pendingUserId: null);
     } catch (e) {
       logPrint('🔥 DEBUG: OTP verification failed: $e');
-      state = state.copyWith(
-        error: e.toString(),
-        isLoading: false,
-      );
+      state = state.copyWith(error: e.toString(), isLoading: false);
       rethrow;
     }
   }
@@ -240,7 +250,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     List<String>? departments,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final user = await _authService.createUserProfile(
         name: name,
@@ -251,10 +261,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         campusId: campusId,
         departments: departments,
       );
-      
+
       final hasProfile = true;
       final isProfileComplete = campusId != null && campusId.isNotEmpty;
-      
+
       state = state.copyWith(
         user: user,
         isLoading: false,
@@ -262,10 +272,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isProfileComplete: isProfileComplete,
       );
     } catch (e) {
-      state = state.copyWith(
-        error: e.toString(),
-        isLoading: false,
-      );
+      state = state.copyWith(error: e.toString(), isLoading: false);
       rethrow;
     }
   }
@@ -281,7 +288,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     dynamic avatarFile, // XFile or File
   }) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final updatedUser = await _authService.updateUserProfile(
         name: name,
@@ -293,10 +300,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
         departments: departments,
         avatarFile: avatarFile,
       );
-      
+
       final hasProfile = true;
-      final isProfileComplete = updatedUser.campusId != null && updatedUser.campusId!.isNotEmpty;
-      
+      final isProfileComplete =
+          updatedUser.campusId != null && updatedUser.campusId!.isNotEmpty;
+
       state = state.copyWith(
         user: updatedUser,
         isLoading: false,
@@ -304,10 +312,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isProfileComplete: isProfileComplete,
       );
     } catch (e) {
-      state = state.copyWith(
-        error: e.toString(),
-        isLoading: false,
-      );
+      state = state.copyWith(error: e.toString(), isLoading: false);
       rethrow;
     }
   }
@@ -317,22 +322,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String? swift,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final updatedUser = await _authService.updatePaymentInformation(
         bankAccount: bankAccount,
         swift: swift,
       );
-      
-      state = state.copyWith(
-        user: updatedUser,
-        isLoading: false,
-      );
+
+      state = state.copyWith(user: updatedUser, isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        error: e.toString(),
-        isLoading: false,
-      );
+      state = state.copyWith(error: e.toString(), isLoading: false);
       rethrow;
     }
   }
@@ -343,33 +342,27 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> logout() async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       await _authService.logout();
       // Clear JWT cache when user signs out
       RobustDocumentService.clearJwtCache();
       state = const AuthState();
     } catch (e) {
-      state = state.copyWith(
-        error: e.toString(),
-        isLoading: false,
-      );
+      state = state.copyWith(error: e.toString(), isLoading: false);
     }
   }
 
   Future<void> clearSession() async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       await _authService.clearSession();
       // Clear JWT cache when session is cleared
       RobustDocumentService.clearJwtCache();
       state = const AuthState();
     } catch (e) {
-      state = state.copyWith(
-        error: e.toString(),
-        isLoading: false,
-      );
+      state = state.copyWith(error: e.toString(), isLoading: false);
     }
   }
 
@@ -384,26 +377,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Register student ID via OAuth
   Future<void> registerStudentIdViaOAuth() async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       await _authService.registerStudentIdViaOAuth();
-      
+
       // Reload profile to get updated student information
       final currentUser = state.user;
       if (currentUser != null) {
         await _loadCompleteProfile(currentUser.id);
       }
-      
+
       state = state.copyWith(isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        error: e.toString(),
-        isLoading: false,
-      );
+      state = state.copyWith(error: e.toString(), isLoading: false);
       rethrow;
     }
   }
-
 
   /// Check and update membership status using proper membership verification
   Future<void> checkMembershipStatus() async {
@@ -411,39 +400,32 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (studentRecord == null || !studentRecord.isVerified) {
       return;
     }
-    
+
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
-      final membershipVerification = await _membershipService.verifyMembership(studentRecord.studentNumber);
+      final membershipVerification = await _membershipService.verifyMembership(
+        studentRecord.studentNumber,
+      );
       state = state.copyWith(
         membershipVerification: membershipVerification,
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        error: e.toString(),
-        isLoading: false,
-      );
+      state = state.copyWith(error: e.toString(), isLoading: false);
     }
   }
 
   /// Remove student ID
   Future<void> removeStudentId() async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       await _authService.removeStudentId();
-      
-      state = state.copyWith(
-        studentRecord: null,
-        isLoading: false,
-      );
+
+      state = state.copyWith(studentRecord: null, isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        error: e.toString(),
-        isLoading: false,
-      );
+      state = state.copyWith(error: e.toString(), isLoading: false);
       rethrow;
     }
   }

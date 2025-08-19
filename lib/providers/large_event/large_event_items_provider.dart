@@ -49,10 +49,12 @@ class LargeEventItemsNotifier extends StateNotifier<LargeEventItemsState> {
 }
 
 final largeEventItemsProvider = StateNotifierProvider.autoDispose
-    .family<LargeEventItemsNotifier, LargeEventItemsState, ({String eventId, String campusId})>((ref, params) {
-  final notifier = LargeEventItemsNotifier(ref);
-  notifier.load(eventId: params.eventId, campusId: params.campusId);
-  return notifier;
-});
-
-
+    .family<
+      LargeEventItemsNotifier,
+      LargeEventItemsState,
+      ({String eventId, String campusId})
+    >((ref, params) {
+      final notifier = LargeEventItemsNotifier(ref);
+      notifier.load(eventId: params.eventId, campusId: params.campusId);
+      return notifier;
+    });

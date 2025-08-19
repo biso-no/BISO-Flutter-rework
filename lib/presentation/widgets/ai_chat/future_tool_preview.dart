@@ -28,32 +28,24 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
   @override
   void initState() {
     super.initState();
-    
+
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    
+
     _shimmerController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
     );
 
-    _pulseAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    _pulseAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
 
-    _shimmerAnimation = Tween<double>(
-      begin: -1.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _shimmerController,
-      curve: Curves.linear,
-    ));
+    _shimmerAnimation = Tween<double>(begin: -1.0, end: 1.0).animate(
+      CurvedAnimation(parent: _shimmerController, curve: Curves.linear),
+    );
 
     _pulseController.repeat(reverse: true);
     _shimmerController.repeat();
@@ -92,16 +84,14 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
 
   Widget _buildCanvasPreview(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.crystalBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.crystalBlue.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.crystalBlue.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -142,7 +132,7 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
 
   Widget _buildStudentLookupPreview(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
@@ -190,16 +180,14 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
 
   Widget _buildEventSchedulerPreview(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.warmGold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.warmGold.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.warmGold.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -246,16 +234,14 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
 
   Widget _buildLibraryPreview(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.skyBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.skyBlue.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.skyBlue.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -296,16 +282,14 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
 
   Widget _buildTimeTablePreview(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.sunGold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.sunGold.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.sunGold.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -352,16 +336,14 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
 
   Widget _buildRoomBookingPreview(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.richNavy.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.richNavy.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.richNavy.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -400,7 +382,7 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
 
   Widget _buildGenericFutureToolPreview(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
@@ -452,11 +434,7 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
               color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 20,
-            ),
+            child: Icon(icon, color: color, size: 20),
           ),
         );
       },
@@ -532,9 +510,7 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
       decoration: BoxDecoration(
         color: AppColors.warmGold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.warmGold.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.warmGold.withValues(alpha: 0.2)),
       ),
       child: Text(
         label,
@@ -554,9 +530,7 @@ class _FutureToolPreviewState extends State<FutureToolPreview>
       decoration: BoxDecoration(
         color: AppColors.sunGold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.sunGold.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.sunGold.withValues(alpha: 0.2)),
       ),
       child: Text(
         time,

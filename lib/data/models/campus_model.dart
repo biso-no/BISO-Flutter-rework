@@ -38,11 +38,17 @@ class CampusModel extends Equatable {
       imageUrl: map['image_url'] ?? '',
       heroImageUrl: map['hero_image_url'] ?? '',
       benefits: List<String>.from(map['benefits'] ?? []),
-      weather: map['weather'] != null ? WeatherData.fromMap(map['weather']) : null,
+      weather: map['weather'] != null
+          ? WeatherData.fromMap(map['weather'])
+          : null,
       stats: CampusStats.fromMap(map['stats'] ?? {}),
       metadata: Map<String, dynamic>.from(map['metadata'] ?? {}),
-      createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
-      updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
+      createdAt: map['\$createdAt'] != null
+          ? DateTime.parse(map['\$createdAt'])
+          : null,
+      updatedAt: map['\$updatedAt'] != null
+          ? DateTime.parse(map['\$updatedAt'])
+          : null,
     );
   }
 
@@ -90,8 +96,18 @@ class CampusModel extends Equatable {
 
   @override
   List<Object?> get props => [
-    id, name, description, location, imageUrl, heroImageUrl,
-    benefits, weather, stats, metadata, createdAt, updatedAt,
+    id,
+    name,
+    description,
+    location,
+    imageUrl,
+    heroImageUrl,
+    benefits,
+    weather,
+    stats,
+    metadata,
+    createdAt,
+    updatedAt,
   ];
 }
 
@@ -131,7 +147,13 @@ class WeatherData extends Equatable {
   }
 
   @override
-  List<Object?> get props => [temperature, condition, icon, humidity, windSpeed];
+  List<Object?> get props => [
+    temperature,
+    condition,
+    icon,
+    humidity,
+    windSpeed,
+  ];
 }
 
 class CampusStats extends Equatable {
@@ -166,7 +188,12 @@ class CampusStats extends Equatable {
   }
 
   @override
-  List<Object?> get props => [studentCount, activeEvents, availableJobs, marketplaceItems];
+  List<Object?> get props => [
+    studentCount,
+    activeEvents,
+    availableJobs,
+    marketplaceItems,
+  ];
 }
 
 // Static campus data for now (can be moved to Appwrite later)

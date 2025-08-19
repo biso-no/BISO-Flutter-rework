@@ -19,20 +19,21 @@ final chatNotificationPreferenceProvider = FutureProvider<bool>((ref) async {
 });
 
 // State notifier for managing notification preferences
-class NotificationPreferencesNotifier extends StateNotifier<AsyncValue<Map<String, bool>>> {
+class NotificationPreferencesNotifier
+    extends StateNotifier<AsyncValue<Map<String, bool>>> {
   final NotificationService _notificationService;
-  
-  NotificationPreferencesNotifier(this._notificationService) : super(const AsyncValue.loading()) {
+
+  NotificationPreferencesNotifier(this._notificationService)
+    : super(const AsyncValue.loading()) {
     _loadPreferences();
   }
 
   Future<void> _loadPreferences() async {
     try {
       state = const AsyncValue.loading();
-      final chatEnabled = await _notificationService.getChatNotificationPreference();
-      state = AsyncValue.data({
-        'chat_notifications': chatEnabled,
-      });
+      final chatEnabled = await _notificationService
+          .getChatNotificationPreference();
+      state = AsyncValue.data({'chat_notifications': chatEnabled});
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
@@ -41,13 +42,10 @@ class NotificationPreferencesNotifier extends StateNotifier<AsyncValue<Map<Strin
   Future<void> updateChatNotifications(bool enabled) async {
     try {
       await _notificationService.updateChatNotificationPreference(enabled);
-      
+
       // Update state
       final currentData = state.value ?? {};
-      state = AsyncValue.data({
-        ...currentData,
-        'chat_notifications': enabled,
-      });
+      state = AsyncValue.data({...currentData, 'chat_notifications': enabled});
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
@@ -59,7 +57,11 @@ class NotificationPreferencesNotifier extends StateNotifier<AsyncValue<Map<Strin
 }
 
 // Provider for notification preferences state notifier
-final notificationPreferencesProvider = StateNotifierProvider<NotificationPreferencesNotifier, AsyncValue<Map<String, bool>>>((ref) {
-  final service = ref.read(notificationServiceProvider);
-  return NotificationPreferencesNotifier(service);
-});
+final notificationPreferencesProvider =
+    StateNotifierProvider<
+      NotificationPreferencesNotifier,
+      AsyncValue<Map<String, bool>>
+    >((ref) {
+      final service = ref.read(notificationServiceProvider);
+      return NotificationPreferencesNotifier(service);
+    });

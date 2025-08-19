@@ -28,7 +28,8 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: _darkColorScheme,
       fontFamily: 'Inter',
-      scaffoldBackgroundColor: AppColors.backgroundDark, // Premium dark background
+      scaffoldBackgroundColor:
+          AppColors.backgroundDark, // Premium dark background
       appBarTheme: _appBarTheme.copyWith(
         backgroundColor: AppColors.backgroundDark,
         foregroundColor: AppColors.onBackgroundDark,
@@ -63,11 +64,11 @@ class AppTheme {
 
   static const ColorScheme _lightColorScheme = ColorScheme(
     brightness: Brightness.light,
-    primary: AppColors.crystalBlue,          // Your brand light blue
+    primary: AppColors.crystalBlue, // Your brand light blue
     onPrimary: AppColors.white,
-    secondary: AppColors.warmGold,           // Sophisticated gold
-    onSecondary: AppColors.richNavy,         // Your brand navy
-    tertiary: AppColors.emeraldGreen,        // Premium accent
+    secondary: AppColors.warmGold, // Sophisticated gold
+    onSecondary: AppColors.richNavy, // Your brand navy
+    tertiary: AppColors.emeraldGreen, // Premium accent
     onTertiary: AppColors.white,
     error: AppColors.error,
     onError: AppColors.white,
@@ -87,9 +88,9 @@ class AppTheme {
 
   static const ColorScheme _darkColorScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: AppColors.crystalBlue,          // Consistent brand blue
+    primary: AppColors.crystalBlue, // Consistent brand blue
     onPrimary: AppColors.charcoalBlack,
-    secondary: AppColors.sunGold,            // Bright gold for dark theme
+    secondary: AppColors.sunGold, // Bright gold for dark theme
     onSecondary: AppColors.charcoalBlack,
     tertiary: AppColors.emeraldGreen,
     onTertiary: AppColors.charcoalBlack,
@@ -123,97 +124,98 @@ class AppTheme {
     ),
   );
 
-  static final ElevatedButtonThemeData _elevatedButtonTheme = 
+  static final ElevatedButtonThemeData _elevatedButtonTheme =
       ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      backgroundColor: AppColors.crystalBlue,  // Premium brand blue
-      foregroundColor: AppColors.white,
-      elevation: 0,
-      shadowColor: AppColors.shadowMedium,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      textStyle: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
-      ),
-    ),
-  );
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.crystalBlue, // Premium brand blue
+          foregroundColor: AppColors.white,
+          elevation: 0,
+          shadowColor: AppColors.shadowMedium,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Inter',
+          ),
+        ),
+      );
 
   static final TextButtonThemeData _textButtonTheme = TextButtonThemeData(
     style: TextButton.styleFrom(
-      foregroundColor: AppColors.crystalBlue,  // Consistent brand blue
+      foregroundColor: AppColors.crystalBlue, // Consistent brand blue
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       textStyle: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         fontFamily: 'Inter',
       ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
   );
 
-  static final OutlinedButtonThemeData _outlinedButtonTheme = 
+  static final OutlinedButtonThemeData _outlinedButtonTheme =
       OutlinedButtonThemeData(
-    style: OutlinedButton.styleFrom(
-      foregroundColor: AppColors.crystalBlue,
-      side: const BorderSide(color: AppColors.crystalBlue, width: 1.5),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      textStyle: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
-      ),
-    ),
-  );
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.crystalBlue,
+          side: const BorderSide(color: AppColors.crystalBlue, width: 1.5),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Inter',
+          ),
+        ),
+      );
 
-  static final InputDecorationTheme _inputDecorationTheme = 
+  static final InputDecorationTheme _inputDecorationTheme =
       InputDecorationTheme(
-    filled: true,
-    fillColor: AppColors.surfaceVariant,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide.none,
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.outline),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.crystalBlue, width: 2),
-    ),
-    errorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.error),
-    ),
-    focusedErrorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.error, width: 2),
-    ),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-    hintStyle: const TextStyle(
-      color: AppColors.onSurfaceVariant,
-      fontSize: 16,
-      fontFamily: 'Inter',
-    ),
-    labelStyle: const TextStyle(
-      color: AppColors.onSurface,
-      fontSize: 16,
-      fontFamily: 'Inter',
-    ),
-  );
+        filled: true,
+        fillColor: AppColors.surfaceVariant,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.outline),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.crystalBlue, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.error, width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+        hintStyle: const TextStyle(
+          color: AppColors.onSurfaceVariant,
+          fontSize: 16,
+          fontFamily: 'Inter',
+        ),
+        labelStyle: const TextStyle(
+          color: AppColors.onSurface,
+          fontSize: 16,
+          fontFamily: 'Inter',
+        ),
+      );
 
   static final CardThemeData _cardThemeData = CardThemeData(
-    elevation: 2,                            // Subtle elevation for depth
-    shadowColor: AppColors.shadowLight,      // Premium shadow
+    elevation: 2, // Subtle elevation for depth
+    shadowColor: AppColors.shadowLight, // Premium shadow
     color: AppColors.white,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(16), // More premium radius
@@ -222,14 +224,14 @@ class AppTheme {
     margin: EdgeInsets.zero,
   );
 
-  static const BottomNavigationBarThemeData _bottomNavigationBarThemeData = 
+  static const BottomNavigationBarThemeData _bottomNavigationBarThemeData =
       BottomNavigationBarThemeData(
-    backgroundColor: AppColors.white,
-    selectedItemColor: AppColors.crystalBlue,
-    unselectedItemColor: AppColors.onSurfaceVariant,
-    type: BottomNavigationBarType.fixed,
-    elevation: 12,                          // More pronounced elevation
-  );
+        backgroundColor: AppColors.white,
+        selectedItemColor: AppColors.crystalBlue,
+        unselectedItemColor: AppColors.onSurfaceVariant,
+        type: BottomNavigationBarType.fixed,
+        elevation: 12, // More pronounced elevation
+      );
 
   static const TabBarThemeData _tabBarThemeData = TabBarThemeData(
     labelColor: AppColors.crystalBlue,

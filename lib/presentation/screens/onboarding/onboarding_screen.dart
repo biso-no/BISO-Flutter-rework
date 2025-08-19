@@ -25,7 +25,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
   final _zipController = TextEditingController();
-  
+
   String? _selectedCampusId;
   List<String> _selectedDepartments = [];
 
@@ -112,15 +112,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   Future<void> _completeOnboarding() async {
     try {
-      await ref.read(authStateProvider.notifier).createProfile(
-        name: _nameController.text,
-        phone: _phoneController.text.isNotEmpty ? _phoneController.text : null,
-        address: _addressController.text.isNotEmpty ? _addressController.text : null,
-        city: _cityController.text.isNotEmpty ? _cityController.text : null,
-        zipCode: _zipController.text.isNotEmpty ? _zipController.text : null,
-        campusId: _selectedCampusId,
-        departments: _selectedDepartments,
-      );
+      await ref
+          .read(authStateProvider.notifier)
+          .createProfile(
+            name: _nameController.text,
+            phone: _phoneController.text.isNotEmpty
+                ? _phoneController.text
+                : null,
+            address: _addressController.text.isNotEmpty
+                ? _addressController.text
+                : null,
+            city: _cityController.text.isNotEmpty ? _cityController.text : null,
+            zipCode: _zipController.text.isNotEmpty
+                ? _zipController.text
+                : null,
+            campusId: _selectedCampusId,
+            departments: _selectedDepartments,
+          );
 
       if (mounted) {
         context.go('/home');
@@ -158,9 +166,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           LinearProgressIndicator(
             value: (_currentStep + 1) / 4,
             backgroundColor: AppColors.gray200,
-            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.defaultBlue),
+            valueColor: const AlwaysStoppedAnimation<Color>(
+              AppColors.defaultBlue,
+            ),
           ),
-          
+
           // Content
           Expanded(
             child: PageView(
@@ -254,7 +264,7 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
                 color: AppColors.onSurfaceVariant,
               ),
             ),
-            
+
             const SizedBox(height: 32),
 
             TextFormField(
@@ -379,7 +389,7 @@ class _CampusSelectionStep extends StatelessWidget {
               color: AppColors.onSurfaceVariant,
             ),
           ),
-          
+
           const SizedBox(height: 32),
 
           Expanded(
@@ -403,14 +413,18 @@ class _CampusSelectionStep extends StatelessWidget {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: isSelected 
-                                  ? AppColors.defaultBlue 
-                                  : AppColors.defaultBlue.withValues(alpha: 0.1),
+                              color: isSelected
+                                  ? AppColors.defaultBlue
+                                  : AppColors.defaultBlue.withValues(
+                                      alpha: 0.1,
+                                    ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
                               Icons.location_city,
-                              color: isSelected ? Colors.white : AppColors.defaultBlue,
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppColors.defaultBlue,
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -495,7 +509,7 @@ class _DepartmentSelectionStep extends StatelessWidget {
               color: AppColors.onSurfaceVariant,
             ),
           ),
-          
+
           const SizedBox(height: 32),
 
           Expanded(
@@ -527,10 +541,7 @@ class _DepartmentSelectionStep extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          ElevatedButton(
-            onPressed: onNext,
-            child: Text(l10n.continueButton),
-          ),
+          ElevatedButton(onPressed: onNext, child: Text(l10n.continueButton)),
         ],
       ),
     );
@@ -547,10 +558,12 @@ class _NotificationPreferencesStep extends StatefulWidget {
   });
 
   @override
-  State<_NotificationPreferencesStep> createState() => _NotificationPreferencesStepState();
+  State<_NotificationPreferencesStep> createState() =>
+      _NotificationPreferencesStepState();
 }
 
-class _NotificationPreferencesStepState extends State<_NotificationPreferencesStep> {
+class _NotificationPreferencesStepState
+    extends State<_NotificationPreferencesStep> {
   final Map<String, bool> _preferences = {
     'events': true,
     'products': true,
@@ -582,7 +595,7 @@ class _NotificationPreferencesStepState extends State<_NotificationPreferencesSt
               color: AppColors.onSurfaceVariant,
             ),
           ),
-          
+
           const SizedBox(height: 32),
 
           Card(
@@ -592,28 +605,32 @@ class _NotificationPreferencesStepState extends State<_NotificationPreferencesSt
                   title: Text(l10n.events),
                   subtitle: const Text('Get notified about new campus events'),
                   value: _preferences['events']!,
-                  onChanged: (value) => setState(() => _preferences['events'] = value),
+                  onChanged: (value) =>
+                      setState(() => _preferences['events'] = value),
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
                   title: Text(l10n.marketplace),
                   subtitle: const Text('New items in the marketplace'),
                   value: _preferences['products']!,
-                  onChanged: (value) => setState(() => _preferences['products'] = value),
+                  onChanged: (value) =>
+                      setState(() => _preferences['products'] = value),
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
                   title: Text(l10n.jobs),
                   subtitle: const Text('Volunteer and job opportunities'),
                   value: _preferences['jobs']!,
-                  onChanged: (value) => setState(() => _preferences['jobs'] = value),
+                  onChanged: (value) =>
+                      setState(() => _preferences['jobs'] = value),
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
                   title: Text(l10n.expenses),
                   subtitle: const Text('Expense reimbursement updates'),
                   value: _preferences['expenses']!,
-                  onChanged: (value) => setState(() => _preferences['expenses'] = value),
+                  onChanged: (value) =>
+                      setState(() => _preferences['expenses'] = value),
                 ),
               ],
             ),

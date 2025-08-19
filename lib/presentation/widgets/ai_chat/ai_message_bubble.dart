@@ -7,6 +7,7 @@ import '../../../core/constants/app_colors.dart';
 import 'markdown_text.dart';
 
 import '../../../core/logging/print_migration.dart';
+
 class AiMessageBubble extends StatefulWidget {
   final ChatMessage message;
   final bool isStreaming;
@@ -35,21 +36,20 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(-0.1, 0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: const Interval(0.2, 1.0, curve: Curves.elasticOut),
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(-0.1, 0), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: const Interval(0.2, 1.0, curve: Curves.elasticOut),
+          ),
+        );
 
     _animationController.forward();
   }
@@ -64,7 +64,7 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: SlideTransition(
@@ -108,10 +108,7 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: LinearGradient(
-          colors: [
-            AppColors.crystalBlue,
-            AppColors.emeraldGreen,
-          ],
+          colors: [AppColors.crystalBlue, AppColors.emeraldGreen],
         ),
         boxShadow: [
           BoxShadow(
@@ -131,22 +128,30 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
 
   Widget _buildMessageBubble(ThemeData theme, bool isDark) {
     final textContent = widget.message.textContent;
-    
+
     logPrint('🎨 [AI_BUBBLE] Building bubble for message ${widget.message.id}');
-    logPrint('📝 [AI_BUBBLE] Text content: "$textContent" (length: ${textContent.length})');
+    logPrint(
+      '📝 [AI_BUBBLE] Text content: "$textContent" (length: ${textContent.length})',
+    );
     logPrint('⏳ [AI_BUBBLE] Is streaming: ${widget.isStreaming}');
     logPrint('🧩 [AI_BUBBLE] Message parts: ${widget.message.parts.length}');
-    
+
     // Only hide bubble if there's no text content, no tool parts, and not streaming
-    if (textContent.isEmpty && widget.message.toolParts.isEmpty && !widget.isStreaming) {
-      logPrint('👻 [AI_BUBBLE] Returning empty bubble - no content, no tools, and not streaming');
+    if (textContent.isEmpty &&
+        widget.message.toolParts.isEmpty &&
+        !widget.isStreaming) {
+      logPrint(
+        '👻 [AI_BUBBLE] Returning empty bubble - no content, no tools, and not streaming',
+      );
       return const SizedBox.shrink();
     }
-    
+
     // If no text but has tool parts, show a placeholder message
     final hasToolParts = widget.message.toolParts.isNotEmpty;
-    logPrint('🔧 [AI_BUBBLE] Has tool parts: $hasToolParts (${widget.message.toolParts.length})');
-    
+    logPrint(
+      '🔧 [AI_BUBBLE] Has tool parts: $hasToolParts (${widget.message.toolParts.length})',
+    );
+
     if (textContent.isEmpty && hasToolParts && !widget.isStreaming) {
       logPrint('🔧 [AI_BUBBLE] Showing tool-only response');
     }
@@ -170,8 +175,9 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
               ),
               boxShadow: [
                 BoxShadow(
-                  color: (isDark ? AppColors.shadowHeavy : AppColors.shadowLight)
-                      .withValues(alpha: 0.1),
+                  color:
+                      (isDark ? AppColors.shadowHeavy : AppColors.shadowLight)
+                          .withValues(alpha: 0.1),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -185,7 +191,9 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
                     text: textContent,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       height: 1.6,
-                      color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
+                      color: isDark
+                          ? AppColors.onSurfaceDark
+                          : AppColors.onSurface,
                     ),
                   )
                 else if (hasToolParts && !widget.isStreaming)
@@ -195,8 +203,11 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
                     child: Text(
                       'Found information using search tools:',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: (isDark ? AppColors.onSurfaceDark : AppColors.onSurface)
-                            .withValues(alpha: 0.7),
+                        color:
+                            (isDark
+                                    ? AppColors.onSurfaceDark
+                                    : AppColors.onSurface)
+                                .withValues(alpha: 0.7),
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -237,22 +248,29 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
   }
 
   Widget _buildCompactToolSummary(ThemeData theme, bool isDark) {
-    logPrint('🔧 [AI_BUBBLE] Building compact tool summary for message ${widget.message.id}');
-    logPrint('🔧 [AI_BUBBLE] Tool parts count: ${widget.message.toolParts.length}');
-    
+    logPrint(
+      '🔧 [AI_BUBBLE] Building compact tool summary for message ${widget.message.id}',
+    );
+    logPrint(
+      '🔧 [AI_BUBBLE] Tool parts count: ${widget.message.toolParts.length}',
+    );
+
     final completedTools = widget.message.toolParts
         .where((tool) => tool.state == ToolPartState.outputAvailable)
         .toList();
-    
+
     final runningTools = widget.message.toolParts
-        .where((tool) => tool.state == ToolPartState.inputStreaming || 
-                        tool.state == ToolPartState.inputAvailable)
+        .where(
+          (tool) =>
+              tool.state == ToolPartState.inputStreaming ||
+              tool.state == ToolPartState.inputAvailable,
+        )
         .toList();
-    
+
     if (completedTools.isEmpty && runningTools.isEmpty) {
       return const SizedBox.shrink();
     }
-    
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -289,14 +307,21 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
             runSpacing: 6,
             children: [
               // Show completed tools
-              ...completedTools.map((tool) => _buildToolChip(theme, tool, true)),
+              ...completedTools.map(
+                (tool) => _buildToolChip(theme, tool, true),
+              ),
               // Show running tools
               ...runningTools.map((tool) => _buildToolChip(theme, tool, false)),
             ],
           ),
           // Show SharePoint search summary if available
           if (completedTools.any((t) => t.toolName == 'searchSharePoint'))
-            _buildSharePointSummary(theme, completedTools.firstWhere((t) => t.toolName == 'searchSharePoint')),
+            _buildSharePointSummary(
+              theme,
+              completedTools.firstWhere(
+                (t) => t.toolName == 'searchSharePoint',
+              ),
+            ),
         ],
       ),
     );
@@ -304,26 +329,21 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
 
   Widget _buildToolChip(ThemeData theme, ToolPart tool, bool isCompleted) {
     final color = isCompleted ? AppColors.emeraldGreen : AppColors.crystalBlue;
-    final icon = isCompleted ? Icons.check_circle_rounded : Icons.hourglass_empty_rounded;
-    
+    final icon = isCompleted
+        ? Icons.check_circle_rounded
+        : Icons.hourglass_empty_rounded;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 12,
-            color: color,
-          ),
+          Icon(icon, size: 12, color: color),
           const SizedBox(width: 4),
           Text(
             _getToolDisplayName(tool.toolName),
@@ -341,20 +361,16 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
   Widget _buildSharePointSummary(ThemeData theme, ToolPart sharePointTool) {
     final result = sharePointTool.result;
     if (result == null) return const SizedBox.shrink();
-    
+
     try {
       final response = SharePointSearchResponse.fromJson(result);
       if (response.results.isEmpty) return const SizedBox.shrink();
-      
+
       return Padding(
         padding: const EdgeInsets.only(top: 8),
         child: Row(
           children: [
-            Icon(
-              Icons.search_rounded,
-              size: 14,
-              color: AppColors.emeraldGreen,
-            ),
+            Icon(Icons.search_rounded, size: 14, color: AppColors.emeraldGreen),
             const SizedBox(width: 6),
             Text(
               'Found ${response.results.length} document${response.results.length == 1 ? '' : 's'}',
@@ -396,7 +412,6 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
     }
   }
 
-
   Widget _buildTimestamp(ThemeData theme) {
     if (widget.message.timestamp == null) {
       return const SizedBox.shrink();
@@ -423,45 +438,51 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
           content: const Text('Message copied to clipboard'),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
     }
   }
 
   bool _hasSharePointSources() {
-    final hasSharePoint = widget.message.toolParts.any((tool) => 
-      tool.toolName == 'searchSharePoint' && 
-      tool.state == ToolPartState.outputAvailable &&
-      tool.result != null);
-    
+    final hasSharePoint = widget.message.toolParts.any(
+      (tool) =>
+          tool.toolName == 'searchSharePoint' &&
+          tool.state == ToolPartState.outputAvailable &&
+          tool.result != null,
+    );
+
     if (hasSharePoint) {
-      logPrint('📚 [AI_BUBBLE] Has SharePoint sources for message ${widget.message.id}');
+      logPrint(
+        '📚 [AI_BUBBLE] Has SharePoint sources for message ${widget.message.id}',
+      );
     }
-    
+
     return hasSharePoint;
   }
 
   Widget _buildSourcesSection(ThemeData theme, bool isDark) {
     final sharePointTools = widget.message.toolParts
-        .where((tool) => 
-          tool.toolName == 'searchSharePoint' && 
-          tool.state == ToolPartState.outputAvailable &&
-          tool.result != null)
+        .where(
+          (tool) =>
+              tool.toolName == 'searchSharePoint' &&
+              tool.state == ToolPartState.outputAvailable &&
+              tool.result != null,
+        )
         .toList();
 
     if (sharePointTools.isEmpty) return const SizedBox.shrink();
 
     final sources = <Map<String, String>>[];
-    
+
     for (final tool in sharePointTools) {
       final result = tool.result;
       final results = result?['results'] as List<dynamic>? ?? [];
-      
-      logPrint('📚 [AI_BUBBLE] Processing SharePoint tool with ${results.length} results');
-      
+
+      logPrint(
+        '📚 [AI_BUBBLE] Processing SharePoint tool with ${results.length} results',
+      );
+
       for (final item in results) {
         final title = item['title'] as String?;
         final url = item['documentViewerUrl'] as String?;
@@ -471,7 +492,7 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
         }
       }
     }
-    
+
     logPrint('📚 [AI_BUBBLE] Total sources found: ${sources.length}');
 
     if (sources.isEmpty) return const SizedBox.shrink();
@@ -492,11 +513,7 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
         children: [
           Row(
             children: [
-              Icon(
-                Icons.link_rounded,
-                size: 16,
-                color: AppColors.crystalBlue,
-              ),
+              Icon(Icons.link_rounded, size: 16, color: AppColors.crystalBlue),
               const SizedBox(width: 8),
               Text(
                 '${sources.length} Source${sources.length == 1 ? '' : 's'}',
@@ -511,7 +528,10 @@ class _AiMessageBubbleState extends State<AiMessageBubble>
           Wrap(
             spacing: 8,
             runSpacing: 6,
-            children: sources.take(5).map((source) => _buildSourceChip(theme, source)).toList(),
+            children: sources
+                .take(5)
+                .map((source) => _buildSourceChip(theme, source))
+                .toList(),
           ),
           if (sources.length > 5) ...[
             const SizedBox(height: 8),

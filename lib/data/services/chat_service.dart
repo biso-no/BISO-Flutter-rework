@@ -11,16 +11,19 @@ import 'robust_document_service.dart';
 
 class ChatService {
   RealtimeSubscription? _subscription;
-  final StreamController<List<ChatModel>> _chatsController = StreamController<List<ChatModel>>.broadcast();
-  final StreamController<List<ChatMessageModel>> _messagesController = StreamController<List<ChatMessageModel>>.broadcast();
-  
+  final StreamController<List<ChatModel>> _chatsController =
+      StreamController<List<ChatModel>>.broadcast();
+  final StreamController<List<ChatMessageModel>> _messagesController =
+      StreamController<List<ChatMessageModel>>.broadcast();
+
   // Using simplified global Appwrite instances
   Databases get _databases => databases;
   Realtime get _realtime => realtime;
   Storage get _storage => storage;
 
   Stream<List<ChatModel>> get chatsStream => _chatsController.stream;
-  Stream<List<ChatMessageModel>> get messagesStream => _messagesController.stream;
+  Stream<List<ChatMessageModel>> get messagesStream =>
+      _messagesController.stream;
 
   // Get user's chats
   Future<List<ChatModel>> getUserChats(String userId) async {
@@ -35,9 +38,7 @@ class ChatService {
         ],
       );
 
-      final chats = documents
-          .map((doc) => ChatModel.fromMap(doc))
-          .toList();
+      final chats = documents.map((doc) => ChatModel.fromMap(doc)).toList();
 
       _chatsController.add(chats);
       return chats;
@@ -142,11 +143,13 @@ class ChatService {
   }) async {
     try {
       // Create team for this chat (unless existing team provided)
-      final teamId = existingTeamId ?? await _createChatTeam(
-        chatName: name,
-        participants: participants,
-        createdBy: createdBy,
-      );
+      final teamId =
+          existingTeamId ??
+          await _createChatTeam(
+            chatName: name,
+            participants: participants,
+            createdBy: createdBy,
+          );
 
       final chatData = {
         'name': name,
@@ -192,12 +195,18 @@ class ChatService {
 
       _subscription!.stream.listen((response) {
         final payload = response.payload;
-        
-        if (response.channels.contains('databases.${AppConstants.databaseId}.collections.chat_messages.documents')) {
+
+        if (response.channels.contains(
+          'databases.${AppConstants.databaseId}.collections.chat_messages.documents',
+        )) {
           _handleMessageUpdate(payload);
-        } else if (response.channels.contains('databases.${AppConstants.databaseId}.collections.chats.documents')) {
+        } else if (response.channels.contains(
+          'databases.${AppConstants.databaseId}.collections.chats.documents',
+        )) {
           _handleChatUpdate(payload, userId);
-        } else if (response.channels.contains('databases.${AppConstants.databaseId}.collections.typing_indicators.documents')) {
+        } else if (response.channels.contains(
+          'databases.${AppConstants.databaseId}.collections.typing_indicators.documents',
+        )) {
           _handleTypingUpdate(payload);
         }
       });
@@ -217,7 +226,7 @@ class ChatService {
 
       final participants = List<String>.from(chat['participants']);
       final teamId = chat['team_id'];
-      
+
       if (!participants.contains(userId)) {
         participants.add(userId);
 
@@ -258,10 +267,7 @@ class ChatService {
           databaseId: AppConstants.databaseId,
           collectionId: 'teams',
           documentId: teamId,
-          data: {
-            'members': members,
-            'total': members.length,
-          },
+          data: {'members': members, 'total': members.length},
         );
       }
     } catch (e) {
@@ -280,7 +286,7 @@ class ChatService {
 
       final participants = List<String>.from(chat['participants']);
       final teamId = chat['team_id'];
-      
+
       participants.remove(userId);
 
       // Update chat participants
@@ -318,10 +324,7 @@ class ChatService {
         databaseId: AppConstants.databaseId,
         collectionId: 'teams',
         documentId: teamId,
-        data: {
-          'members': members,
-          'total': members.length,
-        },
+        data: {'members': members, 'total': members.length},
       );
     } catch (e) {
       throw ChatException('Failed to remove user from team: $e');
@@ -381,10 +384,7 @@ class ChatService {
         databaseId: AppConstants.databaseId,
         collectionId: 'chat_messages',
         documentId: messageId,
-        data: {
-          'is_deleted': true,
-          'content': 'This message has been deleted',
-        },
+        data: {'is_deleted': true, 'content': 'This message has been deleted'},
       );
     } on AppwriteException catch (e) {
       throw ChatException('Failed to delete message: ${e.message}');
@@ -407,11 +407,15 @@ class ChatService {
         documentId: messageId,
       );
 
-      final reactions = List<Map<String, dynamic>>.from(message.data['reactions'] ?? []);
-      
+      final reactions = List<Map<String, dynamic>>.from(
+        message.data['reactions'] ?? [],
+      );
+
       // Remove existing reaction from same user with same emoji
-      reactions.removeWhere((r) => r['user_id'] == userId && r['emoji'] == emoji);
-      
+      reactions.removeWhere(
+        (r) => r['user_id'] == userId && r['emoji'] == emoji,
+      );
+
       // Add new reaction
       reactions.add({
         'emoji': emoji,
@@ -462,7 +466,10 @@ class ChatService {
   }
 
   // Private helper methods
-  Future<void> _updateChatLastMessage(String chatId, ChatMessageModel message) async {
+  Future<void> _updateChatLastMessage(
+    String chatId,
+    ChatMessageModel message,
+  ) async {
     try {
       await _databases.updateDocument(
         databaseId: AppConstants.databaseId,
@@ -546,7 +553,7 @@ class ChatService {
   }) async {
     try {
       final participants = [buyerId, sellerId];
-      
+
       // Check if direct chat already exists between these participants
       final existingChats = await _databases.listDocuments(
         databaseId: AppConstants.databaseId,
@@ -567,7 +574,7 @@ class ChatService {
           participants: participants,
           createdBy: buyerId,
         );
-        
+
         // Update metadata for marketplace context
         await _databases.updateDocument(
           databaseId: AppConstants.databaseId,
@@ -582,7 +589,7 @@ class ChatService {
             },
           },
         );
-        
+
         // Refresh chat data
         final updatedChat = await _databases.getDocument(
           databaseId: AppConstants.databaseId,
@@ -668,7 +675,12 @@ class ChatService {
   }
 
   // Send typing indicator
-  Future<void> sendTypingIndicator(String chatId, String userId, String userName, bool isTyping) async {
+  Future<void> sendTypingIndicator(
+    String chatId,
+    String userId,
+    String userName,
+    bool isTyping,
+  ) async {
     try {
       if (isTyping) {
         // Create or update typing indicator
@@ -681,7 +693,9 @@ class ChatService {
             'user_id': userId,
             'user_name': userName,
             'is_typing': true,
-            'expires_at': DateTime.now().add(const Duration(seconds: 5)).toIso8601String(),
+            'expires_at': DateTime.now()
+                .add(const Duration(seconds: 5))
+                .toIso8601String(),
           },
         );
       } else {
@@ -715,8 +729,10 @@ class ChatService {
         documentId: messageId,
       );
 
-      final reactions = List<Map<String, dynamic>>.from(message.data['reactions'] ?? []);
-      
+      final reactions = List<Map<String, dynamic>>.from(
+        message.data['reactions'] ?? [],
+      );
+
       // Check if user already reacted with this emoji
       final existingReactionIndex = reactions.indexWhere(
         (r) => r['user_id'] == userId && r['emoji'] == reaction,
@@ -785,20 +801,21 @@ class ChatService {
   }
 
   // Upload file for chat attachment with proper permissions
-  Future<String> uploadChatFile(File file, String fileName, ChatModel chat) async {
+  Future<String> uploadChatFile(
+    File file,
+    String fileName,
+    ChatModel chat,
+  ) async {
     try {
       final permissions = _generateFilePermissions(chat);
-      
+
       final response = await _storage.createFile(
         bucketId: 'chat_attachments',
         fileId: ID.unique(),
-        file: InputFile.fromPath(
-          path: file.path,
-          filename: fileName,
-        ),
+        file: InputFile.fromPath(path: file.path, filename: fileName),
         permissions: permissions,
       );
-      
+
       return response.$id;
     } catch (e) {
       throw ChatException('Failed to upload file: $e');
@@ -808,12 +825,12 @@ class ChatService {
   // Generate team-based permissions (simplified approach)
   List<String> _generateFilePermissions(ChatModel chat) {
     final permissions = <String>[];
-    
+
     // All chats now use team-based permissions
     if (chat.teamId != null) {
       // Primary: Team-based permissions
       permissions.add('read("team:${chat.teamId}")');
-      
+
       // Additional role-based permissions for team management
       permissions.add('read("role:team_${chat.teamId}_member")');
       permissions.add('read("role:team_${chat.teamId}_admin")');
@@ -823,7 +840,7 @@ class ChatService {
         permissions.add('read("user:$participantId")');
       }
     }
-    
+
     return permissions;
   }
 
@@ -877,9 +894,7 @@ class ChatService {
         'is_active': true,
         'created_by': createdBy,
         'last_activity_at': DateTime.now().toIso8601String(),
-        'metadata': {
-          'team_permissions_enabled': true,
-        },
+        'metadata': {'team_permissions_enabled': true},
       };
 
       final response = await _databases.createDocument(
@@ -913,9 +928,7 @@ class ChatService {
         'is_active': true,
         'created_by': createdBy,
         'last_activity_at': DateTime.now().toIso8601String(),
-        'metadata': {
-          'department_permissions_enabled': true,
-        },
+        'metadata': {'department_permissions_enabled': true},
       };
 
       final response = await _databases.createDocument(
@@ -933,18 +946,16 @@ class ChatService {
 
   // Get file URL for viewing attachments
   String getFileUrl(String fileId) {
-    return _storage.getFileView(
-      bucketId: 'chat_attachments',
-      fileId: fileId,
-    ).toString();
+    return _storage
+        .getFileView(bucketId: 'chat_attachments', fileId: fileId)
+        .toString();
   }
 
   // Get file download URL
   String getFileDownloadUrl(String fileId) {
-    return _storage.getFileDownload(
-      bucketId: 'chat_attachments',
-      fileId: fileId,
-    ).toString();
+    return _storage
+        .getFileDownload(bucketId: 'chat_attachments', fileId: fileId)
+        .toString();
   }
 
   // Send message with file attachment
@@ -965,10 +976,10 @@ class ChatService {
         documentId: chatId,
       );
       final chatModel = ChatModel.fromMap(chat);
-      
+
       // Upload file first with proper permissions
       final fileId = await uploadChatFile(file, fileName, chatModel);
-      
+
       // Determine message type based on file extension
       String messageType = 'file';
       final extension = fileName.toLowerCase().split('.').last;
@@ -1057,7 +1068,7 @@ class ChatService {
   // Get multiple user names at once
   Future<Map<String, String>> getUserNames(List<String> userIds) async {
     final userNames = <String, String>{};
-    
+
     for (final userId in userIds) {
       try {
         final name = await getUserName(userId);
@@ -1066,7 +1077,7 @@ class ChatService {
         userNames[userId] = 'Unknown User';
       }
     }
-    
+
     return userNames;
   }
 
@@ -1121,10 +1132,13 @@ class ChatService {
   }
 
   // Search users by name using public profiles
-  Future<List<PublicProfileModel>> searchUsers(String query, {String? campusId}) async {
+  Future<List<PublicProfileModel>> searchUsers(
+    String query, {
+    String? campusId,
+  }) async {
     try {
       if (query.trim().isEmpty) return [];
-      
+
       final publicProfileService = PublicProfileService();
       return await publicProfileService.searchPublicProfiles(
         query: query,
@@ -1132,13 +1146,14 @@ class ChatService {
         limit: 20,
       );
     } catch (e) {
-      print('Failed to search users: $e');
       throw ChatException('Failed to search users: $e');
     }
   }
 
   // Get recent chat contacts (only users with public profiles)
-  Future<List<PublicProfileModel>> getRecentContacts(String currentUserId) async {
+  Future<List<PublicProfileModel>> getRecentContacts(
+    String currentUserId,
+  ) async {
     try {
       final documents = await RobustDocumentService.listDocumentsRobust(
         databaseId: AppConstants.databaseId,
@@ -1163,9 +1178,8 @@ class ChatService {
 
       // Get public profiles for these contacts
       final publicProfileService = PublicProfileService();
-      final publicProfiles = await publicProfileService.getMultiplePublicProfiles(
-        contacts.toList(),
-      );
+      final publicProfiles = await publicProfileService
+          .getMultiplePublicProfiles(contacts.toList());
 
       return publicProfiles;
     } catch (e) {
@@ -1179,10 +1193,7 @@ class ChatService {
       final documents = await RobustDocumentService.listDocumentsRobust(
         databaseId: AppConstants.databaseId,
         collectionId: 'departments',
-        queries: [
-          'equal("active", true)',
-          'orderAsc("name")',
-        ],
+        queries: ['equal("active", true)', 'orderAsc("name")'],
       );
 
       return documents;

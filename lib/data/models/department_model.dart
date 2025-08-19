@@ -22,12 +22,18 @@ class DepartmentModel {
       id: (map['\$id'] ?? map['Id'] ?? '').toString(),
       name: (map['Name'] ?? map['name'] ?? '').toString(),
       campusId: (map['campus_id'] ?? '').toString(),
-      active: (map['active'] is bool) ? map['active'] as bool : (map['active']?.toString() == 'true'),
-      logo: (map['logo']?.toString().isNotEmpty ?? false) ? map['logo'].toString() : null,
-      type: (map['type']?.toString().isNotEmpty ?? false) ? map['type'].toString() : null,
-      description: (map['description']?.toString().isNotEmpty ?? false) ? map['description'].toString() : null,
+      active: (map['active'] is bool)
+          ? map['active'] as bool
+          : (map['active']?.toString() == 'true'),
+      logo: (map['logo']?.toString().isNotEmpty ?? false)
+          ? map['logo'].toString()
+          : null,
+      type: (map['type']?.toString().isNotEmpty ?? false)
+          ? map['type'].toString()
+          : null,
+      description: (map['description']?.toString().isNotEmpty ?? false)
+          ? map['description'].toString()
+          : null,
     );
   }
 }
-
-

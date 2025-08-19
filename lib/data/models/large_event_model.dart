@@ -171,7 +171,10 @@ class LargeEventScheduleItem {
 
   factory LargeEventScheduleItem.fromMap(Map<String, dynamic> map) {
     return LargeEventScheduleItem(
-      id: map['id']?.toString() ?? map['\$id']?.toString() ?? UniqueKey().toString(),
+      id:
+          map['id']?.toString() ??
+          map['\$id']?.toString() ??
+          UniqueKey().toString(),
       title: map['title'] ?? '',
       subtitle: map['subtitle'],
       startTime: DateTime.tryParse(map['startTime'] ?? '') ?? DateTime.now(),
@@ -201,5 +204,3 @@ extension LargeEventTicketingModelX on LargeEventTicketingModel {
     }
   }
 }
-
-

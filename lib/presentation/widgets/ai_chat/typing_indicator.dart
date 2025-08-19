@@ -23,17 +23,16 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
     // Create staggered animations for each dot
     _dotAnimations = List.generate(3, (index) {
-      return Tween<double>(
-        begin: 0.4,
-        end: 1.0,
-      ).animate(CurvedAnimation(
-        parent: _animationController,
-        curve: Interval(
-          index * 0.2,
-          0.6 + (index * 0.2),
-          curve: Curves.easeInOut,
+      return Tween<double>(begin: 0.4, end: 1.0).animate(
+        CurvedAnimation(
+          parent: _animationController,
+          curve: Interval(
+            index * 0.2,
+            0.6 + (index * 0.2),
+            curve: Curves.easeInOut,
+          ),
         ),
-      ));
+      );
     });
 
     _animationController.repeat();
@@ -69,8 +68,9 @@ class _TypingIndicatorState extends State<TypingIndicator>
               ),
               boxShadow: [
                 BoxShadow(
-                  color: (isDark ? AppColors.shadowHeavy : AppColors.shadowLight)
-                      .withValues(alpha: 0.1),
+                  color:
+                      (isDark ? AppColors.shadowHeavy : AppColors.shadowLight)
+                          .withValues(alpha: 0.1),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -84,9 +84,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
                     animation: _dotAnimations[index],
                     builder: (context, child) {
                       return Container(
-                        margin: EdgeInsets.only(
-                          left: index > 0 ? 4 : 0,
-                        ),
+                        margin: EdgeInsets.only(left: index > 0 ? 4 : 0),
                         child: Opacity(
                           opacity: _dotAnimations[index].value,
                           child: Container(

@@ -1,6 +1,7 @@
 import 'app_logger.dart';
+
 /// Global replacement functions for gradual logPrint() migration
-/// 
+///
 /// MIGRATION STRATEGY:
 /// 1. Global find-replace: logPrint( -> logPrint(
 /// 2. Gradually replace logPrint with structured logging
@@ -20,8 +21,18 @@ void logWarning(String message, {Map<String, dynamic>? context}) {
   AppLogger.warning(message, extra: context);
 }
 
-void logError(String message, {Object? error, StackTrace? stackTrace, Map<String, dynamic>? context}) {
-  AppLogger.error(message, error: error, stackTrace: stackTrace, extra: context);
+void logError(
+  String message, {
+  Object? error,
+  StackTrace? stackTrace,
+  Map<String, dynamic>? context,
+}) {
+  AppLogger.error(
+    message,
+    error: error,
+    stackTrace: stackTrace,
+    extra: context,
+  );
 }
 
 // PHASE 3: Feature-specific migrations (when you know the context)
@@ -37,48 +48,65 @@ void logExpense(String message, {String? expenseId, String? userId}) {
   AppLogger.expense(message, expenseId: expenseId, userId: userId);
 }
 
-void logApi(String message, {String? endpoint, String? method, int? statusCode}) {
-  AppLogger.api(message, endpoint: endpoint, method: method, statusCode: statusCode);
+void logApi(
+  String message, {
+  String? endpoint,
+  String? method,
+  int? statusCode,
+}) {
+  AppLogger.api(
+    message,
+    endpoint: endpoint,
+    method: method,
+    statusCode: statusCode,
+  );
 }
 
 /// Development helpers for specific debugging patterns
 class DevLog {
   /// Debug API responses
-  static void apiResponse(String endpoint, dynamic response, {int? statusCode}) {
-    AppLogger.api('API Response', 
-      endpoint: endpoint, 
+  static void apiResponse(
+    String endpoint,
+    dynamic response, {
+    int? statusCode,
+  }) {
+    AppLogger.api(
+      'API Response',
+      endpoint: endpoint,
       statusCode: statusCode,
       extra: {
         'response_type': response.runtimeType.toString(),
         'response_length': response.toString().length,
-      }
+      },
     );
   }
 
   /// Debug user actions
-  static void userAction(String action, {String? userId, Map<String, dynamic>? data}) {
-    AppLogger.info('[USER_ACTION] $action', extra: {
-      'user_id': userId,
-      'action': action,
-      ...?data,
-    });
+  static void userAction(
+    String action, {
+    String? userId,
+    Map<String, dynamic>? data,
+  }) {
+    AppLogger.info(
+      '[USER_ACTION] $action',
+      extra: {'user_id': userId, 'action': action, ...?data},
+    );
   }
 
   /// Debug navigation
   static void navigation(String from, String to) {
-    AppLogger.info('[NAVIGATION] $from → $to', extra: {
-      'from_route': from,
-      'to_route': to,
-    });
+    AppLogger.info(
+      '[NAVIGATION] $from → $to',
+      extra: {'from_route': from, 'to_route': to},
+    );
   }
 
   /// Debug state changes
   static void stateChange(String component, String from, String to) {
-    AppLogger.debug('[STATE] $component: $from → $to', extra: {
-      'component': component,
-      'from_state': from,
-      'to_state': to,
-    });
+    AppLogger.debug(
+      '[STATE] $component: $from → $to',
+      extra: {'component': component, 'from_state': from, 'to_state': to},
+    );
   }
 }
 

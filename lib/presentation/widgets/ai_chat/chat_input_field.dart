@@ -26,7 +26,7 @@ class _ChatInputFieldState extends State<ChatInputField>
   late AnimationController _rotationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _rotationAnimation;
-  
+
   bool _hasText = false;
 
   @override
@@ -40,22 +40,14 @@ class _ChatInputFieldState extends State<ChatInputField>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.elasticOut,
-    ));
-    
-    _rotationAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _rotationController,
-      curve: Curves.easeInOut,
-    ));
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut),
+    );
+
+    _rotationAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _rotationController, curve: Curves.easeInOut),
+    );
 
     widget.controller.addListener(_onTextChanged);
     _focusNode.addListener(_onFocusChanged);
@@ -77,7 +69,7 @@ class _ChatInputFieldState extends State<ChatInputField>
       setState(() {
         _hasText = hasText;
       });
-      
+
       if (hasText) {
         _scaleController.forward();
         _rotationController.forward();
@@ -103,12 +95,9 @@ class _ChatInputFieldState extends State<ChatInputField>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
-      constraints: const BoxConstraints(
-        minHeight: 52,
-        maxHeight: 120,
-      ),
+      constraints: const BoxConstraints(minHeight: 52, maxHeight: 120),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -118,9 +107,7 @@ class _ChatInputFieldState extends State<ChatInputField>
             tooltip: 'Attach file',
           ),
           const SizedBox(width: 8),
-          Expanded(
-            child: _buildTextField(theme),
-          ),
+          Expanded(child: _buildTextField(theme)),
           const SizedBox(width: 8),
           _buildSendButton(),
         ],
@@ -139,7 +126,7 @@ class _ChatInputFieldState extends State<ChatInputField>
       decoration: InputDecoration(
         hintText: 'Ask me anything about BISO...',
         hintStyle: theme.textTheme.bodyLarge?.copyWith(
-          color: widget.isDark 
+          color: widget.isDark
               ? AppColors.mist.withValues(alpha: 0.7)
               : AppColors.onSurfaceVariant.withValues(alpha: 0.7),
         ),
@@ -176,10 +163,7 @@ class _ChatInputFieldState extends State<ChatInputField>
               decoration: BoxDecoration(
                 gradient: _hasText && widget.enabled
                     ? const LinearGradient(
-                        colors: [
-                          AppColors.crystalBlue,
-                          AppColors.defaultBlue,
-                        ],
+                        colors: [AppColors.crystalBlue, AppColors.defaultBlue],
                       )
                     : null,
                 color: !_hasText || !widget.enabled
@@ -205,7 +189,9 @@ class _ChatInputFieldState extends State<ChatInputField>
                     Icons.send_rounded,
                     color: _hasText && widget.enabled
                         ? AppColors.white
-                        : (widget.isDark ? AppColors.mist : AppColors.onSurfaceVariant),
+                        : (widget.isDark
+                              ? AppColors.mist
+                              : AppColors.onSurfaceVariant),
                     size: 20,
                   ),
                 ),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:appwrite/appwrite.dart';
+import 'package:bisoflutter/core/logging/migration_helper.dart';
 import '../models/validation_result_model.dart';
 import 'appwrite_service.dart';
 
@@ -25,7 +26,7 @@ class ValidatorService {
 
       if (response.status == 'completed') {
         final responseData = json.decode(response.responseBody);
-        
+
         // Log the audit entry
         _logValidationAttempt(
           token: token,
@@ -98,7 +99,7 @@ class ValidatorService {
 
       if (response.status == 'completed') {
         final responseData = json.decode(response.responseBody);
-        
+
         if (responseData['ok'] == true) {
           return PassTokenResult(
             ok: true,
@@ -160,7 +161,7 @@ class ValidatorService {
     try {
       // Extract JTI from the result metadata if available
       final jti = result['meta']?['jti'] as String?;
-      
+
       // Create audit log entry
       final auditEntry = {
         'timestamp': DateTime.now().toIso8601String(),
@@ -177,12 +178,13 @@ class ValidatorService {
       // Store in a dedicated audit collection (you'll need to create this)
       await databases.createDocument(
         databaseId: 'app',
-        collectionId: 'validation_audit', // You'll need to create this collection
+        collectionId:
+            'validation_audit', // You'll need to create this collection
         documentId: ID.unique(),
         data: auditEntry,
       );
     } catch (e) {
-      print('Failed to log validation attempt: $e');
+      logPrint('Failed to log validation attempt: $e');
     }
   }
 
@@ -191,7 +193,7 @@ class ValidatorService {
     try {
       // Check if the user is a member of the 'validators' team
       final teamsList = await teams.list();
-      
+
       // Look for membership in the 'validators' team
       for (final team in teamsList.teams) {
         if (team.$id == 'validators') {
@@ -199,7 +201,7 @@ class ValidatorService {
           return true;
         }
       }
-      
+
       return false;
     } catch (e) {
       // If there's an error (e.g., user not authenticated, no teams access), return false
@@ -225,10 +227,7 @@ class PassTokenResult {
     this.code,
   });
 
-  factory PassTokenResult.error({
-    required String error,
-    String? code,
-  }) {
+  factory PassTokenResult.error({required String error, String? code}) {
     return PassTokenResult(
       ok: false,
       token: '',

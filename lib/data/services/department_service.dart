@@ -8,20 +8,31 @@ import '../services/appwrite_service.dart';
 class DepartmentService {
   static const String collectionId = AppConstants.departmentsCollectionId;
 
-  Future<List<DepartmentModel>> getActiveDepartmentsForCampus(String campusId) async {
-    print('🔍 DepartmentService: Fetching departments for campus $campusId');
+  Future<List<DepartmentModel>> getActiveDepartmentsForCampus(
+    String campusId,
+  ) async {
     final docs = await databases.listDocuments(
       databaseId: AppConstants.databaseId,
       collectionId: collectionId,
       queries: [
-        Query.select(['\$id', 'Name', 'campus_id', 'logo', 'active', 'type', 'description']),
+        Query.select([
+          '\$id',
+          'Name',
+          'campus_id',
+          'logo',
+          'active',
+          'type',
+          'description',
+        ]),
         Query.equal('active', true),
         //Query.equal('campus_id', campusId),
         Query.orderAsc('Name'),
         Query.limit(200),
       ],
     );
-    return docs.documents.map((doc) => DepartmentModel.fromMap(doc.data)).toList();
+    return docs.documents
+        .map((doc) => DepartmentModel.fromMap(doc.data))
+        .toList();
   }
 
   Future<DepartmentModel?> getDepartmentById(String id) async {
@@ -30,7 +41,15 @@ class DepartmentService {
         databaseId: AppConstants.databaseId,
         collectionId: collectionId,
         queries: [
-          Query.select(['\$id', 'Name', 'campus_id', 'logo', 'active', 'type', 'description']),
+          Query.select([
+            '\$id',
+            'Name',
+            'campus_id',
+            'logo',
+            'active',
+            'type',
+            'description',
+          ]),
           Query.equal('\$id', id),
           Query.limit(1),
         ],
@@ -42,7 +61,9 @@ class DepartmentService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getDepartmentSocials(String departmentId) async {
+  Future<List<Map<String, dynamic>>> getDepartmentSocials(
+    String departmentId,
+  ) async {
     // Collection name assumed to be 'department_socials' per spec
     final docs = await RobustDocumentService.listDocumentsRobust(
       databaseId: AppConstants.databaseId,
@@ -56,5 +77,3 @@ class DepartmentService {
     return docs;
   }
 }
-
-

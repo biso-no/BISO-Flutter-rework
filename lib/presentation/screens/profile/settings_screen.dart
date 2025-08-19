@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../providers/auth/auth_provider.dart';
@@ -11,9 +12,10 @@ import '../../../data/services/validator_service.dart';
 import 'settings_screen_chat_tab.dart';
 
 // Settings providers
-final appSettingsProvider = StateNotifierProvider<AppSettingsNotifier, AppSettingsState>((ref) {
-  return AppSettingsNotifier();
-});
+final appSettingsProvider =
+    StateNotifierProvider<AppSettingsNotifier, AppSettingsState>((ref) {
+      return AppSettingsNotifier();
+    });
 
 // Controller permissions provider
 final controllerPermissionsProvider = FutureProvider<bool>((ref) async {
@@ -62,19 +64,20 @@ class AppSettingsNotifier extends StateNotifier<AppSettingsState> {
 
   Future<void> _loadSettings() async {
     state = state.copyWith(isLoading: true);
-    
+
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       final darkMode = prefs.getBool('dark_mode') ?? false;
       final language = prefs.getString('language') ?? 'en';
-      
+
       // Load notification preferences
       final notifications = Map<String, bool>.from(state.notifications);
       for (final key in notifications.keys) {
-        notifications[key] = prefs.getBool('notification_$key') ?? notifications[key]!;
+        notifications[key] =
+            prefs.getBool('notification_$key') ?? notifications[key]!;
       }
-      
+
       state = state.copyWith(
         darkMode: darkMode,
         language: language,
@@ -101,7 +104,7 @@ class AppSettingsNotifier extends StateNotifier<AppSettingsState> {
   Future<void> setNotification(String key, bool enabled) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('notification_$key', enabled);
-    
+
     final updatedNotifications = Map<String, bool>.from(state.notifications);
     updatedNotifications[key] = enabled;
     state = state.copyWith(notifications: updatedNotifications);
@@ -117,7 +120,8 @@ class SettingsScreen extends ConsumerStatefulWidget {
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTickerProviderStateMixin {
+class _SettingsScreenState extends ConsumerState<SettingsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -216,7 +220,9 @@ class _GeneralSettingsTab extends ConsumerWidget {
               children: [
                 ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: _getCampusColor(selectedCampus.id).withValues(alpha: 0.1),
+                    backgroundColor: _getCampusColor(
+                      selectedCampus.id,
+                    ).withValues(alpha: 0.1),
                     child: Text(
                       authState.user?.name.substring(0, 1).toUpperCase() ?? 'U',
                       style: TextStyle(
@@ -270,10 +276,7 @@ class _GeneralSettingsTab extends ConsumerWidget {
                   color: _getCampusColor(selectedCampus.id),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  Icons.location_city,
-                  color: Colors.white,
-                ),
+                child: Icon(Icons.location_city, color: Colors.white),
               ),
               title: Text('Current Campus'),
               subtitle: Text('BI ${selectedCampus.name}'),
@@ -281,7 +284,9 @@ class _GeneralSettingsTab extends ConsumerWidget {
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Use the campus switcher on the home screen to change campus'),
+                    content: Text(
+                      'Use the campus switcher on the home screen to change campus',
+                    ),
                   ),
                 );
               },
@@ -291,46 +296,56 @@ class _GeneralSettingsTab extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // Controller Mode Section (only show if user has permissions)
-          ref.watch(controllerPermissionsProvider).when(
-            data: (hasPermissions) => hasPermissions ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Validator Mode',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.strongBlue,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Card(
-                  child: ListTile(
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: _getCampusColor(selectedCampus.id),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.qr_code_scanner,
-                        color: Colors.white,
-                      ),
-                    ),
-                    title: const Text('Open Validator Mode'),
-                    subtitle: const Text('Scan student QR codes to verify membership'),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () {
-                      context.push('/controller-mode');
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
-              ],
-            ) : const SizedBox.shrink(),
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
-          ),
+          ref
+              .watch(controllerPermissionsProvider)
+              .when(
+                data: (hasPermissions) => hasPermissions
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Validator Mode',
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.strongBlue,
+                                ),
+                          ),
+                          const SizedBox(height: 12),
+                          Card(
+                            child: ListTile(
+                              leading: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: _getCampusColor(selectedCampus.id),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.qr_code_scanner,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              title: const Text('Open Validator Mode'),
+                              subtitle: const Text(
+                                'Scan student QR codes to verify membership',
+                              ),
+                              trailing: const Icon(
+                                Icons.arrow_forward_ios,
+                                size: 16,
+                              ),
+                              onTap: () {
+                                context.push('/controller-mode');
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
+                loading: () => const SizedBox.shrink(),
+                error: (_, _) => const SizedBox.shrink(),
+              ),
 
           // Data Section
           Text(
@@ -347,7 +362,10 @@ class _GeneralSettingsTab extends ConsumerWidget {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.cached, color: AppColors.onSurfaceVariant),
+                  leading: const Icon(
+                    Icons.cached,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Clear Cache'),
                   subtitle: const Text('Free up storage space'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
@@ -355,13 +373,18 @@ class _GeneralSettingsTab extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.download, color: AppColors.onSurfaceVariant),
+                  leading: const Icon(
+                    Icons.download,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Offline Data'),
                   subtitle: const Text('Manage downloaded content'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Offline data management coming soon')),
+                      const SnackBar(
+                        content: Text('Offline data management coming soon'),
+                      ),
                     );
                   },
                 ),
@@ -386,26 +409,35 @@ class _GeneralSettingsTab extends ConsumerWidget {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.info_outline, color: AppColors.onSurfaceVariant),
+                  leading: const Icon(
+                    Icons.info_outline,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('App Version'),
                   subtitle: const Text('1.0.0 (Build 1)'),
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.privacy_tip_outlined, color: AppColors.onSurfaceVariant),
+                  leading: const Icon(
+                    Icons.privacy_tip_outlined,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Privacy Policy'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
-                    // TODO: Open privacy policy
+                    launchUrl(Uri.parse('https://biso.no/privacy'));
                   },
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.description_outlined, color: AppColors.onSurfaceVariant),
+                  leading: const Icon(
+                    Icons.description_outlined,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Terms of Service'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
-                    // TODO: Open terms of service
+                    launchUrl(Uri.parse('https://biso.no/terms'));
                   },
                 ),
               ],
@@ -436,7 +468,9 @@ class _GeneralSettingsTab extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Clear Cache'),
-        content: const Text('This will clear all cached images and data. The app may take longer to load content after clearing cache.'),
+        content: const Text(
+          'This will clear all cached images and data. The app may take longer to load content after clearing cache.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -483,23 +517,35 @@ class _NotificationSettingsTab extends ConsumerWidget {
             child: Column(
               children: [
                 SwitchListTile(
-                  secondary: const Icon(Icons.event, color: AppColors.accentBlue),
+                  secondary: const Icon(
+                    Icons.event,
+                    color: AppColors.accentBlue,
+                  ),
                   title: const Text('Events'),
                   subtitle: const Text('Get notified about new campus events'),
                   value: settingsState.notifications['events'] ?? true,
                   onChanged: (value) {
-                    ref.read(appSettingsProvider.notifier).setNotification('events', value);
+                    ref
+                        .read(appSettingsProvider.notifier)
+                        .setNotification('events', value);
                   },
                   activeColor: _getCampusColor(selectedCampus.id),
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
-                  secondary: const Icon(Icons.shopping_bag, color: AppColors.green9),
+                  secondary: const Icon(
+                    Icons.shopping_bag,
+                    color: AppColors.green9,
+                  ),
                   title: const Text('Marketplace'),
-                  subtitle: const Text('New items and deals in the marketplace'),
+                  subtitle: const Text(
+                    'New items and deals in the marketplace',
+                  ),
                   value: settingsState.notifications['products'] ?? true,
                   onChanged: (value) {
-                    ref.read(appSettingsProvider.notifier).setNotification('products', value);
+                    ref
+                        .read(appSettingsProvider.notifier)
+                        .setNotification('products', value);
                   },
                   activeColor: _getCampusColor(selectedCampus.id),
                 ),
@@ -510,29 +556,41 @@ class _NotificationSettingsTab extends ConsumerWidget {
                   subtitle: const Text('Volunteer and job opportunities'),
                   value: settingsState.notifications['jobs'] ?? true,
                   onChanged: (value) {
-                    ref.read(appSettingsProvider.notifier).setNotification('jobs', value);
+                    ref
+                        .read(appSettingsProvider.notifier)
+                        .setNotification('jobs', value);
                   },
                   activeColor: _getCampusColor(selectedCampus.id),
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
-                  secondary: const Icon(Icons.receipt, color: AppColors.orange9),
+                  secondary: const Icon(
+                    Icons.receipt,
+                    color: AppColors.orange9,
+                  ),
                   title: const Text('Expenses'),
                   subtitle: const Text('Expense reimbursement status updates'),
                   value: settingsState.notifications['expenses'] ?? false,
                   onChanged: (value) {
-                    ref.read(appSettingsProvider.notifier).setNotification('expenses', value);
+                    ref
+                        .read(appSettingsProvider.notifier)
+                        .setNotification('expenses', value);
                   },
                   activeColor: _getCampusColor(selectedCampus.id),
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
-                  secondary: const Icon(Icons.chat, color: AppColors.defaultBlue),
+                  secondary: const Icon(
+                    Icons.chat,
+                    color: AppColors.defaultBlue,
+                  ),
                   title: const Text('Chat Messages'),
                   subtitle: const Text('New messages in your chats'),
                   value: settingsState.notifications['chat'] ?? true,
                   onChanged: (value) {
-                    ref.read(appSettingsProvider.notifier).setNotification('chat', value);
+                    ref
+                        .read(appSettingsProvider.notifier)
+                        .setNotification('chat', value);
                   },
                   activeColor: _getCampusColor(selectedCampus.id),
                 ),
@@ -556,14 +614,21 @@ class _NotificationSettingsTab extends ConsumerWidget {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.schedule, color: AppColors.onSurfaceVariant),
+                  leading: const Icon(
+                    Icons.schedule,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Quiet Hours'),
-                  subtitle: const Text('Mute notifications during specific hours'),
+                  subtitle: const Text(
+                    'Mute notifications during specific hours',
+                  ),
                   trailing: Switch(
                     value: false,
                     onChanged: (value) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Quiet hours feature coming soon')),
+                        const SnackBar(
+                          content: Text('Quiet hours feature coming soon'),
+                        ),
                       );
                     },
                     activeColor: _getCampusColor(selectedCampus.id),
@@ -571,14 +636,19 @@ class _NotificationSettingsTab extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.vibration, color: AppColors.onSurfaceVariant),
+                  leading: const Icon(
+                    Icons.vibration,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Vibration'),
                   subtitle: const Text('Vibrate for notifications'),
                   trailing: Switch(
                     value: true,
                     onChanged: (value) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Vibration settings coming soon')),
+                        const SnackBar(
+                          content: Text('Vibration settings coming soon'),
+                        ),
                       );
                     },
                     activeColor: _getCampusColor(selectedCampus.id),
@@ -645,31 +715,35 @@ class _PrivacySettingsTab extends ConsumerWidget {
                   data: (isPublic) => SwitchListTile(
                     secondary: Icon(
                       isPublic == true ? Icons.public : Icons.lock_outline,
-                      color: isPublic == true ? AppColors.green9 : AppColors.orange9,
+                      color: isPublic == true
+                          ? AppColors.green9
+                          : AppColors.orange9,
                     ),
                     title: const Text('Public Profile'),
                     subtitle: Text(
                       isPublic == true
                           ? 'Others can find and message you'
-                          : 'Others cannot find you in search'
+                          : 'Others cannot find you in search',
                     ),
                     value: isPublic == true,
                     onChanged: (value) async {
                       try {
-                        final privacyNotifier = ref.read(privacySettingProvider(userId).notifier);
+                        final privacyNotifier = ref.read(
+                          privacySettingProvider(userId).notifier,
+                        );
                         await privacyNotifier.updatePrivacySetting(value);
-                        
+
                         // Refresh the privacy status
                         ref.invalidate(userPrivacyProvider(userId));
                         ref.invalidate(privacyStatusProvider(userId));
-                        
+
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                value 
-                                  ? 'Public profile created - others can find you in search'
-                                  : 'Public profile removed - you won\'t appear in search',
+                                value
+                                    ? 'Public profile created - others can find you in search'
+                                    : 'Public profile removed - you won\'t appear in search',
                               ),
                               backgroundColor: AppColors.defaultBlue,
                             ),
@@ -679,7 +753,9 @@ class _PrivacySettingsTab extends ConsumerWidget {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Failed to update privacy setting: $e'),
+                              content: Text(
+                                'Failed to update privacy setting: $e',
+                              ),
                               backgroundColor: AppColors.error,
                             ),
                           );
@@ -693,7 +769,10 @@ class _PrivacySettingsTab extends ConsumerWidget {
                     title: Text('Loading privacy settings...'),
                   ),
                   error: (error, stack) => ListTile(
-                    leading: const Icon(Icons.error_outline, color: AppColors.error),
+                    leading: const Icon(
+                      Icons.error_outline,
+                      color: AppColors.error,
+                    ),
                     title: const Text('Error loading privacy settings'),
                     subtitle: Text(error.toString()),
                   ),
@@ -714,10 +793,7 @@ class _PrivacySettingsTab extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.info_outline,
-                    color: AppColors.defaultBlue,
-                  ),
+                  const Icon(Icons.info_outline, color: AppColors.defaultBlue),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -754,11 +830,7 @@ class _PrivacySettingsTab extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.public,
-                        color: AppColors.green9,
-                        size: 20,
-                      ),
+                      Icon(Icons.public, color: AppColors.green9, size: 20),
                       const SizedBox(width: 8),
                       Text(
                         'Public Profile',
@@ -777,9 +849,9 @@ class _PrivacySettingsTab extends ConsumerWidget {
                     '• You can still control who messages you',
                     style: TextStyle(height: 1.4),
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   Row(
                     children: [
                       Icon(
@@ -886,10 +958,7 @@ class _LanguageSettingsTab extends ConsumerWidget {
             ),
             child: Row(
               children: [
-                const Icon(
-                  Icons.info_outline,
-                  color: AppColors.defaultBlue,
-                ),
+                const Icon(Icons.info_outline, color: AppColors.defaultBlue),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -919,25 +988,37 @@ class _LanguageSettingsTab extends ConsumerWidget {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.schedule, color: AppColors.onSurfaceVariant),
+                  leading: const Icon(
+                    Icons.schedule,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Date Format'),
                   subtitle: const Text('DD/MM/YYYY (Norwegian)'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Date format options coming soon')),
+                      const SnackBar(
+                        content: Text('Date format options coming soon'),
+                      ),
                     );
                   },
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.attach_money, color: AppColors.onSurfaceVariant),
+                  leading: const Icon(
+                    Icons.attach_money,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Currency'),
                   subtitle: const Text('NOK (Norwegian Krone)'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Currency is automatically set to NOK for BI students')),
+                      const SnackBar(
+                        content: Text(
+                          'Currency is automatically set to NOK for BI students',
+                        ),
+                      ),
                     );
                   },
                 ),

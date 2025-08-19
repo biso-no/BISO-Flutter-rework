@@ -13,7 +13,9 @@ Future<void> showMembershipPurchaseModal(
   required Color campusColor,
 }) async {
   try {
-    final membershipOptions = await ref.read(membershipProvider.notifier).getAvailableMemberships();
+    final membershipOptions = await ref
+        .read(membershipProvider.notifier)
+        .getAvailableMemberships();
 
     if (context.mounted) {
       showDialog(
@@ -23,35 +25,44 @@ Future<void> showMembershipPurchaseModal(
           studentId: studentId,
           campusColor: campusColor,
           membershipOptions: membershipOptions,
-          onPurchase: (MembershipPurchaseOption option, String paymentMethod, String? phoneNumber) async {
-            try {
-              await ref.read(membershipProvider.notifier).purchaseMembership(
-                membershipId: option.membershipId,
-                membershipName: option.displayName,
-                amount: option.priceNok,
-                paymentMethod: paymentMethod,
-                phoneNumber: phoneNumber,
-              );
+          onPurchase:
+              (
+                MembershipPurchaseOption option,
+                String paymentMethod,
+                String? phoneNumber,
+              ) async {
+                try {
+                  await ref
+                      .read(membershipProvider.notifier)
+                      .purchaseMembership(
+                        membershipId: option.membershipId,
+                        membershipName: option.displayName,
+                        amount: option.priceNok,
+                        paymentMethod: paymentMethod,
+                        phoneNumber: phoneNumber,
+                      );
 
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Membership purchase initiated! Complete payment to activate.'),
-                    backgroundColor: AppColors.green9,
-                  ),
-                );
-              }
-            } catch (e) {
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Purchase failed: ${e.toString()}'),
-                    backgroundColor: AppColors.error,
-                  ),
-                );
-              }
-            }
-          },
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Membership purchase initiated! Complete payment to activate.',
+                        ),
+                        backgroundColor: AppColors.green9,
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Purchase failed: ${e.toString()}'),
+                        backgroundColor: AppColors.error,
+                      ),
+                    );
+                  }
+                }
+              },
         ),
       );
     }
@@ -66,5 +77,3 @@ Future<void> showMembershipPurchaseModal(
     }
   }
 }
-
-

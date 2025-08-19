@@ -43,9 +43,10 @@ class _WonderousStoryCardState extends State<WonderousStoryCard>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.97).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.97,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -57,7 +58,7 @@ class _WonderousStoryCardState extends State<WonderousStoryCard>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return GestureDetector(
       onTapDown: (_) => _controller.forward(),
       onTapUp: (_) => _controller.reverse(),
@@ -109,7 +110,7 @@ class _WonderousStoryCardState extends State<WonderousStoryCard>
                       ),
                     ),
                   ),
-                  
+
                   // Hero illustration area
                   if (widget.heroWidget != null || widget.imagePath != null)
                     Positioned(
@@ -117,7 +118,8 @@ class _WonderousStoryCardState extends State<WonderousStoryCard>
                       right: 0,
                       bottom: 0,
                       width: widget.isLarge ? 140 : 100,
-                      child: widget.heroWidget ??
+                      child:
+                          widget.heroWidget ??
                           (widget.imagePath != null
                               ? Image.asset(
                                   widget.imagePath!,
@@ -127,12 +129,12 @@ class _WonderousStoryCardState extends State<WonderousStoryCard>
                                 )
                               : _buildFallbackIllustration()),
                     ),
-                  
+
                   // Content overlay
                   Positioned(
                     left: 20,
-                    right: widget.heroWidget != null || widget.imagePath != null 
-                        ? (widget.isLarge ? 160 : 120) 
+                    right: widget.heroWidget != null || widget.imagePath != null
+                        ? (widget.isLarge ? 160 : 120)
                         : 20,
                     top: 16,
                     bottom: 16,
@@ -154,9 +156,9 @@ class _WonderousStoryCardState extends State<WonderousStoryCard>
                             size: 16,
                           ),
                         ),
-                        
+
                         const SizedBox(height: 6),
-                        
+
                         // Title
                         Text(
                           widget.title,
@@ -168,9 +170,9 @@ class _WonderousStoryCardState extends State<WonderousStoryCard>
                           maxLines: widget.isLarge ? 2 : 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        
+
                         const SizedBox(height: 1),
-                        
+
                         // Subtitle
                         Text(
                           widget.subtitle,
@@ -181,7 +183,7 @@ class _WonderousStoryCardState extends State<WonderousStoryCard>
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        
+
                         // Description (for large cards)
                         if (widget.isLarge && widget.description != null) ...[
                           const SizedBox(height: 2),
@@ -195,12 +197,13 @@ class _WonderousStoryCardState extends State<WonderousStoryCard>
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
-                        
+
                         // Trailing widget or arrow (using Expanded to take remaining space)
                         Expanded(
                           child: Align(
                             alignment: Alignment.bottomRight,
-                            child: widget.trailing ??
+                            child:
+                                widget.trailing ??
                                 Container(
                                   width: 28,
                                   height: 28,
@@ -297,11 +300,7 @@ class WonderousEventCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Icon(
-            Icons.arrow_forward_ios,
-            color: Colors.white,
-            size: 16,
-          ),
+          const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
         ],
       ),
     );

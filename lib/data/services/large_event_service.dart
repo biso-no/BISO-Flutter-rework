@@ -14,10 +14,7 @@ class LargeEventService {
       final results = await RobustDocumentService.listDocumentsRobust(
         databaseId: AppConstants.databaseId,
         collectionId: collectionId,
-        queries: [
-          Query.equal('isActive', true),
-          Query.orderDesc('priority'),
-        ],
+        queries: [Query.equal('isActive', true), Query.orderDesc('priority')],
       );
 
       return results.map(LargeEventModel.fromMap).toList(growable: false);
@@ -52,5 +49,3 @@ class LargeEventService {
     });
   }
 }
-
-

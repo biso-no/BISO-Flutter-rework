@@ -35,7 +35,7 @@ class _WonderousBottomNavBarState extends State<WonderousBottomNavBar>
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    
+
     _animation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOutCubic,
@@ -87,9 +87,10 @@ class _WonderousBottomNavBarState extends State<WonderousBottomNavBar>
           AnimatedBuilder(
             animation: _animation,
             builder: (context, child) {
-              final itemWidth = MediaQuery.of(context).size.width / widget.items.length;
+              final itemWidth =
+                  MediaQuery.of(context).size.width / widget.items.length;
               final indicatorLeft = itemWidth * widget.currentIndex;
-              
+
               return Positioned(
                 left: indicatorLeft + itemWidth * 0.15,
                 top: 12,
@@ -120,9 +121,11 @@ class _WonderousBottomNavBarState extends State<WonderousBottomNavBar>
           AnimatedBuilder(
             animation: _rippleAnimation,
             builder: (context, child) {
-              final itemWidth = MediaQuery.of(context).size.width / widget.items.length;
-              final rippleLeft = itemWidth * widget.currentIndex + itemWidth * 0.5;
-              
+              final itemWidth =
+                  MediaQuery.of(context).size.width / widget.items.length;
+              final rippleLeft =
+                  itemWidth * widget.currentIndex + itemWidth * 0.5;
+
               return Positioned(
                 left: rippleLeft - 30,
                 top: 30,
@@ -147,7 +150,7 @@ class _WonderousBottomNavBarState extends State<WonderousBottomNavBar>
                 final index = entry.key;
                 final item = entry.value;
                 final isSelected = index == widget.currentIndex;
-                
+
                 return Expanded(
                   child: _WonderousNavButton(
                     item: item,
@@ -194,13 +197,9 @@ class _WonderousNavButtonState extends State<_WonderousNavButton>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _bounceAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.95,
-    ).animate(CurvedAnimation(
-      parent: _bounceController,
-      curve: Curves.easeInOut,
-    ));
+    _bounceAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -230,29 +229,35 @@ class _WonderousNavButtonState extends State<_WonderousNavButton>
                   animation: widget.animation,
                   builder: (context, child) {
                     return Transform.scale(
-                      scale: widget.isSelected ? 1.0 + (widget.animation.value * 0.1) : 1.0,
+                      scale: widget.isSelected
+                          ? 1.0 + (widget.animation.value * 0.1)
+                          : 1.0,
                       child: Icon(
-                        widget.isSelected ? widget.item.activeIcon : widget.item.icon,
+                        widget.isSelected
+                            ? widget.item.activeIcon
+                            : widget.item.icon,
                         size: 24,
-                        color: widget.isSelected 
-                            ? Colors.white 
+                        color: widget.isSelected
+                            ? Colors.white
                             : AppColors.stoneGray,
                       ),
                     );
                   },
                 ),
-                
+
                 const SizedBox(height: 4),
-                
+
                 // Label with premium styling
                 AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOutCubic,
                   style: TextStyle(
                     fontSize: 11,
-                    fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500,
-                    color: widget.isSelected 
-                        ? Colors.white 
+                    fontWeight: widget.isSelected
+                        ? FontWeight.w600
+                        : FontWeight.w500,
+                    color: widget.isSelected
+                        ? Colors.white
                         : AppColors.stoneGray,
                     fontFamily: 'Inter',
                   ),
@@ -297,7 +302,8 @@ class WonderousFloatingAction extends StatefulWidget {
   });
 
   @override
-  State<WonderousFloatingAction> createState() => _WonderousFloatingActionState();
+  State<WonderousFloatingAction> createState() =>
+      _WonderousFloatingActionState();
 }
 
 class _WonderousFloatingActionState extends State<WonderousFloatingAction>
@@ -313,12 +319,14 @@ class _WonderousFloatingActionState extends State<WonderousFloatingAction>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-    _rotationAnimation = Tween<double>(begin: 0.0, end: 0.1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _rotationAnimation = Tween<double>(
+      begin: 0.0,
+      end: 0.1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -353,7 +361,8 @@ class _WonderousFloatingActionState extends State<WonderousFloatingAction>
                 boxShadow: [
                   BoxShadow(
                     color: (widget.gradientColors ?? AppColors.eventGradient)
-                        .first.withValues(alpha: 0.4),
+                        .first
+                        .withValues(alpha: 0.4),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -364,11 +373,7 @@ class _WonderousFloatingActionState extends State<WonderousFloatingAction>
                   ),
                 ],
               ),
-              child: Icon(
-                widget.icon,
-                color: Colors.white,
-                size: 28,
-              ),
+              child: Icon(widget.icon, color: Colors.white, size: 28),
             ),
           ),
         ),

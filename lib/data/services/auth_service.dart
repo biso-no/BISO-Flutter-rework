@@ -10,31 +10,40 @@ import 'student_service.dart';
 import '../../core/logging/app_logger.dart';
 
 import '../../core/logging/print_migration.dart';
+
 class AuthService {
   // Using simplified global Appwrite instances
   Account get _account => account;
   Databases get _databases => databases;
   Storage get _storage => storage;
-  
+
   // Student service for managing student verification
   final StudentService _studentService = StudentService();
 
   Future<String> sendOtp(String email) async {
     try {
-      AppLogger.auth('Creating OTP for user', action: 'send_otp', extra: {
-        'email': email.replaceAll(RegExp(r'(.{2}).*(@.*)'), r'\1***\2'), // Mask email for privacy
-      });
-      
+      AppLogger.auth(
+        'Creating OTP for user',
+        action: 'send_otp',
+        extra: {
+          'email': email.replaceAll(
+            RegExp(r'(.{2}).*(@.*)'),
+            r'\1***\2',
+          ), // Mask email for privacy
+        },
+      );
+
       // Generate a unique ID for this OTP session
       final userId = ID.unique();
-      
+
       final token = await _account.createEmailToken(
         userId: userId,
         email: email,
       );
-      
-      AppLogger.auth('OTP token created successfully', 
-        userId: token.userId, 
+
+      AppLogger.auth(
+        'OTP token created successfully',
+        userId: token.userId,
         action: 'otp_created',
         extra: {
           'token_user_id': token.userId,
@@ -42,7 +51,7 @@ class AuthService {
           'ids_match': userId == token.userId,
         },
       );
-      
+
       return token.userId;
     } on AppwriteException catch (e) {
       throw AuthException('Failed to send OTP: ${e.message}');
@@ -52,7 +61,9 @@ class AuthService {
   }
 
   Future<UserModel> verifyOtp(String userId, String secret) async {
-    logPrint('🔥 DEBUG: Starting verifyOtp with userId: $userId, secret: $secret');
+    logPrint(
+      '🔥 DEBUG: Starting verifyOtp with userId: $userId, secret: $secret',
+    );
     try {
       // Create session with OTP
       logPrint('🔥 DEBUG: About to call _account.createSession...');
@@ -83,13 +94,16 @@ class AuthService {
         // User profile doesn't exist, will need onboarding
       }
 
-      return userProfile ?? UserModel(
-        id: accountUser.$id,
-        name: accountUser.name,
-        email: accountUser.email,
-      );
+      return userProfile ??
+          UserModel(
+            id: accountUser.$id,
+            name: accountUser.name,
+            email: accountUser.email,
+          );
     } on AppwriteException catch (e) {
-      logPrint('🔥 DEBUG: AppwriteException - Code: ${e.code}, Message: ${e.message}');
+      logPrint(
+        '🔥 DEBUG: AppwriteException - Code: ${e.code}, Message: ${e.message}',
+      );
       logPrint('🔥 DEBUG: AppwriteException - Type: ${e.type}');
       logPrint('🔥 DEBUG: AppwriteException - Response: ${e.response}');
       throw AuthException('Invalid verification code: ${e.message}');
@@ -102,15 +116,26 @@ class AuthService {
   Future<UserModel?> getCurrentUser() async {
     try {
       final accountUser = await _account.get();
-      
+
       try {
         final doc = await _databases.getDocument(
           databaseId: AppConstants.databaseId,
           collectionId: 'user',
           documentId: accountUser.$id,
           queries: [
-            Query.select(['name', 'email', 'phone', 'address', 'city', 'zip', 'campus_id', 'avatar', '\$id', 'student_id'])
-          ]
+            Query.select([
+              'name',
+              'email',
+              'phone',
+              'address',
+              'city',
+              'zip',
+              'campus_id',
+              'avatar',
+              '\$id',
+              'student_id',
+            ]),
+          ],
         );
         return UserModel.fromMap(doc.data);
       } catch (e) {
@@ -149,7 +174,7 @@ class AuthService {
     } catch (e) {
       // Session might not exist, which is fine
     }
-    
+
     try {
       // Also try to delete all sessions to be thorough
       await _account.deleteSessions();
@@ -170,7 +195,7 @@ class AuthService {
   }) async {
     try {
       final accountUser = await _account.get();
-      
+
       final userData = {
         'name': name,
         'email': accountUser.email,
@@ -274,7 +299,9 @@ class AuthService {
       // Delete any existing avatar for this user
       try {
         final existingFiles = await _storage.listFiles(bucketId: 'avatars');
-        final userAvatars = existingFiles.files.where((file) => file.name.startsWith('avatar_$userId'));
+        final userAvatars = existingFiles.files.where(
+          (file) => file.name.startsWith('avatar_$userId'),
+        );
         for (final file in userAvatars) {
           await _storage.deleteFile(bucketId: 'avatars', fileId: file.$id);
         }
@@ -284,8 +311,9 @@ class AuthService {
       }
 
       // Create a unique file ID for this avatar
-      final fileId = 'avatar_${userId}_${DateTime.now().millisecondsSinceEpoch}';
-      
+      final fileId =
+          'avatar_${userId}_${DateTime.now().millisecondsSinceEpoch}';
+
       // Prepare the file for upload
       InputFile inputFile;
       if (avatarFile is XFile) {
@@ -310,8 +338,9 @@ class AuthService {
       );
 
       // Generate the file URL for viewing
-      final fileUrl = '${AppConstants.appwriteEndpoint}/storage/buckets/avatars/files/${file.$id}/view?project=${AppConstants.appwriteProjectId}';
-      
+      final fileUrl =
+          '${AppConstants.appwriteEndpoint}/storage/buckets/avatars/files/${file.$id}/view?project=${AppConstants.appwriteProjectId}';
+
       logPrint('✅ Avatar uploaded successfully: $fileUrl');
       return fileUrl;
     } on AppwriteException catch (e) {
@@ -334,7 +363,6 @@ class AuthService {
       throw AuthException('Student ID registration failed: $e');
     }
   }
-
 
   /// Check membership status for a student
   Future<bool> checkMembershipStatus(String studentNumber) async {
@@ -407,8 +435,9 @@ class AuthService {
         throw AuthException('User not authenticated');
       }
 
-      AppLogger.auth('Updating payment information', 
-        userId: currentUser.id, 
+      AppLogger.auth(
+        'Updating payment information',
+        userId: currentUser.id,
         action: 'update_payment_info',
         extra: {
           'has_bank_account': bankAccount.isNotEmpty,
@@ -417,9 +446,7 @@ class AuthService {
       );
 
       // Prepare update data
-      final updateData = <String, dynamic>{
-        'bank_account': bankAccount,
-      };
+      final updateData = <String, dynamic>{'bank_account': bankAccount};
 
       // Only include SWIFT if provided, otherwise set to null
       updateData['swift'] = swift?.isNotEmpty == true ? swift : null;
@@ -432,8 +459,9 @@ class AuthService {
         data: updateData,
       );
 
-      AppLogger.auth('Payment information updated successfully', 
-        userId: currentUser.id, 
+      AppLogger.auth(
+        'Payment information updated successfully',
+        userId: currentUser.id,
         action: 'payment_info_updated',
       );
 

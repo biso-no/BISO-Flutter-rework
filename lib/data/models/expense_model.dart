@@ -6,18 +6,21 @@ class ExpenseModel extends Equatable {
   final String id;
   final String userId; // Required - matches userId field
   final String campus; // Required - matches campus field
-  final String department; // Required - matches department field  
-  final String bankAccount; // Required - matches bank_account field (Norwegian 11-digit format)
+  final String department; // Required - matches department field
+  final String
+  bankAccount; // Required - matches bank_account field (Norwegian 11-digit format)
   final String? description; // Optional - matches description field
   final double total; // Required - matches total field
   final double? prepaymentAmount; // Optional - matches prepayment_amount field
-  final String status; // Enum - matches status field (pending, approved, rejected, paid)
+  final String
+  status; // Enum - matches status field (pending, approved, rejected, paid)
   final int? invoiceId; // Optional - matches invoice_id field
   final String? eventName; // Optional - matches eventName field
-  final List<ExpenseAttachmentModel> expenseAttachments; // Relationship - matches expenseAttachments relationship
+  final List<ExpenseAttachmentModel>
+  expenseAttachments; // Relationship - matches expenseAttachments relationship
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  
+
   // Additional fields for UI/display purposes
   final String? userName;
   final String? userEmail;
@@ -60,8 +63,11 @@ class ExpenseModel extends Equatable {
     if (map['expenseAttachments'] != null) {
       if (map['expenseAttachments'] is List) {
         attachments = (map['expenseAttachments'] as List)
-            .map((attachment) => ExpenseAttachmentModel.fromMap(
-                attachment is Map<String, dynamic> ? attachment : {}))
+            .map(
+              (attachment) => ExpenseAttachmentModel.fromMap(
+                attachment is Map<String, dynamic> ? attachment : {},
+              ),
+            )
             .toList();
       }
     }
@@ -74,15 +80,19 @@ class ExpenseModel extends Equatable {
       bankAccount: map['bank_account'] ?? '',
       description: map['description'],
       total: (map['total'] ?? 0).toDouble(),
-      prepaymentAmount: map['prepayment_amount'] != null 
-          ? (map['prepayment_amount']).toDouble() 
+      prepaymentAmount: map['prepayment_amount'] != null
+          ? (map['prepayment_amount']).toDouble()
           : null,
       status: map['status'] ?? 'pending',
       invoiceId: map['invoice_id'],
       eventName: map['eventName'],
       expenseAttachments: attachments,
-      createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
-      updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
+      createdAt: map['\$createdAt'] != null
+          ? DateTime.parse(map['\$createdAt'])
+          : null,
+      updatedAt: map['\$updatedAt'] != null
+          ? DateTime.parse(map['\$updatedAt'])
+          : null,
       // UI/display fields (might come from relationships or be populated separately)
       userName: map['user_name'],
       userEmail: map['user_email'],
@@ -90,7 +100,9 @@ class ExpenseModel extends Equatable {
       rejectionReason: map['rejection_reason'],
       approverUserId: map['approver_user_id'],
       approverName: map['approver_name'],
-      approvedAt: map['approved_at'] != null ? DateTime.parse(map['approved_at']) : null,
+      approvedAt: map['approved_at'] != null
+          ? DateTime.parse(map['approved_at'])
+          : null,
       paidAt: map['paid_at'] != null ? DateTime.parse(map['paid_at']) : null,
     );
   }
@@ -108,7 +120,7 @@ class ExpenseModel extends Equatable {
       if (invoiceId != null) 'invoice_id': invoiceId,
       if (eventName != null) 'eventName': eventName,
       // Note: expenseAttachments relationship is handled separately
-      
+
       // Additional UI fields (not part of core schema)
       if (rejectionReason != null) 'rejection_reason': rejectionReason,
       if (approverUserId != null) 'approver_user_id': approverUserId,
@@ -175,46 +187,57 @@ class ExpenseModel extends Equatable {
   bool get isApproved => status == 'approved';
   bool get isRejected => status == 'rejected';
   bool get isPaid => status == 'paid';
-  
+
   // UI helpers
   bool get canEdit => isPending;
   bool get canSubmit => isPending && expenseAttachments.isNotEmpty;
   bool get hasPrepayment => prepaymentAmount != null && prepaymentAmount! > 0;
-  
+
   String get formattedTotal => 'NOK ${total.toStringAsFixed(2)}';
   String get formattedAmount => formattedTotal; // Backwards compatibility
-  
+
   String get displayStatus {
     switch (status) {
-      case 'pending': return 'Pending';
-      case 'approved': return 'Approved';
-      case 'rejected': return 'Rejected';
-      case 'paid': return 'Paid';
-      default: return status.toUpperCase();
+      case 'pending':
+        return 'Pending';
+      case 'approved':
+        return 'Approved';
+      case 'rejected':
+        return 'Rejected';
+      case 'paid':
+        return 'Paid';
+      default:
+        return status.toUpperCase();
     }
   }
-  
+
   // Get display name for department
   String get displayDepartment => departmentName ?? department;
-  
+
   // Get attachment count
   int get attachmentCount => expenseAttachments.length;
-  
+
   // Get attachment file names for backward compatibility
   List<String> get attachments => expenseAttachments
       .where((attachment) => attachment.url != null)
       .map((attachment) => attachment.url!.split('/').last)
       .toList();
-      
+
   // Category-like display based on description or department
   String get displayCategory {
     if (description != null) {
       final desc = description!.toLowerCase();
-      if (desc.contains('travel') || desc.contains('taxi') || desc.contains('transport')) {
+      if (desc.contains('travel') ||
+          desc.contains('taxi') ||
+          desc.contains('transport')) {
         return 'Travel';
-      } else if (desc.contains('food') || desc.contains('catering') || desc.contains('meal')) {
+      } else if (desc.contains('food') ||
+          desc.contains('catering') ||
+          desc.contains('meal')) {
         return 'Food & Beverages';
-      } else if (desc.contains('supplies') || desc.contains('office') || desc.contains('equipment')) {
+      } else if (desc.contains('supplies') ||
+          desc.contains('office') ||
+          desc.contains('equipment')) {
         return 'Supplies';
       } else if (desc.contains('event')) {
         return 'Event Expenses';
@@ -222,25 +245,31 @@ class ExpenseModel extends Equatable {
     }
     return 'Other';
   }
-  
+
   // Get category for icon/color matching (backwards compatibility)
   String get category {
     final desc = description?.toLowerCase() ?? '';
-    if (desc.contains('travel') || desc.contains('taxi') || desc.contains('transport')) {
+    if (desc.contains('travel') ||
+        desc.contains('taxi') ||
+        desc.contains('transport')) {
       return 'travel';
-    } else if (desc.contains('food') || desc.contains('catering') || desc.contains('meal')) {
+    } else if (desc.contains('food') ||
+        desc.contains('catering') ||
+        desc.contains('meal')) {
       return 'food';
-    } else if (desc.contains('supplies') || desc.contains('office') || desc.contains('equipment')) {
+    } else if (desc.contains('supplies') ||
+        desc.contains('office') ||
+        desc.contains('equipment')) {
       return 'supplies';
     } else if (desc.contains('event')) {
       return 'event';
     }
     return 'other';
   }
-  
+
   // Expense date (for now use createdAt, can be enhanced later)
   DateTime get expenseDate => createdAt ?? DateTime.now();
-  
+
   // Prepayment flag for backward compatibility
   bool get isPrepayment => hasPrepayment;
 
@@ -248,19 +277,19 @@ class ExpenseModel extends Equatable {
   bool get isValidBankAccount {
     if (bankAccount.length != 11) return false;
     if (!RegExp(r'^\d+$').hasMatch(bankAccount)) return false;
-    
+
     // MOD11 validation for Norwegian bank accounts
     final digits = bankAccount.split('').map(int.parse).toList();
     final weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1];
     int sum = 0;
-    
+
     for (int i = 0; i < digits.length; i++) {
       sum += digits[i] * weights[i];
     }
-    
+
     return sum % 11 == 0;
   }
-  
+
   // Format bank account for display (XXXX XX XXXXX)
   String get formattedBankAccount {
     if (bankAccount.length == 11) {

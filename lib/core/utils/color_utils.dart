@@ -11,5 +11,3 @@ Color parseHexColor(String hexColor) {
     return const Color(0xFF3DA9E0); // fallback to brand blue
   }
 }
-
-

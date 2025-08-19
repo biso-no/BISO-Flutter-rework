@@ -38,55 +38,71 @@ class ChatSettingsTab extends ConsumerWidget {
                 // Chat notifications with permission status
                 notificationPrefs.when(
                   data: (prefs) => SwitchListTile(
-                    secondary: const Icon(Icons.notifications, color: AppColors.onSurfaceVariant),
+                    secondary: const Icon(
+                      Icons.notifications,
+                      color: AppColors.onSurfaceVariant,
+                    ),
                     title: const Text('Chat Notifications'),
                     subtitle: notificationStatus.when(
                       data: (enabled) => Text(
-                        enabled 
-                          ? 'Receive notifications for new messages'
-                          : 'Enable system notifications first'
+                        enabled
+                            ? 'Receive notifications for new messages'
+                            : 'Enable system notifications first',
                       ),
                       loading: () => const Text('Checking permissions...'),
-                      error: (_, __) => const Text('Receive notifications for new messages'),
+                      error: (_, _) =>
+                          const Text('Receive notifications for new messages'),
                     ),
                     value: prefs['chat_notifications'] ?? true,
                     onChanged: notificationStatus.when(
-                      data: (systemEnabled) => systemEnabled 
-                        ? (value) async {
-                            try {
-                              await ref.read(notificationPreferencesProvider.notifier)
-                                .updateChatNotifications(value);
-                            } catch (e) {
-                              if (context.mounted) {
+                      data: (systemEnabled) => systemEnabled
+                          ? (value) async {
+                              try {
+                                await ref
+                                    .read(
+                                      notificationPreferencesProvider.notifier,
+                                    )
+                                    .updateChatNotifications(value);
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Failed to update setting: $e',
+                                      ),
+                                      backgroundColor: AppColors.error,
+                                    ),
+                                  );
+                                }
+                              }
+                            }
+                          : (value) async {
+                              // Request permissions first
+                              final service = ref.read(
+                                notificationServiceProvider,
+                              );
+                              final granted = await service.requestPermission();
+                              if (granted && value) {
+                                await ref
+                                    .read(
+                                      notificationPreferencesProvider.notifier,
+                                    )
+                                    .updateChatNotifications(true);
+                                // Refresh permission status
+                                ref.invalidate(notificationStatusProvider);
+                              } else if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Failed to update setting: $e'),
+                                  const SnackBar(
+                                    content: Text(
+                                      'Please enable notifications in system settings',
+                                    ),
                                     backgroundColor: AppColors.error,
                                   ),
                                 );
                               }
-                            }
-                          }
-                        : (value) async {
-                            // Request permissions first
-                            final service = ref.read(notificationServiceProvider);
-                            final granted = await service.requestPermission();
-                            if (granted && value) {
-                              await ref.read(notificationPreferencesProvider.notifier)
-                                .updateChatNotifications(true);
-                              // Refresh permission status
-                              ref.invalidate(notificationStatusProvider);
-                            } else if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Please enable notifications in system settings'),
-                                  backgroundColor: AppColors.error,
-                                ),
-                              );
-                            }
-                          },
+                            },
                       loading: () => null,
-                      error: (_, __) => null,
+                      error: (_, _) => null,
                     ),
                     activeColor: _getCampusColor(selectedCampus.id),
                   ),
@@ -95,30 +111,43 @@ class ChatSettingsTab extends ConsumerWidget {
                     title: Text('Loading notification settings...'),
                   ),
                   error: (error, _) => ListTile(
-                    leading: const Icon(Icons.error_outline, color: AppColors.error),
+                    leading: const Icon(
+                      Icons.error_outline,
+                      color: AppColors.error,
+                    ),
                     title: const Text('Error loading notification settings'),
                     subtitle: Text(error.toString()),
                   ),
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
-                  secondary: const Icon(Icons.vibration, color: AppColors.onSurfaceVariant),
+                  secondary: const Icon(
+                    Icons.vibration,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Vibration'),
                   subtitle: const Text('Vibrate for new messages'),
                   value: settingsState.notifications['chat_vibration'] ?? true,
                   onChanged: (value) {
-                    ref.read(appSettingsProvider.notifier).setNotification('chat_vibration', value);
+                    ref
+                        .read(appSettingsProvider.notifier)
+                        .setNotification('chat_vibration', value);
                   },
                   activeColor: _getCampusColor(selectedCampus.id),
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
-                  secondary: const Icon(Icons.volume_up, color: AppColors.onSurfaceVariant),
+                  secondary: const Icon(
+                    Icons.volume_up,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Sound'),
                   subtitle: const Text('Play sound for new messages'),
                   value: settingsState.notifications['chat_sound'] ?? true,
                   onChanged: (value) {
-                    ref.read(appSettingsProvider.notifier).setNotification('chat_sound', value);
+                    ref
+                        .read(appSettingsProvider.notifier)
+                        .setNotification('chat_sound', value);
                   },
                   activeColor: _getCampusColor(selectedCampus.id),
                 ),
@@ -142,34 +171,52 @@ class ChatSettingsTab extends ConsumerWidget {
             child: Column(
               children: [
                 SwitchListTile(
-                  secondary: const Icon(Icons.visibility, color: AppColors.onSurfaceVariant),
+                  secondary: const Icon(
+                    Icons.visibility,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Read Receipts'),
-                  subtitle: const Text('Let others know when you\'ve read their messages'),
+                  subtitle: const Text(
+                    'Let others know when you\'ve read their messages',
+                  ),
                   value: settingsState.notifications['read_receipts'] ?? true,
                   onChanged: (value) {
-                    ref.read(appSettingsProvider.notifier).setNotification('read_receipts', value);
+                    ref
+                        .read(appSettingsProvider.notifier)
+                        .setNotification('read_receipts', value);
                   },
                   activeColor: _getCampusColor(selectedCampus.id),
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
-                  secondary: const Icon(Icons.edit, color: AppColors.onSurfaceVariant),
+                  secondary: const Icon(
+                    Icons.edit,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Typing Indicators'),
                   subtitle: const Text('Show when you\'re typing'),
-                  value: settingsState.notifications['typing_indicators'] ?? true,
+                  value:
+                      settingsState.notifications['typing_indicators'] ?? true,
                   onChanged: (value) {
-                    ref.read(appSettingsProvider.notifier).setNotification('typing_indicators', value);
+                    ref
+                        .read(appSettingsProvider.notifier)
+                        .setNotification('typing_indicators', value);
                   },
                   activeColor: _getCampusColor(selectedCampus.id),
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
-                  secondary: const Icon(Icons.access_time, color: AppColors.onSurfaceVariant),
+                  secondary: const Icon(
+                    Icons.access_time,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Last Seen'),
                   subtitle: const Text('Show your last seen status'),
                   value: settingsState.notifications['last_seen'] ?? true,
                   onChanged: (value) {
-                    ref.read(appSettingsProvider.notifier).setNotification('last_seen', value);
+                    ref
+                        .read(appSettingsProvider.notifier)
+                        .setNotification('last_seen', value);
                   },
                   activeColor: _getCampusColor(selectedCampus.id),
                 ),
@@ -193,25 +240,37 @@ class ChatSettingsTab extends ConsumerWidget {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.auto_delete, color: AppColors.onSurfaceVariant),
+                  leading: const Icon(
+                    Icons.auto_delete,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Auto-delete Messages'),
                   subtitle: const Text('Automatically delete old messages'),
                   trailing: const Text('Never'),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Auto-delete options coming soon')),
+                      const SnackBar(
+                        content: Text('Auto-delete options coming soon'),
+                      ),
                     );
                   },
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.download, color: AppColors.onSurfaceVariant),
+                  leading: const Icon(
+                    Icons.download,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                   title: const Text('Auto-download Media'),
-                  subtitle: const Text('Download photos and files automatically'),
+                  subtitle: const Text(
+                    'Download photos and files automatically',
+                  ),
                   trailing: const Text('Wi-Fi only'),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Auto-download options coming soon')),
+                      const SnackBar(
+                        content: Text('Auto-download options coming soon'),
+                      ),
                     );
                   },
                 ),
@@ -229,10 +288,7 @@ class ChatSettingsTab extends ConsumerWidget {
             ),
             child: Row(
               children: [
-                const Icon(
-                  Icons.info_outline,
-                  color: AppColors.defaultBlue,
-                ),
+                const Icon(Icons.info_outline, color: AppColors.defaultBlue),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(

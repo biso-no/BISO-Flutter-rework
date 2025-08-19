@@ -21,9 +21,9 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
       duration: const Duration(seconds: 3),
       vsync: this,
     );
-    
+
     _animationController.repeat();
-    
+
     // Simulate progressing through steps
     _startStepProgression();
   }
@@ -34,13 +34,13 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
         setState(() => _currentStep = 1);
       }
     });
-    
+
     Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
         setState(() => _currentStep = 2);
       }
     });
-    
+
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
         setState(() => _currentStep = 3);
@@ -58,7 +58,7 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -82,8 +82,11 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: (isDark ? AppColors.shadowHeavy : AppColors.shadowLight)
-                          .withValues(alpha: 0.1),
+                      color:
+                          (isDark
+                                  ? AppColors.shadowHeavy
+                                  : AppColors.shadowLight)
+                              .withValues(alpha: 0.1),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -115,10 +118,7 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: LinearGradient(
-          colors: [
-            AppColors.crystalBlue,
-            AppColors.emeraldGreen,
-          ],
+          colors: [AppColors.crystalBlue, AppColors.emeraldGreen],
         ),
         boxShadow: [
           BoxShadow(
@@ -197,10 +197,7 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               gradient: const LinearGradient(
-                colors: [
-                  AppColors.crystalBlue,
-                  AppColors.emeraldGreen,
-                ],
+                colors: [AppColors.crystalBlue, AppColors.emeraldGreen],
               ),
             ),
             child: const Icon(
@@ -265,7 +262,7 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
       final (emoji, description) = entry.value;
       final isActive = index <= _currentStep;
       final isCompleted = index < _currentStep;
-      
+
       return Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: Row(
@@ -275,19 +272,16 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
               width: 6,
               height: 6,
               decoration: BoxDecoration(
-                color: isCompleted 
-                    ? AppColors.emeraldGreen 
-                    : isActive 
-                        ? AppColors.crystalBlue 
-                        : AppColors.outline.withValues(alpha: 0.3),
+                color: isCompleted
+                    ? AppColors.emeraldGreen
+                    : isActive
+                    ? AppColors.crystalBlue
+                    : AppColors.outline.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
             const SizedBox(width: 12),
-            Text(
-              emoji,
-              style: TextStyle(fontSize: 14),
-            ),
+            Text(emoji, style: TextStyle(fontSize: 14)),
             const SizedBox(width: 8),
             Expanded(
               child: AnimatedOpacity(
@@ -296,9 +290,7 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
                 child: Text(
                   description,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: isActive 
-                        ? AppColors.onSurface
-                        : AppColors.outline,
+                    color: isActive ? AppColors.onSurface : AppColors.outline,
                     fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
                   ),
                 ),
@@ -310,7 +302,9 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
                 height: 12,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.crystalBlue),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.crystalBlue,
+                  ),
                 ),
               )
             else if (isCompleted)
@@ -329,7 +323,9 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: (isDark ? AppColors.surfaceDark : AppColors.white).withValues(alpha: 0.5),
+        color: (isDark ? AppColors.surfaceDark : AppColors.white).withValues(
+          alpha: 0.5,
+        ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.outline.withValues(alpha: 0.2),
@@ -341,11 +337,7 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
         children: [
           Row(
             children: [
-              Icon(
-                Icons.preview_rounded,
-                size: 16,
-                color: AppColors.outline,
-              ),
+              Icon(Icons.preview_rounded, size: 16, color: AppColors.outline),
               const SizedBox(width: 8),
               Text(
                 'Content Preview',
@@ -358,13 +350,16 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
           ),
           const SizedBox(height: 12),
           // Animated skeleton loading bars
-          ...List.generate(3, (index) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: _buildSkeletonLine(
-              width: [0.9, 0.7, 0.5][index],
-              delay: Duration(milliseconds: index * 200),
+          ...List.generate(
+            3,
+            (index) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _buildSkeletonLine(
+                width: [0.9, 0.7, 0.5][index],
+                delay: Duration(milliseconds: index * 200),
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );
@@ -375,7 +370,8 @@ class _SharePointSearchWidgetState extends State<SharePointSearchWidget>
       animation: _animationController,
       builder: (context, child) {
         // Create shimmer effect
-        final shimmerValue = (_animationController.value + delay.inMilliseconds / 1000) % 1.0;
+        final shimmerValue =
+            (_animationController.value + delay.inMilliseconds / 1000) % 1.0;
         return Container(
           height: 12,
           width: MediaQuery.of(context).size.width * width,

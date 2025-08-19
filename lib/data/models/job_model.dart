@@ -8,8 +8,10 @@ class JobModel extends Equatable {
   final String departmentId;
   final String? departmentLogo;
   final String campusId;
-  final String type; // 'volunteer', 'paid', 'internship', 'part_time', 'full_time'
-  final String category; // 'event_help', 'marketing', 'tech', 'administration', etc.
+  final String
+  type; // 'volunteer', 'paid', 'internship', 'part_time', 'full_time'
+  final String
+  category; // 'event_help', 'marketing', 'tech', 'administration', etc.
   final List<String> requirements;
   final List<String> responsibilities;
   final List<String> skills; // Required skills
@@ -72,15 +74,20 @@ class JobModel extends Equatable {
   });
 
   // Create from the Appwrite Function jobs payload (WordPress-backed)
-  factory JobModel.fromFunctionJob(Map<String, dynamic> map, {required String campusId}) {
+  factory JobModel.fromFunctionJob(
+    Map<String, dynamic> map, {
+    required String campusId,
+  }) {
     // Transformed function returns: id, title, description (cleaned), campus (array), type (array), interests (array), expiry_date, url
     final typeList = map['type'] as List<dynamic>? ?? [];
     final interestsList = map['interests'] as List<dynamic>? ?? [];
     final campusList = map['campus'] as List<dynamic>? ?? [];
-    
+
     // Extract department from type array or use first item
-    final department = typeList.isNotEmpty ? _decodeHtmlEntities(typeList.first.toString()) : 'BISO';
-    
+    final department = typeList.isNotEmpty
+        ? _decodeHtmlEntities(typeList.first.toString())
+        : 'BISO';
+
     return JobModel(
       id: (map['id'] ?? '').toString(),
       title: _decodeHtmlEntities((map['title'] ?? '').toString()),
@@ -90,16 +97,24 @@ class JobModel extends Equatable {
       departmentLogo: null,
       campusId: campusId,
       type: 'volunteer',
-      category: typeList.isNotEmpty ? _decodeHtmlEntities(typeList.first.toString()) : 'general',
-      requirements: List<String>.from(interestsList.map((e) => _decodeHtmlEntities(e.toString()))),
+      category: typeList.isNotEmpty
+          ? _decodeHtmlEntities(typeList.first.toString())
+          : 'general',
+      requirements: List<String>.from(
+        interestsList.map((e) => _decodeHtmlEntities(e.toString())),
+      ),
       responsibilities: const <String>[],
-      skills: List<String>.from(typeList.map((e) => _decodeHtmlEntities(e.toString()))),
+      skills: List<String>.from(
+        typeList.map((e) => _decodeHtmlEntities(e.toString())),
+      ),
       salary: null,
       timeCommitment: null,
       startDate: DateTime.now(),
       endDate: null,
       url: map['url']?.toString() ?? '',
-      applicationDeadline: DateTime.tryParse((map['expiry_date'] ?? '').toString()) ?? DateTime.now().add(const Duration(days: 14)),
+      applicationDeadline:
+          DateTime.tryParse((map['expiry_date'] ?? '').toString()) ??
+          DateTime.now().add(const Duration(days: 14)),
       applicationMethod: 'external',
       applicationUrl: map['url']?.toString(),
       applicationEmail: null,
@@ -121,7 +136,6 @@ class JobModel extends Equatable {
       updatedAt: null,
     );
   }
-
 
   factory JobModel.fromMap(Map<String, dynamic> map) {
     return JobModel(
@@ -156,8 +170,12 @@ class JobModel extends Equatable {
       isFeatured: map['is_featured'] ?? false,
       benefits: List<String>.from(map['benefits'] ?? []),
       metadata: Map<String, dynamic>.from(map['metadata'] ?? {}),
-      createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
-      updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
+      createdAt: map['\$createdAt'] != null
+          ? DateTime.parse(map['\$createdAt'])
+          : null,
+      updatedAt: map['\$updatedAt'] != null
+          ? DateTime.parse(map['\$updatedAt'])
+          : null,
     );
   }
 
@@ -272,34 +290,72 @@ class JobModel extends Equatable {
   bool get isClosed => status == 'closed';
   bool get isFilled => status == 'filled';
   bool get isCancelled => status == 'cancelled';
-  bool get canApply => isOpen && (maxApplicants == 0 || currentApplicants < maxApplicants) && 
-                      applicationDeadline.isAfter(DateTime.now());
-  bool get isPaid => type == 'paid' || type == 'internship' || type == 'part_time' || type == 'full_time';
+  bool get canApply =>
+      isOpen &&
+      (maxApplicants == 0 || currentApplicants < maxApplicants) &&
+      applicationDeadline.isAfter(DateTime.now());
+  bool get isPaid =>
+      type == 'paid' ||
+      type == 'internship' ||
+      type == 'part_time' ||
+      type == 'full_time';
   String get displayType {
     switch (type) {
-      case 'volunteer': return 'Volunteer';
-      case 'paid': return 'Paid Position';
-      case 'internship': return 'Internship';
-      case 'part_time': return 'Part Time';
-      case 'full_time': return 'Full Time';
-      default: return type;
+      case 'volunteer':
+        return 'Volunteer';
+      case 'paid':
+        return 'Paid Position';
+      case 'internship':
+        return 'Internship';
+      case 'part_time':
+        return 'Part Time';
+      case 'full_time':
+        return 'Full Time';
+      default:
+        return type;
     }
   }
 
   @override
   List<Object?> get props => [
-    id, title, description, department, departmentId, departmentLogo,
-    campusId, type, category, requirements, responsibilities, skills,
-    salary, timeCommitment, startDate, endDate, applicationDeadline,
-    applicationMethod, applicationUrl, applicationEmail, contactPersonName,
-    contactPersonEmail, contactPersonPhone, maxApplicants, currentApplicants,
-    status, isUrgent, isFeatured, benefits, metadata, createdAt, updatedAt,
+    id,
+    title,
+    description,
+    department,
+    departmentId,
+    departmentLogo,
+    campusId,
+    type,
+    category,
+    requirements,
+    responsibilities,
+    skills,
+    salary,
+    timeCommitment,
+    startDate,
+    endDate,
+    applicationDeadline,
+    applicationMethod,
+    applicationUrl,
+    applicationEmail,
+    contactPersonName,
+    contactPersonEmail,
+    contactPersonPhone,
+    maxApplicants,
+    currentApplicants,
+    status,
+    isUrgent,
+    isFeatured,
+    benefits,
+    metadata,
+    createdAt,
+    updatedAt,
   ];
 
   /// Decode HTML entities from WordPress content
   static String _decodeHtmlEntities(String text) {
     if (text.isEmpty) return text;
-    
+
     return text
         .replaceAll('&amp;', '&')
         .replaceAll('&lt;', '<')

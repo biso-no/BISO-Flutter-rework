@@ -13,10 +13,12 @@ class ControllerModeScreen extends ConsumerStatefulWidget {
   const ControllerModeScreen({super.key});
 
   @override
-  ConsumerState<ControllerModeScreen> createState() => _ControllerModeScreenState();
+  ConsumerState<ControllerModeScreen> createState() =>
+      _ControllerModeScreenState();
 }
 
-class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> with TickerProviderStateMixin {
+class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen>
+    with TickerProviderStateMixin {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   MobileScannerController? controller;
   bool _isFlashOn = false;
@@ -24,12 +26,12 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
   ValidationResultModel? _lastResult;
   String? _lastError;
   DateTime? _lastScanTime;
-  
+
   // Animation controllers
   late AnimationController _scanLineController;
   late AnimationController _resultController;
   late AnimationController _pulseController;
-  
+
   // Animations
   late Animation<double> _scanLineAnimation;
   late Animation<double> _resultAnimation;
@@ -87,7 +89,10 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Validator Mode', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Validator Mode',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
@@ -111,11 +116,7 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                Icon(
-                  Icons.qr_code_scanner,
-                  color: campusColor,
-                  size: 48,
-                ),
+                Icon(Icons.qr_code_scanner, color: campusColor, size: 48),
                 const SizedBox(height: 16),
                 Text(
                   'Scan Student QR Code',
@@ -127,9 +128,9 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
                 const SizedBox(height: 8),
                 Text(
                   'Point camera at student\'s QR code to verify membership',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.white70,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -146,7 +147,7 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
                   controller: controller,
                   onDetect: _onQRDetected,
                 ),
-                
+
                 // Custom overlay
                 Positioned.fill(
                   child: CustomPaint(
@@ -192,9 +193,8 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
                               const SizedBox(height: 16),
                               Text(
                                 'Verifying membership...',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.w600),
                               ),
                             ],
                           ),
@@ -213,9 +213,7 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
                           scale: _resultAnimation.value,
                           child: Container(
                             color: Colors.black87,
-                            child: Center(
-                              child: _buildResultCard(campusColor),
-                            ),
+                            child: Center(child: _buildResultCard(campusColor)),
                           ),
                         );
                       },
@@ -246,9 +244,8 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
                         const SizedBox(height: 4),
                         Text(
                           'Last scan: ${_formatTime(_lastScanTime!)}',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.white70,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.white70),
                         ),
                       ],
                     ],
@@ -301,11 +298,7 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
             builder: (context, child) {
               return Transform.scale(
                 scale: _pulseAnimation.value,
-                child: Icon(
-                  icon,
-                  size: 80,
-                  color: iconColor,
-                ),
+                child: Icon(icon, size: 80, color: iconColor),
               );
             },
           ),
@@ -346,9 +339,9 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
           ] else if (_lastError != null) ...[
             Text(
               _lastError!,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: iconColor,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: iconColor),
               textAlign: TextAlign.center,
             ),
           ],
@@ -376,7 +369,9 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
 
   void _onQRDetected(BarcodeCapture capture) {
     final List<Barcode> barcodes = capture.barcodes;
-    if (!_isProcessing && barcodes.isNotEmpty && barcodes.first.rawValue != null) {
+    if (!_isProcessing &&
+        barcodes.isNotEmpty &&
+        barcodes.first.rawValue != null) {
       _processQRCode(barcodes.first.rawValue!);
     }
   }
@@ -431,7 +426,6 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
       } else {
         HapticFeedback.vibrate();
       }
-
     } catch (e) {
       setState(() {
         _lastError = e.toString();
@@ -457,7 +451,7 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen> wit
       final uri = Uri.tryParse(qrData);
       return uri?.queryParameters['token'];
     }
-    
+
     // Assume direct token if no URL format detected
     return qrData.trim();
   }
@@ -563,8 +557,8 @@ class _ScanLinePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return oldDelegate is! _ScanLinePainter ||
-           oldDelegate.progress != progress ||
-           oldDelegate.color != color;
+        oldDelegate.progress != progress ||
+        oldDelegate.color != color;
   }
 }
 
@@ -572,10 +566,7 @@ class _ScannerOverlayPainter extends CustomPainter {
   final Color borderColor;
   final double cutOutSize;
 
-  _ScannerOverlayPainter({
-    required this.borderColor,
-    required this.cutOutSize,
-  });
+  _ScannerOverlayPainter({required this.borderColor, required this.cutOutSize});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -592,10 +583,12 @@ class _ScannerOverlayPainter extends CustomPainter {
     // Draw overlay with cutout
     final overlayPath = Path()
       ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..addRRect(RRect.fromRectAndRadius(
-        Rect.fromLTWH(cutOutLeft, cutOutTop, cutOutSize, cutOutSize),
-        const Radius.circular(20),
-      ))
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(cutOutLeft, cutOutTop, cutOutSize, cutOutSize),
+          const Radius.circular(20),
+        ),
+      )
       ..fillType = PathFillType.evenOdd;
 
     canvas.drawPath(overlayPath, paint);
@@ -661,7 +654,7 @@ class _ScannerOverlayPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return oldDelegate is! _ScannerOverlayPainter ||
-           oldDelegate.borderColor != borderColor ||
-           oldDelegate.cutOutSize != cutOutSize;
+        oldDelegate.borderColor != borderColor ||
+        oldDelegate.cutOutSize != cutOutSize;
   }
 }
