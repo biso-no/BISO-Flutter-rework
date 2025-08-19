@@ -24,7 +24,7 @@ class DepartmentService {
           'description',
         ]),
         Query.equal('active', true),
-        //Query.equal('campus_id', campusId),
+        Query.equal('campus_id', campusId),
         Query.orderAsc('Name'),
         Query.limit(200),
       ],

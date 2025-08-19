@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:io' show Platform;
 
 import '../../../core/constants/app_colors.dart';
 import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/large_event/large_event_provider.dart';
 import '../../../data/models/large_event_model.dart';
+import '../../../providers/campus/campus_provider.dart';
 
 class ExploreScreen extends StatelessWidget {
   const ExploreScreen({super.key});
@@ -15,6 +17,43 @@ class ExploreScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+
+    Future<void> _openDirections(String address) async {
+      final encoded = Uri.encodeComponent(address);
+      Uri uri;
+      if (Platform.isIOS) {
+        uri = Uri.parse('http://maps.apple.com/?q=$encoded');
+      } else if (Platform.isAndroid) {
+        uri = Uri.parse('geo:0,0?q=$encoded');
+      } else {
+        uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$encoded');
+      }
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+
+    String _resolveCampusEmail(String campusId) {
+      switch (campusId.toLowerCase()) {
+        case '1':
+        case 'oslo':
+          return 'president.oslo@biso.no';
+        case '2':
+        case 'bergen':
+          return 'president.bergen@biso.no';
+        case '3':
+        case 'trondheim':
+          return 'president.trondheim@biso.no';
+        case '4':
+        case 'stavanger':
+          return 'president.stavanger@biso.no';
+        default:
+          return 'contact@biso.no';
+      }
+    }
+
+    Future<void> _openEmail(String email) async {
+      final uri = Uri(scheme: 'mailto', path: email);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -61,6 +100,13 @@ class ExploreScreen extends StatelessWidget {
                   subtitle: 'Campus events & activities',
                   color: AppColors.accentBlue,
                   onTap: () => context.go('/explore/events'),
+                ),
+                _CategoryCard(
+                  icon: Icons.departure_board,
+                  title: 'Departures',
+                  subtitle: 'Realtime bus & metro',
+                  color: AppColors.defaultBlue,
+                  onTap: () => context.go('/explore/departures'),
                 ),
                 _CategoryCard(
                   icon: Icons.shopping_bag,
@@ -110,10 +156,24 @@ class ExploreScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-
             Card(
               child: Column(
                 children: [
+                  ListTile(
+                    leading: const CircleAvatar(
+                      backgroundColor: AppColors.subtleBlue,
+                      child: Icon(
+                        Icons.web,
+                        color: AppColors.defaultBlue,
+                      ),
+                    ),
+                    title: const Text('BISO.no'),
+                    subtitle: const Text('Visit our website'),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                    onTap: () {
+                      launchUrl(Uri.parse('https://biso.no'));
+                    },
+                  ),
                   ListTile(
                     leading: const CircleAvatar(
                       backgroundColor: AppColors.subtleBlue,
@@ -180,47 +240,55 @@ class ExploreScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+            Consumer(
+              builder: (context, ref, _) {
+                final campus = ref.watch(filterCampusProvider);
+                final contactEmail = _resolveCampusEmail(campus.id);
+                const campusAddress = 'Nydalsveien 37, 0484 Oslo';
+
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(
-                          Icons.location_on,
-                          color: AppColors.defaultBlue,
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on,
+                              color: AppColors.defaultBlue,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Oslo Campus',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Oslo Campus',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        const SizedBox(height: 12),
+                        const Text(campusAddress),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            TextButton.icon(
+                              onPressed: () => _openDirections(campusAddress),
+                              icon: const Icon(Icons.directions),
+                              label: const Text('Directions'),
+                            ),
+                            TextButton.icon(
+                              onPressed: () => _openEmail(contactEmail),
+                              icon: const Icon(Icons.mail),
+                              label: const Text('Contact'),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    const Text('Nydalsveien 37, 0484 Oslo'),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        TextButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(Icons.directions),
-                          label: const Text('Directions'),
-                        ),
-                        TextButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(Icons.phone),
-                          label: const Text('Contact'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
           ],
         ),

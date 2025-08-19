@@ -673,12 +673,6 @@ class _CampusModalCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Text(
-                        '${(campus.stats.studentCount / 1000).toStringAsFixed(1)}k students',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                      ),
                       const SizedBox(width: 16),
                       Text(
                         '${campus.stats.activeEvents} events',

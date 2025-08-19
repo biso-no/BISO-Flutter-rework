@@ -99,7 +99,7 @@ class _ChatInputFieldState extends State<ChatInputField>
     return Container(
       constraints: const BoxConstraints(minHeight: 52, maxHeight: 120),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _buildActionButton(
             icon: Icons.attach_file_rounded,
@@ -209,22 +209,22 @@ class _ChatInputFieldState extends State<ChatInputField>
     required String tooltip,
   }) {
     return Container(
-      width: 40,
-      height: 40,
+      width: 44,
+      height: 44,
       decoration: BoxDecoration(
         color: (widget.isDark ? AppColors.stoneGray : AppColors.outline)
             .withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           onTap: onPressed,
           child: Icon(
             icon,
             color: widget.isDark ? AppColors.mist : AppColors.onSurfaceVariant,
-            size: 18,
+            size: 20,
           ),
         ),
       ),

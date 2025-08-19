@@ -25,7 +25,10 @@ class EventService {
     int offset = 0,
   }) async {
     try {
-      final requestBody = {'campusId': campusId};
+      final requestBody = {
+        'campusId': campusId,
+        'per_page': limit,
+      };
 
       final execution = await functions.createExecution(
         functionId: AppConstants.fnFetchEventsId,
@@ -110,33 +113,12 @@ class EventService {
     int limit = AppConstants.defaultPageSize,
     int offset = 0,
   }) async {
-    try {
-      final futures = await Future.wait([
-        getFunctionEvents(
-          campusId: campusId,
-          limit: limit ~/ 2,
-          offset: offset,
-        ),
-        getAppwriteEvents(
-          campusId: campusId,
-          category: category,
-          status: status,
-          limit: limit ~/ 2,
-          offset: offset,
-        ),
-      ]);
-
-      final allEvents = <EventModel>[];
-      allEvents.addAll(futures[0]);
-      allEvents.addAll(futures[1]);
-
-      // Sort by start date
-      allEvents.sort((a, b) => a.startDate.compareTo(b.startDate));
-
-      return allEvents.take(limit).toList();
-    } catch (e) {
-      throw EventException('Failed to fetch events: $e');
-    }
+    // Since we don't use Appwrite events collection, rely solely on WordPress
+    return getWordPressEvents(
+      campusId: campusId,
+      limit: limit,
+      offset: offset,
+    );
   }
 
   // Get single event by ID
