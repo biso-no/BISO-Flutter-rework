@@ -8,6 +8,8 @@ import '../../../data/models/expense_model.dart';
 import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/expense/expense_provider.dart';
 import '../expense/create_expense_screen.dart';
+import '../../../providers/auth/auth_provider.dart';
+import '../home/premium_home_screen.dart';
 
 class ExpensesScreen extends ConsumerStatefulWidget {
   const ExpensesScreen({super.key});
@@ -30,6 +32,14 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final authState = ref.watch(authStateProvider);
+    if (!authState.isAuthenticated) {
+      return PremiumAuthRequiredPage(
+        title: l10n.expenses,
+        description: 'Manage reimbursements',
+        icon: Icons.receipt_long_rounded,
+      );
+    }
     final expensesState = ref.watch(expensesStateProvider);
     final filteredExpenses = ref.watch(filteredExpensesProvider(_selectedStatus));
 

@@ -25,30 +25,14 @@ class ExpenseServiceV2 {
   }) async {
     try {
       logPrint('💰 ExpenseServiceV2: Fetching user expenses');
-      
-      // If no userId provided, get current user
-      String targetUserId = userId ?? '';
-      if (targetUserId.isEmpty) {
-        try {
-          final user = await account.get();
-          targetUserId = user.$id;
-        } catch (e) {
-          logPrint('💰 ExpenseServiceV2: No authenticated user, returning empty list');
-          return [];
-        }
-      }
 
-      // Build queries to filter by user
-      final userQueries = [
-        'equal("userId", "$targetUserId")',
-        'orderDesc("\$createdAt")', // Order by most recent first
-        ...queries,
-      ];
 
       final documents = await RobustDocumentService.listDocumentsRobust(
         databaseId: AppConstants.databaseId,
         collectionId: expensesCollectionId,
-        queries: userQueries,
+        queries: [
+          Query.orderDesc('\$createdAt'),
+        ]
       );
 
       logPrint('💰 ExpenseServiceV2: Found ${documents.length} expenses');
