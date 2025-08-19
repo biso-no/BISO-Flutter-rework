@@ -16,6 +16,7 @@ class AppConstants {
   static const String campusesCollectionId = 'campus';
   static const String departmentsCollectionId = 'departments';
   static const String usersCollectionId = 'user';
+  static const String featureFlagsCollectionId = 'feature_flags';
   static const String chatMessagesCollectionId = 'chat_messages';
   static const String chatParticipantsCollectionId = 'chat_participants';
   static const String chatRoomsCollectionId = 'chat_rooms';
@@ -28,6 +29,7 @@ class AppConstants {
   static const String fnSummarizeExpenseId = 'fn_summarize_expense';
   static const String fnFetchEventsId = 'fetch_events';
   static const String fnFetchJobsId = 'fetch_jobs';
+  static const String fnSyncWebshopProductsId = 'sync_webshop_products';
 
   // External APIs
   static const String wordPressEventsApi =

@@ -23,7 +23,8 @@ final _socialsProvider =
 
 class UnitDetailScreen extends ConsumerWidget {
   final String departmentId;
-  const UnitDetailScreen({super.key, required this.departmentId});
+  final String departmentName;
+  const UnitDetailScreen({super.key, required this.departmentId, required this.departmentName});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,8 +32,10 @@ class UnitDetailScreen extends ConsumerWidget {
     final asyncSocials = ref.watch(_socialsProvider(departmentId));
     final theme = Theme.of(context);
 
+    //Department name
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Organization')),
+      appBar: AppBar(title: Text(departmentName)),
       body: asyncDept.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Failed to load: $e')),

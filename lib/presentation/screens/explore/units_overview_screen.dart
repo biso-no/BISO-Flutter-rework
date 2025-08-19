@@ -104,7 +104,7 @@ class _DepartmentCard extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.push('/explore/units/${dept.id}'),
+        onTap: () => context.push('/explore/units/${dept.id}', extra: {'id': dept.id, 'name': dept.name}),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -82,7 +82,7 @@ class DeparturesScreen extends ConsumerWidget {
                   items: groupNames
                       .map((name) {
                         final count = groupedByName[name]!.length;
-                        final label = count > 1 ? '$name (${count} stops)' : name;
+                        final label = count > 1 ? '$name ($count stops)' : name;
                         return DropdownMenuItem<String>(
                           value: name,
                           child: Text(label),
@@ -97,7 +97,7 @@ class DeparturesScreen extends ConsumerWidget {
                 );
               },
               loading: () => const LinearProgressIndicator(),
-              error: (_, __) => const Align(
+              error: (_, _) => const Align(
                 alignment: Alignment.centerLeft,
                 child: Text('Failed to load stop places'),
               ),
@@ -145,7 +145,7 @@ class _DepartureBoard extends StatelessWidget {
 
     return ListView.separated(
       itemCount: filtered.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final call = filtered[index];
         return _DepartureTile(call: call);
@@ -166,7 +166,7 @@ class _DepartureTile extends StatelessWidget {
     final minutesTo = diff.inMinutes.abs();
     final bool departed = secondsTo < -30; // give 30s grace
     final String subtitle = departed
-        ? 'Departed ${minutesTo} min ago'
+        ? 'Departed $minutesTo min ago'
         : (secondsTo <= 30 ? 'Now' : 'In ${diff.inMinutes} min');
     final isMetro = call.transportMode == 'metro';
     final int deltaMinutes = call.expectedDepartureTime

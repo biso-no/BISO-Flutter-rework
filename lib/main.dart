@@ -22,6 +22,8 @@ import 'presentation/screens/explore/events_screen.dart';
 import 'presentation/screens/explore/marketplace_screen.dart' as market;
 import 'presentation/screens/explore/sell_product_screen.dart';
 import 'presentation/screens/explore/product_detail_screen.dart';
+import 'presentation/screens/explore/webshop_product_detail_screen.dart';
+import 'data/models/webshop_product_model.dart';
 import 'presentation/screens/explore/jobs_screen.dart';
 import 'presentation/screens/explore/expenses_screen.dart';
 import 'presentation/screens/explore/units_overview_screen.dart';
@@ -171,6 +173,20 @@ final _router = GoRouter(
                     productId: state.pathParameters['productId']!,
                   ),
                 ),
+                GoRoute(
+                  path: '/webshop/:productId',
+                  name: 'webshop-product-detail',
+                  builder: (context, state) {
+                    final product = state.extra as WebshopProduct?;
+                    if (product == null) {
+                      // Fallback if product not passed - shouldn't happen
+                      return const Scaffold(
+                        body: Center(child: Text('Product not found')),
+                      );
+                    }
+                    return WebshopProductDetailScreen(product: product);
+                  },
+                ),
               ],
             ),
             GoRoute(
@@ -181,9 +197,15 @@ final _router = GoRouter(
                 GoRoute(
                   path: '/:id',
                   name: 'unit-detail',
-                  builder: (context, state) => UnitDetailScreen(
-                    departmentId: state.pathParameters['id']!,
-                  ),
+                  builder: (context, state) {
+                    final extra = state.extra as Map<String, dynamic>?;
+                    final id = state.pathParameters['id']!;
+                    final name = extra?['name'] as String? ?? 'Organization';
+                    return UnitDetailScreen(
+                      departmentId: id,
+                      departmentName: name,
+                    );
+                  },
                 ),
               ],
             ),

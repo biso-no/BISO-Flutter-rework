@@ -18,7 +18,7 @@ class ExploreScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    Future<void> _openDirections(String address) async {
+    Future<void> openDirections(String address) async {
       final encoded = Uri.encodeComponent(address);
       Uri uri;
       if (Platform.isIOS) {
@@ -31,7 +31,7 @@ class ExploreScreen extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
 
-    String _resolveCampusEmail(String campusId) {
+    String resolveCampusEmail(String campusId) {
       switch (campusId.toLowerCase()) {
         case '1':
         case 'oslo':
@@ -50,7 +50,7 @@ class ExploreScreen extends StatelessWidget {
       }
     }
 
-    Future<void> _openEmail(String email) async {
+    Future<void> openEmail(String email) async {
       final uri = Uri(scheme: 'mailto', path: email);
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
@@ -243,7 +243,7 @@ class ExploreScreen extends StatelessWidget {
             Consumer(
               builder: (context, ref, _) {
                 final campus = ref.watch(filterCampusProvider);
-                final contactEmail = _resolveCampusEmail(campus.id);
+                final contactEmail = resolveCampusEmail(campus.id);
                 const campusAddress = 'Nydalsveien 37, 0484 Oslo';
 
                 return Card(
@@ -273,12 +273,12 @@ class ExploreScreen extends StatelessWidget {
                         Row(
                           children: [
                             TextButton.icon(
-                              onPressed: () => _openDirections(campusAddress),
+                              onPressed: () => openDirections(campusAddress),
                               icon: const Icon(Icons.directions),
                               label: const Text('Directions'),
                             ),
                             TextButton.icon(
-                              onPressed: () => _openEmail(contactEmail),
+                              onPressed: () => openEmail(contactEmail),
                               icon: const Icon(Icons.mail),
                               label: const Text('Contact'),
                             ),
