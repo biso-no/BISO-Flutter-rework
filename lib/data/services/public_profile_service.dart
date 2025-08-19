@@ -2,7 +2,6 @@ import 'package:appwrite/appwrite.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../models/public_profile_model.dart';
-import 'appwrite_service.dart';
 import 'robust_document_service.dart';
 
 class PublicProfileService {

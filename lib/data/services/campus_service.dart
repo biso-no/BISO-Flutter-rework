@@ -14,6 +14,7 @@ class CampusService {
         collectionId: collectionId,
         queries: [
           Query.orderAsc('name'),
+          Query.select(['\$id', 'name']),
         ],
       );
       

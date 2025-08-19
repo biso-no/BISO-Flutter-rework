@@ -36,10 +36,11 @@ packages:
   appwrite:
     dependency: "direct main"
     description:
-      name: appwrite
-      sha256: "928f37d36d526dfecbb42488aa4e23083d94f0cbdd8f34eea1f99883a8cbb555"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: main
+      resolved-ref: c860479410a944d33a18ec32217696415f8ace3f
+      url: "https://github.com/MHEien/sdk-for-flutter.git"
+    source: git
     version: "17.1.0"
   archive:
     dependency: transitive

@@ -24,6 +24,8 @@ import 'presentation/screens/explore/sell_product_screen.dart';
 import 'presentation/screens/explore/product_detail_screen.dart';
 import 'presentation/screens/explore/jobs_screen.dart';
 import 'presentation/screens/explore/expenses_screen.dart';
+import 'presentation/screens/explore/units_overview_screen.dart';
+import 'presentation/screens/explore/unit_detail_screen.dart';
 import 'presentation/screens/chat/chat_list_screen.dart';
 import 'presentation/screens/ai_chat/ai_chat_screen.dart';
 import 'presentation/screens/profile/profile_screen.dart';
@@ -179,9 +181,16 @@ final _router = GoRouter(
             GoRoute(
               path: '/units',
               name: 'units',
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Clubs & Units - Coming Soon')),
-              ),
+              builder: (context, state) => const UnitsOverviewScreen(),
+              routes: [
+                GoRoute(
+                  path: '/:id',
+                  name: 'unit-detail',
+                  builder: (context, state) => UnitDetailScreen(
+                    departmentId: state.pathParameters['id']!,
+                  ),
+                ),
+              ],
             ),
             GoRoute(
               path: '/expenses',
