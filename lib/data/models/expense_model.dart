@@ -1,216 +1,248 @@
 import 'package:equatable/equatable.dart';
+import 'expense_attachment_model.dart';
 
+/// ExpenseModel that matches the database schema exactly
 class ExpenseModel extends Equatable {
   final String id;
-  final String userId;
-  final String userName;
-  final String userEmail;
-  final double amount;
-  final String currency;
-  final String description;
-  final String category; // 'event', 'travel', 'supplies', 'food', 'other'
-  final String departmentId;
-  final String departmentName;
-  final String? eventId; // Optional association with an event
-  final String? eventName;
-  final String bankAccount; // Norwegian 11-digit format
-  final String accountHolderName;
-  final bool isPrepayment; // Request advance payment
-  final List<String> attachments; // Receipt file URLs
-  final String status; // 'draft', 'submitted', 'under_review', 'approved', 'rejected', 'paid'
+  final String userId; // Required - matches userId field
+  final String campus; // Required - matches campus field
+  final String department; // Required - matches department field  
+  final String bankAccount; // Required - matches bank_account field (Norwegian 11-digit format)
+  final String? description; // Optional - matches description field
+  final double total; // Required - matches total field
+  final double? prepaymentAmount; // Optional - matches prepayment_amount field
+  final String status; // Enum - matches status field (pending, approved, rejected, paid)
+  final int? invoiceId; // Optional - matches invoice_id field
+  final String? eventName; // Optional - matches eventName field
+  final List<ExpenseAttachmentModel> expenseAttachments; // Relationship - matches expenseAttachments relationship
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  
+  // Additional fields for UI/display purposes
+  final String? userName;
+  final String? userEmail;
+  final String? departmentName;
   final String? rejectionReason;
   final String? approverUserId;
   final String? approverName;
   final DateTime? approvedAt;
   final DateTime? paidAt;
-  final String? transactionReference;
-  final Map<String, dynamic> metadata; // Additional expense data
-  final DateTime expenseDate; // Date of the actual expense
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
 
   const ExpenseModel({
     required this.id,
     required this.userId,
-    required this.userName,
-    required this.userEmail,
-    required this.amount,
-    this.currency = 'NOK',
-    required this.description,
-    required this.category,
-    required this.departmentId,
-    required this.departmentName,
-    this.eventId,
-    this.eventName,
+    required this.campus,
+    required this.department,
     required this.bankAccount,
-    required this.accountHolderName,
-    this.isPrepayment = false,
-    this.attachments = const [],
-    this.status = 'draft',
+    this.description,
+    required this.total,
+    this.prepaymentAmount,
+    this.status = 'pending',
+    this.invoiceId,
+    this.eventName,
+    this.expenseAttachments = const [],
+    this.createdAt,
+    this.updatedAt,
+    // UI/display fields
+    this.userName,
+    this.userEmail,
+    this.departmentName,
     this.rejectionReason,
     this.approverUserId,
     this.approverName,
     this.approvedAt,
     this.paidAt,
-    this.transactionReference,
-    this.metadata = const {},
-    required this.expenseDate,
-    this.createdAt,
-    this.updatedAt,
   });
 
   factory ExpenseModel.fromMap(Map<String, dynamic> map) {
+    // Handle expense attachments relationship
+    List<ExpenseAttachmentModel> attachments = [];
+    if (map['expenseAttachments'] != null) {
+      if (map['expenseAttachments'] is List) {
+        attachments = (map['expenseAttachments'] as List)
+            .map((attachment) => ExpenseAttachmentModel.fromMap(
+                attachment is Map<String, dynamic> ? attachment : {}))
+            .toList();
+      }
+    }
+
     return ExpenseModel(
       id: map['\$id'] ?? '',
-      userId: map['user_id'] ?? '',
-      userName: map['user_name'] ?? '',
-      userEmail: map['user_email'] ?? '',
-      amount: (map['amount'] ?? 0).toDouble(),
-      currency: map['currency'] ?? 'NOK',
-      description: map['description'] ?? '',
-      category: map['category'] ?? '',
-      departmentId: map['department_id'] ?? '',
-      departmentName: map['department_name'] ?? '',
-      eventId: map['event_id'],
-      eventName: map['event_name'],
+      userId: map['userId'] ?? '',
+      campus: map['campus'] ?? '',
+      department: map['department'] ?? '',
       bankAccount: map['bank_account'] ?? '',
-      accountHolderName: map['account_holder_name'] ?? '',
-      isPrepayment: map['is_prepayment'] ?? false,
-      attachments: List<String>.from(map['attachments'] ?? []),
-      status: map['status'] ?? 'draft',
+      description: map['description'],
+      total: (map['total'] ?? 0).toDouble(),
+      prepaymentAmount: map['prepayment_amount'] != null 
+          ? (map['prepayment_amount']).toDouble() 
+          : null,
+      status: map['status'] ?? 'pending',
+      invoiceId: map['invoice_id'],
+      eventName: map['eventName'],
+      expenseAttachments: attachments,
+      createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
+      updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
+      // UI/display fields (might come from relationships or be populated separately)
+      userName: map['user_name'],
+      userEmail: map['user_email'],
+      departmentName: map['department_name'],
       rejectionReason: map['rejection_reason'],
       approverUserId: map['approver_user_id'],
       approverName: map['approver_name'],
       approvedAt: map['approved_at'] != null ? DateTime.parse(map['approved_at']) : null,
       paidAt: map['paid_at'] != null ? DateTime.parse(map['paid_at']) : null,
-      transactionReference: map['transaction_reference'],
-      metadata: Map<String, dynamic>.from(map['metadata'] ?? {}),
-      expenseDate: DateTime.parse(map['expense_date']),
-      createdAt: map['\$createdAt'] != null ? DateTime.parse(map['\$createdAt']) : null,
-      updatedAt: map['\$updatedAt'] != null ? DateTime.parse(map['\$updatedAt']) : null,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'user_id': userId,
-      'user_name': userName,
-      'user_email': userEmail,
-      'amount': amount,
-      'currency': currency,
-      'description': description,
-      'category': category,
-      'department_id': departmentId,
-      'department_name': departmentName,
-      'event_id': eventId,
-      'event_name': eventName,
+      'userId': userId,
+      'campus': campus,
+      'department': department,
       'bank_account': bankAccount,
-      'account_holder_name': accountHolderName,
-      'is_prepayment': isPrepayment,
-      'attachments': attachments,
+      if (description != null) 'description': description,
+      'total': total,
+      if (prepaymentAmount != null) 'prepayment_amount': prepaymentAmount,
       'status': status,
-      'rejection_reason': rejectionReason,
-      'approver_user_id': approverUserId,
-      'approver_name': approverName,
-      'approved_at': approvedAt?.toIso8601String(),
-      'paid_at': paidAt?.toIso8601String(),
-      'transaction_reference': transactionReference,
-      'metadata': metadata,
-      'expense_date': expenseDate.toIso8601String(),
+      if (invoiceId != null) 'invoice_id': invoiceId,
+      if (eventName != null) 'eventName': eventName,
+      // Note: expenseAttachments relationship is handled separately
+      
+      // Additional UI fields (not part of core schema)
+      if (rejectionReason != null) 'rejection_reason': rejectionReason,
+      if (approverUserId != null) 'approver_user_id': approverUserId,
+      if (approverName != null) 'approver_name': approverName,
+      if (approvedAt != null) 'approved_at': approvedAt!.toIso8601String(),
+      if (paidAt != null) 'paid_at': paidAt!.toIso8601String(),
     };
   }
 
   ExpenseModel copyWith({
     String? id,
     String? userId,
+    String? campus,
+    String? department,
+    String? bankAccount,
+    String? description,
+    double? total,
+    double? prepaymentAmount,
+    String? status,
+    int? invoiceId,
+    String? eventName,
+    List<ExpenseAttachmentModel>? expenseAttachments,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    // UI/display fields
     String? userName,
     String? userEmail,
-    double? amount,
-    String? currency,
-    String? description,
-    String? category,
-    String? departmentId,
     String? departmentName,
-    String? eventId,
-    String? eventName,
-    String? bankAccount,
-    String? accountHolderName,
-    bool? isPrepayment,
-    List<String>? attachments,
-    String? status,
     String? rejectionReason,
     String? approverUserId,
     String? approverName,
     DateTime? approvedAt,
     DateTime? paidAt,
-    String? transactionReference,
-    Map<String, dynamic>? metadata,
-    DateTime? expenseDate,
-    DateTime? createdAt,
-    DateTime? updatedAt,
   }) {
     return ExpenseModel(
       id: id ?? this.id,
       userId: userId ?? this.userId,
+      campus: campus ?? this.campus,
+      department: department ?? this.department,
+      bankAccount: bankAccount ?? this.bankAccount,
+      description: description ?? this.description,
+      total: total ?? this.total,
+      prepaymentAmount: prepaymentAmount ?? this.prepaymentAmount,
+      status: status ?? this.status,
+      invoiceId: invoiceId ?? this.invoiceId,
+      eventName: eventName ?? this.eventName,
+      expenseAttachments: expenseAttachments ?? this.expenseAttachments,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      // UI/display fields
       userName: userName ?? this.userName,
       userEmail: userEmail ?? this.userEmail,
-      amount: amount ?? this.amount,
-      currency: currency ?? this.currency,
-      description: description ?? this.description,
-      category: category ?? this.category,
-      departmentId: departmentId ?? this.departmentId,
       departmentName: departmentName ?? this.departmentName,
-      eventId: eventId ?? this.eventId,
-      eventName: eventName ?? this.eventName,
-      bankAccount: bankAccount ?? this.bankAccount,
-      accountHolderName: accountHolderName ?? this.accountHolderName,
-      isPrepayment: isPrepayment ?? this.isPrepayment,
-      attachments: attachments ?? this.attachments,
-      status: status ?? this.status,
       rejectionReason: rejectionReason ?? this.rejectionReason,
       approverUserId: approverUserId ?? this.approverUserId,
       approverName: approverName ?? this.approverName,
       approvedAt: approvedAt ?? this.approvedAt,
       paidAt: paidAt ?? this.paidAt,
-      transactionReference: transactionReference ?? this.transactionReference,
-      metadata: metadata ?? this.metadata,
-      expenseDate: expenseDate ?? this.expenseDate,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
-  bool get isDraft => status == 'draft';
-  bool get isSubmitted => status == 'submitted';
-  bool get isUnderReview => status == 'under_review';
+  // Status helpers based on enum values
+  bool get isPending => status == 'pending';
   bool get isApproved => status == 'approved';
   bool get isRejected => status == 'rejected';
   bool get isPaid => status == 'paid';
-  bool get canEdit => isDraft;
-  bool get canSubmit => isDraft && attachments.isNotEmpty;
-  String get formattedAmount => '${amount.toStringAsFixed(2)} $currency';
+  
+  // UI helpers
+  bool get canEdit => isPending;
+  bool get canSubmit => isPending && expenseAttachments.isNotEmpty;
+  bool get hasPrepayment => prepaymentAmount != null && prepaymentAmount! > 0;
+  
+  String get formattedTotal => 'NOK ${total.toStringAsFixed(2)}';
+  String get formattedAmount => formattedTotal; // Backwards compatibility
+  
   String get displayStatus {
     switch (status) {
-      case 'draft': return 'Draft';
-      case 'submitted': return 'Submitted';
-      case 'under_review': return 'Under Review';
+      case 'pending': return 'Pending';
       case 'approved': return 'Approved';
       case 'rejected': return 'Rejected';
       case 'paid': return 'Paid';
-      default: return status;
+      default: return status.toUpperCase();
     }
   }
-
+  
+  // Get display name for department
+  String get displayDepartment => departmentName ?? department;
+  
+  // Get attachment count
+  int get attachmentCount => expenseAttachments.length;
+  
+  // Get attachment file names for backward compatibility
+  List<String> get attachments => expenseAttachments
+      .where((attachment) => attachment.url != null)
+      .map((attachment) => attachment.url!.split('/').last)
+      .toList();
+      
+  // Category-like display based on description or department
   String get displayCategory {
-    switch (category) {
-      case 'event': return 'Event Expenses';
-      case 'travel': return 'Travel';
-      case 'supplies': return 'Supplies';
-      case 'food': return 'Food & Beverages';
-      case 'other': return 'Other';
-      default: return category;
+    if (description != null) {
+      final desc = description!.toLowerCase();
+      if (desc.contains('travel') || desc.contains('taxi') || desc.contains('transport')) {
+        return 'Travel';
+      } else if (desc.contains('food') || desc.contains('catering') || desc.contains('meal')) {
+        return 'Food & Beverages';
+      } else if (desc.contains('supplies') || desc.contains('office') || desc.contains('equipment')) {
+        return 'Supplies';
+      } else if (desc.contains('event')) {
+        return 'Event Expenses';
+      }
     }
+    return 'Other';
   }
+  
+  // Get category for icon/color matching (backwards compatibility)
+  String get category {
+    final desc = description?.toLowerCase() ?? '';
+    if (desc.contains('travel') || desc.contains('taxi') || desc.contains('transport')) {
+      return 'travel';
+    } else if (desc.contains('food') || desc.contains('catering') || desc.contains('meal')) {
+      return 'food';
+    } else if (desc.contains('supplies') || desc.contains('office') || desc.contains('equipment')) {
+      return 'supplies';
+    } else if (desc.contains('event')) {
+      return 'event';
+    }
+    return 'other';
+  }
+  
+  // Expense date (for now use createdAt, can be enhanced later)
+  DateTime get expenseDate => createdAt ?? DateTime.now();
+  
+  // Prepayment flag for backward compatibility
+  bool get isPrepayment => hasPrepayment;
 
   // Validate Norwegian bank account number (11 digits with MOD11 checksum)
   bool get isValidBankAccount {
@@ -228,14 +260,22 @@ class ExpenseModel extends Equatable {
     
     return sum % 11 == 0;
   }
+  
+  // Format bank account for display (XXXX XX XXXXX)
+  String get formattedBankAccount {
+    if (bankAccount.length == 11) {
+      return '${bankAccount.substring(0, 4)} ${bankAccount.substring(4, 6)} ${bankAccount.substring(6)}';
+    }
+    return bankAccount;
+  }
 
   @override
   List<Object?> get props => [
-    id, userId, userName, userEmail, amount, currency, description,
-    category, departmentId, departmentName, eventId, eventName,
-    bankAccount, accountHolderName, isPrepayment, attachments,
-    status, rejectionReason, approverUserId, approverName,
-    approvedAt, paidAt, transactionReference, metadata,
-    expenseDate, createdAt, updatedAt,
+    id, userId, campus, department, bankAccount, description,
+    total, prepaymentAmount, status, invoiceId, eventName,
+    expenseAttachments, createdAt, updatedAt,
+    // UI/display fields
+    userName, userEmail, departmentName, rejectionReason,
+    approverUserId, approverName, approvedAt, paidAt,
   ];
 }

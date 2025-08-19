@@ -6,69 +6,8 @@ import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/expense_model.dart';
 import '../../../generated/l10n/app_localizations.dart';
+import '../../../providers/expense/expense_provider.dart';
 import '../expense/create_expense_screen.dart';
-
-// Mock data provider for expenses
-final expensesProvider = StateProvider<List<ExpenseModel>>((ref) {
-  return [
-    ExpenseModel(
-      id: '1',
-      userId: 'user1',
-      userName: 'John Doe',
-      userEmail: 'john.doe@bi.no',
-      amount: 2500.0,
-      description: 'Taxi to event venue and back',
-      category: 'travel',
-      departmentId: 'marketing',
-      departmentName: 'Marketing Committee',
-      eventId: 'event1',
-      eventName: 'BI Career Fair 2024',
-      bankAccount: '12345678901',
-      accountHolderName: 'John Doe',
-      attachments: ['receipt1.jpg', 'receipt2.pdf'],
-      status: 'under_review',
-      expenseDate: DateTime.now().subtract(const Duration(days: 2)),
-      createdAt: DateTime.now().subtract(const Duration(days: 2)),
-    ),
-    ExpenseModel(
-      id: '2',
-      userId: 'user1',
-      userName: 'John Doe',
-      userEmail: 'john.doe@bi.no',
-      amount: 450.0,
-      description: 'Office supplies for workshop',
-      category: 'supplies',
-      departmentId: 'student_services',
-      departmentName: 'Student Services',
-      bankAccount: '12345678901',
-      accountHolderName: 'John Doe',
-      attachments: ['supplies_receipt.jpg'],
-      status: 'approved',
-      expenseDate: DateTime.now().subtract(const Duration(days: 5)),
-      createdAt: DateTime.now().subtract(const Duration(days: 5)),
-      approvedAt: DateTime.now().subtract(const Duration(days: 1)),
-      approverName: 'Admin User',
-    ),
-    ExpenseModel(
-      id: '3',
-      userId: 'user1',
-      userName: 'John Doe',
-      userEmail: 'john.doe@bi.no',
-      amount: 1200.0,
-      description: 'Catering for orientation week',
-      category: 'food',
-      departmentId: 'student_union',
-      departmentName: 'Student Union',
-      bankAccount: '12345678901',
-      accountHolderName: 'John Doe',
-      isPrepayment: true,
-      attachments: ['catering_quote.pdf'],
-      status: 'draft',
-      expenseDate: DateTime.now().add(const Duration(days: 10)),
-      createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-    ),
-  ];
-});
 
 class ExpensesScreen extends ConsumerStatefulWidget {
   const ExpensesScreen({super.key});
@@ -82,9 +21,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
 
   final List<String> _statusFilters = [
     'all',
-    'draft',
-    'submitted',
-    'under_review',
+    'pending',
     'approved',
     'rejected',
     'paid',
@@ -93,11 +30,81 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final expenses = ref.watch(expensesProvider);
+    final expensesState = ref.watch(expensesStateProvider);
+    final filteredExpenses = ref.watch(filteredExpensesProvider(_selectedStatus));
 
-    final filteredExpenses = _selectedStatus == 'all'
-        ? expenses
-        : expenses.where((expense) => expense.status == _selectedStatus).toList();
+    // Show loading state
+    if (expensesState.isLoading && expensesState.expenses.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.expenses),
+          leading: IconButton(
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    // Show error state
+    if (expensesState.error != null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.expenses),
+          leading: IconButton(
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                size: 64,
+                color: AppColors.error,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Error loading expenses',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                expensesState.error!,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(expensesStateProvider.notifier).refresh();
+                },
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -114,6 +121,12 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
           icon: const Icon(Icons.arrow_back),
         ),
         actions: [
+          IconButton(
+            onPressed: () {
+              ref.read(expensesStateProvider.notifier).refresh();
+            },
+            icon: const Icon(Icons.refresh),
+          ),
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.search),
@@ -199,7 +212,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                 Expanded(
                   child: _SummaryCard(
                     title: 'Pending',
-                    amount: _calculateTotalByStatus(expenses, ['submitted', 'under_review']),
+                    amount: expensesState.totalPendingAmount,
                     color: AppColors.orange9,
                     icon: Icons.pending,
                   ),
@@ -208,7 +221,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                 Expanded(
                   child: _SummaryCard(
                     title: 'Approved',
-                    amount: _calculateTotalByStatus(expenses, ['approved']),
+                    amount: expensesState.totalApprovedAmount,
                     color: AppColors.success,
                     icon: Icons.check_circle,
                   ),
@@ -252,20 +265,12 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
   String _getStatusDisplayName(String status) {
     switch (status) {
       case 'all': return 'All';
-      case 'draft': return 'Draft';
-      case 'submitted': return 'Submitted';
-      case 'under_review': return 'Review';
+      case 'pending': return 'Pending';
       case 'approved': return 'Approved';
       case 'rejected': return 'Rejected';
       case 'paid': return 'Paid';
       default: return status;
     }
-  }
-
-  double _calculateTotalByStatus(List<ExpenseModel> expenses, List<String> statuses) {
-    return expenses
-        .where((expense) => statuses.contains(expense.status))
-        .fold(0.0, (sum, expense) => sum + expense.amount);
   }
 
   void _showExpenseDetails(BuildContext context, ExpenseModel expense) {
@@ -399,7 +404,7 @@ class _ExpenseCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          expense.description,
+                          expense.description ?? 'No description',
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -408,7 +413,7 @@ class _ExpenseCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          expense.departmentName,
+                          expense.displayDepartment,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: AppColors.onSurfaceVariant,
                           ),
@@ -422,7 +427,7 @@ class _ExpenseCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        expense.formattedAmount,
+                        expense.formattedTotal,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.defaultBlue,
@@ -472,7 +477,7 @@ class _ExpenseCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '${expense.attachments.length} files',
+                    '${expense.attachmentCount} files',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: AppColors.onSurfaceVariant,
                     ),
@@ -583,14 +588,14 @@ class _ExpenseDetailSheet extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            expense.description,
+                            expense.description ?? 'No description',
                             style: theme.textTheme.headlineSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            expense.departmentName,
+                            expense.displayDepartment,
                             style: theme.textTheme.titleMedium?.copyWith(
                               color: AppColors.defaultBlue,
                             ),
@@ -638,7 +643,7 @@ class _ExpenseDetailSheet extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              expense.formattedAmount,
+                              expense.formattedTotal,
                               style: theme.textTheme.headlineMedium?.copyWith(
                                 color: AppColors.defaultBlue,
                                 fontWeight: FontWeight.bold,
@@ -700,38 +705,39 @@ class _ExpenseDetailSheet extends StatelessWidget {
                     _DetailItem(
                       icon: Icons.account_balance,
                       label: 'Bank Account',
-                      value: _formatBankAccount(expense.bankAccount),
+                      value: expense.formattedBankAccount,
                     ),
-                    _DetailItem(
-                      icon: Icons.person,
-                      label: 'Account Holder',
-                      value: expense.accountHolderName,
-                    ),
+                    if (expense.userName != null)
+                      _DetailItem(
+                        icon: Icons.person,
+                        label: 'Account Holder',
+                        value: expense.userName!,
+                      ),
                   ],
                 ),
 
                 const SizedBox(height: 16),
 
                 // Attachments
-                if (expense.attachments.isNotEmpty) ...[
+                if (expense.expenseAttachments.isNotEmpty) ...[
                   _DetailSection(
                     title: 'Receipts & Documents',
-                    children: expense.attachments.map((attachment) {
+                    children: expense.expenseAttachments.map((attachment) {
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundColor: AppColors.gray200,
                           child: Icon(
-                            _getFileIcon(attachment),
+                            _getFileIcon(attachment.fileName),
                             color: AppColors.onSurfaceVariant,
                             size: 20,
                           ),
                         ),
-                        title: Text(attachment),
+                        title: Text(attachment.fileName),
                         trailing: IconButton(
                           onPressed: () {
                             // TODO: Open/download file
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Opening $attachment - Coming Soon')),
+                              SnackBar(content: Text('Opening ${attachment.fileName} - Coming Soon')),
                             );
                           },
                           icon: const Icon(Icons.open_in_new),
@@ -823,13 +829,6 @@ class _ExpenseDetailSheet extends StatelessWidget {
       case 'paid': return AppColors.success;
       default: return AppColors.onSurfaceVariant;
     }
-  }
-
-  String _formatBankAccount(String account) {
-    if (account.length == 11) {
-      return '${account.substring(0, 4)} ${account.substring(4, 6)} ${account.substring(6)}';
-    }
-    return account;
   }
 
   IconData _getFileIcon(String filename) {

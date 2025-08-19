@@ -311,11 +311,7 @@ class ProfileScreen extends ConsumerWidget {
                       _ProfileActionTile(
                         icon: Icons.receipt_long_outlined,
                         label: 'Expense History',
-                        onTap: () {
-                          // TODO: Navigate to expense history
-                          //Redirect to expenses
-                          context.push('/explore/expenses');
-                        },
+                        onTap: () => context.push('/explore/expenses'),
                       ),
                       _ProfileActionTile(
                         icon: Icons.payment_outlined,

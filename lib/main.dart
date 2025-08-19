@@ -41,7 +41,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   // Handle background messages here if needed
-  print('Handling a background message: ${message.messageId}');
 }
 
 void main() async {

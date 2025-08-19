@@ -1281,12 +1281,6 @@ class _AnimatedStudentIdCard extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // Remove button
-                  TextButton.icon(
-                    onPressed: onRemove,
-                    icon: const Icon(Icons.delete_outline, color: AppColors.error),
-                    label: const Text('Remove Student ID', style: TextStyle(color: AppColors.error)),
-                  ),
                 ],
               ),
             ),
