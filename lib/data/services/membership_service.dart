@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:appwrite/appwrite.dart';
 import '../models/membership_model.dart';
 import 'appwrite_service.dart';
-import 'robust_document_service.dart';
 
 class MembershipService {
   static final MembershipService _instance = MembershipService._internal();
@@ -73,7 +72,7 @@ class MembershipService {
   /// Gets available membership options from database
   Future<List<MembershipPurchaseOption>> getAvailableMemberships() async {
     try {
-      final documents = await RobustDocumentService.listDocumentsRobust(
+      final documents = await databases.listDocuments(
         databaseId: 'app',
         collectionId: 'memberships',
         queries: [
@@ -83,8 +82,8 @@ class MembershipService {
         ],
       );
 
-      return documents.map((docData) {
-        final membership = MembershipModel.fromMap(docData);
+      return documents.documents.map((docData) {
+        final membership = MembershipModel.fromMap(docData.data);
         return MembershipPurchaseOption.fromMembership(membership);
       }).toList();
     } catch (e) {
@@ -156,7 +155,7 @@ class MembershipService {
   /// Gets user's membership from the database
   Future<MembershipModel?> getUserMembership(String userId) async {
     try {
-      final documents = await RobustDocumentService.listDocumentsRobust(
+      final documents = await databases.listDocuments(
         databaseId: 'app',
         collectionId: 'biso_membership',
         queries: [
@@ -166,8 +165,8 @@ class MembershipService {
         ],
       );
 
-      if (documents.isNotEmpty) {
-        return MembershipModel.fromMap(documents.first);
+      if (documents.documents.isNotEmpty) {
+        return MembershipModel.fromMap(documents.documents.first.data);
       }
 
       return null;

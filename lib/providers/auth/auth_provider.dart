@@ -4,7 +4,7 @@ import '../../data/models/student_id_model.dart';
 import '../../data/models/membership_model.dart';
 import '../../data/services/auth_service.dart';
 import '../../data/services/membership_service.dart';
-import '../../data/services/robust_document_service.dart';
+import '../../data/services/appwrite_service.dart';
 
 import '../../core/logging/print_migration.dart';
 
@@ -124,13 +124,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
       logPrint('🔐 AuthProvider: Loading complete profile for userId: $userId');
 
       // Use RobustDocumentService to handle SDK issues
-      final documentData = await RobustDocumentService.getDocumentRobust(
+      final documentData = await databases.getDocument(
         databaseId: 'app',
         collectionId: 'user',
         documentId: userId,
       );
 
-      final profile = UserModel.fromMap(documentData);
+      final profile = UserModel.fromMap(documentData.data);
       logPrint('🔐 AuthProvider: Profile loaded successfully: ${profile.name}');
 
       // Check if user has student_id in their profile
@@ -346,7 +346,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       await _authService.logout();
       // Clear JWT cache when user signs out
-      RobustDocumentService.clearJwtCache();
       state = const AuthState();
     } catch (e) {
       state = state.copyWith(error: e.toString(), isLoading: false);
@@ -359,7 +358,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       await _authService.clearSession();
       // Clear JWT cache when session is cleared
-      RobustDocumentService.clearJwtCache();
       state = const AuthState();
     } catch (e) {
       state = state.copyWith(error: e.toString(), isLoading: false);

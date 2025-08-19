@@ -3,7 +3,6 @@ import 'package:appwrite/appwrite.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../models/job_model.dart';
-import 'robust_document_service.dart';
 import 'appwrite_service.dart';
 
 class JobService {
@@ -56,12 +55,12 @@ class JobService {
       queries.add(Query.equal('status', status));
     }
 
-    final results = await RobustDocumentService.listDocumentsRobust(
+    final results = await databases.listDocuments(
       databaseId: AppConstants.databaseId,
       collectionId: collectionId,
       queries: queries,
     );
 
-    return results.map(JobModel.fromMap).toList(growable: false);
+    return results.documents.map((doc) => JobModel.fromMap(doc.data)).toList(growable: false);
   }
 }

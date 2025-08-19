@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/auth/auth_provider.dart';
-import '../../../data/services/expense_service.dart';
+import '../../../data/services/expense_service_v2.dart';
 import '../../../core/utils/favorites_storage.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -31,8 +31,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   bool _isLoading = false;
 
   // Fetched from Appwrite
-  final ExpenseService _expenseService = ExpenseService();
-  List<Map<String, String>> _campuses = []; // [{id,name}]
+  final ExpenseServiceV2 _expenseService = ExpenseServiceV2();
+  List<Map<String, dynamic>> _campuses = []; // [{id,name}]
   List<Map<String, String>> _departments = []; // [{id (Id), name (Name)}]
 
   @override

@@ -1,7 +1,7 @@
 import '../../core/constants/app_constants.dart';
 import '../models/user_model.dart';
 import 'public_profile_service.dart';
-import 'robust_document_service.dart';
+import 'appwrite_service.dart';
 
 class PrivacyService {
   static final PrivacyService _instance = PrivacyService._internal();
@@ -12,13 +12,13 @@ class PrivacyService {
   /// Returns null if not set, true if public, false if private
   Future<bool?> getUserPrivacySetting(String userId) async {
     try {
-      final document = await RobustDocumentService.getDocumentRobust(
+      final document = await databases.getDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'user',
         documentId: userId,
       );
 
-      return document['is_public'] as bool?;
+      return document.data['is_public'] as bool?;
     } catch (e) {
       return null;
     }
@@ -42,7 +42,7 @@ class PrivacyService {
       }
 
       // Update the user's privacy setting
-      await RobustDocumentService.updateDocumentRobust(
+      await databases.updateDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'user',
         documentId: userId,
@@ -134,12 +134,12 @@ class PrivacyService {
     if (userData != null) {
       user = userData;
     } else {
-      final userDoc = await RobustDocumentService.getDocumentRobust(
+      final userDoc = await databases.getDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'user',
         documentId: userId,
       );
-      user = UserModel.fromMap(userDoc);
+      user = UserModel.fromMap(userDoc.data);
     }
 
     // Create new public profile

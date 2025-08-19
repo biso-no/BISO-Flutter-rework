@@ -6,7 +6,7 @@ import 'dart:convert';
 import '../../core/constants/app_constants.dart';
 import '../models/student_id_model.dart';
 import 'membership_service.dart';
-import 'robust_document_service.dart';
+import 'appwrite_service.dart';
 import '../../core/logging/app_logger.dart';
 import 'auth_service.dart';
 
@@ -96,7 +96,7 @@ class StudentService {
       );
 
       // Update user profile to link student ID
-      await RobustDocumentService.updateDocumentRobust(
+      await databases.updateDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'user',
         documentId: currentUser.id,
@@ -171,13 +171,14 @@ class StudentService {
         'verified_at': isVerified ? DateTime.now().toIso8601String() : null,
       };
 
-      final createdData = await RobustDocumentService.createDocumentRobust(
+      final createdData = await databases.createDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'student_id',
+        documentId: studentNumber,
         data: studentData,
       );
 
-      return StudentIdModel.fromMap(createdData);
+      return StudentIdModel.fromMap(createdData.data);
     } catch (e) {
       throw StudentException('Failed to create student ID record: $e');
     }
@@ -221,7 +222,7 @@ class StudentService {
   /// Gets student ID record for a user
   Future<StudentIdModel?> getStudentIdRecord(String userId) async {
     try {
-      final documents = await RobustDocumentService.listDocumentsRobust(
+      final documents = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: 'student_id',
         queries: [
@@ -230,11 +231,11 @@ class StudentService {
         ],
       );
 
-      if (documents.isEmpty) {
+      if (documents.documents.isEmpty) {
         return null;
       }
 
-      return StudentIdModel.fromMap(documents.first);
+      return StudentIdModel.fromMap(documents.documents.first.data);
     } catch (e) {
       throw StudentException('Failed to get student ID record: $e');
     }
@@ -250,14 +251,14 @@ class StudentService {
       }
 
       // Remove from student_id collection
-      await RobustDocumentService.deleteDocumentRobust(
+      await databases.deleteDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'student_id',
         documentId: studentRecord.id,
       );
 
       // Update user profile to remove relationship
-      await RobustDocumentService.updateDocumentRobust(
+      await databases.updateDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'user',
         documentId: userId,

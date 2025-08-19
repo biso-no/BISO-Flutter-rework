@@ -3,7 +3,6 @@ import 'package:appwrite/appwrite.dart';
 import '../../core/constants/app_constants.dart';
 import '../models/product_model.dart';
 import 'appwrite_service.dart';
-import 'robust_document_service.dart';
 
 class ProductService {
   static const String collectionId = 'products';
@@ -26,12 +25,18 @@ class ProductService {
       queries.add(Query.equal('status', status));
     }
 
-    final results = await RobustDocumentService.listDocumentsRobust(
+    final response = await databases.listDocuments(
       databaseId: AppConstants.databaseId,
       collectionId: collectionId,
       queries: queries,
     );
-    return results.map(ProductModel.fromMap).toList(growable: false);
+    return response.documents
+        .map((doc) {
+          final map = Map<String, dynamic>.from(doc.data);
+          map['\$id'] = doc.$id;
+          return ProductModel.fromMap(map);
+        })
+        .toList(growable: false);
   }
 
   Future<List<ProductModel>> listProducts({
@@ -55,22 +60,29 @@ class ProductService {
       queries.add(Query.search('name', search.trim()));
     }
 
-    final results = await RobustDocumentService.listDocumentsRobust(
+    final response = await databases.listDocuments(
       databaseId: AppConstants.databaseId,
       collectionId: collectionId,
       queries: queries,
     );
-    //Since we search on both description and name, we need to deduplicate the results
-    return results.map(ProductModel.fromMap).toList(growable: false);
+    return response.documents
+        .map((doc) {
+          final map = Map<String, dynamic>.from(doc.data);
+          map['\$id'] = doc.$id;
+          return ProductModel.fromMap(map);
+        })
+        .toList(growable: false);
   }
 
   Future<ProductModel?> getProductById(String id) async {
-    final doc = await RobustDocumentService.getDocumentRobust(
+    final doc = await databases.getDocument(
       databaseId: AppConstants.databaseId,
       collectionId: collectionId,
       documentId: id,
     );
-    return ProductModel.fromMap(doc);
+    final map = Map<String, dynamic>.from(doc.data);
+    map['\$id'] = doc.$id;
+    return ProductModel.fromMap(map);
   }
 
   Future<ProductModel> createProduct({
@@ -91,15 +103,15 @@ class ProductService {
         .toMap();
     final docId = ID.unique();
 
-    // Use HTTP method directly to avoid SDK creation + fallback double call
-    final doc = await RobustDocumentService.createDocumentViaHttpDirect(
+    final doc = await databases.createDocument(
       databaseId: AppConstants.databaseId,
       collectionId: collectionId,
       documentId: docId,
       data: data,
     );
-
-    return ProductModel.fromMap(doc);
+    final map = Map<String, dynamic>.from(doc.data);
+    map['\$id'] = doc.$id;
+    return ProductModel.fromMap(map);
   }
 
   Future<ProductModel> updateProduct(ProductModel product) async {
@@ -118,7 +130,7 @@ class ProductService {
     required String productId,
     required String status, // 'available' | 'sold' | 'reserved' | 'inactive'
   }) async {
-    await RobustDocumentService.updateDocumentRobust(
+    await databases.updateDocument(
       databaseId: AppConstants.databaseId,
       collectionId: collectionId,
       documentId: productId,
@@ -128,12 +140,12 @@ class ProductService {
 
   Future<void> incrementViewCount(String productId) async {
     try {
-      final current = await RobustDocumentService.getDocumentRobust(
+      final current = await databases.getDocument(
         databaseId: AppConstants.databaseId,
         collectionId: collectionId,
         documentId: productId,
       );
-      final count = (current['view_count'] ?? 0) as int;
+      final count = (current.data['view_count'] ?? 0) as int;
       await databases.updateDocument(
         databaseId: AppConstants.databaseId,
         collectionId: collectionId,
@@ -149,7 +161,7 @@ class ProductService {
     required String userId,
     required String productId,
   }) async {
-    final res = await RobustDocumentService.listDocumentsRobust(
+    final res = await databases.listDocuments(
       databaseId: AppConstants.databaseId,
       collectionId: favoritesCollectionId,
       queries: [
@@ -158,14 +170,14 @@ class ProductService {
         Query.limit(1),
       ],
     );
-    return res.isNotEmpty;
+    return res.documents.isNotEmpty;
   }
 
   Future<bool> toggleFavorite({
     required String userId,
     required String productId,
   }) async {
-    final res = await RobustDocumentService.listDocumentsRobust(
+    final res = await databases.listDocuments(
       databaseId: AppConstants.databaseId,
       collectionId: favoritesCollectionId,
       queries: [
@@ -174,8 +186,8 @@ class ProductService {
         Query.limit(1),
       ],
     );
-    if (res.isEmpty) {
-      await RobustDocumentService.createDocumentRobust(
+    if (res.documents.isEmpty) {
+      await databases.createDocument(
         databaseId: AppConstants.databaseId,
         collectionId: favoritesCollectionId,
         documentId: ID.unique(),
@@ -184,10 +196,10 @@ class ProductService {
       await _bumpFavoriteCount(productId, 1);
       return true;
     } else {
-      await RobustDocumentService.deleteDocumentRobust(
+      await databases.deleteDocument(
         databaseId: AppConstants.databaseId,
         collectionId: favoritesCollectionId,
-        documentId: res.first['\$id'],
+        documentId: res.documents.first.$id,
       );
       await _bumpFavoriteCount(productId, -1);
       return false;
@@ -208,7 +220,7 @@ class ProductService {
       Query.equal('user_id', userId),
     ];
 
-    final results = await RobustDocumentService.listDocumentsRobust(
+    final results = await databases.listDocuments(
       databaseId: AppConstants.databaseId,
       collectionId: favoritesCollectionId,
       queries: queries,
@@ -216,8 +228,10 @@ class ProductService {
 
     // Extract products from the relationship field and filter them
     final List<ProductModel> products = [];
-    for (final favorite in results) {
-      final productData = favorite['product'];
+    for (final favorite in results.documents) {
+      final favoriteMap = Map<String, dynamic>.from(favorite.data);
+      favoriteMap['\$id'] = favorite.$id;
+      final productData = favoriteMap['product'];
       if (productData != null && productData is Map<String, dynamic>) {
         try {
           final product = ProductModel.fromMap(productData);
@@ -248,12 +262,12 @@ class ProductService {
 
   Future<void> _bumpFavoriteCount(String productId, int delta) async {
     try {
-      final current = await RobustDocumentService.getDocumentRobust(
+      final current = await databases.getDocument(
         databaseId: AppConstants.databaseId,
         collectionId: collectionId,
         documentId: productId,
       );
-      final count = (current['favorite_count'] ?? 0) as int;
+      final count = (current.data['favorite_count'] ?? 0) as int;
       final int newCount = count + delta;
       final int safeCount = newCount < 0 ? 0 : newCount;
       await databases.updateDocument(

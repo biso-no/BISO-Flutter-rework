@@ -2,7 +2,6 @@ import 'package:appwrite/appwrite.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../models/department_model.dart';
-import 'robust_document_service.dart';
 import '../services/appwrite_service.dart';
 
 class DepartmentService {
@@ -37,7 +36,7 @@ class DepartmentService {
 
   Future<DepartmentModel?> getDepartmentById(String id) async {
     try {
-      final docs = await RobustDocumentService.listDocumentsRobust(
+      final docs = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: collectionId,
         queries: [
@@ -54,8 +53,8 @@ class DepartmentService {
           Query.limit(1),
         ],
       );
-      if (docs.isEmpty) return null;
-      return DepartmentModel.fromMap(docs.first);
+      if (docs.documents.isEmpty) return null;
+      return DepartmentModel.fromMap(docs.documents.first.data);
     } catch (_) {
       return null;
     }
@@ -65,7 +64,7 @@ class DepartmentService {
     String departmentId,
   ) async {
     // Collection name assumed to be 'department_socials' per spec
-    final docs = await RobustDocumentService.listDocumentsRobust(
+      final docs = await databases.listDocuments(
       databaseId: AppConstants.databaseId,
       collectionId: 'department_socials',
       queries: [
@@ -74,6 +73,6 @@ class DepartmentService {
         Query.limit(10),
       ],
     );
-    return docs;
+    return docs.documents.map((doc) => doc.data).toList();
   }
 }

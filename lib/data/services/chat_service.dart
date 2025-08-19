@@ -7,7 +7,6 @@ import '../models/chat_model.dart';
 import '../models/public_profile_model.dart';
 import 'appwrite_service.dart';
 import 'public_profile_service.dart';
-import 'robust_document_service.dart';
 
 class ChatService {
   RealtimeSubscription? _subscription;
@@ -28,7 +27,7 @@ class ChatService {
   // Get user's chats
   Future<List<ChatModel>> getUserChats(String userId) async {
     try {
-      final documents = await RobustDocumentService.listDocumentsRobust(
+      final documents = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: 'chats',
         queries: [
@@ -38,7 +37,7 @@ class ChatService {
         ],
       );
 
-      final chats = documents.map((doc) => ChatModel.fromMap(doc)).toList();
+      final chats = documents.documents.map((doc) => ChatModel.fromMap(doc.data)).toList();
 
       _chatsController.add(chats);
       return chats;
@@ -66,14 +65,14 @@ class ChatService {
         queries.add('cursorAfter("$offset")');
       }
 
-      final documents = await RobustDocumentService.listDocumentsRobust(
+      final documents = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: 'chat_messages',
         queries: queries,
       );
 
-      return documents
-          .map((doc) => ChatMessageModel.fromMap(doc))
+      return documents.documents
+          .map((doc) => ChatMessageModel.fromMap(doc.data))
           .toList()
           .reversed // Reverse to show oldest first
           .toList();
@@ -111,14 +110,14 @@ class ChatService {
         'metadata': metadata ?? {},
       };
 
-      final doc = await RobustDocumentService.createDocumentRobust(
+      final doc = await databases.createDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'chat_messages',
         documentId: ID.unique(),
         data: messageData,
       );
 
-      final message = ChatMessageModel.fromMap(doc);
+      final message = ChatMessageModel.fromMap(doc.data);
 
       // Update chat's last message and activity
       await _updateChatLastMessage(chatId, message);
@@ -169,14 +168,14 @@ class ChatService {
         'last_activity_at': DateTime.now().toIso8601String(),
       };
 
-      final doc = await RobustDocumentService.createDocumentRobust(
+      final doc = await databases.createDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'chats',
         documentId: ID.unique(),
         data: chatData,
       );
 
-      return ChatModel.fromMap(doc);
+      return ChatModel.fromMap(doc.data);
     } on AppwriteException catch (e) {
       throw ChatException('Failed to create chat: ${e.message}');
     } catch (e) {
@@ -218,20 +217,20 @@ class ChatService {
   // Add user to chat (adds to both chat and team)
   Future<void> addUserToChat(String chatId, String userId) async {
     try {
-      final chat = await RobustDocumentService.getDocumentRobust(
+      final chat = await databases.getDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'chats',
         documentId: chatId,
       );
 
-      final participants = List<String>.from(chat['participants']);
-      final teamId = chat['team_id'];
+      final participants = List<String>.from(chat.data['participants']);
+      final teamId = chat.data['team_id'];
 
       if (!participants.contains(userId)) {
         participants.add(userId);
 
         // Update chat participants
-        await RobustDocumentService.updateDocumentRobust(
+        await databases.updateDocument(
           databaseId: AppConstants.databaseId,
           collectionId: 'chats',
           documentId: chatId,
@@ -253,17 +252,17 @@ class ChatService {
   // Add user to team
   Future<void> _addUserToTeam(String teamId, String userId) async {
     try {
-      final team = await RobustDocumentService.getDocumentRobust(
+      final team = await databases.getDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'teams',
         documentId: teamId,
       );
 
-      final members = List<String>.from(team['members']);
+      final members = List<String>.from(team.data['members']);
       if (!members.contains(userId)) {
         members.add(userId);
 
-        await RobustDocumentService.updateDocumentRobust(
+        await databases.updateDocument(
           databaseId: AppConstants.databaseId,
           collectionId: 'teams',
           documentId: teamId,
@@ -278,19 +277,19 @@ class ChatService {
   // Remove user from chat (removes from both chat and team)
   Future<void> removeUserFromChat(String chatId, String userId) async {
     try {
-      final chat = await RobustDocumentService.getDocumentRobust(
+      final chat = await databases.getDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'chats',
         documentId: chatId,
       );
 
-      final participants = List<String>.from(chat['participants']);
-      final teamId = chat['team_id'];
+      final participants = List<String>.from(chat.data['participants']);
+      final teamId = chat.data['team_id'];
 
       participants.remove(userId);
 
       // Update chat participants
-      await RobustDocumentService.updateDocumentRobust(
+      await databases.updateDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'chats',
         documentId: chatId,
@@ -311,16 +310,16 @@ class ChatService {
   // Remove user from team
   Future<void> _removeUserFromTeam(String teamId, String userId) async {
     try {
-      final team = await RobustDocumentService.getDocumentRobust(
+      final team = await databases.getDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'teams',
         documentId: teamId,
       );
 
-      final members = List<String>.from(team['members']);
+      final members = List<String>.from(team.data['members']);
       members.remove(userId);
 
-      await RobustDocumentService.updateDocumentRobust(
+      await databases.updateDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'teams',
         documentId: teamId,
@@ -334,7 +333,7 @@ class ChatService {
   // Mark messages as read
   Future<void> markAsRead(String chatId, String userId) async {
     try {
-      await RobustDocumentService.updateDocumentRobust(
+      await databases.updateDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'chats',
         documentId: chatId,
@@ -863,14 +862,14 @@ class ChatService {
         },
       };
 
-      final response = await RobustDocumentService.createDocumentRobust(
+      final response = await databases.createDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'teams',
         documentId: ID.unique(),
         data: teamData,
       );
 
-      return response['\$id'];
+      return response.$id;
     } catch (e) {
       throw ChatException('Failed to create chat team: $e');
     }
@@ -970,12 +969,12 @@ class ChatService {
   }) async {
     try {
       // Get chat details for permission calculation
-      final chat = await RobustDocumentService.getDocumentRobust(
+      final chat = await databases.getDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'chats',
         documentId: chatId,
       );
-      final chatModel = ChatModel.fromMap(chat);
+      final chatModel = ChatModel.fromMap(chat.data);
 
       // Upload file first with proper permissions
       final fileId = await uploadChatFile(file, fileName, chatModel);
@@ -1054,12 +1053,12 @@ class ChatService {
   // Get user name by ID
   Future<String> getUserName(String userId) async {
     try {
-      final user = await RobustDocumentService.getDocumentRobust(
+      final user = await databases.getDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'user',
         documentId: userId,
       );
-      return user['name'] ?? 'Unknown User';
+      return user.data['name'] ?? 'Unknown User';
     } catch (e) {
       return 'Unknown User';
     }
@@ -1085,25 +1084,25 @@ class ChatService {
   Future<void> deleteChat(String chatId) async {
     try {
       // Get chat details first
-      final chat = await RobustDocumentService.getDocumentRobust(
+      final chat = await databases.getDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'chats',
         documentId: chatId,
       );
 
-      final teamId = chat['team_id'];
+      final teamId = chat.data['team_id'];
 
       // Delete the chat
-      await RobustDocumentService.deleteDocumentRobust(
+      await databases.deleteDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'chats',
         documentId: chatId,
       );
 
       // Delete associated team if it was auto-created for this chat
-      if (teamId != null && chat['metadata']?['auto_team_created'] == true) {
+      if (teamId != null && chat.data['metadata']?['auto_team_created'] == true) {
         try {
-          await RobustDocumentService.deleteDocumentRobust(
+          await databases.deleteDocument(
             databaseId: AppConstants.databaseId,
             collectionId: 'teams',
             documentId: teamId,
@@ -1120,7 +1119,7 @@ class ChatService {
   // Mute/unmute chat
   Future<void> muteChat(String chatId, bool muted) async {
     try {
-      await RobustDocumentService.updateDocumentRobust(
+      await databases.updateDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'chats',
         documentId: chatId,
@@ -1155,7 +1154,7 @@ class ChatService {
     String currentUserId,
   ) async {
     try {
-      final documents = await RobustDocumentService.listDocumentsRobust(
+      final documents = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: 'chats',
         queries: [
@@ -1167,8 +1166,8 @@ class ChatService {
       );
 
       final contacts = <String>{};
-      for (final chat in documents) {
-        final participants = List<String>.from(chat['participants'] ?? []);
+      for (final chat in documents.documents) {
+        final participants = List<String>.from(chat.data['participants'] ?? []);
         for (final participant in participants) {
           if (participant != currentUserId) {
             contacts.add(participant);
@@ -1190,13 +1189,13 @@ class ChatService {
   // Get departments list
   Future<List<Map<String, dynamic>>> getDepartments() async {
     try {
-      final documents = await RobustDocumentService.listDocumentsRobust(
+      final documents = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: 'departments',
         queries: ['equal("active", true)', 'orderAsc("name")'],
       );
 
-      return documents;
+      return documents.documents.map((doc) => doc.data).toList();
     } catch (e) {
       return [];
     }
@@ -1205,7 +1204,7 @@ class ChatService {
   // Get teams list
   Future<List<Map<String, dynamic>>> getTeams() async {
     try {
-      final documents = await RobustDocumentService.listDocumentsRobust(
+      final documents = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: 'teams',
         queries: [
@@ -1214,7 +1213,7 @@ class ChatService {
         ],
       );
 
-      return documents;
+      return documents.documents.map((doc) => doc.data).toList();
     } catch (e) {
       return [];
     }

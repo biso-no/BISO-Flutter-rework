@@ -1,9 +1,8 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter/foundation.dart';
-
+import 'appwrite_service.dart';
 import '../../core/constants/app_constants.dart';
 import '../models/large_event_model.dart';
-import 'robust_document_service.dart';
 
 class LargeEventItemService {
   static const String collectionId = 'large_event_item';
@@ -13,7 +12,7 @@ class LargeEventItemService {
     required String campusId,
   }) async {
     try {
-      final docs = await RobustDocumentService.listDocumentsRobust(
+      final docs = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: collectionId,
         queries: [
@@ -24,8 +23,8 @@ class LargeEventItemService {
           Query.limit(200),
         ],
       );
-      return docs
-          .map((e) => LargeEventScheduleItem.fromMap(e))
+      return docs.documents
+          .map((doc) => LargeEventScheduleItem.fromMap(doc.data))
           .toList(growable: false);
     } catch (e, st) {
       debugPrint('LargeEventItemService.listItems error: $e\n$st');

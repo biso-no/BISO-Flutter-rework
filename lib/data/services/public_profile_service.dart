@@ -2,7 +2,7 @@ import 'package:appwrite/appwrite.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../models/public_profile_model.dart';
-import 'robust_document_service.dart';
+import 'appwrite_service.dart';
 
 class PublicProfileService {
   static final PublicProfileService _instance =
@@ -35,14 +35,14 @@ class PublicProfileService {
         'phone_visible': phoneVisible,
       };
 
-      final document = await RobustDocumentService.createDocumentRobust(
+      final document = await databases.createDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'public_profiles',
         documentId: ID.unique(),
         data: profileData,
       );
 
-      return PublicProfileModel.fromMap(document);
+      return PublicProfileModel.fromMap(document.data);
     } on AppwriteException catch (e) {
       throw PublicProfileException(
         'Failed to create public profile: ${e.message}',
@@ -55,17 +55,17 @@ class PublicProfileService {
   /// Get a user's public profile by user ID
   Future<PublicProfileModel?> getPublicProfileByUserId(String userId) async {
     try {
-      final documents = await RobustDocumentService.listDocumentsRobust(
+      final documents = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: 'public_profiles',
         queries: [Query.equal('user_id', userId), Query.limit(1)],
       );
 
-      if (documents.isEmpty) {
+      if (documents.documents.isEmpty) {
         return null;
       }
 
-      return PublicProfileModel.fromMap(documents.first);
+      return PublicProfileModel.fromMap(documents.documents.first.data);
     } on AppwriteException catch (e) {
       throw PublicProfileException(
         'Failed to get public profile: ${e.message}',
@@ -102,14 +102,14 @@ class PublicProfileService {
       if (emailVisible != null) updateData['email_visible'] = emailVisible;
       if (phoneVisible != null) updateData['phone_visible'] = phoneVisible;
 
-      final document = await RobustDocumentService.updateDocumentRobust(
+      final document = await databases.updateDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'public_profiles',
         documentId: currentProfile.id,
         data: updateData,
       );
 
-      return PublicProfileModel.fromMap(document);
+      return PublicProfileModel.fromMap(document.data);
     } on AppwriteException catch (e) {
       throw PublicProfileException(
         'Failed to update public profile: ${e.message}',
@@ -127,7 +127,7 @@ class PublicProfileService {
         return; // Profile doesn't exist, nothing to delete
       }
 
-      await RobustDocumentService.deleteDocumentRobust(
+      await databases.deleteDocument(
         databaseId: AppConstants.databaseId,
         collectionId: 'public_profiles',
         documentId: currentProfile.id,
@@ -161,13 +161,13 @@ class PublicProfileService {
         queries.add(Query.equal('campus_id', campusId));
       }
 
-      final documents = await RobustDocumentService.listDocumentsRobust(
+      final documents = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: 'public_profiles',
         queries: queries,
       );
 
-      return documents.map((doc) => PublicProfileModel.fromMap(doc)).toList();
+      return documents.documents.map((doc) => PublicProfileModel.fromMap(doc.data)).toList();
     } on AppwriteException catch (e) {
       throw PublicProfileException(
         'Failed to search public profiles: ${e.message}',
@@ -184,7 +184,7 @@ class PublicProfileService {
     try {
       if (userIds.isEmpty) return [];
 
-      final documents = await RobustDocumentService.listDocumentsRobust(
+      final documents = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: 'public_profiles',
         queries: [
@@ -193,7 +193,7 @@ class PublicProfileService {
         ],
       );
 
-      return documents.map((doc) => PublicProfileModel.fromMap(doc)).toList();
+      return documents.documents.map((doc) => PublicProfileModel.fromMap(doc.data)).toList();
     } on AppwriteException catch (e) {
       throw PublicProfileException(
         'Failed to get multiple public profiles: ${e.message}',
@@ -251,7 +251,7 @@ class PublicProfileService {
     int limit = 50,
   }) async {
     try {
-      final documents = await RobustDocumentService.listDocumentsRobust(
+      final documents = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: 'public_profiles',
         queries: [
@@ -261,7 +261,7 @@ class PublicProfileService {
         ],
       );
 
-      return documents.map((doc) => PublicProfileModel.fromMap(doc)).toList();
+      return documents.documents.map((doc) => PublicProfileModel.fromMap(doc.data)).toList();
     } on AppwriteException catch (e) {
       throw PublicProfileException(
         'Failed to get campus public profiles: ${e.message}',

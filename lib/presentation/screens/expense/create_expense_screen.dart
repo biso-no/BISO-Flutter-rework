@@ -11,7 +11,7 @@ import 'dart:ui' as ui;
 
 import '../../../core/constants/app_colors.dart';
 import '../../../providers/auth/auth_provider.dart';
-import '../../../data/services/expense_service.dart';
+import '../../../data/services/expense_service_v2.dart';
 import '../../../core/utils/favorites_storage.dart';
 
 class CreateExpenseScreen extends ConsumerStatefulWidget {
@@ -49,7 +49,7 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
   String? _selectedCampusName;
   List<Map<String, String>> _campuses = [];
   List<Map<String, String>> _departments = [];
-  final ExpenseService _expenseService = ExpenseService();
+  final ExpenseServiceV2 _expenseService = ExpenseServiceV2();
   List<String> _favoriteDepartmentIds = [];
 
   // categories removed per new flow
@@ -63,7 +63,14 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
       final user = ref.read(currentUserProvider);
       // Load campuses (id + name)
       try {
-        _campuses = await _expenseService.listCampuses();
+        final rawCampuses = await _expenseService.listCampuses();
+        _campuses = rawCampuses
+            .map<Map<String, String>>((c) => {
+                  'id': (c['\$id'] ?? c['id'] ?? '').toString(),
+                  'name': (c['name'] ?? '').toString(),
+                })
+            .where((c) => c['id']!.isNotEmpty && c['name']!.isNotEmpty)
+            .toList();
       } catch (_) {}
       _favoriteDepartmentIds =
           await FavoritesStorage.getFavoriteDepartmentIds();
