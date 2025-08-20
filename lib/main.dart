@@ -14,6 +14,7 @@ import 'core/constants/app_colors.dart';
 import 'generated/l10n/app_localizations.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/otp_verification_screen.dart';
+import 'presentation/screens/auth/magic_link_verify_screen.dart';
 import 'presentation/screens/onboarding/onboarding_screen.dart';
 import 'presentation/screens/home/premium_home_screen.dart';
 import 'presentation/screens/explore/explore_screen.dart';
@@ -38,6 +39,7 @@ import 'presentation/screens/validator/controller_mode_screen.dart';
 import 'data/models/large_event_model.dart';
 import 'data/services/large_event_service.dart';
 import 'data/services/notification_service.dart';
+import 'data/services/deep_link_service.dart';
 
 // Background message handler for Firebase
 @pragma('vm:entry-point')
@@ -60,6 +62,14 @@ void main() async {
 
   // Initialize notification service
   await NotificationService().initialize();
+
+  // Initialize deep link service (with error handling)
+  try {
+    await DeepLinkService().initialize();
+  } catch (e) {
+    debugPrint('Warning: Deep link service failed to initialize: $e');
+    // Continue app startup even if deep links fail
+  }
 
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
@@ -105,19 +115,34 @@ class BisoApp extends ConsumerWidget {
 
 // Create router as a static instance to prevent rebuilding
 final _router = GoRouter(
+  navigatorKey: navigatorKey,
   initialLocation: '/',
   routes: [
     // Auth routes (outside shell)
     GoRoute(
       path: '/auth/login',
       name: 'login',
-      builder: (context, state) => const LoginScreen(),
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        final useFallback = extra?['useFallback'] == true;
+        return LoginScreen(useFallback: useFallback);
+      },
     ),
     GoRoute(
       path: '/auth/verify-otp',
       name: 'verify-otp',
       builder: (context, state) =>
           OtpVerificationScreen(email: state.extra as String? ?? ''),
+    ),
+    GoRoute(
+      path: '/auth/magic-link-verify',
+      name: 'magic-link-verify',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        final userId = extra?['userId'] as String? ?? '';
+        final secret = extra?['secret'] as String? ?? '';
+        return MagicLinkVerifyScreen(userId: userId, secret: secret);
+      },
     ),
     GoRoute(
       path: '/onboarding',

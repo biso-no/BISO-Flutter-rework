@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
@@ -185,6 +186,34 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
     }
   }
 
+  Future<void> _openMailApp() async {
+    try {
+      final Uri emailUri = Uri(scheme: 'mailto');
+      
+      if (await canLaunchUrl(emailUri)) {
+        await launchUrl(emailUri);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Could not open mail app. Please check your email manually.'),
+              backgroundColor: AppColors.warning,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please check your email manually.'),
+            backgroundColor: AppColors.warning,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -226,7 +255,26 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                 textAlign: TextAlign.center,
               ),
 
-              const SizedBox(height: 48),
+              const SizedBox(height: 24),
+
+              // Open Mail App Button
+              Center(
+                child: OutlinedButton.icon(
+                  onPressed: _openMailApp,
+                  icon: const Icon(Icons.mail_outline),
+                  label: Text(l10n.openMailApp),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.defaultBlue,
+                    side: const BorderSide(color: AppColors.defaultBlue),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 32),
 
               // OTP Input Fields
               Row(

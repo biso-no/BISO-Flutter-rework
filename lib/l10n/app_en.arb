@@ -90,6 +90,11 @@
     "description": "Resend OTP button"
   },
   
+  "openMailApp": "Open Mail App",
+  "@openMailApp": {
+    "description": "Button to open default mail app"
+  },
+  
   "home": "Home",
   "@home": {
     "description": "Home tab label"

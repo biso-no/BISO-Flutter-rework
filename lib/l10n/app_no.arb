@@ -21,6 +21,7 @@
   "enterOtpCode": "Skriv inn 6-sifret kode",
   "invalidOtpCode": "Ugyldig kode. Vennligst prøv igjen.",
   "resendCode": "Send kode på nytt",
+  "openMailApp": "Åpne e-post app",
   
   "home": "Hjem",
   "explore": "Utforsk",

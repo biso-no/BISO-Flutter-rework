@@ -103,18 +103,50 @@ class EventModel extends Equatable {
       endDate: (map['end_date'] ?? map['meta']?['end_date']) != null
           ? DateTime.parse(map['end_date'] ?? map['meta']?['end_date'])
           : null,
-      venue: map['venue'] ?? map['meta']?['venue'] ?? '',
+      venue: (() {
+        final venue = map['venue'];
+        if (venue is Map<String, dynamic>) {
+          return venue['name']?.toString() ?? '';
+        }
+        return venue?.toString() ?? map['meta']?['venue']?.toString() ?? '';
+      })(),
       location: map['location'] ?? map['meta']?['location'],
-      organizerId: (map['organizer_id'] ?? map['meta']?['organizer_id'] ?? '')
-          .toString(),
-      organizerName:
-          map['organizer_name'] ??
-          map['organizer'] ??
-          map['meta']?['organizer_name'] ??
-          '',
+      organizerId: (() {
+        final organizer = map['organizer'];
+        if (organizer is Map<String, dynamic>) {
+          return organizer['id']?.toString() ?? '';
+        }
+        return (map['organizer_id'] ?? map['meta']?['organizer_id'] ?? '').toString();
+      })(),
+      organizerName: (() {
+        final organizer = map['organizer'];
+        if (organizer is Map<String, dynamic>) {
+          return organizer['name']?.toString() ?? '';
+        }
+        return map['organizer_name'] ?? 
+               map['organizer'] ?? 
+               map['meta']?['organizer_name'] ?? 
+               '';
+      })(),
       organizerLogo: map['organizer_logo'] ?? map['meta']?['organizer_logo'],
-      campusId: (map['campus_id'] ?? map['meta']?['campus_id'] ?? '')
-          .toString(),
+      campusId: (() {
+        // First try explicit campus_id fields
+        if (map['campus_id'] != null || map['meta']?['campus_id'] != null) {
+          return (map['campus_id'] ?? map['meta']?['campus_id'] ?? '').toString();
+        }
+        
+        // Try to derive campus from organizer slug (for WordPress API)
+        final organizer = map['organizer'];
+        if (organizer is Map<String, dynamic>) {
+          final slug = organizer['slug']?.toString() ?? '';
+          if (slug.contains('oslo')) return 'oslo';
+          if (slug.contains('bergen')) return 'bergen'; 
+          if (slug.contains('trondheim')) return 'trondheim';
+          if (slug.contains('stavanger')) return 'stavanger';
+        }
+        
+        return '';
+      })(),
       categories: (() {
         final raw = map['categories'] ?? map['category'] ?? [];
         if (raw is List) {
@@ -185,8 +217,10 @@ class EventModel extends Equatable {
   }
 
   // Factory for the Appwrite Function events payload
-  factory EventModel.fromFunctionEvent(Map<String, dynamic> map) {
-    return EventModel.fromWordPress(map);
+  factory EventModel.fromFunctionEvent(Map<String, dynamic> map, {String? campusId}) {
+    final event = EventModel.fromWordPress(map);
+    // Override campus ID with the one passed from the function call
+    return event.copyWith(campusId: campusId ?? event.campusId);
   }
 
   Map<String, dynamic> toMap() {

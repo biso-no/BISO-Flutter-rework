@@ -24,7 +24,8 @@
       "mcp__appwrite__databases_create_integer_attribute",
       "mcp__appwrite__databases_create_datetime_attribute",
       "Bash(flutter pub remove:*)",
-      "Bash(flutter build:*)"
+      "Bash(flutter build:*)",
+      "Bash(dart:*)"
     ],
     "deny": []
   }

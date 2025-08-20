@@ -63,6 +63,9 @@ class AppLocalizationsNo extends AppLocalizations {
   String get resendCode => 'Send kode på nytt';
 
   @override
+  String get openMailApp => 'Åpne e-post app';
+
+  @override
   String get home => 'Hjem';
 
   @override

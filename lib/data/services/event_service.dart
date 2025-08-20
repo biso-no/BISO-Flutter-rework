@@ -42,7 +42,7 @@ class EventService {
         final List<dynamic> events =
             (payload['events'] as List<dynamic>? ?? <dynamic>[]);
         final models = events
-            .map((e) => EventModel.fromFunctionEvent(e as Map<String, dynamic>))
+            .map((e) => EventModel.fromFunctionEvent(e as Map<String, dynamic>, campusId: campusId ?? ''))
             .toList();
 
         // Sort by start date ascending and apply limit/offset locally

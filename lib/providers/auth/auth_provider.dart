@@ -202,6 +202,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> sendMagicLink(String email) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final userId = await _authService.sendMagicLink(email);
+      state = state.copyWith(isLoading: false, pendingUserId: userId);
+    } catch (e) {
+      state = state.copyWith(
+        error: e.toString(),
+        isLoading: false,
+        pendingUserId: null,
+      );
+      rethrow;
+    }
+  }
+
   Future<void> sendOtp(String email) async {
     state = state.copyWith(isLoading: true, error: null);
 
@@ -214,6 +230,28 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
         pendingUserId: null,
       );
+      rethrow;
+    }
+  }
+
+  Future<void> verifyMagicLink(String userId, String secret) async {
+    logPrint(
+      '🔗 DEBUG: Starting verifyMagicLink with userId: $userId, secret: $secret',
+    );
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final user = await _authService.verifyMagicLink(userId, secret);
+      logPrint('🔗 DEBUG: Magic link verification successful, user: ${user.email}');
+
+      // After successful magic link verification, load complete profile
+      await _loadCompleteProfile(user.id);
+
+      // Clear pending userId
+      state = state.copyWith(pendingUserId: null);
+    } catch (e) {
+      logPrint('🔗 DEBUG: Magic link verification failed: $e');
+      state = state.copyWith(error: e.toString(), isLoading: false);
       rethrow;
     }
   }

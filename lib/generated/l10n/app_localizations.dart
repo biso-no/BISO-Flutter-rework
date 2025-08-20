@@ -200,6 +200,12 @@ abstract class AppLocalizations {
   /// **'Resend code'**
   String get resendCode;
 
+  /// Button to open default mail app
+  ///
+  /// In en, this message translates to:
+  /// **'Open Mail App'**
+  String get openMailApp;
+
   /// Home tab label
   ///
   /// In en, this message translates to:

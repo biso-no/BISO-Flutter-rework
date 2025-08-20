@@ -63,6 +63,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resendCode => 'Resend code';
 
   @override
+  String get openMailApp => 'Open Mail App';
+
+  @override
   String get home => 'Home';
 
   @override

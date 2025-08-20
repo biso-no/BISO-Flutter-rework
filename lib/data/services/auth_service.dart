@@ -20,6 +20,50 @@ class AuthService {
   // Student service for managing student verification
   final StudentService _studentService = StudentService();
 
+  Future<String> sendMagicLink(String email) async {
+    try {
+      AppLogger.auth(
+        'Creating magic link for user',
+        action: 'send_magic_link',
+        extra: {
+          'email': email.replaceAll(
+            RegExp(r'(.{2}).*(@.*)'),
+            r'\1***\2',
+          ), // Mask email for privacy
+        },
+      );
+
+      // Generate a unique ID for this magic link session
+      final userId = ID.unique();
+
+      // Create magic URL with custom scheme
+      const magicLinkUrl = 'biso://auth/magic-link';
+
+      final token = await _account.createMagicURLToken(
+        userId: userId,
+        email: email,
+        url: magicLinkUrl,
+      );
+
+      AppLogger.auth(
+        'Magic link token created successfully',
+        userId: token.userId,
+        action: 'magic_link_created',
+        extra: {
+          'token_user_id': token.userId,
+          'session_user_id': userId,
+          'ids_match': userId == token.userId,
+        },
+      );
+
+      return token.userId;
+    } on AppwriteException catch (e) {
+      throw AuthException('Failed to send magic link: ${e.message}');
+    } catch (e) {
+      throw AuthException('Network error occurred');
+    }
+  }
+
   Future<String> sendOtp(String email) async {
     try {
       AppLogger.auth(
@@ -57,6 +101,68 @@ class AuthService {
       throw AuthException('Failed to send OTP: ${e.message}');
     } catch (e) {
       throw AuthException('Network error occurred');
+    }
+  }
+
+  Future<UserModel> verifyMagicLink(String userId, String secret) async {
+    logPrint(
+      '🔗 DEBUG: Starting verifyMagicLink with userId: $userId, secret: $secret',
+    );
+    try {
+      // Create session with magic link tokens
+      logPrint('🔗 DEBUG: About to call _account.createSession for magic link...');
+      logPrint('🔗 DEBUG: Parameters - userId: $userId, secret: $secret');
+      final session = await _account.createSession(
+        userId: userId,
+        secret: secret,
+      );
+      logPrint('🔗 DEBUG: Magic link session created successfully!');
+      logPrint('🔗 DEBUG: Session ID: ${session.$id}');
+      logPrint('🔗 DEBUG: Session userId: ${session.userId}');
+      logPrint('🔗 DEBUG: Session provider: ${session.provider}');
+
+      // Get user account info
+      final accountUser = await _account.get();
+
+      // Check if user profile exists in database
+      UserModel? userProfile;
+      try {
+        final doc = await _databases.getDocument(
+          databaseId: AppConstants.databaseId,
+          collectionId: 'user',
+          documentId: accountUser.$id,
+        );
+        userProfile = UserModel.fromMap(doc.data);
+      } catch (e) {
+        // User profile doesn't exist, will need onboarding
+      }
+
+      return userProfile ??
+          UserModel(
+            id: accountUser.$id,
+            name: accountUser.name,
+            email: accountUser.email,
+          );
+    } on AppwriteException catch (e) {
+      logPrint(
+        '🔗 DEBUG: AppwriteException - Code: ${e.code}, Message: ${e.message}',
+      );
+      logPrint('🔗 DEBUG: AppwriteException - Type: ${e.type}');
+      logPrint('🔗 DEBUG: AppwriteException - Response: ${e.response}');
+      
+      // Handle specific magic link errors
+      if (e.message?.contains('Invalid credentials') == true ||
+          e.message?.contains('User (role: guests) missing scope') == true ||
+          e.code == 401) {
+        throw MagicLinkException('This magic link has expired or is invalid. Please request a new one.');
+      } else if (e.message?.contains('A user with the same email already exists') == true) {
+        throw MagicLinkException('You may already have an active session. Try clearing your session and signing in again.');
+      }
+      
+      throw MagicLinkException('Failed to sign in with magic link: ${e.message}');
+    } catch (e) {
+      logPrint('🔗 DEBUG: General exception: $e');
+      throw MagicLinkException('Magic link sign-in failed');
     }
   }
 
@@ -478,6 +584,14 @@ class AuthService {
 class AuthException implements Exception {
   final String message;
   AuthException(this.message);
+
+  @override
+  String toString() => message;
+}
+
+class MagicLinkException implements Exception {
+  final String message;
+  MagicLinkException(this.message);
 
   @override
   String toString() => message;
