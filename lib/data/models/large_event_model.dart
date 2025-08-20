@@ -1,7 +1,63 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import '../../core/utils/color_utils.dart';
+
+/// Types of content that can be showcased in the hero carousel
+enum ShowcaseType {
+  largeEvent,     // Traditional large events (default)
+  webshopProduct, // Featured webshop products
+  externalEvent,  // TicketCo or other external events
+  jobOpportunity, // Featured job opportunities
+  announcement,   // General announcements
+}
+
+extension ShowcaseTypeX on ShowcaseType {
+  static ShowcaseType parse(dynamic value) {
+    final s = (value ?? '').toString().toLowerCase();
+    switch (s) {
+      case 'webshopproduct':
+      case 'webshop_product':
+      case 'webshop-product':
+      case 'product':
+        return ShowcaseType.webshopProduct;
+      case 'externalevent':
+      case 'external_event':
+      case 'external-event':
+      case 'ticketco':
+        return ShowcaseType.externalEvent;
+      case 'jobopportunity':
+      case 'job_opportunity':
+      case 'job-opportunity':
+      case 'job':
+        return ShowcaseType.jobOpportunity;
+      case 'announcement':
+        return ShowcaseType.announcement;
+      case 'largeevent':
+      case 'large_event':
+      case 'large-event':
+      case 'event':
+      default:
+        return ShowcaseType.largeEvent;
+    }
+  }
+
+  String get value {
+    switch (this) {
+      case ShowcaseType.webshopProduct:
+        return 'webshopProduct';
+      case ShowcaseType.externalEvent:
+        return 'externalEvent';
+      case ShowcaseType.jobOpportunity:
+        return 'jobOpportunity';
+      case ShowcaseType.announcement:
+        return 'announcement';
+      case ShowcaseType.largeEvent:
+        return 'largeEvent';
+    }
+  }
+}
 
 class LargeEventModel {
   final String id;
@@ -13,6 +69,12 @@ class LargeEventModel {
   final bool isActive;
   final bool heroOverrideEnabled; // Global toggle for replacing home hero
   final int priority; // Higher wins when multiple events active
+
+  // Showcase system
+  final ShowcaseType showcaseType; // Type of content being showcased
+  final Map<String, dynamic> contentMetadata; // Flexible data for different types
+  final String? externalUrl; // CTA URL for external links
+  final String? ctaText; // Custom call-to-action text
 
   // Theming
   final String? primaryColorHex;
@@ -36,6 +98,10 @@ class LargeEventModel {
     required this.heroOverrideEnabled,
     required this.priority,
     required this.campusConfigs,
+    this.showcaseType = ShowcaseType.largeEvent,
+    this.contentMetadata = const {},
+    this.externalUrl,
+    this.ctaText,
     this.primaryColorHex,
     this.secondaryColorHex,
     this.textColorHex,
@@ -50,6 +116,31 @@ class LargeEventModel {
   List<Color> get gradientColors => (gradientHex ?? ['#3DA9E0', '#7BC8E8'])
       .map(parseHexColor)
       .toList(growable: false);
+
+  // Convenience getters for different showcase types
+  String? get productId => contentMetadata['productId'];
+  String? get jobId => contentMetadata['jobId'];  
+  String? get ticketcoEventId => contentMetadata['ticketcoEventId'];
+  String? get ticketcoOrgId => contentMetadata['ticketcoOrgId'];
+  String? get announcementContent => contentMetadata['content'];
+  
+  // Get the effective CTA text based on showcase type
+  String get effectiveCtaText {
+    if (ctaText?.isNotEmpty == true) return ctaText!;
+    
+    switch (showcaseType) {
+      case ShowcaseType.webshopProduct:
+        return 'Shop Now';
+      case ShowcaseType.externalEvent:
+        return 'Get Tickets';
+      case ShowcaseType.jobOpportunity:
+        return 'Apply Now';
+      case ShowcaseType.announcement:
+        return 'Learn More';
+      case ShowcaseType.largeEvent:
+        return 'View Event';
+    }
+  }
 
   bool isActiveForCampus(String campusId, DateTime now) {
     if (!isActive) return false;
@@ -82,6 +173,19 @@ class LargeEventModel {
       }
     }
 
+    // Parse contentMetadata
+    Map<String, dynamic> contentMetadata = {};
+    dynamic rawMetadata = map['contentMetadata'];
+    if (rawMetadata is String && rawMetadata.isNotEmpty) {
+      try {
+        contentMetadata = Map<String, dynamic>.from(json.decode(rawMetadata));
+      } catch (_) {
+        contentMetadata = {};
+      }
+    } else if (rawMetadata is Map<String, dynamic>) {
+      contentMetadata = rawMetadata;
+    }
+
     return LargeEventModel(
       id: map['\$id'] ?? map['id'] ?? '',
       slug: map['slug'] ?? '',
@@ -95,6 +199,10 @@ class LargeEventModel {
       priority: map['priority'] is int
           ? map['priority'] as int
           : int.tryParse('${map['priority']}') ?? 0,
+      showcaseType: ShowcaseTypeX.parse(map['showcaseType']),
+      contentMetadata: contentMetadata,
+      externalUrl: map['externalUrl'],
+      ctaText: map['ctaText'],
       primaryColorHex: map['primaryColorHex'],
       secondaryColorHex: map['secondaryColorHex'],
       textColorHex: map['textColorHex'],

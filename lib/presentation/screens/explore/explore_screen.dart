@@ -174,6 +174,7 @@ class ExploreScreen extends StatelessWidget {
                       launchUrl(Uri.parse('https://biso.no'));
                     },
                   ),
+                  const Divider(height: 1),
                   ListTile(
                     leading: const CircleAvatar(
                       backgroundColor: AppColors.subtleBlue,

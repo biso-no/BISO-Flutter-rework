@@ -93,3 +93,23 @@ final featuredLargeEventProvider = Provider<LargeEventModel?>((ref) {
   eligible.sort((a, b) => b.priority.compareTo(a.priority));
   return eligible.first;
 });
+
+// Provider to get all showcase items for hero carousel (including different types)
+final heroShowcaseItemsProvider = Provider<List<LargeEventModel>>((ref) {
+  final campus = ref.watch(filterCampusProvider);
+  final state = ref.watch(largeEventProvider);
+  final now = DateTime.now();
+  
+  final eligible = state.activeEvents
+      .where((e) => e.isActiveForCampus(campus.id, now))
+      .where(
+        (e) =>
+            e.heroOverrideEnabled &&
+            (e.campusConfig(campus.id)?.heroOverrideEnabled ?? true),
+      )
+      .toList();
+  
+  // Sort by priority (highest first)
+  eligible.sort((a, b) => b.priority.compareTo(a.priority));
+  return eligible;
+});

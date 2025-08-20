@@ -65,9 +65,9 @@ flutter:
   assets:
     - assets/images/
     - assets/images/campus/
-    - assets/icons/
-    - assets/animations/
-    - assets/translations/
+   # - assets/icons/
+   # - assets/animations/
+   # - assets/translations/
   
 # fonts:
   # Using system default fonts for better compatibility

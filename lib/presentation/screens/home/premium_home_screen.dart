@@ -11,14 +11,15 @@ import '../../../presentation/widgets/premium/premium_components.dart';
 import '../../../presentation/widgets/premium/premium_layouts.dart';
 import '../../../presentation/widgets/premium/premium_navigation.dart';
 import '../../../presentation/widgets/premium/premium_html_renderer.dart';
+import '../../../presentation/widgets/dynamic_hero_carousel.dart';
 
 import '../../../providers/large_event/large_event_provider.dart';
 import '../../../data/services/event_service.dart';
 import '../../../data/services/job_service.dart';
-import '../../../data/services/product_service.dart';
+import '../../../data/services/webshop_service.dart';
 import '../../../data/models/event_model.dart';
 import '../../../data/models/job_model.dart';
-import '../../../data/models/product_model.dart';
+import '../../../data/models/webshop_product_model.dart';
 import '../explore/explore_screen.dart';
 import '../chat/chat_list_screen.dart';
 import '../auth/login_screen.dart';
@@ -154,8 +155,8 @@ class PremiumHomePage extends ConsumerWidget {
   static final _eventServiceProvider = Provider<EventService>(
     (ref) => EventService(),
   );
-  static final _productServiceProvider = Provider<ProductService>(
-    (ref) => ProductService(),
+  static final _webshopServiceProvider = Provider<WebshopService>(
+    (ref) => WebshopService(),
   );
   static final _jobServiceProvider = Provider<JobService>(
     (ref) => JobService(),
@@ -167,10 +168,14 @@ class PremiumHomePage extends ConsumerWidget {
         return service.getWordPressEvents(campusId: campusId, limit: 6);
       });
 
-  static final _latestProductsProvider =
-      FutureProvider.family<List<ProductModel>, String>((ref, campusId) async {
-        final service = ref.watch(_productServiceProvider);
-        return service.getLatestProducts(campusId: campusId, limit: 6);
+  static final _latestWebshopProductsProvider =
+      FutureProvider.family<List<WebshopProduct>, String>((ref, campusName) async {
+        final service = ref.watch(_webshopServiceProvider);
+        return service.listWebshopProducts(
+          campusName: campusName,
+          departmentId: null,
+          limit: 6,
+        );
       });
 
   static final _latestJobsProvider =
@@ -185,21 +190,21 @@ class PremiumHomePage extends ConsumerWidget {
     ref.watch(authStateProvider);
     AppLocalizations.of(context);
 
-    final featuredEvent = ref.watch(featuredLargeEventProvider);
+    final showcaseItems = ref.watch(heroShowcaseItemsProvider);
     final campusId = campus.id;
 
     final eventsAsync = ref.watch(_latestEventsProvider(campusId));
-    final productsAsync = ref.watch(_latestProductsProvider(campusId));
+    final webshopProductsAsync = ref.watch(_latestWebshopProductsProvider(campus.name));
     final jobsAsync = ref.watch(_latestJobsProvider(campusId));
 
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
       slivers: [
-        // Premium Hero Section
+        // Dynamic Hero Carousel Section
         SliverToBoxAdapter(
-          child: _PremiumHeroSection(
+          child: DynamicHeroCarousel(
             campus: campus,
-            featuredEvent: featuredEvent,
+            showcaseItems: showcaseItems,
             onCampusTap: () => _showCampusSwitcher(context, ref),
           ),
         ),
@@ -228,18 +233,18 @@ class PremiumHomePage extends ConsumerWidget {
           providerFamily: _latestEventsProvider,
         ),
 
-        // Marketplace Section
+        // Webshop Section
         _buildPremiumContentSection(
-          title: 'Student Marketplace',
-          subtitle: 'Buy and sell with fellow students',
-          icon: Icons.shopping_bag_rounded,
+          title: 'BISO Webshop',
+          subtitle: 'Official merchandise and campus gear',
+          icon: Icons.storefront_rounded,
           onViewAll: () => context.go('/explore/products'),
-          asyncData: productsAsync,
-          campusId: campusId,
+          asyncData: webshopProductsAsync,
+          campusId: campus.name,
           contentBuilder: (items) =>
-              _PremiumProductGrid(products: items.cast<ProductModel>()),
+              _PremiumWebshopCarousel(products: items.cast<WebshopProduct>()),
           ref: ref,
-          providerFamily: _latestProductsProvider,
+          providerFamily: _latestWebshopProductsProvider,
         ),
 
         // Volunteer Opportunities Section
@@ -325,195 +330,8 @@ class PremiumHomePage extends ConsumerWidget {
   }
 }
 
-// === PREMIUM HERO SECTION ===
-
-class _PremiumHeroSection extends StatelessWidget {
-  final dynamic campus;
-  final dynamic featuredEvent;
-  final VoidCallback onCampusTap;
-
-  const _PremiumHeroSection({
-    required this.campus,
-    this.featuredEvent,
-    required this.onCampusTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final statusBarHeight = MediaQuery.of(context).padding.top;
-
-    return SizedBox(
-      height: 400 + statusBarHeight,
-      child: Stack(
-        children: [
-          // Background gradient
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.biLightBlue,
-                  AppColors.biNavy,
-                  AppColors.charcoalBlack,
-                ],
-                stops: const [0.0, 0.7, 1.0],
-              ),
-            ),
-          ),
-
-          // Floating decorative elements
-          Positioned(
-            top: statusBarHeight + 60,
-            right: -50,
-            child: Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    Colors.white.withValues(alpha: 0.1),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          Positioned(
-            bottom: 80,
-            left: -80,
-            child: Container(
-              width: 160,
-              height: 160,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.biLightBlue.withValues(alpha: 0.2),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // Main content
-          Positioned(
-            top: statusBarHeight + 20,
-            left: 24,
-            right: 24,
-            bottom: 24,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header with campus switcher
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Welcome to BISO',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    _CampusButton(campus: campus, onTap: onCampusTap),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-
-                // Campus info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        campus.name,
-                        style: theme.textTheme.displayMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          height: 1.1,
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      Text(
-                        'Connecting students across Norway\'s leading business school',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.9),
-                          height: 1.4,
-                        ),
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // Campus stats
-                      // _PremiumStatsRow(campus: campus),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// === CAMPUS BUTTON ===
-
-class _CampusButton extends StatelessWidget {
-  final dynamic campus;
-  final VoidCallback onTap;
-
-  const _CampusButton({required this.campus, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.2),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.location_on_rounded, size: 18, color: Colors.white),
-            const SizedBox(width: 8),
-            Text(
-              campus.name,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Icon(
-              Icons.expand_more,
-              size: 16,
-              color: Colors.white.withValues(alpha: 0.8),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// Old _PremiumHeroSection and _CampusButton classes removed
+// They have been replaced by the DynamicHeroCarousel widget
 
 // === CAMPUS SWITCHER MODAL ===
 
@@ -1190,97 +1008,206 @@ class _PremiumEventCard extends StatelessWidget {
   }
 }
 
-class _PremiumProductGrid extends StatelessWidget {
-  final List<ProductModel> products;
+class _PremiumWebshopCarousel extends StatelessWidget {
+  final List<WebshopProduct> products;
 
-  const _PremiumProductGrid({required this.products});
+  const _PremiumWebshopCarousel({required this.products});
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
+    return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       scrollDirection: Axis.horizontal,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 0.8,
-      ),
+      physics: const BouncingScrollPhysics(),
       itemCount: products.length,
+      separatorBuilder: (_, _) => const SizedBox(width: 16),
       itemBuilder: (context, index) {
         final product = products[index];
-        return _PremiumProductCard(product: product);
+        return SizedBox(width: 280, child: _PremiumWebshopProductCard(product: product));
       },
     );
   }
 }
 
-class _PremiumProductCard extends StatelessWidget {
-  final ProductModel product;
+class _PremiumWebshopProductCard extends StatelessWidget {
+  final WebshopProduct product;
 
-  const _PremiumProductCard({required this.product});
+  const _PremiumWebshopProductCard({required this.product});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final hasSale = product.hasSale;
 
     return PremiumCard(
-      padding: const EdgeInsets.all(12),
-      onTap: () => context.go('/explore/products/${product.id}'),
+      padding: EdgeInsets.zero,
+      onTap: () {
+        context.pushNamed(
+          'webshop-product-detail',
+          pathParameters: {'productId': product.id.toString()},
+          extra: product,
+        );
+      },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Product image placeholder
-          Expanded(
-            flex: 3,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                gradient: LinearGradient(colors: AppColors.marketplaceGradient),
+          // Product image with overlay
+          Container(
+            height: 140,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
               ),
-              child: Center(
-                child: Icon(
-                  Icons.shopping_bag_outlined,
-                  color: Colors.white,
-                  size: 32,
+              color: AppColors.gray100,
+            ),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                    child: product.images.isNotEmpty
+                        ? Image.network(
+                            product.images.first,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => Container(
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(20),
+                                ),
+                                gradient: LinearGradient(colors: [
+                                  AppColors.biLightBlue,
+                                  AppColors.defaultBlue,
+                                ]),
+                              ),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.storefront_outlined,
+                                  color: Colors.white,
+                                  size: 48,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(20),
+                              ),
+                              gradient: LinearGradient(colors: [
+                                AppColors.biLightBlue,
+                                AppColors.defaultBlue,
+                              ]),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.storefront_outlined,
+                                color: Colors.white,
+                                size: 48,
+                              ),
+                            ),
+                          ),
+                  ),
                 ),
-              ),
+                
+                // Price overlay
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (hasSale) ...[
+                          Text(
+                            'NOK ${product.price}',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.stoneGray,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                        ],
+                        Text(
+                          'NOK ${hasSale ? product.salePrice : product.price}',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.charcoalBlack,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                // Sale badge
+                if (hasSale)
+                  Positioned(
+                    top: 12,
+                    left: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.error,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'SALE',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 10,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
 
-          const SizedBox(height: 8),
-
-          // Product info
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                product.name,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
+          // Content
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  product.name,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
 
-              Text(
-                product.formattedPrice,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: AppColors.biLightBlue,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+                const SizedBox(height: 8),
 
-              Text(
-                'by ${product.sellerName}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.stoneGray,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+                if (product.campusLabel != null)
+                  Text(
+                    product.campusLabel!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.biLightBlue,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+              ],
+            ),
           ),
         ],
       ),
