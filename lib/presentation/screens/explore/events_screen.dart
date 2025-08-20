@@ -607,27 +607,8 @@ class _EventDetailSheet extends StatelessWidget {
                         onPressed: () {
                           // TODO: Share event
                         },
-                        icon: const Icon(Icons.share),
-                        label: const Text('Share'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      flex: 2,
-                      child: ElevatedButton.icon(
-                        onPressed: event.canRegister
-                            ? () {
-                                // TODO: Register for event
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Registration - Coming Soon'),
-                                  ),
-                                );
-                              }
-                            : null,
-                        icon: const Icon(Icons.event_available),
-                        label: Text(event.isFull ? 'Full' : 'Register'),
+                        icon: const Icon(Icons.web),
+                        label: const Text('View on Biso.no'),
                       ),
                     ),
                   ],
