@@ -30,6 +30,7 @@ import 'presentation/screens/explore/expenses_screen.dart';
 import 'presentation/screens/explore/units_overview_screen.dart';
 import 'presentation/screens/explore/unit_detail_screen.dart';
 import 'presentation/screens/explore/departures_screen.dart';
+import 'presentation/screens/explore/campus_detail_screen.dart';
 import 'presentation/screens/chat/chat_list_screen.dart';
 import 'presentation/screens/ai_chat/ai_chat_screen.dart';
 import 'presentation/screens/profile/profile_screen.dart';
@@ -248,6 +249,14 @@ final _router = GoRouter(
               path: '/ai-chat',
               name: 'ai-chat',
               builder: (context, state) => const AiChatScreen(),
+            ),
+            GoRoute(
+              path: '/campus/:campusId',
+              name: 'campus-detail',
+              builder: (context, state) {
+                final campusId = state.pathParameters['campusId']!;
+                return CampusDetailScreen(campusId: campusId);
+              },
             ),
           ],
         ),

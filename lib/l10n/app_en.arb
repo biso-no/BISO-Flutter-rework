@@ -263,5 +263,45 @@
   "somethingWentWrong": "Something went wrong",
   "@somethingWentWrong": {
     "description": "Generic error message"
+  },
+
+  "forStudents": "For Students",
+  "@forStudents": {
+    "description": "Student benefits section title"
+  },
+
+  "forBusiness": "For Business",
+  "@forBusiness": {
+    "description": "Business benefits section title"
+  },
+
+  "careerAdvantages": "Career Advantages",
+  "@careerAdvantages": {
+    "description": "Career advantages section title"
+  },
+
+  "students": "Students",
+  "@students": {
+    "description": "Students count label"
+  },
+
+  "products": "Products",
+  "@products": {
+    "description": "Products category"
+  },
+
+  "clubs": "Clubs",
+  "@clubs": {
+    "description": "Clubs category"
+  },
+
+  "campusLeadership": "Campus Leadership",
+  "@campusLeadership": {
+    "description": "Campus leadership section title"
+  },
+
+  "contactInformation": "Contact Information",
+  "@contactInformation": {
+    "description": "Contact information section title"
   }
 }

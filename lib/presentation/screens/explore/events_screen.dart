@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/navigation_utils.dart';
@@ -12,14 +13,23 @@ import '../../../providers/campus/campus_provider.dart';
 // Provider for EventService
 final eventServiceProvider = Provider<EventService>((ref) => EventService());
 
+// Search term for events (server-backed)
+final eventsSearchTermProvider = StateProvider<String?>((ref) => null);
+
 // Provider for events list
-final eventsProvider = FutureProvider.family<List<EventModel>, String?>((
-  ref,
-  campusId,
-) {
-  final service = ref.watch(eventServiceProvider);
-  return service.getAllEvents(campusId: campusId, limit: 50);
-});
+final eventsProvider = FutureProvider.family<List<EventModel>, String?>(
+  (ref, campusId) {
+    final service = ref.watch(eventServiceProvider);
+    final searchTerm = ref.watch(eventsSearchTermProvider);
+    // Use function-backed fetch with pagination params; initial page 1
+    return service.getWordPressEvents(
+      campusId: campusId,
+      limit: 50,
+      includePast: false,
+      search: searchTerm,
+    );
+  },
+);
 
 class EventsScreen extends ConsumerStatefulWidget {
   const EventsScreen({super.key});
@@ -30,17 +40,6 @@ class EventsScreen extends ConsumerStatefulWidget {
 
 class _EventsScreenState extends ConsumerState<EventsScreen> {
   final TextEditingController _searchController = TextEditingController();
-  String _selectedCategory = 'all';
-
-  final List<String> _categories = [
-    'all',
-    'academic',
-    'social',
-    'career',
-    'sports',
-    'cultural',
-    'workshop',
-  ];
 
   @override
   void dispose() {
@@ -61,69 +60,21 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              // TODO: Implement search functionality
+              _promptSearch(context);
             },
             icon: const Icon(Icons.search),
-          ),
-          IconButton(
-            onPressed: () {
-              // TODO: Implement filter functionality
-            },
-            icon: const Icon(Icons.filter_list),
           ),
         ],
       ),
       body: Column(
         children: [
-          // Category Filter
-          Container(
-            height: 60,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _categories.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                final category = _categories[index];
-                final isSelected = _selectedCategory == category;
-
-                return FilterChip(
-                  label: Text(_getCategoryDisplayName(category)),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedCategory = category;
-                    });
-                  },
-                  backgroundColor: Colors.transparent,
-                  selectedColor: AppColors.subtleBlue,
-                  checkmarkColor: AppColors.defaultBlue,
-                  labelStyle: TextStyle(
-                    color: isSelected
-                        ? AppColors.defaultBlue
-                        : AppColors.onSurfaceVariant,
-                    fontWeight: isSelected
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
-                  side: BorderSide(
-                    color: isSelected
-                        ? AppColors.defaultBlue
-                        : AppColors.outline,
-                  ),
-                );
-              },
-            ),
-          ),
-
           const Divider(height: 1),
 
           // Events List
           Expanded(
             child: eventsAsync.when(
               data: (events) {
-                final filteredEvents = _filterEvents(events);
+                final filteredEvents = _applyClientSearch(events);
 
                 if (filteredEvents.isEmpty) {
                   return _EmptyState(
@@ -147,7 +98,6 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                       return _EventCard(
                         event: event,
                         onTap: () {
-                          // TODO: Navigate to event detail
                           _showEventDetails(context, event);
                         },
                       );
@@ -164,62 +114,17 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // TODO: Implement create event functionality
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Create Event - Coming Soon')),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Create Event'),
-        backgroundColor: AppColors.defaultBlue,
-      ),
     );
   }
 
-  String _getCategoryDisplayName(String category) {
-    switch (category) {
-      case 'all':
-        return 'All';
-      case 'academic':
-        return 'Academic';
-      case 'social':
-        return 'Social';
-      case 'career':
-        return 'Career';
-      case 'sports':
-        return 'Sports';
-      case 'cultural':
-        return 'Cultural';
-      case 'workshop':
-        return 'Workshop';
-      default:
-        return category;
-    }
-  }
-
-  List<EventModel> _filterEvents(List<EventModel> events) {
-    var filtered = events;
-
-    // Filter by category
-    if (_selectedCategory != 'all') {
-      filtered = filtered.where((event) {
-        return event.categories.contains(_selectedCategory);
-      }).toList();
-    }
-
-    // Filter by search query
+  List<EventModel> _applyClientSearch(List<EventModel> events) {
     final searchQuery = _searchController.text.toLowerCase();
-    if (searchQuery.isNotEmpty) {
-      filtered = filtered.where((event) {
-        return event.title.toLowerCase().contains(searchQuery) ||
-            event.description.toLowerCase().contains(searchQuery) ||
-            event.organizerName.toLowerCase().contains(searchQuery);
-      }).toList();
-    }
-
-    return filtered;
+    if (searchQuery.isEmpty) return events;
+    return events.where((event) {
+      return event.title.toLowerCase().contains(searchQuery) ||
+          event.description.toLowerCase().contains(searchQuery) ||
+          event.organizerName.toLowerCase().contains(searchQuery);
+    }).toList();
   }
 
   void _showEventDetails(BuildContext context, EventModel event) {
@@ -238,6 +143,64 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
             _EventDetailSheet(event: event, scrollController: scrollController),
       ),
     );
+  }
+
+  Future<void> _promptSearch(BuildContext context) async {
+    final current = ref.read(eventsSearchTermProvider);
+    final controller = TextEditingController(text: current ?? _searchController.text);
+    final result = await showDialog<String?>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Search events'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              hintText: 'Type at least 2 characters',
+            ),
+            onSubmitted: (value) => Navigator.of(context).pop(value),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(null),
+              child: const Text('Cancel'),
+            ),
+            if ((current ?? '').isNotEmpty)
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(''),
+                child: const Text('Clear'),
+              ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(controller.text),
+              child: const Text('Search'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (!mounted) return;
+    if (result == null) return; // cancelled
+
+    final trimmed = result.trim();
+    if (trimmed.isEmpty) {
+      // clear search
+      ref.read(eventsSearchTermProvider.notifier).state = null;
+      _searchController.text = '';
+    } else if (trimmed.length >= 2) {
+      ref.read(eventsSearchTermProvider.notifier).state = trimmed;
+      _searchController.text = trimmed; // keep local for client-side refine
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Search must be at least 2 characters')),
+      );
+      return;
+    }
+
+    // reload with new search param
+    final campusId = ref.read(filterCampusProvider).id;
+    ref.invalidate(eventsProvider(campusId));
   }
 }
 
@@ -605,7 +568,10 @@ class _EventDetailSheet extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () {
-                          // TODO: Share event
+                          final url = event.registrationUrl;
+                          if (url != null && url.isNotEmpty) {
+                            launchUrl(Uri.parse(url));
+                          }
                         },
                         icon: const Icon(Icons.web),
                         label: const Text('View on Biso.no'),

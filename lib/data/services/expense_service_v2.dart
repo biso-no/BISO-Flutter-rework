@@ -25,11 +25,30 @@ class ExpenseServiceV2 {
   }) async {
     try {
       logPrint('💰 ExpenseServiceV2: Fetching user expenses');
+      // Resolve userId: prefer provided, otherwise use the currently authenticated user
+      String? effectiveUserId = userId;
+      if (effectiveUserId == null || effectiveUserId.isEmpty) {
+        try {
+          final user = await account.get();
+          effectiveUserId = user.$id;
+        } catch (_) {
+          // If we cannot resolve current user, we proceed without user filter
+        }
+      }
+
+      // Build queries: always order by creation date desc, filter by user when available,
+      // and include any additional queries passed in (status, campus, department, etc.)
+      final List<String> mergedQueries = <String>[];
+      if (effectiveUserId != null && effectiveUserId.isNotEmpty) {
+        mergedQueries.add(Query.equal('userId', effectiveUserId));
+      }
+      mergedQueries.addAll(queries);
+      mergedQueries.add(Query.orderDesc('\$createdAt'));
 
       final documents = await databases.listDocuments(
         databaseId: AppConstants.databaseId,
         collectionId: expensesCollectionId,
-        queries: [Query.orderDesc('\$createdAt')],
+        queries: mergedQueries,
       );
 
       logPrint('💰 ExpenseServiceV2: Found ${documents.total} expenses');
@@ -295,7 +314,7 @@ class ExpenseServiceV2 {
   }) async {
     return getUserExpenses(
       userId: userId,
-      queries: ['equal("status", "$status")'],
+      queries: [Query.equal('status', status)],
     );
   }
 
@@ -329,14 +348,16 @@ class ExpenseServiceV2 {
       final stats = <String, dynamic>{
         'total_count': expenses.length,
         'total_amount': 0.0,
+        'draft_count': 0,
+        'draft_amount': 0.0,
         'pending_count': 0,
         'pending_amount': 0.0,
-        'approved_count': 0,
-        'approved_amount': 0.0,
+        'submitted_count': 0,
+        'submitted_amount': 0.0,
+        'success_count': 0,
+        'success_amount': 0.0,
         'rejected_count': 0,
         'rejected_amount': 0.0,
-        'paid_count': 0,
-        'paid_amount': 0.0,
         'prepayment_count': 0,
         'prepayment_amount': 0.0,
       };
@@ -345,21 +366,25 @@ class ExpenseServiceV2 {
         stats['total_amount'] += expense.total;
 
         switch (expense.status) {
+          case 'draft':
+            stats['draft_count']++;
+            stats['draft_amount'] += expense.total;
+            break;
           case 'pending':
             stats['pending_count']++;
             stats['pending_amount'] += expense.total;
             break;
-          case 'approved':
-            stats['approved_count']++;
-            stats['approved_amount'] += expense.total;
+          case 'submitted':
+            stats['submitted_count']++;
+            stats['submitted_amount'] += expense.total;
+            break;
+          case 'success':
+            stats['success_count']++;
+            stats['success_amount'] += expense.total;
             break;
           case 'rejected':
             stats['rejected_count']++;
             stats['rejected_amount'] += expense.total;
-            break;
-          case 'paid':
-            stats['paid_count']++;
-            stats['paid_amount'] += expense.total;
             break;
         }
 

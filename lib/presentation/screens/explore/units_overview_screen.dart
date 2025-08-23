@@ -25,7 +25,7 @@ class UnitsOverviewScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Clubs & Departments')),
+      appBar: AppBar(title: const Text('Units & Departments')),
       body: asyncDepts.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Failed to load: $e')),
@@ -42,7 +42,7 @@ class UnitsOverviewScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'No active clubs here yet',
+                      'No active units here yet',
                     style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(height: 4),

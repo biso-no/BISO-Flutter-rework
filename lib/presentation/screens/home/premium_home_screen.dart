@@ -165,7 +165,11 @@ class PremiumHomePage extends ConsumerWidget {
   static final _latestEventsProvider =
       FutureProvider.family<List<EventModel>, String>((ref, campusId) async {
         final service = ref.watch(_eventServiceProvider);
-        return service.getWordPressEvents(campusId: campusId, limit: 6);
+        return service.getWordPressEvents(
+          campusId: campusId,
+          limit: 6,
+          includePast: false,
+        );
       });
 
   static final _latestWebshopProductsProvider =
@@ -181,7 +185,12 @@ class PremiumHomePage extends ConsumerWidget {
   static final _latestJobsProvider =
       FutureProvider.family<List<JobModel>, String>((ref, campusId) async {
         final service = ref.watch(_jobServiceProvider);
-        return service.getLatestJobs(campusId: campusId, limit: 6);
+        return service.getLatestJobs(
+          campusId: campusId,
+          limit: 6,
+          page: 1,
+          includeExpired: false,
+        );
       });
 
   @override
@@ -312,17 +321,20 @@ class PremiumHomePage extends ConsumerWidget {
       builder: (context) => Consumer(
         builder: (context, ref, child) {
           final selectedCampus = ref.watch(filterCampusProvider);
-          final allCampuses = ref.watch(allCampusesSyncProvider);
-
-          return _CampusSwitcherModal(
-            selectedCampus: selectedCampus,
-            allCampuses: allCampuses,
-            onCampusSelected: (campus) {
-              ref
-                  .read(filterCampusProvider.notifier)
-                  .selectFilterCampus(campus);
-              Navigator.pop(context);
-            },
+          final allCampusesAsync = ref.watch(switcherCampusesProvider);
+          return allCampusesAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => const Center(child: Text('Failed to load campuses')),
+            data: (allCampuses) => _CampusSwitcherModal(
+              selectedCampus: selectedCampus,
+              allCampuses: allCampuses,
+              onCampusSelected: (campus) {
+                ref
+                    .read(filterCampusStateProvider.notifier)
+                    .selectFilterCampus(campus);
+                Navigator.pop(context);
+              },
+            ),
           );
         },
       ),

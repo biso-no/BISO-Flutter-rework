@@ -166,4 +166,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get somethingWentWrong => 'Something went wrong';
+
+  @override
+  String get forStudents => 'For Students';
+
+  @override
+  String get forBusiness => 'For Business';
+
+  @override
+  String get careerAdvantages => 'Career Advantages';
+
+  @override
+  String get students => 'Students';
+
+  @override
+  String get products => 'Products';
+
+  @override
+  String get clubs => 'Clubs';
+
+  @override
+  String get campusLeadership => 'Campus Leadership';
+
+  @override
+  String get contactInformation => 'Contact Information';
 }

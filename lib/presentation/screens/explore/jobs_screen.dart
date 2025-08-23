@@ -13,12 +13,17 @@ import '../../widgets/premium/premium_html_renderer.dart';
 
 // Providers
 final _jobServiceProvider = Provider<JobService>((ref) => JobService());
-final jobsProvider = FutureProvider.family<List<JobModel>, String?>((
+final jobsProvider = FutureProvider.family<List<JobModel>, String?>( (
   ref,
   campusId,
 ) {
   final service = ref.watch(_jobServiceProvider);
-  return service.getLatestJobs(campusId: campusId, limit: 50);
+  return service.getLatestJobs(
+    campusId: campusId,
+    limit: 50,
+    page: 1,
+    includeExpired: false,
+  );
 });
 
 class JobsScreen extends ConsumerStatefulWidget {
@@ -31,7 +36,7 @@ class JobsScreen extends ConsumerStatefulWidget {
 class _JobsScreenState extends ConsumerState<JobsScreen> {
   String _selectedType = 'all';
 
-  final List<String> _jobTypes = ['all', 'volunteer', 'paid', 'internship'];
+  final List<String> _jobTypes = ['all', 'volunteer', 'paid'];
 
   @override
   Widget build(BuildContext context) {
@@ -211,8 +216,6 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
         return 'Volunteer';
       case 'paid':
         return 'Paid';
-      case 'internship':
-        return 'Internship';
       default:
         return type;
     }
@@ -443,8 +446,6 @@ class _JobCard extends StatelessWidget {
         return 'Volunteer';
       case 'paid':
         return 'Paid';
-      case 'internship':
-        return 'Internship';
       default:
         return type;
     }
@@ -456,8 +457,6 @@ class _JobCard extends StatelessWidget {
         return AppColors.success;
       case 'paid':
         return AppColors.defaultBlue;
-      case 'internship':
-        return AppColors.purple9;
       default:
         return AppColors.onSurfaceVariant;
     }
@@ -469,8 +468,6 @@ class _JobCard extends StatelessWidget {
         return Icons.volunteer_activism;
       case 'paid':
         return Icons.work;
-      case 'internship':
-        return Icons.school;
       default:
         return Icons.work_outline;
     }

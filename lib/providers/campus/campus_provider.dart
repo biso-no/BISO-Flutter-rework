@@ -7,10 +7,20 @@ import '../../data/services/campus_service.dart';
 import '../auth/auth_provider.dart';
 
 // Filter campus provider - used for filtering content display
-final filterCampusProvider =
-    StateNotifierProvider<FilterCampusNotifier, CampusModel>((ref) {
+final filterCampusStateProvider =
+    StateNotifierProvider<FilterCampusNotifier, CampusState>((ref) {
       return FilterCampusNotifier();
     });
+
+// Provider for the current campus (for backward compatibility)
+final filterCampusProvider = Provider<CampusModel>((ref) {
+  return ref.watch(filterCampusStateProvider).campus;
+});
+
+// Provider for checking if campus is initialized
+final campusInitializedProvider = Provider<bool>((ref) {
+  return ref.watch(filterCampusStateProvider).isInitialized;
+});
 
 // DEPRECATED: Use filterCampusProvider instead
 // This is kept for backward compatibility during migration
@@ -23,8 +33,11 @@ final profileCampusProvider = Provider<CampusModel?>((ref) {
   final authState = ref.watch(authStateProvider);
   final user = authState.user;
 
+  // No static lookup; this provider only exposes user preference if available
   if (user?.campusId != null) {
-    return CampusData.getCampusById(user!.campusId!);
+    // The full CampusModel should be fetched via campusProvider(user.campusId!)
+    // Keeping this nullable for compatibility where only ID presence is needed
+    return null;
   }
   return null;
 });
@@ -35,22 +48,59 @@ final allCampusesProvider = FutureProvider<List<CampusModel>>((ref) async {
   return await campusService.getAllCampuses();
 });
 
-// Synchronous provider for immediate access (with static fallback)
-final allCampusesSyncProvider = Provider<List<CampusModel>>((ref) {
-  final asyncCampuses = ref.watch(allCampusesProvider);
-  return asyncCampuses.when(
-    data: (campuses) => campuses,
-    loading: () => CampusData.campuses, // Fallback while loading
-    error: (_, _) => CampusData.campuses, // Fallback on error
-  );
+// Lightweight campuses for switcher (id, name, address), weather skipped for speed
+final switcherCampusesProvider = FutureProvider<List<CampusModel>>((ref) async {
+  final campusService = CampusService();
+  return await campusService.getSwitcherCampuses(includeWeather: false);
 });
 
+// Individual campus provider - fetches specific campus by ID
+final campusProvider = FutureProvider.family<CampusModel?, String>((ref, campusId) async {
+  final campusService = CampusService();
+  return await campusService.getCampusById(campusId);
+});
+
+// Synchronous provider for immediate access (with static fallback)
+// Removed synchronous fallback provider to avoid showing mock data before load
+
+// Campus state with initialization flag
+class CampusState {
+  final CampusModel campus;
+  final bool isInitialized;
+
+  const CampusState({
+    required this.campus,
+    required this.isInitialized,
+  });
+
+  CampusState copyWith({
+    CampusModel? campus,
+    bool? isInitialized,
+  }) {
+    return CampusState(
+      campus: campus ?? this.campus,
+      isInitialized: isInitialized ?? this.isInitialized,
+    );
+  }
+}
+
 // Filter campus state notifier - manages campus for content filtering
-class FilterCampusNotifier extends StateNotifier<CampusModel> {
+class FilterCampusNotifier extends StateNotifier<CampusState> {
   static const String _filterCampusKey = 'filter_campus_id';
   final CampusService _campusService = CampusService();
 
-  FilterCampusNotifier() : super(CampusData.defaultCampus) {
+  FilterCampusNotifier() : super(const CampusState(
+    campus: CampusModel(
+      id: '',
+      name: '',
+      description: '',
+      location: '',
+      imageUrl: '',
+      heroImageUrl: '',
+      stats: CampusStats(),
+    ),
+    isInitialized: false,
+  )) {
     _loadFilterCampus();
   }
 
@@ -61,26 +111,19 @@ class FilterCampusNotifier extends StateNotifier<CampusModel> {
 
       if (campusId != null) {
         logPrint('🏛️ FilterCampusNotifier: Loading campus with ID: $campusId');
-
-        // Try to fetch from Appwrite first
-        final campus = await _campusService.getCampusById(campusId);
+        // Prefer lite fetch to avoid heavy model build
+        final campus = await _campusService.getCampusByIdLite(campusId, includeWeather: false)
+            ?? await _campusService.getCampusById(campusId);
         if (campus != null) {
-          logPrint('✅ FilterCampusNotifier: Loaded campus: ${campus.name}');
-          state = campus;
-        } else {
-          // Fallback to static data
-          final staticCampus = CampusData.getCampusById(campusId);
-          if (staticCampus != null) {
-            logPrint(
-              '🔄 FilterCampusNotifier: Using static campus: ${staticCampus.name}',
-            );
-            state = staticCampus;
-          }
+          logPrint('✅ FilterCampusNotifier: Updated campus data: ${campus.name}');
+          state = state.copyWith(campus: campus);
         }
       }
     } catch (e) {
       logPrint('❌ FilterCampusNotifier: Error loading campus: $e');
-      // If loading fails, keep default campus
+      // If loading fails, keep current state
+    } finally {
+      state = state.copyWith(isInitialized: true);
     }
   }
 
@@ -88,7 +131,9 @@ class FilterCampusNotifier extends StateNotifier<CampusModel> {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_filterCampusKey, campus.id);
-      state = campus;
+      // Store name for instant UI header
+      await prefs.setString('${_filterCampusKey}_name', campus.name);
+      state = state.copyWith(campus: campus);
     } catch (e) {
       // Handle error - maybe show snackbar
       throw Exception('Failed to save filter campus selection');
@@ -99,7 +144,17 @@ class FilterCampusNotifier extends StateNotifier<CampusModel> {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_filterCampusKey);
-      state = CampusData.defaultCampus;
+      state = state.copyWith(
+        campus: const CampusModel(
+          id: '',
+          name: '',
+          description: '',
+          location: '',
+          imageUrl: '',
+          heroImageUrl: '',
+          stats: CampusStats(),
+        ),
+      );
     } catch (e) {
       // Handle error
     }

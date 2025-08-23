@@ -8,14 +8,22 @@ import 'appwrite_service.dart';
 class EventService {
   Databases get _databases => databases;
 
-  // Get events from WordPress API (external events)
+  // Get events from WordPress API via Appwrite Function
   Future<List<EventModel>> getWordPressEvents({
     String? campusId,
     int limit = AppConstants.defaultPageSize,
     int offset = 0,
+    bool includePast = false,
+    String? search,
   }) async {
-    // Backwards-compatible wrapper over Appwrite Function-based fetch
-    return getFunctionEvents(campusId: campusId, limit: limit, offset: offset);
+    final int page = (offset ~/ limit) + 1;
+    return getFunctionEvents(
+      campusId: campusId,
+      limit: limit,
+      page: page,
+      includePast: includePast,
+      search: search,
+    );
   }
 
   // Get events via Appwrite Function which fetches from WordPress
@@ -23,11 +31,78 @@ class EventService {
     String? campusId,
     int limit = AppConstants.defaultPageSize,
     int offset = 0,
+    int? page,
+    bool includePast = false,
+    String? search,
   }) async {
     try {
       final requestBody = {
         'campusId': campusId,
         'per_page': limit,
+        'page': page ?? ((offset ~/ limit) + 1),
+        'include_past': includePast,
+      };
+
+      // Only include search when present and meets minimal length constraints
+      final trimmedSearch = search?.trim();
+      if (trimmedSearch != null && trimmedSearch.isNotEmpty) {
+        requestBody['search'] = trimmedSearch;
+      }
+
+      final execution = await functions.createExecution(
+        functionId: AppConstants.fnFetchEventsId,
+        body: json.encode(requestBody),
+      );
+
+      if (execution.responseStatusCode == 200) {
+        final dynamic decoded = json.decode(execution.responseBody);
+
+        if (decoded is Map<String, dynamic>) {
+          final List<dynamic> events = (decoded['events'] as List<dynamic>? ?? <dynamic>[]);
+          return events
+              .map((e) => EventModel.fromFunctionEvent(
+                    e as Map<String, dynamic>,
+                    campusId: campusId ?? '',
+                  ))
+              .toList();
+        }
+
+        // Old format (array-only)
+        if (decoded is List) {
+          final models = decoded
+              .map((e) => EventModel.fromFunctionEvent(
+                    e as Map<String, dynamic>,
+                    campusId: campusId ?? '',
+                  ))
+              .toList();
+          models.sort((a, b) => a.startDate.compareTo(b.startDate));
+          final start = offset < models.length ? offset : models.length;
+          final end = (start + limit) < models.length ? (start + limit) : models.length;
+          return models.sublist(start, end);
+        }
+
+        throw EventException('Unexpected function response');
+      } else {
+        throw EventException(
+          'Failed to fetch events (function): HTTP ${execution.responseStatusCode}',
+        );
+      }
+    } catch (e) {
+      throw EventException('Error fetching events via function: $e');
+    }
+  }
+
+  // Get total events count for a campus via Appwrite Function
+  Future<int> getEventsTotalCount({
+    required String campusId,
+    bool includePast = false,
+  }) async {
+    try {
+      final requestBody = {
+        'campusId': campusId,
+        'per_page': 1,
+        'page': 1,
+        'include_past': includePast,
       };
 
       final execution = await functions.createExecution(
@@ -36,29 +111,30 @@ class EventService {
       );
 
       if (execution.responseStatusCode == 200) {
-        final Map<String, dynamic> payload = json.decode(
-          execution.responseBody,
-        );
-        final List<dynamic> events =
-            (payload['events'] as List<dynamic>? ?? <dynamic>[]);
-        final models = events
-            .map((e) => EventModel.fromFunctionEvent(e as Map<String, dynamic>, campusId: campusId ?? ''))
-            .toList();
+        final dynamic decoded = json.decode(execution.responseBody);
 
-        // Sort by start date ascending and apply limit/offset locally
-        models.sort((a, b) => a.startDate.compareTo(b.startDate));
-        final start = offset < models.length ? offset : models.length;
-        final end = (start + limit) < models.length
-            ? (start + limit)
-            : models.length;
-        return models.sublist(start, end);
-      } else {
-        throw EventException(
-          'Failed to fetch events (function): HTTP ${execution.responseStatusCode}',
-        );
+        if (decoded is Map<String, dynamic>) {
+          // New format
+          if (decoded['total_events'] is int) {
+            return decoded['total_events'] as int;
+          }
+          final pagination = decoded['pagination'];
+          if (pagination is Map<String, dynamic> && pagination['total_events'] is int) {
+            return pagination['total_events'] as int;
+          }
+          // Old format fallback (no total provided)
+          if (decoded['events'] is List) {
+            return (decoded['events'] as List).length;
+          }
+        } else if (decoded is List) {
+          // Old array-only format
+          return decoded.length;
+        }
       }
+
+      throw EventException('Failed to fetch events total: HTTP ${execution.responseStatusCode}');
     } catch (e) {
-      throw EventException('Error fetching events via function: $e');
+      throw EventException('Error fetching events total: $e');
     }
   }
 

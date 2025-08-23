@@ -328,6 +328,60 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
     }
   }
 
+  Future<void> _saveDraft() async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    try {
+      final user = ref.read(currentUserProvider);
+      if (user == null) throw Exception('Not authenticated');
+
+      // Minimal validation for draft: require campus & department selection
+      if (_selectedCampusId == null || _selectedDepartmentId == null) {
+        throw Exception('Select campus and department to save draft');
+      }
+
+      // No uploads for draft; attachments can be added later in edit flow
+      final sanitizedBank = _bankAccountController.text.replaceAll(' ', '');
+      final description = (_useAi
+              ? _overallDescriptionController.text
+              : _descriptionController.text)
+          .trim();
+
+      final data = <String, dynamic>{
+        'campus': _selectedCampusId ?? '',
+        'department': _selectedDepartmentName,
+        'departmentRel': _selectedDepartmentId,
+        'bank_account': sanitizedBank,
+        if (description.isNotEmpty) 'description': description,
+        'expenseAttachments': <String>[],
+        'total': 0,
+        'status': 'draft',
+        'user': user.id,
+        'userId': user.id,
+        'eventName': widget.eventName,
+      };
+
+      await _expenseService.createExpenseDocument(data: data);
+      if (mounted) {
+        Navigator.pop(context);
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text('Draft saved'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text('Failed to save draft: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -883,6 +937,14 @@ class _CreateExpenseScreenState extends ConsumerState<CreateExpenseScreen> {
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
+          ),
+
+          const SizedBox(height: 12),
+
+          OutlinedButton.icon(
+            onPressed: _saveDraft,
+            icon: const Icon(Icons.save_outlined),
+            label: const Text('Save as Draft'),
           ),
 
           const SizedBox(height: 12),

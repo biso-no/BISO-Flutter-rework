@@ -409,6 +409,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong'**
   String get somethingWentWrong;
+
+  /// Student benefits section title
+  ///
+  /// In en, this message translates to:
+  /// **'For Students'**
+  String get forStudents;
+
+  /// Business benefits section title
+  ///
+  /// In en, this message translates to:
+  /// **'For Business'**
+  String get forBusiness;
+
+  /// Career advantages section title
+  ///
+  /// In en, this message translates to:
+  /// **'Career Advantages'**
+  String get careerAdvantages;
+
+  /// Students count label
+  ///
+  /// In en, this message translates to:
+  /// **'Students'**
+  String get students;
+
+  /// Products category
+  ///
+  /// In en, this message translates to:
+  /// **'Products'**
+  String get products;
+
+  /// Clubs category
+  ///
+  /// In en, this message translates to:
+  /// **'Clubs'**
+  String get clubs;
+
+  /// Campus leadership section title
+  ///
+  /// In en, this message translates to:
+  /// **'Campus Leadership'**
+  String get campusLeadership;
+
+  /// Contact information section title
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Information'**
+  String get contactInformation;
 }
 
 class _AppLocalizationsDelegate

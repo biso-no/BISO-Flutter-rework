@@ -13,7 +13,7 @@ class ExpenseModel extends Equatable {
   final double total; // Required - matches total field
   final double? prepaymentAmount; // Optional - matches prepayment_amount field
   final String
-  status; // Enum - matches status field (pending, approved, rejected, paid)
+  status; // Enum - matches status field (draft, pending, submitted, success, rejected)
   final int? invoiceId; // Optional - matches invoice_id field
   final String? eventName; // Optional - matches eventName field
   final List<ExpenseAttachmentModel>
@@ -183,14 +183,17 @@ class ExpenseModel extends Equatable {
   }
 
   // Status helpers based on enum values
+  bool get isDraft => status == 'draft';
   bool get isPending => status == 'pending';
-  bool get isApproved => status == 'approved';
+  bool get isSubmitted => status == 'submitted';
+  bool get isSuccess => status == 'success';
   bool get isRejected => status == 'rejected';
-  bool get isPaid => status == 'paid';
 
   // UI helpers
-  bool get canEdit => isPending;
-  bool get canSubmit => isPending && expenseAttachments.isNotEmpty;
+  // Only draft expenses can be edited; submitted/pending/success/rejected are locked
+  bool get canEdit => isDraft;
+  // Draft can be submitted when it has at least one attachment
+  bool get canSubmit => isDraft && expenseAttachments.isNotEmpty;
   bool get hasPrepayment => prepaymentAmount != null && prepaymentAmount! > 0;
 
   String get formattedTotal => 'NOK ${total.toStringAsFixed(2)}';
@@ -198,14 +201,16 @@ class ExpenseModel extends Equatable {
 
   String get displayStatus {
     switch (status) {
+      case 'draft':
+        return 'Draft';
       case 'pending':
         return 'Pending';
-      case 'approved':
-        return 'Approved';
+      case 'submitted':
+        return 'Submitted';
+      case 'success':
+        return 'Success';
       case 'rejected':
         return 'Rejected';
-      case 'paid':
-        return 'Paid';
       default:
         return status.toUpperCase();
     }

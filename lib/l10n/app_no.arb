@@ -61,5 +61,14 @@
   "loading": "Laster...",
   "retry": "Prøv igjen",
   "noInternetConnection": "Ingen internettforbindelse",
-  "somethingWentWrong": "Noe gikk galt"
+  "somethingWentWrong": "Noe gikk galt",
+
+  "forStudents": "For Studenter",
+  "forBusiness": "For Bedrifter",
+  "careerAdvantages": "Karrierefordeler",
+  "students": "Studenter",
+  "products": "Produkter",
+  "clubs": "Klubber",
+  "campusLeadership": "Campus Ledelse",
+  "contactInformation": "Kontaktinformasjon"
 }

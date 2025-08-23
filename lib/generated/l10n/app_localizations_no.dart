@@ -166,4 +166,28 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String get somethingWentWrong => 'Noe gikk galt';
+
+  @override
+  String get forStudents => 'For Studenter';
+
+  @override
+  String get forBusiness => 'For Bedrifter';
+
+  @override
+  String get careerAdvantages => 'Karrierefordeler';
+
+  @override
+  String get students => 'Studenter';
+
+  @override
+  String get products => 'Produkter';
+
+  @override
+  String get clubs => 'Klubber';
+
+  @override
+  String get campusLeadership => 'Campus Ledelse';
+
+  @override
+  String get contactInformation => 'Kontaktinformasjon';
 }

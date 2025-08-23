@@ -9,7 +9,7 @@ class JobModel extends Equatable {
   final String? departmentLogo;
   final String campusId;
   final String
-  type; // 'volunteer', 'paid', 'internship', 'part_time', 'full_time'
+  type; // 'volunteer', 'paid', 'part_time', 'full_time'
   final String
   category; // 'event_help', 'marketing', 'tech', 'administration', etc.
   final List<String> requirements;
@@ -296,7 +296,6 @@ class JobModel extends Equatable {
       applicationDeadline.isAfter(DateTime.now());
   bool get isPaid =>
       type == 'paid' ||
-      type == 'internship' ||
       type == 'part_time' ||
       type == 'full_time';
   String get displayType {
@@ -305,8 +304,6 @@ class JobModel extends Equatable {
         return 'Volunteer';
       case 'paid':
         return 'Paid Position';
-      case 'internship':
-        return 'Internship';
       case 'part_time':
         return 'Part Time';
       case 'full_time':

@@ -17,6 +17,14 @@ class NavigationUtils {
     }
   }
 
+  /// Alias for safeGoBack - for consistency with different naming conventions
+  static void goBackSafely(
+    BuildContext context, {
+    String fallbackRoute = '/home',
+  }) {
+    safeGoBack(context, fallbackRoute: fallbackRoute);
+  }
+
   /// Creates a standardized back button that safely handles navigation
   static Widget buildBackButton(
     BuildContext context, {

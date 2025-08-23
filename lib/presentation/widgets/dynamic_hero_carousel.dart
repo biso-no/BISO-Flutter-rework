@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../data/models/large_event_model.dart';
 import '../../data/models/campus_model.dart';
 import '../../data/services/showcase_navigation_service.dart';
+import '../../providers/campus/campus_provider.dart';
 
 /// Dynamic hero carousel that can display different types of showcase content
-class DynamicHeroCarousel extends StatefulWidget {
+class DynamicHeroCarousel extends ConsumerStatefulWidget {
   final CampusModel campus;
   final List<LargeEventModel> showcaseItems;
   final VoidCallback onCampusTap;
@@ -24,10 +27,10 @@ class DynamicHeroCarousel extends StatefulWidget {
   });
 
   @override
-  State<DynamicHeroCarousel> createState() => _DynamicHeroCarouselState();
+  ConsumerState<DynamicHeroCarousel> createState() => _DynamicHeroCarouselState();
 }
 
-class _DynamicHeroCarouselState extends State<DynamicHeroCarousel>
+class _DynamicHeroCarouselState extends ConsumerState<DynamicHeroCarousel>
     with TickerProviderStateMixin {
   late PageController _pageController;
   late AnimationController _fadeController;
@@ -65,6 +68,23 @@ class _DynamicHeroCarouselState extends State<DynamicHeroCarousel>
     super.dispose();
   }
 
+  String _getCampusImagePath(String campusId) {
+    switch (campusId) {
+      case '1': // Oslo
+        return 'assets/images/campus/oslo.png';
+      case '2': // Bergen
+        return 'assets/images/campus/bergen.png';
+      case '3': // Trondheim
+        return 'assets/images/campus/trondheim.png';
+      case '4': // Stavanger
+        return 'assets/images/campus/stavanger.png';
+      case '5': // National
+        return 'assets/images/campus/oslo.png'; // Use Oslo as fallback
+      default:
+        return 'assets/images/campus/oslo.png'; // Default fallback
+    }
+  }
+
   void _startAutoAdvance() {
     _autoAdvanceTimer?.cancel();
     _autoAdvanceTimer = Timer.periodic(widget.autoAdvanceDuration, (_) {
@@ -94,13 +114,113 @@ class _DynamicHeroCarouselState extends State<DynamicHeroCarousel>
   @override
   Widget build(BuildContext context) {
     final statusBarHeight = MediaQuery.of(context).padding.top;
+    final isInitialized = ref.watch(campusInitializedProvider);
     
-    // Always show carousel (with default hero as first item)
+    // Show loading state until campus is properly initialized
+    if (!isInitialized) {
+      return SizedBox(
+        height: 400 + statusBarHeight,
+        child: _buildLoadingSkeleton(statusBarHeight),
+      );
+    }
+    
+    // Show carousel once campus is initialized
     return SizedBox(
       height: 400 + statusBarHeight,
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: _buildCarouselView(statusBarHeight),
+      ),
+    );
+  }
+
+  Widget _buildLoadingSkeleton(double statusBarHeight) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.gray200,
+            AppColors.gray300,
+            AppColors.gray400,
+          ],
+          stops: const [0.0, 0.7, 1.0],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Content placeholder
+          Positioned(
+            top: statusBarHeight + 20,
+            left: 24,
+            right: 24,
+            bottom: 24,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header placeholder
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 120,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    Container(
+                      width: 80,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 40),
+
+                // Title placeholder
+                Container(
+                  width: double.infinity,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Subtitle placeholder
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                // Button placeholder
+                Container(
+                  width: 140,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -183,6 +303,11 @@ class _DynamicHeroCarouselState extends State<DynamicHeroCarousel>
           ],
           stops: const [0.0, 0.7, 1.0],
         ),
+        image: DecorationImage(
+          image: AssetImage(_getCampusImagePath(widget.campus.id)),
+          fit: BoxFit.cover,
+          opacity: 0.3,
+        ),
       ),
       child: Stack(
         children: [
@@ -217,29 +342,77 @@ class _DynamicHeroCarouselState extends State<DynamicHeroCarousel>
 
                 // Campus info
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        widget.campus.name,
-                        style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          height: 1.1,
+                  child: GestureDetector(
+                    onTap: () => context.push('/explore/campus/${widget.campus.id}'),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.campus.name,
+                          style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            height: 1.1,
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 12),
+                        const SizedBox(height: 12),
 
-                      Text(
-                        'Connecting students across Norway\'s leading business school',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.9),
-                          height: 1.4,
+                        Text(
+                          'Connecting students across Norway\'s leading business school',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            height: 1.4,
+                          ),
                         ),
-                      ),
-                    ],
+
+                        const SizedBox(height: 20),
+
+                        // Campus Detail Button
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () => context.push('/explore/campus/${widget.campus.id}'),
+                              borderRadius: BorderRadius.circular(16),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Explore Campus',
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: Colors.white,
+                                      size: 14,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/expense_model.dart';
@@ -23,10 +24,11 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
 
   final List<String> _statusFilters = [
     'all',
+    'draft',
     'pending',
-    'approved',
+    'submitted',
+    'success',
     'rejected',
-    'paid',
   ];
 
   @override
@@ -137,9 +139,9 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'history') {
-                // TODO: Show expense history
+                _showHistory(context, filteredExpenses);
               } else if (value == 'guidelines') {
-                // TODO: Show expense guidelines
+                _showGuidelines(context);
               }
             },
             itemBuilder: (context) => [
@@ -220,19 +222,19 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
               children: [
                 Expanded(
                   child: _SummaryCard(
-                    title: 'Pending',
-                    amount: expensesState.totalPendingAmount,
-                    color: AppColors.orange9,
-                    icon: Icons.pending,
+                    title: 'Draft',
+                    amount: expensesState.totalDraftAmount,
+                    color: AppColors.onSurfaceVariant,
+                    icon: Icons.drafts_outlined,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _SummaryCard(
-                    title: 'Approved',
-                    amount: expensesState.totalApprovedAmount,
-                    color: AppColors.success,
-                    icon: Icons.check_circle,
+                    title: 'Pending',
+                    amount: expensesState.totalPendingAmount,
+                    color: AppColors.orange9,
+                    icon: Icons.pending,
                   ),
                 ),
               ],
@@ -272,18 +274,90 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
     );
   }
 
+  void _showHistory(BuildContext context, List<ExpenseModel> expenses) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        final theme = Theme.of(context);
+        final recent = expenses.take(20).toList();
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Recent Expenses',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: recent.isEmpty
+                      ? const Center(child: Text('No recent expenses'))
+                      : ListView.separated(
+                          itemCount: recent.length,
+                          separatorBuilder: (_, _) => const Divider(height: 1),
+                          itemBuilder: (context, index) {
+                            final e = recent[index];
+                            return ListTile(
+                              title: Text(e.description ?? 'No description'),
+                              subtitle: Text(
+                                '${e.displayDepartment} • ${DateFormat('MMM dd, yyyy').format(e.expenseDate)}',
+                              ),
+                              trailing: Text(e.displayStatus),
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showGuidelines(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Expense Statuses'),
+        content: const Text(
+          '• Draft: Your local draft before submission.\n'
+          '• Pending: Reimbursement reached our invoice mailbox.\n'
+          '• Submitted: Registered to be sent in our invoice service.\n'
+          '• Success: Transaction confirmed in accounting.\n'
+          '• Rejected: Expense was not approved.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
   String _getStatusDisplayName(String status) {
     switch (status) {
       case 'all':
         return 'All';
+      case 'draft':
+        return 'Draft';
       case 'pending':
         return 'Pending';
-      case 'approved':
-        return 'Approved';
+      case 'submitted':
+        return 'Submitted';
+      case 'success':
+        return 'Success';
       case 'rejected':
         return 'Rejected';
-      case 'paid':
-        return 'Paid';
       default:
         return status;
     }
@@ -567,23 +641,21 @@ class _ExpenseCard extends StatelessWidget {
     switch (status) {
       case 'draft':
         return AppColors.onSurfaceVariant;
+      case 'pending':
+        return AppColors.orange9;
       case 'submitted':
         return AppColors.accentBlue;
-      case 'under_review':
-        return AppColors.orange9;
-      case 'approved':
+      case 'success':
         return AppColors.success;
       case 'rejected':
         return AppColors.error;
-      case 'paid':
-        return AppColors.success;
       default:
         return AppColors.onSurfaceVariant;
     }
   }
 }
 
-class _ExpenseDetailSheet extends StatelessWidget {
+class _ExpenseDetailSheet extends ConsumerWidget {
   final ExpenseModel expense;
   final ScrollController scrollController;
 
@@ -593,7 +665,7 @@ class _ExpenseDetailSheet extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
     return Container(
@@ -784,15 +856,13 @@ class _ExpenseDetailSheet extends StatelessWidget {
                         ),
                         title: Text(attachment.fileName),
                         trailing: IconButton(
-                          onPressed: () {
-                            // TODO: Open/download file
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Opening ${attachment.fileName} - Coming Soon',
-                                ),
-                              ),
-                            );
+                          onPressed: () async {
+                            final url = attachment.url;
+                            if (url == null || url.isEmpty) return;
+                            final uri = Uri.parse(url);
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri, mode: LaunchMode.externalApplication);
+                            }
                           },
                           icon: const Icon(Icons.open_in_new),
                         ),
@@ -846,7 +916,13 @@ class _ExpenseDetailSheet extends StatelessWidget {
                         child: OutlinedButton.icon(
                           onPressed: () {
                             Navigator.pop(context);
-                            // TODO: Navigate to edit expense
+                            // Navigate to create/edit screen; editing can be implemented there later
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const CreateExpenseScreen(),
+                              ),
+                            );
                           },
                           icon: const Icon(Icons.edit),
                           label: const Text('Edit'),
@@ -856,14 +932,22 @@ class _ExpenseDetailSheet extends StatelessWidget {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: expense.canSubmit
-                              ? () {
-                                  // TODO: Submit expense
-                                  Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Expense submitted!'),
-                                    ),
-                                  );
+                              ? () async {
+                                  // Update status to pending and refresh list
+                                  await ref
+                                      .read(expensesStateProvider.notifier)
+                                      .updateExpense(
+                                        expenseId: expense.id,
+                                        status: 'pending',
+                                      );
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Expense submitted'),
+                                      ),
+                                    );
+                                  }
                                 }
                               : null,
                           icon: const Icon(Icons.send),
@@ -885,16 +969,14 @@ class _ExpenseDetailSheet extends StatelessWidget {
     switch (status) {
       case 'draft':
         return AppColors.onSurfaceVariant;
+      case 'pending':
+        return AppColors.orange9;
       case 'submitted':
         return AppColors.accentBlue;
-      case 'under_review':
-        return AppColors.orange9;
-      case 'approved':
+      case 'success':
         return AppColors.success;
       case 'rejected':
         return AppColors.error;
-      case 'paid':
-        return AppColors.success;
       default:
         return AppColors.onSurfaceVariant;
     }

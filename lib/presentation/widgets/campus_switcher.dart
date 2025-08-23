@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/logging/print_migration.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../providers/weather/weather_provider.dart';
 import '../../data/models/campus_model.dart';
 import '../../providers/campus/campus_provider.dart';
 
@@ -17,15 +20,46 @@ class CampusSwitcher extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final buildStart = DateTime.now();
     final selectedCampus = ref.watch(filterCampusProvider);
-    final allCampuses = ref.watch(allCampusesSyncProvider);
+    final allCampusesAsync = ref.watch(switcherCampusesProvider);
+    final isInitialized = ref.watch(campusInitializedProvider);
     final theme = Theme.of(context);
 
+    logInfo('CampusSwitcher.build: start', context: {
+      'initialized': isInitialized,
+      'selected_id': selectedCampus.id,
+      'selected_name': selectedCampus.name,
+      'allCampuses_state': allCampusesAsync.hasValue
+          ? 'data'
+          : (allCampusesAsync.hasError ? 'error' : 'loading'),
+    });
+
     if (showFullScreen) {
-      return _FullScreenCampusSwitcher(
-        selectedCampus: selectedCampus,
-        allCampuses: allCampuses,
-        onCampusChanged: onCampusChanged,
+      return allCampusesAsync.when(
+        loading: () {
+          logInfo('CampusSwitcher.fullScreen: loading');
+          return const Center(child: CircularProgressIndicator());
+        },
+        error: (e, _) {
+          logError('CampusSwitcher.fullScreen: error', error: e);
+          return Center(
+            child: Text('Failed to load campuses'),
+          );
+        },
+        data: (allCampuses) {
+          logInfo('CampusSwitcher.fullScreen: data', context: {
+            'campus_count': allCampuses.length,
+            'elapsed_ms_since_build': DateTime.now()
+                .difference(buildStart)
+                .inMilliseconds,
+          });
+          return _FullScreenCampusSwitcher(
+            selectedCampus: selectedCampus,
+            allCampuses: allCampuses,
+            onCampusChanged: onCampusChanged,
+          );
+        },
       );
     }
 
@@ -63,12 +97,44 @@ class CampusSwitcher extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              selectedCampus.name,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.defaultBlue,
-              ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  selectedCampus.name,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.defaultBlue,
+                  ),
+                ),
+                Consumer(
+                  builder: (context, ref, _) {
+                    final weatherAsync = ref.watch(campusWeatherProvider(selectedCampus.name));
+                    return weatherAsync.when(
+                      data: (w) => w == null
+                          ? const SizedBox.shrink()
+                          : Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(w.icon, style: const TextStyle(fontSize: 10)),
+                                const SizedBox(width: 2),
+                                Text(
+                                  '${w.temperature.round()}°',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: AppColors.onSurfaceVariant,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                      loading: () => const SizedBox(height: 12, width: 12, child: CircularProgressIndicator(strokeWidth: 2)),
+                      error: (err, st) => const SizedBox.shrink(),
+                    );
+                  },
+                ),
+              ],
             ),
             const SizedBox(width: 4),
             Icon(Icons.expand_more, size: 16, color: AppColors.defaultBlue),
@@ -79,6 +145,7 @@ class CampusSwitcher extends ConsumerWidget {
   }
 
   void _showCampusSwitcherModal(BuildContext context) {
+    logInfo('CampusSwitcher: open modal');
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -86,17 +153,36 @@ class CampusSwitcher extends ConsumerWidget {
       builder: (context) => Consumer(
         builder: (context, ref, child) {
           final selectedCampus = ref.watch(filterCampusProvider);
-          final allCampuses = ref.watch(allCampusesSyncProvider);
-
-          return _CampusSwitcherModal(
-            selectedCampus: selectedCampus,
-            allCampuses: allCampuses,
-            onCampusSelected: (campus) {
-              ref
-                  .read(filterCampusProvider.notifier)
-                  .selectFilterCampus(campus);
-              Navigator.pop(context);
-              onCampusChanged?.call();
+          final allCampusesAsync = ref.watch(switcherCampusesProvider);
+          return allCampusesAsync.when(
+            loading: () {
+              logInfo('CampusSwitcher.modal: loading');
+              return const Center(child: CircularProgressIndicator());
+            },
+            error: (e, _) {
+              logError('CampusSwitcher.modal: error', error: e);
+              return Center(child: Text('Failed to load campuses'));
+            },
+            data: (allCampuses) {
+              logInfo('CampusSwitcher.modal: data', context: {
+                'campus_count': allCampuses.length,
+                'selected_id': selectedCampus.id,
+              });
+              return _CampusSwitcherModal(
+                selectedCampus: selectedCampus,
+                allCampuses: allCampuses,
+                onCampusSelected: (campus) {
+                  logInfo('CampusSwitcher.modal: select campus', context: {
+                    'selected_id': campus.id,
+                    'selected_name': campus.name,
+                  });
+                  ref
+                      .read(filterCampusStateProvider.notifier)
+                      .selectFilterCampus(campus);
+                  Navigator.pop(context);
+                  onCampusChanged?.call();
+                },
+              );
             },
           );
         },
@@ -106,13 +192,13 @@ class CampusSwitcher extends ConsumerWidget {
 
   Color _getCampusColor(String campusId) {
     switch (campusId) {
-      case 'oslo':
+      case '1': // Oslo
         return AppColors.defaultBlue;
-      case 'bergen':
+      case '2': // Bergen
         return AppColors.green9;
-      case 'trondheim':
+      case '3': // Trondheim
         return AppColors.purple9;
-      case 'stavanger':
+      case '4': // Stavanger
         return AppColors.orange9;
       default:
         return AppColors.gray400;
@@ -153,7 +239,7 @@ class _FullScreenCampusSwitcher extends StatelessWidget {
                 isSelected: isSelected,
                 onTap: () {
                   ref
-                      .read(filterCampusProvider.notifier)
+                      .read(filterCampusStateProvider.notifier)
                       .selectFilterCampus(campus);
                   Navigator.pop(context);
                   onCampusChanged?.call();
@@ -361,7 +447,7 @@ class _CampusCard extends StatelessWidget {
                     const SizedBox(height: 4),
 
                     Text(
-                      campus.description,
+                      _extractAddress(campus.location),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: AppColors.onSurfaceVariant,
                       ),
@@ -394,13 +480,15 @@ class _CampusCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '${campus.weather!.temperature.toStringAsFixed(0)}°',
+                                '${campus.weather!.temperature.round()}°',
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
-                          ),
+                          )
+                        else
+                          const SizedBox.shrink(),
                       ],
                     ),
                   ],
@@ -415,13 +503,13 @@ class _CampusCard extends StatelessWidget {
 
   Color _getCampusColor(String campusId) {
     switch (campusId) {
-      case 'oslo':
+      case '1': // Oslo
         return AppColors.defaultBlue;
-      case 'bergen':
+      case '2': // Bergen
         return AppColors.green9;
-      case 'trondheim':
+      case '3': // Trondheim
         return AppColors.purple9;
-      case 'stavanger':
+      case '4': // Stavanger
         return AppColors.orange9;
       default:
         return AppColors.gray400;
@@ -493,7 +581,7 @@ class _CampusModalCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    campus.location,
+                    _extractAddress(campus.location),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppColors.onSurfaceVariant,
                     ),
@@ -522,19 +610,33 @@ class _CampusModalCard extends StatelessWidget {
 
             Column(
               children: [
-                if (campus.weather != null) ...[
-                  Text(
-                    campus.weather!.icon,
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${campus.weather!.temperature.toStringAsFixed(0)}°',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+                Consumer(
+                  builder: (context, ref, _) {
+                    final weatherAsync = ref.watch(campusWeatherProvider(campus.name));
+                    return weatherAsync.when(
+                      data: (w) => w == null
+                          ? const SizedBox.shrink()
+                          : Column(
+                              children: [
+                                Text(w.icon, style: const TextStyle(fontSize: 24)),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '${w.temperature.round()}°',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                      loading: () => const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      error: (err, st) => const SizedBox.shrink(),
+                    );
+                  },
+                ),
                 const SizedBox(height: 8),
                 if (isSelected)
                   const Icon(
@@ -558,13 +660,13 @@ class _CampusModalCard extends StatelessWidget {
 
   Color _getCampusColor(String campusId) {
     switch (campusId) {
-      case 'oslo':
+      case '1': // Oslo
         return AppColors.defaultBlue;
-      case 'bergen':
+      case '2': // Bergen
         return AppColors.green9;
-      case 'trondheim':
+      case '3': // Trondheim
         return AppColors.purple9;
-      case 'stavanger':
+      case '4': // Stavanger
         return AppColors.orange9;
       default:
         return AppColors.gray400;
@@ -608,4 +710,18 @@ class _StatBadge extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Helper function to extract address from location data
+String _extractAddress(String location) {
+  // If it looks like JSON, try to parse it
+  if (location.startsWith('{') && location.endsWith('}')) {
+    try {
+      final Map<String, dynamic> locationJson = jsonDecode(location);
+      return locationJson['address'] ?? location;
+    } catch (e) {
+      // If parsing fails, return original
+    }
+  }
+  return location;
 }

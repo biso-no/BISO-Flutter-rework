@@ -64,23 +64,28 @@ class ExpensesState {
   }
 
   // Calculate totals by status
+  double get totalDraftAmount =>
+      expenses.where((e) => e.isDraft).fold(0.0, (sum, e) => sum + e.total);
+
   double get totalPendingAmount =>
       expenses.where((e) => e.isPending).fold(0.0, (sum, e) => sum + e.total);
 
-  double get totalApprovedAmount =>
-      expenses.where((e) => e.isApproved).fold(0.0, (sum, e) => sum + e.total);
+  double get totalSubmittedAmount => expenses
+      .where((e) => e.isSubmitted)
+      .fold(0.0, (sum, e) => sum + e.total);
+
+  double get totalSuccessAmount =>
+      expenses.where((e) => e.isSuccess).fold(0.0, (sum, e) => sum + e.total);
 
   double get totalRejectedAmount =>
       expenses.where((e) => e.isRejected).fold(0.0, (sum, e) => sum + e.total);
 
-  double get totalPaidAmount =>
-      expenses.where((e) => e.isPaid).fold(0.0, (sum, e) => sum + e.total);
-
   // Count by status
+  int get draftCount => expenses.where((e) => e.isDraft).length;
   int get pendingCount => expenses.where((e) => e.isPending).length;
-  int get approvedCount => expenses.where((e) => e.isApproved).length;
+  int get submittedCount => expenses.where((e) => e.isSubmitted).length;
+  int get successCount => expenses.where((e) => e.isSuccess).length;
   int get rejectedCount => expenses.where((e) => e.isRejected).length;
-  int get paidCount => expenses.where((e) => e.isPaid).length;
 }
 
 class ExpensesNotifier extends StateNotifier<ExpensesState> {

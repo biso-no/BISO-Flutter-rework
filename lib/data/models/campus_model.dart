@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'dart:convert';
 
 class CampusModel extends Equatable {
   final String id;
@@ -8,6 +9,11 @@ class CampusModel extends Equatable {
   final String imageUrl;
   final String heroImageUrl;
   final List<String> benefits;
+  final List<String> studentBenefits;
+  final List<String> businessBenefits;
+  final List<String> careerAdvantages;
+  final String? contactEmail;
+  final String? contactAddress;
   final WeatherData? weather;
   final CampusStats stats;
   final Map<String, dynamic> metadata;
@@ -22,6 +28,11 @@ class CampusModel extends Equatable {
     required this.imageUrl,
     required this.heroImageUrl,
     this.benefits = const [],
+    this.studentBenefits = const [],
+    this.businessBenefits = const [],
+    this.careerAdvantages = const [],
+    this.contactEmail,
+    this.contactAddress,
     this.weather,
     required this.stats,
     this.metadata = const {},
@@ -29,15 +40,46 @@ class CampusModel extends Equatable {
     this.updatedAt,
   });
 
+  /// Helper method to extract location string from various formats
+  static String _extractLocationString(dynamic locationData) {
+    if (locationData == null) return '';
+    
+    if (locationData is String) {
+      final trimmed = locationData.trim();
+      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        try {
+          final decoded = jsonDecode(trimmed);
+          if (decoded is Map<String, dynamic>) {
+            return decoded['address']?.toString() ?? '';
+          }
+        } catch (_) {}
+      }
+      return locationData;
+    }
+    
+    if (locationData is Map<String, dynamic>) {
+      // Extract address from the location object
+      return locationData['address']?.toString() ?? '';
+    }
+    
+    // Fallback for any other type
+    return locationData.toString();
+  }
+
   factory CampusModel.fromMap(Map<String, dynamic> map) {
     return CampusModel(
       id: map['\$id'] ?? map['id'] ?? '',
       name: map['name'] ?? '',
       description: map['description'] ?? '',
-      location: map['location'] ?? '',
+      location: _extractLocationString(map['location']),
       imageUrl: map['image_url'] ?? '',
       heroImageUrl: map['hero_image_url'] ?? '',
       benefits: List<String>.from(map['benefits'] ?? []),
+      studentBenefits: List<String>.from(map['student_benefits'] ?? []),
+      businessBenefits: List<String>.from(map['business_benefits'] ?? []),
+      careerAdvantages: List<String>.from(map['career_advantages'] ?? []),
+      contactEmail: map['contact_email'],
+      contactAddress: map['contact_address'],
       weather: map['weather'] != null
           ? WeatherData.fromMap(map['weather'])
           : null,
@@ -60,6 +102,11 @@ class CampusModel extends Equatable {
       'image_url': imageUrl,
       'hero_image_url': heroImageUrl,
       'benefits': benefits,
+      'student_benefits': studentBenefits,
+      'business_benefits': businessBenefits,
+      'career_advantages': careerAdvantages,
+      'contact_email': contactEmail,
+      'contact_address': contactAddress,
       'weather': weather?.toMap(),
       'stats': stats.toMap(),
       'metadata': metadata,
@@ -74,6 +121,11 @@ class CampusModel extends Equatable {
     String? imageUrl,
     String? heroImageUrl,
     List<String>? benefits,
+    List<String>? studentBenefits,
+    List<String>? businessBenefits,
+    List<String>? careerAdvantages,
+    String? contactEmail,
+    String? contactAddress,
     WeatherData? weather,
     CampusStats? stats,
     Map<String, dynamic>? metadata,
@@ -86,6 +138,11 @@ class CampusModel extends Equatable {
       imageUrl: imageUrl ?? this.imageUrl,
       heroImageUrl: heroImageUrl ?? this.heroImageUrl,
       benefits: benefits ?? this.benefits,
+      studentBenefits: studentBenefits ?? this.studentBenefits,
+      businessBenefits: businessBenefits ?? this.businessBenefits,
+      careerAdvantages: careerAdvantages ?? this.careerAdvantages,
+      contactEmail: contactEmail ?? this.contactEmail,
+      contactAddress: contactAddress ?? this.contactAddress,
       weather: weather ?? this.weather,
       stats: stats ?? this.stats,
       metadata: metadata ?? this.metadata,
@@ -103,6 +160,11 @@ class CampusModel extends Equatable {
     imageUrl,
     heroImageUrl,
     benefits,
+    studentBenefits,
+    businessBenefits,
+    careerAdvantages,
+    contactEmail,
+    contactAddress,
     weather,
     stats,
     metadata,
@@ -161,12 +223,14 @@ class CampusStats extends Equatable {
   final int activeEvents;
   final int availableJobs;
   final int marketplaceItems;
+  final int departmentsCount;
 
   const CampusStats({
     this.studentCount = 0,
     this.activeEvents = 0,
     this.availableJobs = 0,
     this.marketplaceItems = 0,
+    this.departmentsCount = 0,
   });
 
   factory CampusStats.fromMap(Map<String, dynamic> map) {
@@ -175,6 +239,7 @@ class CampusStats extends Equatable {
       activeEvents: map['active_events'] ?? 0,
       availableJobs: map['available_jobs'] ?? 0,
       marketplaceItems: map['marketplace_items'] ?? 0,
+      departmentsCount: map['departments_count'] ?? 0,
     );
   }
 
@@ -184,6 +249,7 @@ class CampusStats extends Equatable {
       'active_events': activeEvents,
       'available_jobs': availableJobs,
       'marketplace_items': marketplaceItems,
+      'departments_count': departmentsCount,
     };
   }
 
@@ -193,129 +259,6 @@ class CampusStats extends Equatable {
     activeEvents,
     availableJobs,
     marketplaceItems,
+    departmentsCount,
   ];
-}
-
-// Static campus data for now (can be moved to Appwrite later)
-class CampusData {
-  static const List<CampusModel> campuses = [
-    CampusModel(
-      id: 'oslo',
-      name: 'Oslo',
-      description: 'Norway\'s capital and largest campus',
-      location: 'Oslo, Norway',
-      imageUrl: 'assets/images/oslo_campus.jpg',
-      heroImageUrl: 'assets/images/oslo_hero.jpg',
-      benefits: [
-        'Largest student body',
-        'Most events and activities',
-        'Central location',
-        'Excellent transport links',
-      ],
-      weather: WeatherData(
-        temperature: 8.5,
-        condition: 'Cloudy',
-        icon: '☁️',
-        humidity: 78,
-        windSpeed: 12.3,
-      ),
-      stats: CampusStats(
-        studentCount: 12500,
-        activeEvents: 45,
-        availableJobs: 23,
-        marketplaceItems: 156,
-      ),
-    ),
-    CampusModel(
-      id: 'bergen',
-      name: 'Bergen',
-      description: 'Beautiful coastal campus',
-      location: 'Bergen, Norway',
-      imageUrl: 'assets/images/bergen_campus.jpg',
-      heroImageUrl: 'assets/images/bergen_hero.jpg',
-      benefits: [
-        'Stunning coastal views',
-        'Strong maritime focus',
-        'Vibrant cultural scene',
-        'UNESCO World Heritage nearby',
-      ],
-      weather: WeatherData(
-        temperature: 6.2,
-        condition: 'Rainy',
-        icon: '🌧️',
-        humidity: 85,
-        windSpeed: 15.8,
-      ),
-      stats: CampusStats(
-        studentCount: 3200,
-        activeEvents: 18,
-        availableJobs: 8,
-        marketplaceItems: 67,
-      ),
-    ),
-    CampusModel(
-      id: 'trondheim',
-      name: 'Trondheim',
-      description: 'Historic and innovative campus',
-      location: 'Trondheim, Norway',
-      imageUrl: 'assets/images/trondheim_campus.jpg',
-      heroImageUrl: 'assets/images/trondheim_hero.jpg',
-      benefits: [
-        'Rich history and culture',
-        'Innovation hub',
-        'Tech partnerships',
-        'Student-friendly city',
-      ],
-      weather: WeatherData(
-        temperature: 4.8,
-        condition: 'Partly Cloudy',
-        icon: '⛅',
-        humidity: 72,
-        windSpeed: 8.9,
-      ),
-      stats: CampusStats(
-        studentCount: 2800,
-        activeEvents: 12,
-        availableJobs: 15,
-        marketplaceItems: 43,
-      ),
-    ),
-    CampusModel(
-      id: 'stavanger',
-      name: 'Stavanger',
-      description: 'Energy capital campus',
-      location: 'Stavanger, Norway',
-      imageUrl: 'assets/images/stavanger_campus.jpg',
-      heroImageUrl: 'assets/images/stavanger_hero.jpg',
-      benefits: [
-        'Energy industry focus',
-        'Modern facilities',
-        'Strong industry connections',
-        'Beautiful fjord region',
-      ],
-      weather: WeatherData(
-        temperature: 7.3,
-        condition: 'Sunny',
-        icon: '☀️',
-        humidity: 65,
-        windSpeed: 11.2,
-      ),
-      stats: CampusStats(
-        studentCount: 2100,
-        activeEvents: 9,
-        availableJobs: 12,
-        marketplaceItems: 38,
-      ),
-    ),
-  ];
-
-  static CampusModel? getCampusById(String id) {
-    try {
-      return campuses.firstWhere((campus) => campus.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  static CampusModel get defaultCampus => campuses.first;
 }

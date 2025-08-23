@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math' as math;
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/campus_model.dart';
+// Removed weather provider usage in favor of CampusModel.weather
 
-class WonderousCampusHero extends StatefulWidget {
+class WonderousCampusHero extends ConsumerStatefulWidget {
   final CampusModel campus;
   final double expandedHeight;
   final Widget? trailing;
@@ -18,10 +20,10 @@ class WonderousCampusHero extends StatefulWidget {
   });
 
   @override
-  State<WonderousCampusHero> createState() => _WonderousCampusHeroState();
+  ConsumerState<WonderousCampusHero> createState() => _WonderousCampusHeroState();
 }
 
-class _WonderousCampusHeroState extends State<WonderousCampusHero>
+class _WonderousCampusHeroState extends ConsumerState<WonderousCampusHero>
     with TickerProviderStateMixin {
   late AnimationController _parallaxController;
   late AnimationController _overlayController;
@@ -316,17 +318,21 @@ class _WonderousCampusHeroState extends State<WonderousCampusHero>
               child: Row(
                 children: [
                   // Weather widget
-                  if (widget.campus.weather != null) ...[
-                    _buildStatPill(
-                      icon: widget.campus.weather!.icon,
-                      value:
-                          '${widget.campus.weather!.temperature.toStringAsFixed(0)}°',
-                      label: widget.campus.weather!.condition,
-                      theme: theme,
-                      isWeather: true,
-                    ),
-                    const SizedBox(width: 12),
-                  ],
+                  if (widget.campus.weather != null)
+                    Row(
+                      children: [
+                        _buildStatPill(
+                          icon: widget.campus.weather!.icon,
+                          value: '${widget.campus.weather!.temperature.round()}°',
+                          label: widget.campus.weather!.condition,
+                          theme: theme,
+                          isWeather: true,
+                        ),
+                        const SizedBox(width: 12),
+                      ],
+                    )
+                  else
+                    const SizedBox.shrink(),
 
                   // Stats
                   Expanded(
