@@ -21,7 +21,7 @@ class CampusLeadershipSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final boardMembersAsync = ref.watch(boardMembersProvider(campusId));
 
     return TweenAnimationBuilder(
@@ -67,7 +67,7 @@ class CampusLeadershipSection extends ConsumerWidget {
                       const SizedBox(width: 16),
                       Expanded(
                         child: Text(
-                          l10n.campusLeadership,
+                          l10n.campusLeadershipMessage,
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,

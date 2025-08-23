@@ -1,0 +1,2737 @@
+{
+  "@@locale": "no",
+  "appName": "BISO",
+  "@appName": {
+    "description": "Auto-extracted string"
+  },
+  "aboutMessage": "Om BISO",
+  "@aboutMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "aboutThisRoleMessage": "Om denne rollen",
+  "@aboutThisRoleMessage": {
+    "description": "Auto-extracted string"
+  },
+  "academicCalendarMessage": "Akademisk kalender",
+  "@academicCalendarMessage": {
+    "description": "Auto-extracted string"
+  },
+  "accessToMemberOnlyDiscussionGroupsMessage": "Tilgang til medlemseksklusive diskusjonsgrupper",
+  "@accessToMemberOnlyDiscussionGroupsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "accountHolderMessage": "Kontoinnehaver",
+  "@accountHolderMessage": {
+    "description": "Auto-extracted string"
+  },
+  "accountMessage": "Konto",
+  "@accountMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "accountNumberIsRequiredMessage": "Kontonummer er påkrevd",
+  "@accountNumberIsRequiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "accountTypeMessage": "Kontotype",
+  "@accountTypeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "addContextOptionalMessage": "Legg til kontekst (valgfritt)",
+  "@addContextOptionalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "addYourBankAccountInformationToReceiveExpenseReimbursementsFromBISOMessage": "Legg til bankkontoinformasjon for å motta utgiftsrefusjoner fra BISO.",
+  "@addYourBankAccountInformationToReceiveExpenseReimbursementsFromBISOMessage": {
+    "description": "Auto-extracted string"
+  },
+  "addedToFavoritesMessage": "Lagt til favoritter",
+  "@addedToFavoritesMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "addressInformationMessage": "Adresseinformasjon",
+  "@addressInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "addressMessage": "Adresse",
+  "@addressMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "advancedAppFeaturesAndToolsMessage": "Avanserte appfunksjoner og verktøy",
+  "@advancedAppFeaturesAndToolsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "aiAssistantMessage": "AI-assistent",
+  "@aiAssistantMessage": {
+    "description": "Auto-extracted string"
+  },
+  "all": "Alle",
+  "@all": {
+    "description": "Auto-extracted string"
+  },
+  "allAccessPassMessage": "Alle-tilgang-pass",
+  "@allAccessPassMessage": {
+    "description": "Auto-extracted string"
+  },
+  "allDepartmentsMessage": "Alle avdelinger",
+  "@allDepartmentsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "allMessage": "Alle",
+  "@allMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "amountMessage": "Beløp",
+  "@amountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "amountNOKMessage": "Beløp (NOK)",
+  "@amountNOKMessage": {
+    "description": "Auto-extracted string"
+  },
+  "appLanguageMessage": "Appspråk",
+  "@appLanguageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "appVersionMessage": "Appversjon",
+  "@appVersionMessage": {
+    "description": "Auto-extracted string"
+  },
+  "applyNowMessage": "Søk nå",
+  "@applyNowMessage": {
+    "description": "Auto-extracted string"
+  },
+  "approvedMessage": "Godkjent",
+  "@approvedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "areYouSureYouWantToDeleteThisChatThisActionCannotBeUndone": "Er du sikker på at du vil slette denne chatten? Denne handlingen kan ikke angres.",
+  "@areYouSureYouWantToDeleteThisChatThisActionCannotBeUndone": {
+    "description": "Auto-extracted string"
+  },
+  "areYouSureYouWantToRemoveYourStudentIDThisWillRemoveYourVerifiedStatusAndAccessToStudentBenefitsMessage": "Er du sikker på at du vil fjerne student-ID-en din? Dette vil fjerne din verifiserte status og tilgang til studentfordeler.",
+  "@areYouSureYouWantToRemoveYourStudentIDThisWillRemoveYourVerifiedStatusAndAccessToStudentBenefitsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "areYouSureYouWantToSignOutMessage": "Er du sikker på at du vil logge ut?",
+  "@areYouSureYouWantToSignOutMessage": {
+    "description": "Auto-extracted string"
+  },
+  "askAIMessage": "Spør AI-assistent",
+  "@askAIMessage": {
+    "description": "Auto-extracted string"
+  },
+  "attachedFilesMessage": "Vedlagte filer",
+  "@attachedFilesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "attachmentsMessage": "Vedlegg",
+  "@attachmentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "authenticationRequiredPleaseLogInAgainMessage": "Autentisering kreves. Vennligst logg inn igjen.",
+  "@authenticationRequiredPleaseLogInAgainMessage": {
+    "description": "Auto-extracted string"
+  },
+  "autoDeleteMessagesMessage": "Slett meldinger automatisk",
+  "@autoDeleteMessagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "autoDeleteOptionsComingSoonMessage": "Alternativer for automatisk sletting kommer snart",
+  "@autoDeleteOptionsComingSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "autoDownloadMediaMessage": "Last ned media automatisk",
+  "@autoDownloadMediaMessage": {
+    "description": "Auto-extracted string"
+  },
+  "autoDownloadOptionsComingSoonMessage": "Alternativer for automatisk nedlasting kommer snart",
+  "@autoDownloadOptionsComingSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "autoFillDateAmountAndDescriptionFromReceiptsMessage": "Fyll ut dato, beløp og beskrivelse automatisk fra kvitteringer",
+  "@autoFillDateAmountAndDescriptionFromReceiptsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "automaticallyDeleteOldMessagesMessage": "Slett gamle meldinger automatisk",
+  "@automaticallyDeleteOldMessagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "backMessage": "Tilbake",
+  "@backMessage": {
+    "description": "Auto-extracted string"
+  },
+  "bankAccountMessage": "Bankkonto",
+  "@bankAccountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "bankAccountNumberIsRequiredMessage": "Kontonummer er påkrevd",
+  "@bankAccountNumberIsRequiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "bankAccountNumberMessage": "Kontonummer",
+  "@bankAccountNumberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "biSelectedCampusNameMessage": "BI {selectedCampus}",
+  "@biSelectedCampusNameMessage": {
+    "description": "Auto-extracted string (used in 2 files)",
+    "placeholders": {
+      "selectedCampus": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "bisoCampusNameMessage": "BISO {widget}",
+  "@bisoCampusNameMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "widget": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "bisoMemberMessage": "BISO-medlem",
+  "@bisoMemberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "bisoMembershipMessage": "BISO-medlemskap",
+  "@bisoMembershipMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "bisoShopMessage": "BISO-butikk",
+  "@bisoShopMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "bisoWebshopMessage": "BISO nettbutikk",
+  "@bisoWebshopMessage": {
+    "description": "Auto-extracted string"
+  },
+  "bookRoomsResourcesMessage": "Bestill rom og ressurser",
+  "@bookRoomsResourcesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "booksMessage": "Bøker",
+  "@booksMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "brandNewMessage": "Splitter ny",
+  "@brandNewMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "browseAsGuestMessage": "Bla som gjest",
+  "@browseAsGuestMessage": {
+    "description": "Auto-extracted string"
+  },
+  "build1Message": "1.0.0 (Build 1)",
+  "@build1Message": {
+    "description": "Auto-extracted string"
+  },
+  "busMessage": "Buss",
+  "@busMessage": {
+    "description": "Auto-extracted string"
+  },
+  "buyAndSellItemsMessage": "Kjøp og selg varer",
+  "@buyAndSellItemsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "buyMembershipMessage": "Kjøp medlemskap",
+  "@buyMembershipMessage": {
+    "description": "Auto-extracted string"
+  },
+  "buyPassMessage": "Kjøp pass",
+  "@buyPassMessage": {
+    "description": "Auto-extracted string"
+  },
+  "buySellItemsMessage": "Kjøp og selg varer",
+  "@buySellItemsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "byOrganizerNameMessage": "av {event}",
+  "@byOrganizerNameMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "event": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "bySubmittingYouConfirmThatAllInformationIsAccurateAndYouHaveAppropriateReceiptsMessage": "Ved å sende inn bekrefter du at all informasjon er riktig og at du har passende kvitteringer.",
+  "@bySubmittingYouConfirmThatAllInformationIsAccurateAndYouHaveAppropriateReceiptsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "cacheClearedSuccessfullyMessage": "Cache slettet",
+  "@cacheClearedSuccessfullyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "callMessage": "Ring",
+  "@callMessage": {
+    "description": "Auto-extracted string"
+  },
+  "cameraMessage": "Kamera",
+  "@cameraMessage": {
+    "description": "Auto-extracted string"
+  },
+  "campusAndDepartmentMessage": "Campus og avdeling",
+  "@campusAndDepartmentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "campusAndInterestsMessage": "Campus og interesser",
+  "@campusAndInterestsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "campusEventsActivitiesMessage": "Campusarrangementer og aktiviteter",
+  "@campusEventsActivitiesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "campusInformationMessage": "Campusinformasjon",
+  "@campusInformationMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "campusLeadershipMessage": "Campusledelse",
+  "@campusLeadershipMessage": {
+    "description": "Auto-extracted string"
+  },
+  "campusMessage": "Campus",
+  "@campusMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "cancel": "Avbryt",
+  "@cancel": {
+    "description": "Auto-extracted string"
+  },
+  "cancelMessage": "Avbryt",
+  "@cancelMessage": {
+    "description": "Auto-extracted string (used in 6 files)"
+  },
+  "cancelledMessage": "Avlyst",
+  "@cancelledMessage": {
+    "description": "Auto-extracted string"
+  },
+  "cardPaymentMessage": "Kortbetaling",
+  "@cardPaymentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "careerAdvantagesMessage": "Karrierefordeler",
+  "@careerAdvantagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "categoriesMessage": "Kategorier",
+  "@categoriesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "categoryMessage": "Kategori",
+  "@categoryMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "chat": "Chat",
+  "@chat": {
+    "description": "Auto-extracted string"
+  },
+  "chatBehaviorMessage": "Chatoppførsel",
+  "@chatBehaviorMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatDeletedSuccessfully": "Chat slettet",
+  "@chatDeletedSuccessfully": {
+    "description": "Auto-extracted string"
+  },
+  "chatInfo": "Chatinfo",
+  "@chatInfo": {
+    "description": "Auto-extracted string"
+  },
+  "chatMessage": "Chat",
+  "@chatMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatMessagesMessage": "Chatmeldinger",
+  "@chatMessagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatMuted": "Chat dempet",
+  "@chatMuted": {
+    "description": "Auto-extracted string"
+  },
+  "chatNotificationsMessage": "Chatvarsler",
+  "@chatNotificationsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatPrivacyMessage": "Chatpersonvern",
+  "@chatPrivacyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatPrivacySettingsMessage": "Innstillinger for chatpersonvern",
+  "@chatPrivacySettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatSettingsApplyToAllConversationsIndividualChatSettingsCanBeChangedFromTheChatInfoScreenMessage": "Chatinnstillinger gjelder for alle samtaler. Individuelle chatinnstillinger kan endres fra chatinfoskjermen.",
+  "@chatSettingsApplyToAllConversationsIndividualChatSettingsCanBeChangedFromTheChatInfoScreenMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatSettingsMessage": "Chatinnstillinger",
+  "@chatSettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatStorageMessage": "Chatlagring",
+  "@chatStorageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatUnmuted": "Chat ikke lenger dempet",
+  "@chatUnmuted": {
+    "description": "Auto-extracted string"
+  },
+  "checkBackLaterOrSwitchCampusMessage": "Sjekk igjen senere eller bytt campus",
+  "@checkBackLaterOrSwitchCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "checkMembershipStatusPurchaseBISOmembershipAccessExclusiveFeaturesExpenseReimbursementsMessage": "• Sjekk medlemskapsstatus\\n• Kjøp BISO-medlemskap\\n• Få tilgang til eksklusive funksjoner\\n• Utgiftsrefusjoner",
+  "@checkMembershipStatusPurchaseBISOmembershipAccessExclusiveFeaturesExpenseReimbursementsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "checkingPermissionsMessage": "Sjekker tillatelser...",
+  "@checkingPermissionsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chooseHowOthersCanFindAndContactYouMessage": "Velg hvordan andre kan finne og kontakte deg:",
+  "@chooseHowOthersCanFindAndContactYouMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chooseWhatNotificationsYouWantToReceiveMessage": "Velg hvilke varsler du vil motta",
+  "@chooseWhatNotificationsYouWantToReceiveMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chooseYourBICampusLocationMessage": "Velg din BI-campus",
+  "@chooseYourBICampusLocationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chooseYourCampusAndTheDepartmentResponsibleForThisExpenseMessage": "Velg ditt campus og avdelingen som er ansvarlig for denne utgiften",
+  "@chooseYourCampusAndTheDepartmentResponsibleForThisExpenseMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chooseYourMembershipPlanMessage": "Velg din medlemskapsplan",
+  "@chooseYourMembershipPlanMessage": {
+    "description": "Auto-extracted string"
+  },
+  "cityMessage": "By",
+  "@cityMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "clear": "Tøm",
+  "@clear": {
+    "description": "Auto-extracted string"
+  },
+  "clearCacheMessage": "Tøm hurtigbuffer",
+  "@clearCacheMessage": {
+    "description": "Auto-extracted string"
+  },
+  "clearMessage": "Tøm",
+  "@clearMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "clearSessionAndTryAgainMessage": "Tøm økt og prøv igjen",
+  "@clearSessionAndTryAgainMessage": {
+    "description": "Auto-extracted string"
+  },
+  "clearSessionMessage": "Tøm økt",
+  "@clearSessionMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "clothesMessage": "Klær",
+  "@clothesMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "clubsMessage": "Klubber",
+  "@clubsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "clubsUnitsMessage": "Klubber og enheter",
+  "@clubsUnitsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "compensationMessage": "Kompensasjon",
+  "@compensationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "completeProfileMessage": "Fullfør profil",
+  "@completeProfileMessage": {
+    "description": "Auto-extracted string"
+  },
+  "completeSetupMessage": "Fullfør oppsett",
+  "@completeSetupMessage": {
+    "description": "Auto-extracted string"
+  },
+  "completeYourProfileMessage": "Fullfør profilen din",
+  "@completeYourProfileMessage": {
+    "description": "Auto-extracted string"
+  },
+  "conditionMessage": "Tilstand",
+  "@conditionMessage": {
+    "description": "Auto-extracted string"
+  },
+  "connectBIAccountMessage": "Koble til BI-konto",
+  "@connectBIAccountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "connectWithYourBIStudentAccountForInstantVerificationAndAccessToExclusiveMemberFeaturesMessage": "Koble til din BI-studentkonto for øyeblikkelig verifisering og tilgang til eksklusive medlemsfunksjoner.",
+  "@connectWithYourBIStudentAccountForInstantVerificationAndAccessToExclusiveMemberFeaturesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "contactInfoOptionalMessage": "Kontaktinfo (valgfritt)",
+  "@contactInfoOptionalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "contactInformationMessage": "Kontaktinformasjon",
+  "@contactInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "contactMessage": "Kontakt",
+  "@contactMessage": {
+    "description": "Auto-extracted string"
+  },
+  "contactSellerMessage": "Kontakt selger",
+  "@contactSellerMessage": {
+    "description": "Auto-extracted string"
+  },
+  "continueButtonMessage": "Fortsett",
+  "@continueButtonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "continueMessage": "Fortsett",
+  "@continueMessage": {
+    "description": "Auto-extracted string"
+  },
+  "continueToLoginMessage": "Fortsett til innlogging",
+  "@continueToLoginMessage": {
+    "description": "Auto-extracted string"
+  },
+  "copyTokenForTestingMessage": "Kopier token for testing",
+  "@copyTokenForTestingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "couldNotOpenMailAppMessage": "Kunne ikke åpne e-postapp. Vennligst sjekk e-posten din manuelt.",
+  "@couldNotOpenMailAppMessage": {
+    "description": "Auto-extracted string"
+  },
+  "createdMessage": "Opprettet",
+  "@createdMessage": {
+    "description": "Auto-extracted string"
+  },
+  "currencyIsAutomaticallySetToNOKForBIStudentsMessage": "Valuta blir automatisk satt til NOK for BI-studenter",
+  "@currencyIsAutomaticallySetToNOKForBIStudentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "currencyMessage": "Valuta",
+  "@currencyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "currentAttendeesMaxAttendeesRegisteredMessage": "{event}/{event} registrert",
+  "@currentAttendeesMaxAttendeesRegisteredMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "event": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "currentCampusMessage": "Nåværende campus",
+  "@currentCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "darkModeMessage": "Mørk modus",
+  "@darkModeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "dataAndStorageMessage": "Data og lagring",
+  "@dataAndStorageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "dateFormatMessage": "Datoformat",
+  "@dateFormatMessage": {
+    "description": "Auto-extracted string"
+  },
+  "dateFormatOptionsComingSoonMessage": "Datoformatalternativer kommer snart",
+  "@dateFormatOptionsComingSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "dateMessage": "{date}/{date}/{date}",
+  "@dateMessage": {
+    "description": "Auto-extracted string (used in 2 files)",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "ddMMyyyyNorwegianMessage": "DD/MM/YYYY (norsk)",
+  "@ddMMyyyyNorwegianMessage": {
+    "description": "Auto-extracted string"
+  },
+  "deadlineMessage": "Frist",
+  "@deadlineMessage": {
+    "description": "Auto-extracted string"
+  },
+  "delayedMinutesMessage": "Forsinket +{deltaMinutes}m",
+  "@delayedMinutesMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "deltaMinutes": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "delete": "Slett",
+  "@delete": {
+    "description": "Auto-extracted string"
+  },
+  "deleteChat": "Slett chat",
+  "@deleteChat": {
+    "description": "Auto-extracted string"
+  },
+  "departedMinutesAgoMessage": "Avreist for $minutesTo min siden",
+  "@departedMinutesAgoMessage": {
+    "description": "Auto-extracted string"
+  },
+  "departmentChatMembers": "Avdelingschat • {chat} medlemmer",
+  "@departmentChatMembers": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "chat": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "departmentMessage": "Avdeling",
+  "@departmentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "departments": "Avdelinger",
+  "@departments": {
+    "description": "Auto-extracted string"
+  },
+  "departuresMessage": "Avganger",
+  "@departuresMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "describeBrieflyWhatTheExpenseIsForMessage": "Beskriv kort hva utgiften er til",
+  "@describeBrieflyWhatTheExpenseIsForMessage": {
+    "description": "Auto-extracted string"
+  },
+  "descriptionMessage": "Beskrivelse",
+  "@descriptionMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "detailsAndSummaryMessage": "Detaljer og sammendrag",
+  "@detailsAndSummaryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "detailsMessage": "Detaljer",
+  "@detailsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "deutdeffMessage": "DEUTDEFF",
+  "@deutdeffMessage": {
+    "description": "Auto-extracted string"
+  },
+  "direct": "Direkte",
+  "@direct": {
+    "description": "Auto-extracted string"
+  },
+  "directMessage": "Direktemelding",
+  "@directMessage": {
+    "description": "Auto-extracted string"
+  },
+  "directionsMessage": "Veibeskrivelse",
+  "@directionsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "discardChangesMessage": "Forkast endringer?",
+  "@discardChangesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "discardMessage": "Forkast",
+  "@discardMessage": {
+    "description": "Auto-extracted string"
+  },
+  "discoverEventsAndOpportunitiesMessage": "Oppdag arrangementer og muligheter",
+  "@discoverEventsAndOpportunitiesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "discoverHappeningsMessage": "Oppdag hendelser",
+  "@discoverHappeningsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "discoverStudentDrivenOrganizationsAtMessage": "Oppdag studentdrevne organisasjoner ved {campus}",
+  "@discoverStudentDrivenOrganizationsAtMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "campus": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "documentStatsMessage": "Dokumentstatistikk",
+  "@documentStatsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "done": "Ferdig",
+  "@done": {
+    "description": "Auto-extracted string"
+  },
+  "downloadPhotosAndFilesAutomaticallyMessage": "Last ned bilder og filer automatisk",
+  "@downloadPhotosAndFilesAutomaticallyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "draftMessage": "Utkast",
+  "@draftMessage": {
+    "description": "Auto-extracted string"
+  },
+  "draftSavedMessage": "Utkast lagret",
+  "@draftSavedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "draftYourLocalDraftBeforeSubmissionMessage": "• Utkast: Ditt lokale utkast før innsending.\\n",
+  "@draftYourLocalDraftBeforeSubmissionMessage": {
+    "description": "Auto-extracted string"
+  },
+  "earlyMinutesMessage": "Tidlig {deltaMinutes}m",
+  "@earlyMinutesMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "deltaMinutes": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "earlyRegistrationForPopularEventsMessage": "Tidlig registrering for populære arrangementer",
+  "@earlyRegistrationForPopularEventsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "editMessage": "Rediger",
+  "@editMessage": {
+    "description": "Auto-extracted string"
+  },
+  "editProfileMessage": "Rediger profil",
+  "@editProfileMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "egMacBookPro13Message": "f.eks. MacBook Pro 13\"",
+  "@egMacBookPro13Message": {
+    "description": "Auto-extracted string"
+  },
+  "electronicsMessage": "Elektronikk",
+  "@electronicsMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "email": "E-post",
+  "@email": {
+    "description": "Auto-extracted string"
+  },
+  "emailMessage": "E-post",
+  "@emailMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "enableMessage": "Aktiver",
+  "@enableMessage": {
+    "description": "Auto-extracted string"
+  },
+  "enableNotificationsMessage": "Aktiver varsler",
+  "@enableNotificationsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "enableSystemNotificationsFirstMessage": "Aktiver systemvarsler først",
+  "@enableSystemNotificationsFirstMessage": {
+    "description": "Auto-extracted string"
+  },
+  "endedMessage": "Avsluttet",
+  "@endedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "enterAValidAmountMessage": "Skriv inn et gyldig beløp",
+  "@enterAValidAmountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "enterEmail": "Skriv inn e-post",
+  "@enterEmail": {
+    "description": "Auto-extracted string"
+  },
+  "enterValidEmail": "Skriv inn gyldig e-post",
+  "@enterValidEmail": {
+    "description": "Auto-extracted string"
+  },
+  "enterYourInternationalAccountNumberMessage": "Skriv inn ditt internasjonale kontonummer",
+  "@enterYourInternationalAccountNumberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorEnablingNotificationsMessage": "Feil ved aktivering av varsler: $e",
+  "@errorEnablingNotificationsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorLoadingBoardMembersMessage": "Feil ved lasting av styremedlemmer",
+  "@errorLoadingBoardMembersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorLoadingExpensesMessage": "Feil ved lasting av utgifter",
+  "@errorLoadingExpensesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorLoadingNotificationSettingsMessage": "Feil ved lasting av varselinnstillinger",
+  "@errorLoadingNotificationSettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorLoadingPrivacySettingsMessage": "Feil ved lasting av personverninnstillinger",
+  "@errorLoadingPrivacySettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorMessage": "Det oppstod en feil",
+  "@errorMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorPickingImageMessage": "Feil ved valg av bilde: $e",
+  "@errorPickingImageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorUpdatingProfileMessage": "Feil ved oppdatering av profil: $e",
+  "@errorUpdatingProfileMessage": {
+    "description": "Auto-extracted string"
+  },
+  "eventAccessExpenseReimbursementsMarketplaceDiscountsPrioritySupportMessage": "Arrangementsadgang • Utgiftsrefusjon • Markedsplassrabatter • Prioritert support",
+  "@eventAccessExpenseReimbursementsMarketplaceDiscountsPrioritySupportMessage": {
+    "description": "Auto-extracted string"
+  },
+  "eventMessage": "Arrangement",
+  "@eventMessage": {
+    "description": "Auto-extracted string"
+  },
+  "eventsAndTicketsMessage": "Arrangementer og billetter",
+  "@eventsAndTicketsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "eventsMessage": "Arrangementer",
+  "@eventsMessage": {
+    "description": "Auto-extracted string (used in 8 files)"
+  },
+  "exclusiveChatChannelsMessage": "Eksklusive chatkanaler",
+  "@exclusiveChatChannelsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "exclusiveDealsOnMarketplaceItemsMessage": "Eksklusive tilbud på markedsplassvarer",
+  "@exclusiveDealsOnMarketplaceItemsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "expenseDetailsMessage": "Utgiftsdetaljer",
+  "@expenseDetailsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "expenseHistoryMessage": "Utgiftshistorikk",
+  "@expenseHistoryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "expenseReimbursementMessage": "Utgiftsrefusjon",
+  "@expenseReimbursementMessage": {
+    "description": "Auto-extracted string"
+  },
+  "expenseReimbursementStatusUpdatesMessage": "Oppdateringer om utgiftsrefusjonsstatus",
+  "@expenseReimbursementStatusUpdatesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "expenseReimbursementsMessage": "Utgiftsrefusjoner",
+  "@expenseReimbursementsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "expenseStatusesMessage": "Utgiftsstatuser",
+  "@expenseStatusesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "expenseSubmittedMessage": "Utgift sendt inn",
+  "@expenseSubmittedMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "expensesMessage": "Utgifter",
+  "@expensesMessage": {
+    "description": "Auto-extracted string (used in 5 files)"
+  },
+  "expiresInRemainingSecondsMessage": "Utløper om {remainingSeconds}s",
+  "@expiresInRemainingSecondsMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "remainingSeconds": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "explore": "Utforsk",
+  "@explore": {
+    "description": "Auto-extracted string"
+  },
+  "exploreCampusMessage": "Utforsk campus",
+  "@exploreCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "exploreMessage": "Utforsk",
+  "@exploreMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "facebookMessage": "Facebook",
+  "@facebookMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToDeleteChat": "Kunne ikke slette chat: $e",
+  "@failedToDeleteChat": {
+    "description": "Auto-extracted string"
+  },
+  "failedToGenerateVerificationTokenMessage": "Kunne ikke generere verifiseringstoken.",
+  "@failedToGenerateVerificationTokenMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadBoardMembersMessage": "Kunne ikke laste styremedlemmer",
+  "@failedToLoadBoardMembersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadCampusesMessage": "Kunne ikke laste campuser",
+  "@failedToLoadCampusesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadChats": "Kunne ikke laste chater",
+  "@failedToLoadChats": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadContentMessage": "Kunne ikke laste innhold",
+  "@failedToLoadContentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadMembershipOptionsMessage": "Kunne ikke laste medlemskapsalternativer: {e}",
+  "@failedToLoadMembershipOptionsMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "e": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "failedToLoadMessage": "Kunne ikke laste",
+  "@failedToLoadMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "failedToLoadProductMessage": "Kunne ikke laste produkt: $e",
+  "@failedToLoadProductMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadSocialsMessage": "Kunne ikke laste sosiale medier: $e",
+  "@failedToLoadSocialsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadStopPlacesMessage": "Kunne ikke laste stoppesteder",
+  "@failedToLoadStopPlacesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToPublishMessage": "Kunne ikke publisere: $e",
+  "@failedToPublishMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToResendCodeMessage": "Kunne ikke sende kode på nytt: $e",
+  "@failedToResendCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToSaveDraftMessage": "Kunne ikke lagre utkast: $e",
+  "@failedToSaveDraftMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToSavePaymentInformationMessage": "Kunne ikke lagre betalingsinformasjon: $e",
+  "@failedToSavePaymentInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToSendMessageMessage": "Kunne ikke sende melding: $e",
+  "@failedToSendMessageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToSubmitMessage": "Kunne ikke sende inn: $e",
+  "@failedToSubmitMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToUpdateFavoriteMessage": "Kunne ikke oppdatere favoritt: $e",
+  "@failedToUpdateFavoriteMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "failedToUpdatePrivacySetting": "Kunne ikke oppdatere personverninnstilling: $e",
+  "@failedToUpdatePrivacySetting": {
+    "description": "Auto-extracted string"
+  },
+  "failedToUpdatePrivacySettingMessage": "Kunne ikke oppdatere personverninnstilling: $e",
+  "@failedToUpdatePrivacySettingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToUpdateSettingMessage": "Kunne ikke oppdatere innstilling: $e",
+  "@failedToUpdateSettingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "fairMessage": "Rettferdig",
+  "@fairMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "favoritesMessage": "Favoritter",
+  "@favoritesMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "featuredEventMessage": "Utvalgt arrangement",
+  "@featuredEventMessage": {
+    "description": "Auto-extracted string"
+  },
+  "featuredOpportunityMessage": "Utvalgt mulighet",
+  "@featuredOpportunityMessage": {
+    "description": "Auto-extracted string"
+  },
+  "featuredProductMessage": "Utvalgt produkt",
+  "@featuredProductMessage": {
+    "description": "Auto-extracted string"
+  },
+  "fileSAttachedMessage": "{attachedFiles} fil(er) vedlagt",
+  "@fileSAttachedMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "attachedFiles": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "filesMessage": "Filer",
+  "@filesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "findOpportunitiesMessage": "Finn muligheter",
+  "@findOpportunitiesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "findUsOnlineMessage": "Finn oss online",
+  "@findUsOnlineMessage": {
+    "description": "Auto-extracted string"
+  },
+  "forBusinessMessage": "For bedrifter",
+  "@forBusinessMessage": {
+    "description": "Auto-extracted string"
+  },
+  "forFasterVippsProcessingMessage": "For raskere Vipps-behandling",
+  "@forFasterVippsProcessingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "forPrepaymentsYouCanUploadQuotesOrEstimatesMessage": "For forskuddsbetalinger kan du laste opp tilbud eller overslag",
+  "@forPrepaymentsYouCanUploadQuotesOrEstimatesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "forStudentsMessage": "For studenter",
+  "@forStudentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "freeUpStorageSpaceMessage": "Frigjør lagringsplass",
+  "@freeUpStorageSpaceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "fromGalleryMessage": "Fra galleri",
+  "@fromGalleryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "furnitureMessage": "Møbler",
+  "@furnitureMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "galleryMessage": "Galleri",
+  "@galleryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "generalMessage": "Generelt",
+  "@generalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "generatingMessage": "Genererer...",
+  "@generatingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getACodeInsteadMessage": "Få en kode i stedet",
+  "@getACodeInsteadMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getAccessToExclusiveEventsDiscountsAndMoreMessage": "Få tilgang til eksklusive arrangementer, rabatter og mer",
+  "@getAccessToExclusiveEventsDiscountsAndMoreMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getHelpGuidanceMessage": "Få hjelp og veiledning",
+  "@getHelpGuidanceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getHelpInformationMessage": "Få hjelp og informasjon",
+  "@getHelpInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getNotifiedAboutNewCampusEventsMessage": "Få varsler om nye campusarrangementer",
+  "@getNotifiedAboutNewCampusEventsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getNotifiedWhenYouReceiveNewMessagesInChatMessage": "Få varsling når du mottar nye meldinger i chat.",
+  "@getNotifiedWhenYouReceiveNewMessagesInChatMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getTheMostOutOfBISOByCompletingYourProfileWithCampusAndContactInformationMessage": "Få mest mulig ut av BISO ved å fullføre profilen din med campus- og kontaktinformasjon.",
+  "@getTheMostOutOfBISOByCompletingYourProfileWithCampusAndContactInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "goodMessage": "Bra",
+  "@goodMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "groups": "Grupper",
+  "@groups": {
+    "description": "Auto-extracted string"
+  },
+  "guidelinesMessage": "Retningslinjer",
+  "@guidelinesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "happeningAtMessage": "Skjer i {campus}",
+  "@happeningAtMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "campus": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "heartItemsYouLikeToSeeThemHereMessage": "Hjerte elementer du liker for å se dem her!",
+  "@heartItemsYouLikeToSeeThemHereMessage": {
+    "description": "Auto-extracted string"
+  },
+  "home": "Hjem",
+  "@home": {
+    "description": "Auto-extracted string"
+  },
+  "homeMessage": "Hjem",
+  "@homeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "idVerificationCodeMessage": "ID: $verificationCode",
+  "@idVerificationCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "ifYouLeaveNowYourChangesWillNotBeSavedMessage": "Hvis du forlater nå, vil ikke endringene dine bli lagret.",
+  "@ifYouLeaveNowYourChangesWillNotBeSavedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "image": "📷 Bilde",
+  "@image": {
+    "description": "Auto-extracted string"
+  },
+  "importantAnnouncementMessage": "Viktig kunngjøring",
+  "@importantAnnouncementMessage": {
+    "description": "Auto-extracted string"
+  },
+  "inAppMessageMessage": "Melding i appen",
+  "@inAppMessageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "inMinutesMessage": "Om {diff} min",
+  "@inMinutesMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "diff": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "instagramMessage": "Instagram",
+  "@instagramMessage": {
+    "description": "Auto-extracted string"
+  },
+  "interestsDepartmentsMessage": "Interesser og avdelinger",
+  "@interestsDepartmentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "interestsMessage": "Interesser",
+  "@interestsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "internationalAccountNumberMessage": "Internasjonalt kontonummer",
+  "@internationalAccountNumberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "internationalBankAccountMessage": "Internasjonal bankkonto",
+  "@internationalBankAccountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "invalidNorwegianBankAccountNumberMessage": "Ugyldig norsk bankkontonummer",
+  "@invalidNorwegianBankAccountNumberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "invalidOtpCodeMessage": "Ugyldig OTP-kode",
+  "@invalidOtpCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "invalidZipCodeMessage": "Ugyldig postnummer",
+  "@invalidZipCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "jobOpportunitiesMessage": "Jobbmuligheter",
+  "@jobOpportunitiesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "jobsMessage": "Jobber",
+  "@jobsMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "keepEditingMessage": "Fortsett å redigere",
+  "@keepEditingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "keepPrivateMessage": "Hold privat",
+  "@keepPrivateMessage": {
+    "description": "Auto-extracted string"
+  },
+  "languageChangesWillTakeEffectAfterRestartingTheAppMessage": "Språkendringer vil tre i kraft etter omstart av appen.",
+  "@languageChangesWillTakeEffectAfterRestartingTheAppMessage": {
+    "description": "Auto-extracted string"
+  },
+  "languageMessage": "Språk",
+  "@languageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "languageSettingsMessage": "Språkinnstillinger",
+  "@languageSettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "lastSeenMessage": "Sist sett",
+  "@lastSeenMessage": {
+    "description": "Auto-extracted string"
+  },
+  "learnMoreMessage": "Lær mer",
+  "@learnMoreMessage": {
+    "description": "Auto-extracted string"
+  },
+  "libraryServicesMessage": "Bibliotektjenester",
+  "@libraryServicesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "likeNewMessage": "Som ny",
+  "@likeNewMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "linkedInMessage": "LinkedIn",
+  "@linkedInMessage": {
+    "description": "Auto-extracted string"
+  },
+  "liveMessage": "Direkte",
+  "@liveMessage": {
+    "description": "Auto-extracted string"
+  },
+  "loadingBoardMembersMessage": "Laster styremedlemmer...",
+  "@loadingBoardMembersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "loadingNotificationSettingsMessage": "Laster varslingsinnstillinger...",
+  "@loadingNotificationSettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "loadingPrivacySettingsMessage": "Laster personverninnstillinger...",
+  "@loadingPrivacySettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "loadingStudentInformationMessage": "Laster studentinformasjon...",
+  "@loadingStudentInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "loadingYourProfileMessage": "Laster profilen din...",
+  "@loadingYourProfileMessage": {
+    "description": "Auto-extracted string"
+  },
+  "magicLinkSentMessage": "Magisk lenke sendt! Sjekk e-posten din og klikk på lenken for å logge inn.",
+  "@magicLinkSentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "makePublicMessage": "Gjør offentlig",
+  "@makePublicMessage": {
+    "description": "Auto-extracted string"
+  },
+  "manageAccountAndPreferences": "Administrer kontoen og innstillingene dine",
+  "@manageAccountAndPreferences": {
+    "description": "Auto-extracted string"
+  },
+  "manageDownloadedContentMessage": "Administrer nedlastet innhold",
+  "@manageDownloadedContentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "manageReimbursementsMessage": "Administrer refusjoner",
+  "@manageReimbursementsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "manageYourAccountAndPreferencesMessage": "Administrer kontoen og innstillingene dine",
+  "@manageYourAccountAndPreferencesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "marketplaceMessage": "Markedsplass",
+  "@marketplaceMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "memberBenefitsActiveMessage": "Medlemsfordeler aktive",
+  "@memberBenefitsActiveMessage": {
+    "description": "Auto-extracted string"
+  },
+  "memberDiscountsMessage": "Medlemsrabatter",
+  "@memberDiscountsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "memberMessage": "Medlem",
+  "@memberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "memberSinceMessage": "Medlem siden",
+  "@memberSinceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "members": "{chat} medlemmer",
+  "@members": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "chat": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "membershipExpiredMessage": "Medlemskap utløpt",
+  "@membershipExpiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "membershipPurchaseInitiatedCompletePaymentToActivateMessage": "Medlemskapskjøp startet! Fullfør betaling for å aktivere.",
+  "@membershipPurchaseInitiatedCompletePaymentToActivateMessage": {
+    "description": "Auto-extracted string"
+  },
+  "messageCopiedToClipboardMessage": "Melding kopiert til utklippstavle",
+  "@messageCopiedToClipboardMessage": {
+    "description": "Auto-extracted string"
+  },
+  "messageSellerMessage": "Melding {product}",
+  "@messageSellerMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "product": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "messageSentSuccessfullyMessage": "Melding sendt!",
+  "@messageSentSuccessfullyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "metroMessage": "Metro",
+  "@metroMessage": {
+    "description": "Auto-extracted string"
+  },
+  "minutes": "{difference}m",
+  "@minutes": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "difference": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "moreDocumentsMessage": "+ {sources} flere dokumenter",
+  "@moreDocumentsMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "sources": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "mute": "Demp",
+  "@mute": {
+    "description": "Auto-extracted string"
+  },
+  "muteNotificationsDuringSpecificHoursMessage": "Demp varsler i spesifikke timer",
+  "@muteNotificationsDuringSpecificHoursMessage": {
+    "description": "Auto-extracted string"
+  },
+  "nameCountStopsMessage": "$name ($count stopp)",
+  "@nameCountStopsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "nameIsRequiredMessage": "Navn er påkrevd",
+  "@nameIsRequiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "nameMessage": "Navn",
+  "@nameMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "negotiableMessage": "Til forhandling",
+  "@negotiableMessage": {
+    "description": "Auto-extracted string"
+  },
+  "networkErrorMessage": "Nettverksfeil: {e}",
+  "@networkErrorMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "e": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "newExpenseMessage": "Ny utgift",
+  "@newExpenseMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "newItemsAndDealsInTheMarketplaceMessage": "Nye varer og tilbud på markedsplassen",
+  "@newItemsAndDealsInTheMarketplaceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "newMessagesInYourChatsMessage": "Nye meldinger i chattene dine",
+  "@newMessagesInYourChatsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noActiveMembershipFoundPleasePurchaseABISOMembershipFirstMessage": "Ingen aktivt medlemskap funnet. Vennligst kjøp et BISO-medlemskap først.",
+  "@noActiveMembershipFoundPleasePurchaseABISOMembershipFirstMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noActiveUnitsHereYetMessage": "Ingen aktive enheter her ennå",
+  "@noActiveUnitsHereYetMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noBoardMembersFoundMessage": "Ingen styremedlemmer funnet",
+  "@noBoardMembersFoundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noChatsFound": "Ingen chatter funnet",
+  "@noChatsFound": {
+    "description": "Auto-extracted string"
+  },
+  "noConversationsYet": "Ingen samtaler ennå",
+  "@noConversationsYet": {
+    "description": "Auto-extracted string"
+  },
+  "noDeparturesMessage": "Ingen avganger",
+  "@noDeparturesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noEventSelectedMessage": "Ingen hendelse valgt",
+  "@noEventSelectedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noEventsFoundMessage": "Ingen hendelser funnet",
+  "@noEventsFoundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noExpensesFoundMessage": "Ingen utgifter funnet",
+  "@noExpensesFoundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noExpensesMatchYourCurrentFilterMessage": "Ingen utgifter samsvarer med gjeldende filter",
+  "@noExpensesMatchYourCurrentFilterMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noExpiryMessage": "Ingen utløp",
+  "@noExpiryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noFavoritesYetMessage": "Ingen favoritter ennå",
+  "@noFavoritesYetMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noFilesUploadedYetMessage": "Ingen filer lastet opp ennå",
+  "@noFilesUploadedYetMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noItemsFoundMessage": "Ingen elementer funnet",
+  "@noItemsFoundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noMembersFoundForDepartmentNameMessage": "Ingen medlemmer funnet for $departmentName",
+  "@noMembersFoundForDepartmentNameMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noMembershipsAvailableMessage": "Ingen medlemskap tilgjengelig",
+  "@noMembershipsAvailableMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noRecentExpensesMessage": "Ingen nylige utgifter",
+  "@noRecentExpensesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noSocialLinksYetMessage": "Ingen sosiale lenker ennå",
+  "@noSocialLinksYetMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noStopPlacesConfiguredForThisCampusMessage": "Ingen stoppesteder konfigurert for dette campuset",
+  "@noStopPlacesConfiguredForThisCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "nokMessage": "NOK {amount}",
+  "@nokMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "nokNorwegianKroneMessage": "NOK (Norske kroner)",
+  "@nokNorwegianKroneMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noneMessage": "Ingen",
+  "@noneMessage": {
+    "description": "Auto-extracted string"
+  },
+  "norwegianAccountNumberMessage": "Norsk kontonummer",
+  "@norwegianAccountNumberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "norwegianBankAccountMessage": "Norsk bankkonto",
+  "@norwegianBankAccountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "norwegianBankAccountMustBe11DigitsMessage": "Norsk bankkontonummer må være 11 siffer",
+  "@norwegianBankAccountMustBe11DigitsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "norwegianBusinessSchoolMessage": "Handelshøyskolen BI",
+  "@norwegianBusinessSchoolMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "notAuthenticatedMessage": "Ikke autentisert",
+  "@notAuthenticatedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "notFoundMessage": "Ikke funnet",
+  "@notFoundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "notNowMessage": "Ikke nå",
+  "@notNowMessage": {
+    "description": "Auto-extracted string"
+  },
+  "nothingHereYetCheckBackSoonMessage": "Ingenting her ennå. Kom tilbake snart!",
+  "@nothingHereYetCheckBackSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "notificationPreferencesMessage": "Varslingsinnstillinger",
+  "@notificationPreferencesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "notificationScheduleMessage": "Varslingsplan",
+  "@notificationScheduleMessage": {
+    "description": "Auto-extracted string"
+  },
+  "notificationsEnabledSuccessfullyMessage": "Varsler aktivert!",
+  "@notificationsEnabledSuccessfullyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "notificationsMessage": "Varsler",
+  "@notificationsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "now": "nå",
+  "@now": {
+    "description": "Auto-extracted string"
+  },
+  "nowMessage": "Nå",
+  "@nowMessage": {
+    "description": "Auto-extracted string"
+  },
+  "officialMerchandiseAndCampusGearMessage": "Offisielle produkter og campusutstyr",
+  "@officialMerchandiseAndCampusGearMessage": {
+    "description": "Auto-extracted string"
+  },
+  "offlineDataManagementComingSoonMessage": "Offline datahåndtering kommer snart",
+  "@offlineDataManagementComingSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "offlineDataMessage": "Offline Data",
+  "@offlineDataMessage": {
+    "description": "Auto-extracted string"
+  },
+  "oneTicketGrantsAccessToAllEventsOnThisCampusMessage": "Én billett gir tilgang til alle arrangementer på dette campus.",
+  "@oneTicketGrantsAccessToAllEventsOnThisCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "openMailApp": "Åpne e-postapp",
+  "@openMailApp": {
+    "description": "Auto-extracted string"
+  },
+  "openPositionsMessage": "Ledige stillinger",
+  "@openPositionsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "openTicketPortalMessage": "Åpne billettportal",
+  "@openTicketPortalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "openValidatorModeMessage": "Åpne valideringsmodus",
+  "@openValidatorModeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "osloCampusMessage": "Oslo Campus",
+  "@osloCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "otherMessage": "Andre",
+  "@otherMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "othersCanFindAndMessageYouMessage": "Andre kan finne og sende melding til deg",
+  "@othersCanFindAndMessageYouMessage": {
+    "description": "Auto-extracted string"
+  },
+  "othersCannotFindYouInSearchMessage": "Andre kan ikke finne deg i søk",
+  "@othersCannotFindYouInSearchMessage": {
+    "description": "Auto-extracted string"
+  },
+  "otpSentTo": "Engangspassord sendt til $widget.email",
+  "@otpSentTo": {
+    "description": "Auto-extracted string"
+  },
+  "overallDescriptionAIGeneratedEditableMessage": "Overordnet beskrivelse (AI-generert, redigerbar)",
+  "@overallDescriptionAIGeneratedEditableMessage": {
+    "description": "Auto-extracted string"
+  },
+  "overallDescriptionMessage": "Overordnet beskrivelse",
+  "@overallDescriptionMessage": {
+    "description": "Auto-extracted string"
+  },
+  "paidMessage": "Betalt",
+  "@paidMessage": {
+    "description": "Auto-extracted string"
+  },
+  "paySelectedOptionPriceNokNOKMessage": "Betal {selectedOption} NOK",
+  "@paySelectedOptionPriceNokNOKMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "selectedOption": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "payWithMessage": "Betal med ",
+  "@payWithMessage": {
+    "description": "Auto-extracted string"
+  },
+  "paymentInformationMessage": "Betalingsinformasjon",
+  "@paymentInformationMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "paymentInformationSavedSuccessfullyMessage": "Betalingsinformasjon lagret",
+  "@paymentInformationSavedSuccessfullyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "paymentMethodMessage": "Betalingsmetode",
+  "@paymentMethodMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pendingMessage": "Venter",
+  "@pendingMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "personalInfoMessage": "Personlig info",
+  "@personalInfoMessage": {
+    "description": "Auto-extracted string"
+  },
+  "personalInformationMessage": "Personlig informasjon",
+  "@personalInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "phoneMessage": "Telefon",
+  "@phoneMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "phoneNumberOptionalMessage": "Telefonnummer (valgfritt)",
+  "@phoneNumberOptionalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "photosMessage": "Bilder",
+  "@photosMessage": {
+    "description": "Auto-extracted string"
+  },
+  "playSoundForNewMessagesMessage": "Spill av lyd for nye meldinger",
+  "@playSoundForNewMessagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseAddABitMoreDetailMessage": "Vennligst legg til litt mer detaljer",
+  "@pleaseAddABitMoreDetailMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseAddAtLeastOnePhotoMessage": "Vennligst legg til minst ett bilde",
+  "@pleaseAddAtLeastOnePhotoMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseCheckYourEmailManuallyMessage": "Vennligst sjekk e-posten din manuelt.",
+  "@pleaseCheckYourEmailManuallyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseEnableNotificationsInSystemSettingsMessage": "Vennligst aktiver varsler i systeminnstillinger",
+  "@pleaseEnableNotificationsInSystemSettingsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "pleaseEnterAValidNorwegianPhoneNumberMessage": "Vennligst oppgi et gyldig norsk telefonnummer",
+  "@pleaseEnterAValidNorwegianPhoneNumberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseRegisterYourStudentIDFirstMessage": "Vennligst registrer student-ID-en din først.",
+  "@pleaseRegisterYourStudentIDFirstMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseReviewAllInformationBeforeSubmittingMessage": "Vennligst gå gjennom all informasjon før innsending",
+  "@pleaseReviewAllInformationBeforeSubmittingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseSignInToAccessAndOtherPersonalizedFeaturesMessage": "Vennligst logg inn for å få tilgang til $feature og andre personlige funksjoner.",
+  "@pleaseSignInToAccessAndOtherPersonalizedFeaturesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseSignInToContactSellerMessage": "Vennligst logg inn for å kontakte selger",
+  "@pleaseSignInToContactSellerMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseSignInToSaveFavoritesMessage": "Vennligst logg inn for å lagre favoritter",
+  "@pleaseSignInToSaveFavoritesMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "pleaseSignInToSellItemsMessage": "Vennligst logg inn for å selge gjenstander",
+  "@pleaseSignInToSellItemsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseWaitWhileWeVerifyYourMagicLinkMessage": "Vennligst vent mens vi bekrefter den magiske lenken din...",
+  "@pleaseWaitWhileWeVerifyYourMagicLinkMessage": {
+    "description": "Auto-extracted string"
+  },
+  "plus47xxxxxxxMessage": "+47 xxx xx xxx",
+  "@plus47xxxxxxxMessage": {
+    "description": "Auto-extracted string"
+  },
+  "poorMessage": "Dårlig",
+  "@poorMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "popularMessage": "POPULÆRT",
+  "@popularMessage": {
+    "description": "Auto-extracted string"
+  },
+  "preferredContactOptionalMessage": "Foretrukket kontakt (valgfritt)",
+  "@preferredContactOptionalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "prefersMessage": "Foretrekker: {contactMethodLabel}",
+  "@prefersMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "contactMethodLabel": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "premiumFeaturesMessage": "Premium-funksjoner",
+  "@premiumFeaturesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "prepaymentMessage": "Forskuddsbetaling",
+  "@prepaymentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "prepaymentRequestMessage": "Forespørsel om forskuddsbetaling",
+  "@prepaymentRequestMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "priceIsNegotiableMessage": "Pris kan forhandles",
+  "@priceIsNegotiableMessage": {
+    "description": "Auto-extracted string"
+  },
+  "priceNOKMessage": "Pris (NOK)",
+  "@priceNOKMessage": {
+    "description": "Auto-extracted string"
+  },
+  "priorityEventAccessMessage": "Prioritert arrangementsadgang",
+  "@priorityEventAccessMessage": {
+    "description": "Auto-extracted string"
+  },
+  "privacyInformationMessage": "Personverninformasjon",
+  "@privacyInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "privacyMessage": "Personvern",
+  "@privacyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "privacyPolicyMessage": "Personvernerklæring",
+  "@privacyPolicyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "privateProfileMessage": "Privat profil",
+  "@privateProfileMessage": {
+    "description": "Auto-extracted string"
+  },
+  "productDetailsMessage": "Produktdetaljer",
+  "@productDetailsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "productInformationNotAvailableMessage": "Produktinformasjon ikke tilgjengelig",
+  "@productInformationNotAvailableMessage": {
+    "description": "Auto-extracted string"
+  },
+  "productMessage": "🛍️ $productName: {message}",
+  "@productMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "message": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "productNotFoundMessage": "Produkt ikke funnet",
+  "@productNotFoundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "productsMessage": "Produkter",
+  "@productsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "profile": "Profil",
+  "@profile": {
+    "description": "Auto-extracted string"
+  },
+  "profileInformationMessage": "Profilinformasjon",
+  "@profileInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "profileMessage": "Profil",
+  "@profileMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "profileSetToPrivate": "Profil satt til privat - andre kan ikke finne deg i søk",
+  "@profileSetToPrivate": {
+    "description": "Auto-extracted string"
+  },
+  "profileSetToPublic": "Profil satt til offentlig - andre kan finne og sende melding til deg",
+  "@profileSetToPublic": {
+    "description": "Auto-extracted string"
+  },
+  "profileUpdatedSuccessfullyMessage": "Profil oppdatert",
+  "@profileUpdatedSuccessfullyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "publicProfileCreatedOthersCanFindYouInSearchMessage": "Offentlig profil opprettet - andre kan finne deg i søk",
+  "@publicProfileCreatedOthersCanFindYouInSearchMessage": {
+    "description": "Auto-extracted string"
+  },
+  "publicProfileMessage": "Offentlig profil",
+  "@publicProfileMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "publishMessage": "Publiser",
+  "@publishMessage": {
+    "description": "Auto-extracted string"
+  },
+  "purchaseFailedMessage": "Kjøp mislyktes: {e}",
+  "@purchaseFailedMessage": {
+    "description": "Auto-extracted string (used in 2 files)",
+    "placeholders": {
+      "e": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "purchaseMembershipMessage": "Kjøp medlemskap",
+  "@purchaseMembershipMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pushNotificationsMessage": "Push-varsler",
+  "@pushNotificationsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "qrDataCopiedToClipboardMessage": "QR-data kopiert til utklippstavle: {qrData}...",
+  "@qrDataCopiedToClipboardMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "qrData": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "qrErrorMessage": "QR-feil",
+  "@qrErrorMessage": {
+    "description": "Auto-extracted string"
+  },
+  "queryMessage": "• \"{response}\"",
+  "@queryMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "response": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "quickLinksMessage": "Hurtiglenker",
+  "@quickLinksMessage": {
+    "description": "Auto-extracted string"
+  },
+  "quietHoursFeatureComingSoonMessage": "Stilletimer-funksjon kommer snart",
+  "@quietHoursFeatureComingSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "quietHoursMessage": "Stilletimer",
+  "@quietHoursMessage": {
+    "description": "Auto-extracted string"
+  },
+  "reRunAIMessage": "Kjør AI på nytt",
+  "@reRunAIMessage": {
+    "description": "Auto-extracted string"
+  },
+  "readReceiptsMessage": "Lesebekreftelser",
+  "@readReceiptsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "readyToHelpMessage": "Klar til å hjelpe",
+  "@readyToHelpMessage": {
+    "description": "Auto-extracted string"
+  },
+  "realtimeBusMetroMessage": "Sanntids buss og T-bane",
+  "@realtimeBusMetroMessage": {
+    "description": "Auto-extracted string"
+  },
+  "receiptsAreRequiredForReimbursementMessage": "Kvitteringer er påkrevd for refusjon",
+  "@receiptsAreRequiredForReimbursementMessage": {
+    "description": "Auto-extracted string"
+  },
+  "receiptsDocumentsMessage": "Kvitteringer og dokumenter",
+  "@receiptsDocumentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "receiptsMessage": "Kvitteringer",
+  "@receiptsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "receiveNotificationsForNewMessagesMessage": "Motta varsler for nye meldinger",
+  "@receiveNotificationsForNewMessagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "recentExpensesMessage": "Nylige utgifter",
+  "@recentExpensesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "refreshMessage": "Oppdater",
+  "@refreshMessage": {
+    "description": "Auto-extracted string"
+  },
+  "refreshStatusMessage": "Oppdater status",
+  "@refreshStatusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "regionalSettingsMessage": "Regionale innstillinger",
+  "@regionalSettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "registrationRequiredMessage": "Registrering påkrevd",
+  "@registrationRequiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "rejectedMessage": "Avvist",
+  "@rejectedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "relatedEventMessage": "Relatert arrangement",
+  "@relatedEventMessage": {
+    "description": "Auto-extracted string"
+  },
+  "relatesToAnEventMessage": "Relaterer til en hendelse",
+  "@relatesToAnEventMessage": {
+    "description": "Auto-extracted string"
+  },
+  "remainingSecondsMessage": "{remainingSeconds}s",
+  "@remainingSecondsMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "remainingSeconds": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "removeMessage": "Fjern",
+  "@removeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "removeStudentIDMessage": "Fjern student-ID",
+  "@removeStudentIDMessage": {
+    "description": "Auto-extracted string"
+  },
+  "removedFromFavoritesMessage": "Fjernet fra favoritter",
+  "@removedFromFavoritesMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "renewMembershipMessage": "Forny medlemskap",
+  "@renewMembershipMessage": {
+    "description": "Auto-extracted string"
+  },
+  "requestPrepaymentMessage": "Be om forskuddsbetaling",
+  "@requestPrepaymentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "requiredMessage": "Påkrevd",
+  "@requiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "requiredSkillsMessage": "Nødvendige ferdigheter",
+  "@requiredSkillsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "requiresSWIFTCodeForInternationalTransfersMessage": "Krever SWIFT-kode for internasjonale overføringer",
+  "@requiresSWIFTCodeForInternationalTransfersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "resendCode": "Send kode på nytt",
+  "@resendCode": {
+    "description": "Auto-extracted string"
+  },
+  "resendCodeInMessage": "Send kode på nytt om {resendCountdown}s",
+  "@resendCodeInMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "resendCountdown": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "retry": "Prøv igjen",
+  "@retry": {
+    "description": "Auto-extracted string"
+  },
+  "retryMessage": "Prøv igjen",
+  "@retryMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "reviewAndSubmitMessage": "Gjennomgå og send inn",
+  "@reviewAndSubmitMessage": {
+    "description": "Auto-extracted string"
+  },
+  "reviewYourExpenseMessage": "Gjennomgå utgiften din",
+  "@reviewYourExpenseMessage": {
+    "description": "Auto-extracted string"
+  },
+  "saleMessage": "SALG",
+  "@saleMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "saveAsDraftMessage": "Lagre som utkast",
+  "@saveAsDraftMessage": {
+    "description": "Auto-extracted string"
+  },
+  "saveMessage": "Lagre",
+  "@saveMessage": {
+    "description": "Auto-extracted string"
+  },
+  "savePaymentInformationMessage": "Lagre betalingsinformasjon",
+  "@savePaymentInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "scanStudentQRCodesToVerifyMembershipMessage": "Skann student QR-koder for å verifisere medlemskap",
+  "@scanStudentQRCodesToVerifyMembershipMessage": {
+    "description": "Auto-extracted string"
+  },
+  "scheduleMessage": "Timeplan",
+  "@scheduleMessage": {
+    "description": "Auto-extracted string"
+  },
+  "scheduledTimeMessage": "Planlagt {formatTime}",
+  "@scheduledTimeMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "formatTime": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "searchChats": "Søk i samtaler",
+  "@searchChats": {
+    "description": "Auto-extracted string"
+  },
+  "searchDisabledInFavoritesMessage": "Søk deaktivert i favoritter",
+  "@searchDisabledInFavoritesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "searchEventsMessage": "Søk arrangementer",
+  "@searchEventsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "searchMarketplaceMessage": "Søk markedsplass",
+  "@searchMarketplaceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "searchMessage": "Søk",
+  "@searchMessage": {
+    "description": "Auto-extracted string"
+  },
+  "searchMessages": "Søk meldinger",
+  "@searchMessages": {
+    "description": "Auto-extracted string"
+  },
+  "searchMessagesAndChatNames": "Søk meldinger og chattenavn...",
+  "@searchMessagesAndChatNames": {
+    "description": "Auto-extracted string"
+  },
+  "searchMustBeAtLeast2CharactersMessage": "Søk må være minst 2 tegn",
+  "@searchMustBeAtLeast2CharactersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "searchWebshopMessage": "Søk nettbutikk",
+  "@searchWebshopMessage": {
+    "description": "Auto-extracted string"
+  },
+  "securePaymentPoweredByVippsMobilePayMessage": "Sikker betaling drevet av Vipps MobilePay",
+  "@securePaymentPoweredByVippsMobilePayMessage": {
+    "description": "Auto-extracted string"
+  },
+  "secureStorageMessage": "Sikker lagring",
+  "@secureStorageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "secureVerificationMessage": "Sikker verifisering",
+  "@secureVerificationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "selectCampusAndDepartmentToSaveDraftMessage": "Velg campus og avdeling for å lagre utkast",
+  "@selectCampusAndDepartmentToSaveDraftMessage": {
+    "description": "Auto-extracted string"
+  },
+  "selectCampusMessage": "Velg campus",
+  "@selectCampusMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "selectImageSourceMessage": "Velg bildekilde",
+  "@selectImageSourceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "selectInterestsMessage": "Velg interesser",
+  "@selectInterestsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "selectMessage": "Velg",
+  "@selectMessage": {
+    "description": "Auto-extracted string"
+  },
+  "selectYourHomeCampusMessage": "Velg hjemcampus",
+  "@selectYourHomeCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "selectedPlanMessage": "Valgt plan",
+  "@selectedPlanMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sellItemMessage": "Selg gjenstand",
+  "@sellItemMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "sellerInformationMessage": "Selgerinformasjon",
+  "@sellerInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sendMagicLinkMessage": "Send magisk lenke",
+  "@sendMagicLinkMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sendMessage": "Send",
+  "@sendMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sendMessageToSellerMessage": "Send en melding til {product}:",
+  "@sendMessageToSellerMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "product": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "sessionClearedMessage": "Økt tømt - OTP-flyt skal fungere nå",
+  "@sessionClearedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "settingsMessage": "Innstillinger",
+  "@settingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sharePointSearchMessage": "SharePoint-søk",
+  "@sharePointSearchMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "sharedProduct": "🛍️ Delt $productName",
+  "@sharedProduct": {
+    "description": "Auto-extracted string"
+  },
+  "shopOnBISOnoMessage": "Handle på BISO.no",
+  "@shopOnBISOnoMessage": {
+    "description": "Auto-extracted string"
+  },
+  "showAllProductsMessage": "Vis alle produkter",
+  "@showAllProductsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "showFavoritesOnlyMessage": "Vis kun favoritter",
+  "@showFavoritesOnlyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "showLessMessage": "Vis mindre",
+  "@showLessMessage": {
+    "description": "Auto-extracted string"
+  },
+  "showMoreMessage": "Vis {widget} flere",
+  "@showMoreMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "widget": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "showThisToValidatorsMessage": "Vis dette til validatorer",
+  "@showThisToValidatorsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "showYourLastSeenStatusMessage": "Vis din sist sett-status",
+  "@showYourLastSeenStatusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "signInFailedMessage": "Innlogging mislyktes",
+  "@signInFailedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "signInMessage": "Logg inn",
+  "@signInMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "signInRequiredMessage": "Innlogging påkrevd",
+  "@signInRequiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "signInToViewYourProfileMessage": "Logg inn for å se profilen din",
+  "@signInToViewYourProfileMessage": {
+    "description": "Auto-extracted string"
+  },
+  "signInWithBIAccountMessage": "Logg inn med BI-konto",
+  "@signInWithBIAccountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "signOutMessage": "Logg ut",
+  "@signOutMessage": {
+    "description": "Auto-extracted string"
+  },
+  "signingYouInMessage": "Logger deg inn...",
+  "@signingYouInMessage": {
+    "description": "Auto-extracted string"
+  },
+  "siteListingMessage": "Nettstedslisting",
+  "@siteListingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sitesMessage": "Nettsteder",
+  "@sitesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "somethingWentWrongMessage": "Noe gikk galt",
+  "@somethingWentWrongMessage": {
+    "description": "Auto-extracted string"
+  },
+  "somethingWentWrongWhileSigningYouInMessage": "Noe gikk galt under innlogging. Vennligst prøv igjen.",
+  "@somethingWentWrongWhileSigningYouInMessage": {
+    "description": "Auto-extracted string"
+  },
+  "soundMessage": "Lyd",
+  "@soundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "specialEventMessage": "Spesialbegivenhet",
+  "@specialEventMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sportsMessage": "Sport",
+  "@sportsMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "standardNorwegianBankAccountWithMOD11ValidationMessage": "Standard norsk bankkonto med MOD11-validering",
+  "@standardNorwegianBankAccountWithMOD11ValidationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "startChat": "Start chat",
+  "@startChat": {
+    "description": "Auto-extracted string"
+  },
+  "startConversationWithYourTeam": "Start en samtale med teamet ditt",
+  "@startConversationWithYourTeam": {
+    "description": "Auto-extracted string"
+  },
+  "statusHistoryMessage": "Statushistorikk",
+  "@statusHistoryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "stopPlaceMessage": "Stoppested",
+  "@stopPlaceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "studentIDNotFoundPleaseVerifyYourStudentStatusFirstMessage": "Student-ID ikke funnet. Vennligst verifiser din studentstatus først.",
+  "@studentIDNotFoundPleaseVerifyYourStudentStatusFirstMessage": {
+    "description": "Auto-extracted string"
+  },
+  "studentIdMessage": "Student-ID",
+  "@studentIdMessage": {
+    "description": "Auto-extracted string"
+  },
+  "studentOrganizationsMessage": "Studentorganisasjoner",
+  "@studentOrganizationsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "studentSupportMessage": "Studentstøtte",
+  "@studentSupportMessage": {
+    "description": "Auto-extracted string"
+  },
+  "studentVerificationMessage": "Studentverifisering",
+  "@studentVerificationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "studentsMessage": "Studenter",
+  "@studentsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "submitAndTrackYourExpenseClaimsMessage": "Send inn og spor dine utleggsrefusjoner",
+  "@submitAndTrackYourExpenseClaimsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "submitForApprovalMessage": "Send til godkjenning",
+  "@submitForApprovalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "submitMessage": "Send inn",
+  "@submitMessage": {
+    "description": "Auto-extracted string"
+  },
+  "submittedMessage": "Sendt inn",
+  "@submittedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "successMessage": "Suksess",
+  "@successMessage": {
+    "description": "Auto-extracted string"
+  },
+  "swiftBICCodeMessage": "SWIFT/BIC-kode",
+  "@swiftBICCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "swiftCodeCanOnlyContainLettersAndNumbersMessage": "SWIFT-kode kan bare inneholde bokstaver og tall",
+  "@swiftCodeCanOnlyContainLettersAndNumbersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "swiftCodeIsRequiredForInternationalAccountsMessage": "SWIFT-kode er påkrevd for internasjonale kontoer",
+  "@swiftCodeIsRequiredForInternationalAccountsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "swiftCodeMessage": "SWIFT-kode",
+  "@swiftCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "swiftCodeMustBe8Or11CharactersMessage": "SWIFT-kode må være 8 eller 11 tegn",
+  "@swiftCodeMustBe8Or11CharactersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "takePhotoMessage": "Ta bilde",
+  "@takePhotoMessage": {
+    "description": "Auto-extracted string"
+  },
+  "tapToGenerateMessage": "Trykk for å generere",
+  "@tapToGenerateMessage": {
+    "description": "Auto-extracted string"
+  },
+  "teamChatMembers": "Teamchat • {chat} medlemmer",
+  "@teamChatMembers": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "chat": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "teams": "Team",
+  "@teams": {
+    "description": "Auto-extracted string"
+  },
+  "termsOfServiceMessage": "Vilkår for bruk",
+  "@termsOfServiceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "thereAreCurrentlyNoActiveMembershipPlansForYourCampusThisMayBeBecauseMembershipSalesAreTemporarilyDisabledOrUndergoingMaintenancePleaseCheckBackLaterMessage": "Det finnes for øyeblikket ingen aktive medlemskapsplaner for ditt campus. Dette kan skyldes at medlemskapssalg er midlertidig deaktivert eller under vedlikehold. Vennligst sjekk igjen senere.",
+  "@thereAreCurrentlyNoActiveMembershipPlansForYourCampusThisMayBeBecauseMembershipSalesAreTemporarilyDisabledOrUndergoingMaintenancePleaseCheckBackLaterMessage": {
+    "description": "Auto-extracted string"
+  },
+  "thereAreNoEventsMatchingYourCriteriaMessage": "Det finnes ingen hendelser som matcher dine kriterier.",
+  "@thereAreNoEventsMatchingYourCriteriaMessage": {
+    "description": "Auto-extracted string"
+  },
+  "thinkingMessage": "Tenker...",
+  "@thinkingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "thisMagicLinkHasExpiredOrIsInvalidMessage": "Denne magiske lenken har utløpt eller er ugyldig. Be om en ny.",
+  "@thisMagicLinkHasExpiredOrIsInvalidMessage": {
+    "description": "Auto-extracted string"
+  },
+  "thisMessageWasDeleted": "Denne meldingen ble slettet",
+  "@thisMessageWasDeleted": {
+    "description": "Auto-extracted string"
+  },
+  "thisWillClearAllCachedImagesAndDataTheAppMayTakeLongerToLoadContentAfterClearingCacheMessage": "Dette vil slette alle mellomlagrede bilder og data. Appen kan ta lengre tid å laste innhold etter å ha tømt mellomlageret.",
+  "@thisWillClearAllCachedImagesAndDataTheAppMayTakeLongerToLoadContentAfterClearingCacheMessage": {
+    "description": "Auto-extracted string"
+  },
+  "ticketsMessage": "Billetter",
+  "@ticketsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "tikTokMessage": "TikTok",
+  "@tikTokMessage": {
+    "description": "Auto-extracted string"
+  },
+  "titleIsRequiredMessage": "Tittel er påkrevd",
+  "@titleIsRequiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "titleMessage": "Tittel",
+  "@titleMessage": {
+    "description": "Auto-extracted string"
+  },
+  "tokenExpiresInMessage": "Token utløper om",
+  "@tokenExpiresInMessage": {
+    "description": "Auto-extracted string"
+  },
+  "totalAmountMessage": "Totalbeløp",
+  "@totalAmountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "totalMessage": "Total",
+  "@totalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "tryAgainMessage": "Prøv igjen",
+  "@tryAgainMessage": {
+    "description": "Auto-extracted string"
+  },
+  "tryChangingYourFilterOrCheckBackLaterMessage": "Prøv å endre filteret eller sjekk igjen senere",
+  "@tryChangingYourFilterOrCheckBackLaterMessage": {
+    "description": "Auto-extracted string"
+  },
+  "tryDifferentSearchTerm": "Prøv et annet søkeord",
+  "@tryDifferentSearchTerm": {
+    "description": "Auto-extracted string"
+  },
+  "typeAtLeast2CharactersMessage": "Skriv minst 2 tegn",
+  "@typeAtLeast2CharactersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "typeYourMessageMessage": "Skriv meldingen din...",
+  "@typeYourMessageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "typingIndicatorsMessage": "Skriveindikatorer",
+  "@typingIndicatorsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unableToVerifyMembershipStatusPleaseTryAgainMessage": "Kan ikke verifisere medlemskapsstatus. Prøv igjen.",
+  "@unableToVerifyMembershipStatusPleaseTryAgainMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unitsDepartmentsMessage": "Enheter og avdelinger",
+  "@unitsDepartmentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unitsMessage": "Enheter",
+  "@unitsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unknownMessage": "Ukjent",
+  "@unknownMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unknownUserMessage": "Ukjent bruker",
+  "@unknownUserMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unlockAfterVerificationMessage": "Lås opp etter verifisering",
+  "@unlockAfterVerificationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unlockTheseBenefitsMessage": "Lås opp disse fordelene",
+  "@unlockTheseBenefitsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unmute": "Fjern lyddemping",
+  "@unmute": {
+    "description": "Auto-extracted string"
+  },
+  "upcomingMessage": "Kommende",
+  "@upcomingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "uploadDocumentPDFMessage": "Last opp dokument (PDF)",
+  "@uploadDocumentPDFMessage": {
+    "description": "Auto-extracted string"
+  },
+  "uploadPhotosOrScansOfYourReceiptsMessage": "Last opp bilder eller skanninger av kvitteringene dine",
+  "@uploadPhotosOrScansOfYourReceiptsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "uploadReceiptsAndDocumentsMessage": "Last opp kvitteringer og dokumenter",
+  "@uploadReceiptsAndDocumentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "urgentMessage": "HASTER",
+  "@urgentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "useAIToExtractDetailsMessage": "Bruk AI til å trekke ut detaljer",
+  "@useAIToExtractDetailsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "useDarkThemeThroughoutTheAppMessage": "Bruk mørkt tema i hele appen",
+  "@useDarkThemeThroughoutTheAppMessage": {
+    "description": "Auto-extracted string"
+  },
+  "useMagicLinkInsteadMessage": "Bruk magisk lenke i stedet",
+  "@useMagicLinkInsteadMessage": {
+    "description": "Auto-extracted string"
+  },
+  "useTheCampusSwitcherOnTheHomeScreenToChangeCampusMessage": "Bruk campusbytteren på hjemmeskjermen for å endre campus",
+  "@useTheCampusSwitcherOnTheHomeScreenToChangeCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "useVerificationCodeInsteadMessage": "Bruk verifiseringskode i stedet",
+  "@useVerificationCodeInsteadMessage": {
+    "description": "Auto-extracted string"
+  },
+  "useYourbiNoEmailForSecureInstantVerificationThisEnsuresYourStudentIDBelongsToYouMessage": "Bruk din @bi.no e-post for sikker, øyeblikkelig verifisering. Dette sikrer at student-ID-en din tilhører deg.",
+  "@useYourbiNoEmailForSecureInstantVerificationThisEnsuresYourStudentIDBelongsToYouMessage": {
+    "description": "Auto-extracted string"
+  },
+  "usingToolMessage": "Bruker {runningTools}...",
+  "@usingToolMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "runningTools": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "validUntilMessage": "Gyldig til",
+  "@validUntilMessage": {
+    "description": "Auto-extracted string"
+  },
+  "validatorModeMessage": "Valideringsmodus",
+  "@validatorModeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verificationCodeCopiedMessage": "Verifiseringskode kopiert",
+  "@verificationCodeCopiedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verificationCodeMessage": "Verifiseringskode",
+  "@verificationCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verificationCodeSentSuccessfullyMessage": "Verifiseringskode sendt",
+  "@verificationCodeSentSuccessfullyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verificationQRCodeMessage": "Verifiserings QR-kode",
+  "@verificationQRCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verifiedMessage": "Verifisert",
+  "@verifiedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verifyOtp": "Bekreft OTP",
+  "@verifyOtp": {
+    "description": "Auto-extracted string"
+  },
+  "verifyYourBIcampusNameStudentStatusAndUnlockExclusiveFeaturesMembershipBenefitsAndCampusWideAccessMessage": "Bekreft din BI $campusName studentstatus og lås opp eksklusive funksjoner, medlemsfordeler og tilgang på hele campus.",
+  "@verifyYourBIcampusNameStudentStatusAndUnlockExclusiveFeaturesMembershipBenefitsAndCampusWideAccessMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verifyYourStudentStatusMessage": "Bekreft din studentstatus",
+  "@verifyYourStudentStatusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "vibrateForNewMessagesMessage": "Vibrer for nye meldinger",
+  "@vibrateForNewMessagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "vibrateForNotificationsMessage": "Vibrer for varsler",
+  "@vibrateForNotificationsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "vibrationMessage": "Vibrasjon",
+  "@vibrationMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "vibrationSettingsComingSoonMessage": "Vibrasjonsinnstillinger kommer snart",
+  "@vibrationSettingsComingSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "viewDetailsMessage": "Vis detaljer",
+  "@viewDetailsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "viewHistoryMessage": "Vis historikk",
+  "@viewHistoryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "viewImportantDatesMessage": "Vis viktige datoer",
+  "@viewImportantDatesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "viewOnBisoNoMessage": "Vis på Biso.no",
+  "@viewOnBisoNoMessage": {
+    "description": "Auto-extracted string"
+  },
+  "vippsMessage": "Vipps",
+  "@vippsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "vippsMobilePayMessage": "Vipps/MobilePay",
+  "@vippsMobilePayMessage": {
+    "description": "Auto-extracted string"
+  },
+  "visitOurWebsiteMessage": "Besøk nettstedet vårt",
+  "@visitOurWebsiteMessage": {
+    "description": "Auto-extracted string"
+  },
+  "volunteerAndJobOpportunitiesMessage": "Frivillig- og jobbmuligheter",
+  "@volunteerAndJobOpportunitiesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "volunteerMessage": "Verv",
+  "@volunteerMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "volunteerOpportunitiesMessage": "Verv",
+  "@volunteerOpportunitiesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "volunteerOpportunitiesWithBISOMessage": "Verv med BISO",
+  "@volunteerOpportunitiesWithBISOMessage": {
+    "description": "Auto-extracted string"
+  },
+  "weatherMessage": "Vær",
+  "@weatherMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "webshopMessage": "Nettbutikk",
+  "@webshopMessage": {
+    "description": "Auto-extracted string"
+  },
+  "websiteMessage": "Nettsted",
+  "@websiteMessage": {
+    "description": "Auto-extracted string"
+  },
+  "welcomeBackMessage": "Velkommen tilbake!",
+  "@welcomeBackMessage": {
+    "description": "Auto-extracted string"
+  },
+  "welcomeToBISOMessage": "Velkommen til BISO",
+  "@welcomeToBISOMessage": {
+    "description": "Auto-extracted string"
+  },
+  "welcomeToBiso": "Velkommen til BISO",
+  "@welcomeToBiso": {
+    "description": "Auto-extracted string"
+  },
+  "welcomeToMessage": "Velkommen til",
+  "@welcomeToMessage": {
+    "description": "Auto-extracted string"
+  },
+  "whatWasThisExpenseForYouCanEditMessage": "Hva var denne utgiften for? (du kan redigere)",
+  "@whatWasThisExpenseForYouCanEditMessage": {
+    "description": "Auto-extracted string"
+  },
+  "whatYouGetMessage": "Det du får",
+  "@whatYouGetMessage": {
+    "description": "Auto-extracted string"
+  },
+  "xMessage": "X",
+  "@xMessage": {
+    "description": "Auto-extracted string"
+  },
+  "youCanChangeThisSettingAnytimeInYourProfileMessage": "Du kan endre denne innstillingen når som helst i profilen din.",
+  "@youCanChangeThisSettingAnytimeInYourProfileMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "youCannotMessageYourselfMessage": "Du kan ikke sende melding til deg selv",
+  "@youCannotMessageYourselfMessage": {
+    "description": "Auto-extracted string"
+  },
+  "youMayAlreadyBeSignedInMessage": "Du kan allerede være logget inn. Prøv å slette økten din og logg inn på nytt.",
+  "@youMayAlreadyBeSignedInMessage": {
+    "description": "Auto-extracted string"
+  },
+  "yourItemIsNowLiveMessage": "Varen din er nå aktiv!",
+  "@yourItemIsNowLiveMessage": {
+    "description": "Auto-extracted string"
+  },
+  "yourMemberBenefitsMessage": "Dine medlemsfordeler",
+  "@yourMemberBenefitsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "yourPaymentInformationIsEncryptedAndStoredSecurelyOnlyBISOAdministratorsCanAccessThisInformationForReimbursementProcessingMessage": "Betalingsinformasjonen din er kryptert og lagret trygt. Bare BISO-administratorer kan få tilgang til denne informasjonen for refusjonsbehandling.",
+  "@yourPaymentInformationIsEncryptedAndStoredSecurelyOnlyBISOAdministratorsCanAccessThisInformationForReimbursementProcessingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "zipCodeMessage": "Postnummer",
+  "@zipCodeMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "connectingStudentsMessage": "Koble studenter over hele Norges ledende handelshøyskole",
+  "@connectingStudentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "volunteerOpportunitiesWithBISO": "Frivillighetmuligheter med BISO",
+  "@volunteerOpportunitiesWithBISO": {
+    "description": "Auto-extracted string"
+  },
+  "viewAllMessage": "Vis alle",
+  "@viewAllMessage": {
+    "description": "Auto-extracted string"
+  },
+  "bisoWebsiteMessage": "BISO.no",
+  "@bisoWebsiteMessage": {
+    "description": "Auto-extracted string"
+  }
+}

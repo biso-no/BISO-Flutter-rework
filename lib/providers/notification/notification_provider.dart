@@ -31,9 +31,21 @@ class NotificationPreferencesNotifier
   Future<void> _loadPreferences() async {
     try {
       state = const AsyncValue.loading();
+      
+      // Load chat notifications preference
       final chatEnabled = await _notificationService
           .getChatNotificationPreference();
-      state = AsyncValue.data({'chat_notifications': chatEnabled});
+      
+      // Load topic subscriptions
+      final topicSubscriptions = _notificationService.topicSubscriptions;
+      
+      // Combine all preferences
+      final allPreferences = {
+        'chat_notifications': chatEnabled,
+        ...topicSubscriptions,
+      };
+      
+      state = AsyncValue.data(allPreferences);
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
@@ -46,6 +58,18 @@ class NotificationPreferencesNotifier
       // Update state
       final currentData = state.value ?? {};
       state = AsyncValue.data({...currentData, 'chat_notifications': enabled});
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+    }
+  }
+
+  Future<void> updateTopicSubscription(String topicId, bool enabled) async {
+    try {
+      await _notificationService.updateTopicSubscription(topicId, enabled);
+
+      // Update state
+      final currentData = state.value ?? {};
+      state = AsyncValue.data({...currentData, topicId: enabled});
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }

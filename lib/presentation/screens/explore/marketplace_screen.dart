@@ -172,7 +172,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final campus = ref.watch(filterCampusProvider);
     final auth = ref.watch(authStateProvider);
@@ -184,7 +184,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
       return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Text(l10n.marketplace),
+          title: Text(l10n.marketplaceMessage),
           centerTitle: true,
           elevation: 0,
           backgroundColor: Colors.white,
@@ -226,7 +226,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(effectiveMode == _ShopMode.marketplace ? l10n.marketplace : 'Webshop'),
+        title: Text(effectiveMode == _ShopMode.marketplace ? l10n.marketplaceMessage : l10n.webshopMessage),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,

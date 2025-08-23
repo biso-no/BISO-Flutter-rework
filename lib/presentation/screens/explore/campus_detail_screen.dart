@@ -99,14 +99,14 @@ class _CampusDetailScreenState extends ConsumerState<CampusDetailScreen>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final campusAsync = ref.watch(campusProvider(widget.campusId));
 
     return campusAsync.when(
       loading: () => Scaffold(
         appBar: AppBar(
-          title: Text(l10n.campus),
+          title: Text(l10n.campusMessage),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => NavigationUtils.goBackSafely(context),
@@ -118,7 +118,7 @@ class _CampusDetailScreenState extends ConsumerState<CampusDetailScreen>
       ),
       error: (error, stack) => Scaffold(
         appBar: AppBar(
-          title: Text(l10n.campus),
+          title: Text(l10n.campusMessage),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => NavigationUtils.goBackSafely(context),
@@ -154,7 +154,7 @@ class _CampusDetailScreenState extends ConsumerState<CampusDetailScreen>
         if (campus == null) {
           return Scaffold(
             appBar: AppBar(
-              title: Text(l10n.campus),
+              title: Text(l10n.campusMessage),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => NavigationUtils.goBackSafely(context),
@@ -223,7 +223,7 @@ class _CampusDetailScreenState extends ConsumerState<CampusDetailScreen>
                         
                         // Benefit Cards
                         CampusBenefitCard(
-                          title: l10n.forStudents,
+                          title: l10n.forStudentsMessage,
                           benefits: campus.studentBenefits,
                           icon: Icons.school_outlined,
                           color: AppColors.defaultBlue,
@@ -233,7 +233,7 @@ class _CampusDetailScreenState extends ConsumerState<CampusDetailScreen>
                         const SizedBox(height: 24),
                         
                         CampusBenefitCard(
-                          title: l10n.forBusiness,
+                          title: l10n.forBusinessMessage,
                           benefits: campus.businessBenefits,
                           icon: Icons.business_outlined,
                           color: AppColors.accentBlue,
@@ -243,7 +243,7 @@ class _CampusDetailScreenState extends ConsumerState<CampusDetailScreen>
                         const SizedBox(height: 24),
                         
                         CampusBenefitCard(
-                          title: l10n.careerAdvantages,
+                          title: l10n.careerAdvantagesMessage,
                           benefits: campus.careerAdvantages,
                           icon: Icons.trending_up_outlined,
                           color: AppColors.strongGold,

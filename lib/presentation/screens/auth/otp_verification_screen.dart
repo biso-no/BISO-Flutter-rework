@@ -134,7 +134,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context).invalidOtpCode),
+            content: Text(AppLocalizations.of(context)?.invalidOtpCodeMessage ?? 'Invalid OTP code'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -216,7 +216,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -248,7 +248,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
               // Subtitle
               Text(
-                l10n.otpSentTo(widget.email),
+                '${l10n.otpSentTo} ${widget.email}',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: AppColors.onSurfaceVariant,
                 ),

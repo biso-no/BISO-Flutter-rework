@@ -8,8 +8,22 @@ import '../../../core/constants/app_colors.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
 import '../../../providers/privacy/privacy_provider.dart';
+import '../../../providers/ui/locale_provider.dart';
+import '../../../providers/notification/notification_provider.dart';
 import '../../../data/services/validator_service.dart';
+import '../../../data/services/feature_flag_service.dart';
+import '../../widgets/premium/notification_tile.dart';
 import 'settings_screen_chat_tab.dart';
+
+// Feature flag provider for expenses
+final _featureFlagServiceProvider = Provider<FeatureFlagService>(
+  (ref) => FeatureFlagService(),
+);
+
+final expenseFeatureFlagProvider = FutureProvider.autoDispose<bool>((ref) async {
+  final service = ref.watch(_featureFlagServiceProvider);
+  return service.isEnabled('expenses');
+});
 
 // Settings providers
 final appSettingsProvider =
@@ -495,8 +509,8 @@ class _NotificationSettingsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final settingsState = ref.watch(appSettingsProvider);
     final selectedCampus = ref.watch(selectedCampusProvider);
+    final notificationPrefsAsync = ref.watch(notificationPreferencesProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -513,88 +527,162 @@ class _NotificationSettingsTab extends ConsumerWidget {
 
           const SizedBox(height: 12),
 
-          Card(
-            child: Column(
-              children: [
-                SwitchListTile(
-                  secondary: const Icon(
-                    Icons.event,
-                    color: AppColors.accentBlue,
+          notificationPrefsAsync.when(
+            data: (preferences) => Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  buildNotificationTile(
+                    context: context,
+                    ref: ref,
+                    icon: Icons.event_outlined,
+                    iconColor: AppColors.accentBlue,
+                    title: 'Events',
+                    subtitle: 'New campus events and activities',
+                    isEnabled: preferences['events'] ?? true,
+                    onChanged: (value) {
+                      ref
+                          .read(notificationPreferencesProvider.notifier)
+                          .updateTopicSubscription('events', value);
+                    },
+                    selectedCampus: selectedCampus,
                   ),
-                  title: const Text('Events'),
-                  subtitle: const Text('Get notified about new campus events'),
-                  value: settingsState.notifications['events'] ?? true,
-                  onChanged: (value) {
-                    ref
-                        .read(appSettingsProvider.notifier)
-                        .setNotification('events', value);
-                  },
-                  activeColor: _getCampusColor(selectedCampus.id),
-                ),
-                const Divider(height: 1),
-                SwitchListTile(
-                  secondary: const Icon(
-                    Icons.shopping_bag,
-                    color: AppColors.green9,
+                  buildDivider(),
+                  buildNotificationTile(
+                    context: context,
+                    ref: ref,
+                    icon: Icons.shopping_bag_outlined,
+                    iconColor: AppColors.green9,
+                    title: 'Marketplace',
+                    subtitle: 'New products and special deals',
+                    isEnabled: preferences['products'] ?? true,
+                    onChanged: (value) {
+                      ref
+                          .read(notificationPreferencesProvider.notifier)
+                          .updateTopicSubscription('products', value);
+                    },
+                    selectedCampus: selectedCampus,
                   ),
-                  title: const Text('Marketplace'),
-                  subtitle: const Text(
-                    'New items and deals in the marketplace',
+                  buildDivider(),
+                  buildNotificationTile(
+                    context: context,
+                    ref: ref,
+                    icon: Icons.work_outline,
+                    iconColor: AppColors.purple9,
+                    title: 'Job Opportunities',
+                    subtitle: 'Volunteer work and job postings',
+                    isEnabled: preferences['jobs'] ?? true,
+                    onChanged: (value) {
+                      ref
+                          .read(notificationPreferencesProvider.notifier)
+                          .updateTopicSubscription('jobs', value);
+                    },
+                    selectedCampus: selectedCampus,
                   ),
-                  value: settingsState.notifications['products'] ?? true,
-                  onChanged: (value) {
-                    ref
-                        .read(appSettingsProvider.notifier)
-                        .setNotification('products', value);
-                  },
-                  activeColor: _getCampusColor(selectedCampus.id),
-                ),
-                const Divider(height: 1),
-                SwitchListTile(
-                  secondary: const Icon(Icons.work, color: AppColors.purple9),
-                  title: const Text('Job Opportunities'),
-                  subtitle: const Text('Volunteer and job opportunities'),
-                  value: settingsState.notifications['jobs'] ?? true,
-                  onChanged: (value) {
-                    ref
-                        .read(appSettingsProvider.notifier)
-                        .setNotification('jobs', value);
-                  },
-                  activeColor: _getCampusColor(selectedCampus.id),
-                ),
-                const Divider(height: 1),
-                SwitchListTile(
-                  secondary: const Icon(
-                    Icons.receipt,
-                    color: AppColors.orange9,
+                  // Expense feature - only show when enabled
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final expenseFlagAsync = ref.watch(expenseFeatureFlagProvider);
+                      return expenseFlagAsync.when(
+                        data: (enabled) => enabled
+                            ? Column(
+                                children: [
+                                  buildDivider(),
+                                  buildNotificationTile(
+                                    context: context,
+                                    ref: ref,
+                                    icon: Icons.receipt_outlined,
+                                    iconColor: AppColors.orange9,
+                                    title: 'Expenses',
+                                    subtitle: 'Reimbursement status updates',
+                                    isEnabled: preferences['expenses'] ?? false,
+                                    onChanged: (value) {
+                                      ref
+                                          .read(notificationPreferencesProvider.notifier)
+                                          .updateTopicSubscription('expenses', value);
+                                    },
+                                    selectedCampus: selectedCampus,
+                                  ),
+                                ],
+                              )
+                            : const SizedBox.shrink(),
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const SizedBox.shrink(),
+                      );
+                    },
                   ),
-                  title: const Text('Expenses'),
-                  subtitle: const Text('Expense reimbursement status updates'),
-                  value: settingsState.notifications['expenses'] ?? false,
-                  onChanged: (value) {
-                    ref
-                        .read(appSettingsProvider.notifier)
-                        .setNotification('expenses', value);
-                  },
-                  activeColor: _getCampusColor(selectedCampus.id),
-                ),
-                const Divider(height: 1),
-                SwitchListTile(
-                  secondary: const Icon(
-                    Icons.chat,
-                    color: AppColors.defaultBlue,
+                  buildDivider(),
+                  buildNotificationTile(
+                    context: context,
+                    ref: ref,
+                    icon: Icons.chat_outlined,
+                    iconColor: AppColors.defaultBlue,
+                    title: 'Chat Messages',
+                    subtitle: 'New messages and conversations',
+                    isEnabled: preferences['chat_notifications'] ?? true,
+                    onChanged: (value) {
+                      ref
+                          .read(notificationPreferencesProvider.notifier)
+                          .updateChatNotifications(value);
+                    },
+                    selectedCampus: selectedCampus,
                   ),
-                  title: const Text('Chat Messages'),
-                  subtitle: const Text('New messages in your chats'),
-                  value: settingsState.notifications['chat'] ?? true,
-                  onChanged: (value) {
-                    ref
-                        .read(appSettingsProvider.notifier)
-                        .setNotification('chat', value);
-                  },
-                  activeColor: _getCampusColor(selectedCampus.id),
+                ],
+              ),
+            ),
+            loading: () => const Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(32),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
+            error: (error, stack) => Card(
+              elevation: 2,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: AppColors.error,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Failed to load notification preferences',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: AppColors.error,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      error.toString(),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        ref.read(notificationPreferencesProvider.notifier).refresh();
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
 
@@ -911,7 +999,7 @@ class _LanguageSettingsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final settingsState = ref.watch(appSettingsProvider);
+    final currentLocale = ref.watch(localeProvider);
     final selectedCampus = ref.watch(selectedCampusProvider);
 
     return SingleChildScrollView(
@@ -934,10 +1022,10 @@ class _LanguageSettingsTab extends ConsumerWidget {
               children: _languages.map((language) {
                 return RadioListTile<String>(
                   value: language['code']!,
-                  groupValue: settingsState.language,
+                  groupValue: currentLocale.languageCode,
                   onChanged: (value) {
                     if (value != null) {
-                      ref.read(appSettingsProvider.notifier).setLanguage(value);
+                      ref.read(localeProvider.notifier).setLocale(value);
                     }
                   },
                   title: Text(language['name']!),
@@ -962,7 +1050,7 @@ class _LanguageSettingsTab extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Language changes will take effect after restarting the app.',
+                    'Language changes will take effect immediately.',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppColors.defaultBlue,
                     ),

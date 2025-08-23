@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/expense_model.dart';
 import '../../../generated/l10n/app_localizations.dart';
@@ -33,11 +32,11 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authStateProvider);
     if (!authState.isAuthenticated) {
       return PremiumAuthRequiredPage(
-        title: l10n.expenses,
+        title: l10n.expensesMessage,
         description: 'Manage reimbursements',
         icon: Icons.receipt_long_rounded,
       );
@@ -51,7 +50,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
     if (expensesState.isLoading && expensesState.expenses.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(l10n.expenses),
+          title: Text(l10n.expensesMessage),
           leading: IconButton(
             onPressed: () {
               if (context.canPop()) {
@@ -71,7 +70,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
     if (expensesState.error != null) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(l10n.expenses),
+          title: Text(l10n.expensesMessage),
           leading: IconButton(
             onPressed: () {
               if (context.canPop()) {
@@ -116,7 +115,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.expenses),
+        title: Text(l10n.expensesMessage),
         leading: IconButton(
           onPressed: () {
             // Navigate back to home screen (explore tab)

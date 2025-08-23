@@ -6,6 +6,7 @@ import '../../core/logging/print_migration.dart';
 import '../../core/constants/app_constants.dart';
 import '../models/campus_model.dart';
 import '../models/campus_data_model.dart';
+import '../models/campus_location_model.dart';
 import '../models/department_board_model.dart';
 import '../models/weather_model.dart' as wm;
 import 'event_service.dart';
@@ -33,7 +34,7 @@ class CampusService {
         collectionId: campusCollectionId,
         queries: [
           Query.orderAsc('name'),
-          Query.select(['\$id', 'name', 'campusData']),
+          Query.select(['\$id', 'name']),
         ],
       );
       apiTimer.stop();
@@ -110,7 +111,7 @@ class CampusService {
         collectionId: campusCollectionId,
         queries: [
           Query.orderAsc('name'),
-          Query.select(['\$id', 'name', 'campusData']),
+          Query.select(['\$id', 'name']),
         ],
       );
       apiTimer.stop();
@@ -184,7 +185,7 @@ class CampusService {
         collectionId: campusCollectionId,
         documentId: campusId,
         queries: [
-          Query.select(['\$id', 'name', 'campusData']),
+          Query.select(['\$id', 'name']),
         ],
       );
       apiTimer.stop();
@@ -249,7 +250,20 @@ class CampusService {
         documentId: campusDataId,
       );
       final data = document.data;
-      return data['location']?.toString() ?? '';
+      final locationData = data['location']?.toString() ?? '';
+      
+      // Parse the location data to extract address
+      if (locationData.isNotEmpty) {
+        try {
+          final location = CampusLocationModel.fromString(locationData);
+          return location.address;
+        } catch (e) {
+          // If parsing fails, return the raw string
+          return locationData;
+        }
+      }
+      
+      return '';
     } catch (e) {
       return '';
     }
@@ -327,7 +341,7 @@ class CampusService {
         
         if (campusDataId != null) {
           final campusDataTimer = Stopwatch()..start();
-          campusData = await _getCampusData(campusDataId);
+          campusData = await getCampusData(campusDataId);
           campusDataTimer.stop();
           logInfo('CampusService._buildCampusModel: campusData loaded', context: {
             'elapsed_ms': campusDataTimer.elapsedMilliseconds,
@@ -341,7 +355,7 @@ class CampusService {
       } else {
         // Fallback: campus_data has same ID as campus
         final campusDataTimer = Stopwatch()..start();
-        campusData = await _getCampusData(campusDoc['\$id']);
+        campusData = await getCampusData(campusDoc['\$id']);
         campusDataTimer.stop();
         logInfo('CampusService._buildCampusModel: campusData fallback by campusId', context: {
           'elapsed_ms': campusDataTimer.elapsedMilliseconds,
@@ -375,15 +389,15 @@ class CampusService {
         id: campusDoc['\$id'] ?? '',
         name: campusDoc['name'] ?? '',
         description: campusData?.description ?? '',
-        location: campusData?.location ?? '',
+        location: campusData?.location?.address ?? '',
         imageUrl: 'assets/images/${campusDoc['name']?.toLowerCase()}_campus.jpg',
         heroImageUrl: 'assets/images/${campusDoc['name']?.toLowerCase()}_hero.jpg',
         benefits: campusData?.socialNetwork ?? [],
         studentBenefits: campusData?.studentBenefits ?? [],
         businessBenefits: campusData?.businessBenefits ?? [],
         careerAdvantages: campusData?.careerAdvantages ?? [],
-        contactEmail: '${campusDoc['name']?.toLowerCase()}@bi.no',
-        contactAddress: campusData?.location,
+        contactEmail: campusData?.location?.email ?? '${campusDoc['name']?.toLowerCase()}@bi.no',
+        contactAddress: campusData?.location?.address,
         weather: weather,
         stats: stats,
         metadata: {
@@ -407,7 +421,7 @@ class CampusService {
     }
   }
 
-  Future<CampusDataModel?> _getCampusData(String campusDataId) async {
+  Future<CampusDataModel?> getCampusData(String campusDataId) async {
     final stopwatch = Stopwatch()..start();
     logInfo('CampusService._getCampusData: start', context: {
       'campusDataId': campusDataId,

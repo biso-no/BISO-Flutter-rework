@@ -24,7 +24,7 @@ class _WebshopProductDetailScreenState extends State<WebshopProductDetailScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final product = widget.product;
     final hasSale = product.hasSale;
     final regularPrice = double.tryParse(product.price) ?? 0.0;

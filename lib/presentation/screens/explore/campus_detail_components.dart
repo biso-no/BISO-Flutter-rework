@@ -301,7 +301,7 @@ class _StatsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+  final l10n = AppLocalizations.of(context)!;
     
     return Container(
       padding: const EdgeInsets.all(16),
@@ -322,12 +322,12 @@ class _StatsWidget extends StatelessWidget {
           ),
           _StatItem(
             value: stats.activeEvents.toString(),
-            label: l10n.events,
+            label: l10n.eventsMessage,
             icon: Icons.event,
           ),
           _StatItem(
             value: stats.availableJobs.toString(),
-            label: l10n.jobs,
+            label: l10n.jobsMessage,
             icon: Icons.work,
           ),
         ],
@@ -395,7 +395,7 @@ class CampusQuickActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -416,25 +416,25 @@ class CampusQuickActions extends StatelessWidget {
         children: [
           _QuickActionButton(
             icon: Icons.event_outlined,
-            label: l10n.events,
+            label: l10n.eventMessage,
             color: AppColors.defaultBlue,
             onTap: () => onActionTap('events'),
           ),
           _QuickActionButton(
             icon: Icons.shopping_bag_outlined,
-            label: l10n.products,
+            label: l10n.productsMessage,
             color: AppColors.accentBlue,
             onTap: () => onActionTap('products'),
           ),
           _QuickActionButton(
             icon: Icons.work_outline,
-            label: l10n.jobs,
+            label: l10n.jobsMessage,
             color: AppColors.strongGold,
             onTap: () => onActionTap('jobs'),
           ),
           _QuickActionButton(
             icon: Icons.groups_outlined,
-            label: l10n.clubs,
+            label: l10n.unitsMessage,
             color: AppColors.defaultGold,
             onTap: () => onActionTap('units'),
           ),
@@ -769,7 +769,7 @@ class CampusContactCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return TweenAnimationBuilder(
       duration: Duration(milliseconds: 600 + animationDelay),
@@ -813,7 +813,7 @@ class CampusContactCard extends StatelessWidget {
                       const SizedBox(width: 16),
                       Expanded(
                         child: Text(
-                          l10n.contactInformation,
+                          l10n.contactInformationMessage,
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -830,7 +830,7 @@ class CampusContactCard extends StatelessWidget {
                   if (campus.contactAddress != null) ...[
                     _ContactItem(
                       icon: Icons.location_on_outlined,
-                      label: l10n.address,
+                      label: l10n.addressMessage,
                       value: campus.contactAddress!,
                       onTap: () => _launchMaps(campus.contactAddress!),
                     ),
@@ -840,7 +840,7 @@ class CampusContactCard extends StatelessWidget {
                   if (campus.contactEmail != null) ...[
                     _ContactItem(
                       icon: Icons.email_outlined,
-                      label: l10n.email,
+                      label: l10n.emailMessage,
                       value: campus.contactEmail!,
                       onTap: () => _launchEmail(campus.contactEmail!),
                     ),

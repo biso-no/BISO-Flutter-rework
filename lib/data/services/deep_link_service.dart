@@ -46,6 +46,21 @@ class DeepLinkService {
         case 'auth':
           _handleAuthDeepLink(uri);
           break;
+        case 'event':
+          _handleEventDeepLink(uri);
+          break;
+        case 'product':
+          _handleProductDeepLink(uri);
+          break;
+        case 'job':
+          _handleJobDeepLink(uri);
+          break;
+        case 'expense':
+          _handleExpenseDeepLink(uri);
+          break;
+        case 'chat':
+          _handleChatDeepLink(uri);
+          break;
         default:
           logPrint('🔴 Unknown deep link host: ${uri.host}');
       }
@@ -88,6 +103,106 @@ class DeepLinkService {
 
   void dispose() {
     _linkSubscription?.cancel();
+  }
+
+  /// Handle event deep links
+  void _handleEventDeepLink(Uri uri) {
+    final eventId = uri.queryParameters['id'];
+    
+    logPrint('🔗 Event deep link - ID: $eventId');
+    
+    if (eventId != null) {
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        // Navigate to events screen and then open the event modal
+        context.go('/explore/events', extra: {'eventId': eventId});
+      } else {
+        logPrint('🔴 No navigation context available for event deep link');
+      }
+    } else {
+      logPrint('🔴 Missing event ID in deep link');
+    }
+  }
+
+  /// Handle product deep links
+  void _handleProductDeepLink(Uri uri) {
+    final productId = uri.queryParameters['id'];
+    
+    logPrint('🔗 Product deep link - ID: $productId');
+    
+    if (productId != null) {
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        // Navigate to product detail screen
+        context.go('/explore/marketplace/product/$productId');
+      } else {
+        logPrint('🔴 No navigation context available for product deep link');
+      }
+    } else {
+      logPrint('🔴 Missing product ID in deep link');
+    }
+  }
+
+  /// Handle job deep links
+  void _handleJobDeepLink(Uri uri) {
+    final jobId = uri.queryParameters['id'];
+    
+    logPrint('🔗 Job deep link - ID: $jobId');
+    
+    if (jobId != null) {
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        // Navigate to jobs screen and then open the job modal
+        context.go('/explore/jobs', extra: {'jobId': jobId});
+      } else {
+        logPrint('🔴 No navigation context available for job deep link');
+      }
+    } else {
+      logPrint('🔴 Missing job ID in deep link');
+    }
+  }
+
+  /// Handle expense deep links
+  void _handleExpenseDeepLink(Uri uri) {
+    final expenseId = uri.queryParameters['id'];
+    
+    logPrint('🔗 Expense deep link - ID: $expenseId');
+    
+    if (expenseId != null) {
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        // Navigate to expenses screen
+        context.go('/explore/expenses', extra: {'expenseId': expenseId});
+      } else {
+        logPrint('🔴 No navigation context available for expense deep link');
+      }
+    } else {
+      logPrint('🔴 Missing expense ID in deep link');
+    }
+  }
+
+  /// Handle chat deep links
+  void _handleChatDeepLink(Uri uri) {
+    final chatId = uri.queryParameters['id'];
+    
+    logPrint('🔗 Chat deep link - ID: $chatId');
+    
+    if (chatId != null) {
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        // Navigate to chat conversation
+        context.go('/chat/conversation/$chatId');
+      } else {
+        logPrint('🔴 No navigation context available for chat deep link');
+      }
+    } else {
+      logPrint('🔴 Missing chat ID in deep link');
+    }
+  }
+
+  /// Public method to handle programmatic deep links
+  void handleDeepLink(Uri uri) {
+    _handleDeepLink(uri);
   }
 }
 

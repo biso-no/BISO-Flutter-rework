@@ -133,14 +133,14 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final campusId = ref.watch(filterCampusProvider).id;
     // Ensure initial load for current campus
     _ensureInitialLoad(campusId);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.volunteer),
+        title: Text(l10n.volunteerMessage),
         leading: IconButton(
           onPressed: () {
             // Navigate back to home screen (explore tab)

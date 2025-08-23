@@ -1,11 +1,12 @@
 import 'package:equatable/equatable.dart';
 import 'department_board_model.dart';
+import 'campus_location_model.dart';
 
 class CampusDataModel extends Equatable {
   final String id;
   final String name;
   final String? description;
-  final String? location;
+  final CampusLocationModel? location;
   final List<String> businessBenefits;
   final List<String> studentBenefits;
   final List<String> careerAdvantages;
@@ -30,37 +31,22 @@ class CampusDataModel extends Equatable {
     this.updatedAt,
   });
 
-  /// Helper method to extract location string from various formats
-  static String? _extractLocationString(dynamic locationData) {
+  /// Helper method to extract location data from various formats
+  static CampusLocationModel? _extractLocationData(dynamic locationData) {
     if (locationData == null) return null;
     
     if (locationData is String) {
       // Handle stringified JSON containing address/email
-      final trimmed = locationData.trim();
-      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
-        try {
-          // Use basic decode via dart:convert without importing here to avoid dependency
-          // We'll parse in CampusModel where dart:convert is already used; here, fallback
-          // Keep raw string as-is; actual decoding handled in service/model consumer
-          // But attempt lightweight parse pattern
-          final addressMatch = RegExp(r'"address"\s*:\s*"([^"]+)"').firstMatch(trimmed);
-          if (addressMatch != null) {
-            return addressMatch.group(1);
-          }
-        } catch (_) {
-          // ignore and fall through
-        }
-      }
-      return locationData;
+      return CampusLocationModel.fromString(locationData);
     }
     
     if (locationData is Map<String, dynamic>) {
-      // Extract address from the location object
-      return locationData['address'];
+      // Extract from the location object
+      return CampusLocationModel.fromJson(locationData);
     }
     
     // Fallback for any other type
-    return locationData.toString();
+    return null;
   }
 
   factory CampusDataModel.fromMap(Map<String, dynamic> map) {
@@ -68,7 +54,7 @@ class CampusDataModel extends Equatable {
       id: map['\$id'] ?? map['id'] ?? '',
       name: map['name'] ?? '',
       description: map['description'],
-      location: _extractLocationString(map['location']),
+      location: _extractLocationData(map['location']),
       businessBenefits: _parseStringList(map['businessBenefits']),
       studentBenefits: _parseStringList(map['studentBenefits']),
       careerAdvantages: _parseStringList(map['careerAdvantages']),
@@ -123,7 +109,7 @@ class CampusDataModel extends Equatable {
     return {
       'name': name,
       'description': description,
-      'location': location,
+      'location': location?.toJson(),
       'businessBenefits': businessBenefits,
       'studentBenefits': studentBenefits,
       'careerAdvantages': careerAdvantages,
@@ -136,7 +122,7 @@ class CampusDataModel extends Equatable {
     String? id,
     String? name,
     String? description,
-    String? location,
+    CampusLocationModel? location,
     List<String>? businessBenefits,
     List<String>? studentBenefits,
     List<String>? careerAdvantages,

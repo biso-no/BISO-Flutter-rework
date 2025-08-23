@@ -163,8 +163,11 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
       final notificationService = ref.read(notificationServiceProvider);
       final isEnabled = await notificationService.areNotificationsEnabled();
 
-      // Only prompt if notifications are not enabled and user hasn't been asked recently
-      if (!isEnabled && mounted) {
+      // Check if push target exists (indicates proper setup)
+      final hasPushTarget = notificationService.pushTargetId != null;
+
+      // Only prompt if notifications are not enabled or push target is missing
+      if ((!isEnabled || !hasPushTarget) && mounted) {
         // Add a small delay to avoid conflicting with privacy prompt
         await Future.delayed(const Duration(seconds: 2));
         if (mounted) {
@@ -186,19 +189,20 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authStateProvider);
 
     if (authState.user == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+    
 
     final userId = authState.user!.id;
     final chatsAsync = ref.watch(userChatsProvider(userId));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.chat),
+        title: Text(l10n.chatMessage),
         leading: IconButton(
           onPressed: () {
             // Navigate back to home screen (chat tab)

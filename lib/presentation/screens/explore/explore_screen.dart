@@ -9,14 +9,28 @@ import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/large_event/large_event_provider.dart';
 import '../../../data/models/large_event_model.dart';
 import '../../../providers/campus/campus_provider.dart';
+import '../../../providers/campus/campus_data_provider.dart';
+import '../../../providers/ui/locale_provider.dart';
+import '../../../data/services/feature_flag_service.dart';
 
-class ExploreScreen extends StatelessWidget {
+// Feature flag provider for expenses
+final _featureFlagServiceProvider = Provider<FeatureFlagService>(
+  (ref) => FeatureFlagService(),
+);
+
+final expenseFeatureFlagProvider = FutureProvider.autoDispose<bool>((ref) async {
+  final service = ref.watch(_featureFlagServiceProvider);
+  return service.isEnabled('expenses');
+});
+
+class ExploreScreen extends ConsumerWidget {
   const ExploreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final currentLocale = ref.watch(localeProvider);
 
     Future<void> openDirections(String address) async {
       final encoded = Uri.encodeComponent(address);
@@ -56,8 +70,70 @@ class ExploreScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.explore),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: BoxDecoration(
+            color: theme.scaffoldBackgroundColor,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Text(
+                    l10n.explore,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.strongBlue,
+                    ),
+                  ),
+                  const Spacer(),
+                  _LanguageSwitcher(
+                    currentLanguage: currentLocale.languageCode,
+                    onLanguageChanged: (languageCode) {
+                      ref.read(localeProvider.notifier).setLocale(languageCode);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(
+                                Icons.language,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'Language changed to ${languageCode == 'en' ? 'English' : 'Norwegian'}.',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            ],
+                          ),
+                          backgroundColor: AppColors.defaultBlue,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          margin: const EdgeInsets.all(16),
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -85,71 +161,196 @@ class ExploreScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Main Categories Grid
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.2,
-              children: [
-                _CategoryCard(
-                  icon: Icons.event,
-                  title: l10n.events,
-                  subtitle: 'Campus events & activities',
-                  color: AppColors.accentBlue,
-                  onTap: () => context.go('/explore/events'),
-                ),
-                _CategoryCard(
-                  icon: Icons.departure_board,
-                  title: 'Departures',
-                  subtitle: 'Realtime bus & metro',
-                  color: AppColors.defaultBlue,
-                  onTap: () => context.go('/explore/departures'),
-                ),
-                _CategoryCard(
-                  icon: Icons.shopping_bag,
-                  title: l10n.bisoShop,
-                  subtitle: 'Buy & sell items',
-                  color: AppColors.green9,
-                  onTap: () => context.go('/explore/products'),
-                ),
-                _CategoryCard(
-                  icon: Icons.groups,
-                  title: l10n.clubsAndUnits,
-                  subtitle: 'Student organizations',
-                  color: AppColors.purple9,
-                  onTap: () => context.go('/explore/units'),
-                ),
-                _CategoryCard(
-                  icon: Icons.receipt_long,
-                  title: l10n.expenses,
-                  subtitle: 'Expense reimbursements',
-                  color: AppColors.orange9,
-                  onTap: () => context.go('/explore/expenses'),
-                ),
-                _CategoryCard(
-                  icon: Icons.volunteer_activism,
-                  title: l10n.volunteer,
-                  subtitle: 'Volunteer opportunities',
-                  color: AppColors.pink9,
-                  onTap: () => context.go('/explore/volunteer'),
-                ),
-                _CategoryCard(
-                  icon: Icons.chat,
-                  title: 'AI Assistant',
-                  subtitle: 'Get help & information',
-                  color: AppColors.defaultGold,
-                  onTap: () => context.go('/explore/ai-chat'),
-                ),
-              ],
+            Consumer(
+              builder: (context, ref, child) {
+                final expenseFlagAsync = ref.watch(expenseFeatureFlagProvider);
+                return expenseFlagAsync.when(
+                  data: (enabled) {
+                    final List<Widget> gridChildren = [
+                      _CategoryCard(
+                        icon: Icons.event,
+                        title: l10n.eventsMessage,
+                        subtitle: l10n.campusEventsActivitiesMessage,
+                        color: AppColors.accentBlue,
+                        onTap: () => context.go('/explore/events'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.departure_board,
+                        title: l10n.departuresMessage,
+                        subtitle: l10n.realtimeBusMetroMessage,
+                        color: AppColors.defaultBlue,
+                        onTap: () => context.go('/explore/departures'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.shopping_bag,
+                        title: l10n.bisoShopMessage,
+                        subtitle: l10n.buySellItemsMessage,
+                        color: AppColors.green9,
+                        onTap: () => context.go('/explore/products'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.groups,
+                        title: l10n.unitsMessage,
+                        subtitle: l10n.studentOrganizationsMessage,
+                        color: AppColors.purple9,
+                        onTap: () => context.go('/explore/units'),
+                      ),
+                    ];
+
+                    // Only add expense card when feature is enabled
+                    if (enabled) {
+                      gridChildren.add(
+                        _CategoryCard(
+                          icon: Icons.receipt_long,
+                          title: l10n.expensesMessage,
+                          subtitle: l10n.expenseReimbursementsMessage,
+                          color: AppColors.orange9,
+                          onTap: () => context.go('/explore/expenses'),
+                        ),
+                      );
+                    }
+
+                    // Add remaining cards
+                    gridChildren.addAll([
+                      _CategoryCard(
+                        icon: Icons.volunteer_activism,
+                        title: l10n.volunteerMessage,
+                        subtitle: l10n.volunteerOpportunitiesMessage,
+                        color: AppColors.pink9,
+                        onTap: () => context.go('/explore/volunteer'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.chat,
+                        title: l10n.aiAssistantMessage,
+                        subtitle: l10n.getHelpInformationMessage,
+                        color: AppColors.defaultGold,
+                        onTap: () => context.go('/explore/ai-chat'),
+                      ),
+                    ]);
+
+                    return GridView.count(
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 1.2,
+                      children: gridChildren,
+                    );
+                  },
+                  loading: () => GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 1.2,
+                    children: [
+                      _CategoryCard(
+                        icon: Icons.event,
+                        title: l10n.eventsMessage,
+                        subtitle: l10n.campusEventsActivitiesMessage,
+                        color: AppColors.accentBlue,
+                        onTap: () => context.go('/explore/events'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.departure_board,
+                        title: l10n.departuresMessage,
+                        subtitle: l10n.realtimeBusMetroMessage,
+                        color: AppColors.defaultBlue,
+                        onTap: () => context.go('/explore/departures'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.shopping_bag,
+                        title: l10n.bisoShopMessage,
+                        subtitle: l10n.buySellItemsMessage,
+                        color: AppColors.green9,
+                        onTap: () => context.go('/explore/products'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.groups,
+                        title: l10n.unitsMessage,
+                        subtitle: l10n.studentOrganizationsMessage,
+                        color: AppColors.purple9,
+                        onTap: () => context.go('/explore/units'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.volunteer_activism,
+                        title: l10n.volunteerMessage,
+                        subtitle: l10n.volunteerOpportunitiesMessage,
+                        color: AppColors.pink9,
+                        onTap: () => context.go('/explore/volunteer'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.chat,
+                        title: l10n.aiAssistantMessage,
+                        subtitle: l10n.getHelpInformationMessage,
+                        color: AppColors.defaultGold,
+                        onTap: () => context.go('/explore/ai-chat'),
+                      ),
+                    ],
+                  ),
+                  error: (_, __) => GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 1.2,
+                    children: [
+                      _CategoryCard(
+                        icon: Icons.event,
+                        title: l10n.eventsMessage,
+                        subtitle: l10n.campusEventsActivitiesMessage,
+                        color: AppColors.accentBlue,
+                        onTap: () => context.go('/explore/events'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.departure_board,
+                        title: l10n.departuresMessage,
+                        subtitle: l10n.realtimeBusMetroMessage,
+                        color: AppColors.defaultBlue,
+                        onTap: () => context.go('/explore/departures'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.shopping_bag,
+                        title: l10n.bisoShopMessage,
+                        subtitle: l10n.buySellItemsMessage,
+                        color: AppColors.green9,
+                        onTap: () => context.go('/explore/products'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.groups,
+                        title: l10n.unitsMessage,
+                        subtitle: l10n.studentOrganizationsMessage,
+                        color: AppColors.purple9,
+                        onTap: () => context.go('/explore/units'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.volunteer_activism,
+                        title: l10n.volunteerMessage,
+                        subtitle: l10n.volunteerOpportunitiesMessage,
+                        color: AppColors.pink9,
+                        onTap: () => context.go('/explore/volunteer'),
+                      ),
+                      _CategoryCard(
+                        icon: Icons.chat,
+                        title: l10n.aiAssistantMessage,
+                        subtitle: l10n.getHelpInformationMessage,
+                        color: AppColors.defaultGold,
+                        onTap: () => context.go('/explore/ai-chat'),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
 
             const SizedBox(height: 32),
 
             // Quick Links Section
             Text(
-              'Quick Links',
+              l10n.quickLinksMessage,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -166,8 +367,8 @@ class ExploreScreen extends StatelessWidget {
                         color: AppColors.defaultBlue,
                       ),
                     ),
-                    title: const Text('BISO.no'),
-                    subtitle: const Text('Visit our website'),
+                    title: Text(l10n.bisoWebsiteMessage),
+                    subtitle: Text(l10n.visitOurWebsiteMessage),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
                       launchUrl(Uri.parse('https://biso.no'));
@@ -182,8 +383,8 @@ class ExploreScreen extends StatelessWidget {
                         color: AppColors.defaultBlue,
                       ),
                     ),
-                    title: const Text('Academic Calendar'),
-                    subtitle: const Text('View important dates'),
+                    title: Text(l10n.academicCalendarMessage),
+                    subtitle: Text(l10n.viewImportantDatesMessage),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
                       launchUrl(
@@ -202,8 +403,8 @@ class ExploreScreen extends StatelessWidget {
                         color: AppColors.defaultBlue,
                       ),
                     ),
-                    title: const Text('Library Services'),
-                    subtitle: const Text('Book rooms & resources'),
+                    title: Text(l10n.libraryServicesMessage),
+                    subtitle: Text(l10n.bookRoomsResourcesMessage),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
                       launchUrl(
@@ -220,8 +421,8 @@ class ExploreScreen extends StatelessWidget {
                         color: AppColors.defaultBlue,
                       ),
                     ),
-                    title: const Text('Student Support'),
-                    subtitle: const Text('Get help & guidance'),
+                    title: Text(l10n.studentSupportMessage),
+                    subtitle: Text(l10n.getHelpGuidanceMessage),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {},
                   ),
@@ -233,7 +434,7 @@ class ExploreScreen extends StatelessWidget {
 
             // Campus Information
             Text(
-              'Campus Information',
+              l10n.campusInformationMessage,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -243,48 +444,186 @@ class ExploreScreen extends StatelessWidget {
             Consumer(
               builder: (context, ref, _) {
                 final campus = ref.watch(filterCampusProvider);
-                final contactEmail = resolveCampusEmail(campus.id);
-                const campusAddress = 'Nydalsveien 37, 0484 Oslo';
+                final campusDataAsync = ref.watch(currentCampusDataProvider);
 
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              color: AppColors.defaultBlue,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Oslo Campus',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
+                return campusDataAsync.when(
+                  data: (campusData) {
+                    final contactEmail = campusData?.location?.email ?? resolveCampusEmail(campus.id);
+                    final campusAddress = campusData?.location?.address ?? 'Address not available';
+                    final campusName = campus.name.isNotEmpty ? campus.name : 'Campus';
+                    
+                    // Only show the card if we have valid data
+                    if (campusData?.location?.address?.isNotEmpty == true) {
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_on,
+                                    color: AppColors.defaultBlue,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    campusName,
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 12),
+                              Text(campusAddress),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  TextButton.icon(
+                                    onPressed: () => openDirections(campusAddress),
+                                    icon: const Icon(Icons.directions),
+                                    label: Text(l10n.directionsMessage),
+                                  ),
+                                  TextButton.icon(
+                                    onPressed: () => openEmail(contactEmail),
+                                    icon: const Icon(Icons.mail),
+                                    label: Text(l10n.contactMessage),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 12),
-                        const Text(campusAddress),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            TextButton.icon(
-                              onPressed: () => openDirections(campusAddress),
-                              icon: const Icon(Icons.directions),
-                              label: const Text('Directions'),
-                            ),
-                            TextButton.icon(
-                              onPressed: () => openEmail(contactEmail),
-                              icon: const Icon(Icons.mail),
-                              label: const Text('Contact'),
-                            ),
-                          ],
+                      );
+                    } else {
+                      // Fallback to basic campus info if no location data
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_on,
+                                    color: AppColors.defaultBlue,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    campusName,
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              const Text('Address not available'),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  TextButton.icon(
+                                    onPressed: null,
+                                    icon: const Icon(Icons.directions),
+                                    label: Text(l10n.directionsMessage),
+                                  ),
+                                  TextButton.icon(
+                                    onPressed: () => openEmail(contactEmail),
+                                    icon: const Icon(Icons.mail),
+                                    label: Text(l10n.contactMessage),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
+                      );
+                    }
+                  },
+                  loading: () => Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                color: AppColors.defaultBlue,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Loading campus...',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          const Text('Loading address...'),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              TextButton.icon(
+                                onPressed: null,
+                                icon: const Icon(Icons.directions),
+                                label: Text(l10n.directionsMessage),
+                              ),
+                              TextButton.icon(
+                                onPressed: null,
+                                icon: const Icon(Icons.mail),
+                                label: Text(l10n.contactMessage),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  error: (error, stackTrace) => Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                color: AppColors.defaultBlue,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                campus.name.isNotEmpty ? campus.name : 'Campus',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          const Text('Unable to load address'),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              TextButton.icon(
+                                onPressed: null,
+                                icon: const Icon(Icons.directions),
+                                label: Text(l10n.directionsMessage),
+                              ),
+                              TextButton.icon(
+                                onPressed: () => openEmail(resolveCampusEmail(campus.id)),
+                                icon: const Icon(Icons.mail),
+                                label: Text(l10n.contactMessage),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -411,6 +750,319 @@ class _LargeEventBanner extends StatelessWidget {
             const SizedBox(width: 12),
             const Icon(Icons.chevron_right, color: Colors.white),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LanguageSwitcher extends StatefulWidget {
+  final String currentLanguage;
+  final Function(String) onLanguageChanged;
+
+  const _LanguageSwitcher({
+    required this.currentLanguage,
+    required this.onLanguageChanged,
+  });
+
+  @override
+  State<_LanguageSwitcher> createState() => _LanguageSwitcherState();
+}
+
+class _LanguageSwitcherState extends State<_LanguageSwitcher> {
+  String _getCurrentLanguageName(String languageCode) {
+    switch (languageCode) {
+      case 'en':
+        return 'EN';
+      case 'no':
+        return 'NO';
+      default:
+        return 'EN';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: () => _showLanguageMenu(context),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.defaultBlue.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: AppColors.defaultBlue.withValues(alpha: 0.4),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.defaultBlue.withValues(alpha: 0.15),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+              spreadRadius: 0,
+            ),
+          ],
+        ),
+        child: SizedBox(
+          width: 24,
+          height: 24,
+          child: Icon(
+            Icons.language,
+            size: 24,
+            color: AppColors.defaultBlue,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showLanguageMenu(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withValues(alpha: 0.4),
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.15),
+                  blurRadius: 25,
+                  offset: const Offset(0, 15),
+                  spreadRadius: 0,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppColors.subtleBlue.withValues(alpha: 0.3),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.defaultBlue.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          Icons.language,
+                          color: AppColors.defaultBlue,
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Select Language',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.strongBlue,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Choose your preferred language',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: AppColors.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      _LanguageOption(
+                        code: 'en',
+                        name: 'English',
+                        nativeName: 'English',
+                        isSelected: widget.currentLanguage == 'en',
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          widget.onLanguageChanged('en');
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _LanguageOption(
+                        code: 'no',
+                        name: 'Norwegian',
+                        nativeName: 'Norsk',
+                        isSelected: widget.currentLanguage == 'no',
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          widget.onLanguageChanged('no');
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _LanguageOption extends StatefulWidget {
+  final String code;
+  final String name;
+  final String nativeName;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _LanguageOption({
+    required this.code,
+    required this.name,
+    required this.nativeName,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  State<_LanguageOption> createState() => _LanguageOptionState();
+}
+
+class _LanguageOptionState extends State<_LanguageOption> {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: widget.isSelected 
+          ? AppColors.defaultBlue.withValues(alpha: 0.12)
+          : Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: widget.isSelected 
+            ? AppColors.defaultBlue.withValues(alpha: 0.3)
+            : Colors.transparent,
+          width: 2,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: widget.onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: widget.isSelected 
+                        ? [
+                            AppColors.defaultBlue,
+                            AppColors.defaultBlue.withValues(alpha: 0.8),
+                          ]
+                        : [
+                            AppColors.subtleBlue,
+                            AppColors.subtleBlue.withValues(alpha: 0.6),
+                          ],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: widget.isSelected ? [
+                      BoxShadow(
+                        color: AppColors.defaultBlue.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ] : null,
+                  ),
+                  child: Center(
+                    child: Text(
+                      widget.code.toUpperCase(),
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: widget.isSelected 
+                          ? Colors.white
+                          : AppColors.defaultBlue,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: widget.isSelected 
+                            ? AppColors.defaultBlue
+                            : theme.textTheme.titleMedium?.color,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.nativeName,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (widget.isSelected)
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppColors.defaultBlue,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.defaultBlue.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );

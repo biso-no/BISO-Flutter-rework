@@ -12,3 +12,4 @@ final Storage storage = Storage(client);
 final Realtime realtime = Realtime(client);
 final Functions functions = Functions(client);
 final Teams teams = Teams(client);
+final Messaging messaging = Messaging(client);

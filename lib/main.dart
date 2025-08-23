@@ -34,6 +34,7 @@ import 'presentation/screens/explore/campus_detail_screen.dart';
 import 'presentation/screens/ai_chat/ai_chat_screen.dart';
 import 'presentation/screens/profile/profile_screen.dart';
 import 'providers/auth/auth_provider.dart';
+import 'providers/ui/locale_provider.dart';
 import 'presentation/screens/events/large_event_screen.dart';
 import 'presentation/screens/validator/controller_mode_screen.dart';
 import 'data/models/large_event_model.dart';
@@ -91,6 +92,9 @@ class BisoApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch auth state and initialize user data when authenticated
     ref.watch(authStateProvider);
+    
+    // Watch locale changes to update the app language
+    final currentLocale = ref.watch(localeProvider);
 
     // Auth state listener is now handled internally by AuthProvider
     // No need for external orchestration
@@ -101,6 +105,7 @@ class BisoApp extends ConsumerWidget {
       theme: PremiumTheme.lightTheme,
       darkTheme: PremiumTheme.darkTheme,
       themeMode: ThemeMode.system,
+      locale: currentLocale,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -343,7 +348,7 @@ class _AppShellState extends ConsumerState<_AppShell> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: widget.child,
@@ -368,17 +373,17 @@ class _AppShellState extends ConsumerState<_AppShell> {
             BottomNavigationBarItem(
               icon: const Icon(Icons.home_outlined),
               activeIcon: const Icon(Icons.home_rounded),
-              label: l10n.home,
+              label: l10n.homeMessage,
             ),
             BottomNavigationBarItem(
               icon: const Icon(Icons.explore_outlined),
               activeIcon: const Icon(Icons.explore_rounded),
-              label: l10n.explore,
+              label: l10n.exploreMessage,
             ),
             BottomNavigationBarItem(
               icon: const Icon(Icons.person_outline_rounded),
               activeIcon: const Icon(Icons.person_rounded),
-              label: l10n.profile,
+              label: l10n.profileMessage,
             ),
           ],
         ),
@@ -428,13 +433,13 @@ class _ProfilePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     if (authState.isAuthenticated) {
       return const ProfileScreen();
     } else {
       return PremiumAuthRequiredPage(
-        title: l10n.profile,
+        title: l10n.profileMessage,
         description: 'Manage your account and preferences',
         icon: Icons.person_outline_rounded,
       );

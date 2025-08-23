@@ -35,7 +35,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   String? _validateEmail(String? value) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     if (value == null || value.isEmpty) {
       return l10n.enterValidEmail;
@@ -94,7 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -168,7 +168,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                         )
-                      : Text(_useMagicLink ? 'Send Magic Link' : l10n.continueButton),
+                      : Text(_useMagicLink ? 'Send Magic Link' : l10n.continueButtonMessage),
                 ),
 
                 const SizedBox(height: 16),

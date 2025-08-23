@@ -6,6 +6,7 @@ import 'package:permission_handler/permission_handler.dart'
 import 'package:appwrite/appwrite.dart';
 
 import 'appwrite_service.dart';
+import 'deep_link_service.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -15,9 +16,12 @@ class NotificationService {
   static final FirebaseMessaging _firebaseMessaging =
       FirebaseMessaging.instance;
   static final Account _account = account;
+  static final Messaging _messaging = messaging;
 
   String? _fcmToken;
+  String? _pushTargetId;
   bool _isInitialized = false;
+  final Map<String, bool> _topicSubscriptions = {};
 
   /// Initialize the notification service
   Future<void> initialize() async {
@@ -68,7 +72,7 @@ class NotificationService {
       // Listen for token refresh
       _firebaseMessaging.onTokenRefresh.listen((newToken) {
         _fcmToken = newToken;
-        _updateTokenInAppwrite(newToken);
+        _createPushTarget(newToken);
       });
 
       return _fcmToken;
@@ -109,7 +113,8 @@ class NotificationService {
       );
 
       if (isGranted && _fcmToken != null) {
-        await _updateTokenInAppwrite(_fcmToken!);
+        await _createPushTarget(_fcmToken!);
+        await _loadTopicSubscriptions();
       }
 
       return isGranted;
@@ -131,7 +136,29 @@ class NotificationService {
     }
   }
 
-  /// Store FCM token in Appwrite user preferences
+  /// Create push target in Appwrite
+  Future<void> _createPushTarget(String token) async {
+    try {
+      // First try to create the push target
+      final target = await _account.createPushTarget(
+        targetId: ID.unique(),
+        identifier: token,
+        providerId: 'fcm',
+      );
+      
+      _pushTargetId = target.$id;
+      debugPrint('Push target created successfully: $_pushTargetId');
+
+      // Also store in user preferences for reference
+      await _updateTokenInAppwrite(token);
+    } catch (e) {
+      debugPrint('Failed to create push target: $e');
+      // Fallback to storing in preferences only
+      await _updateTokenInAppwrite(token);
+    }
+  }
+
+  /// Store FCM token in Appwrite user preferences (backup method)
   Future<void> _updateTokenInAppwrite(String token) async {
     try {
       // Get current user preferences
@@ -141,6 +168,9 @@ class NotificationService {
       final updatedPrefs = Map<String, dynamic>.from(prefs.data);
       updatedPrefs['fcm_token'] = token;
       updatedPrefs['fcm_token_updated_at'] = DateTime.now().toIso8601String();
+      if (_pushTargetId != null) {
+        updatedPrefs['push_target_id'] = _pushTargetId;
+      }
 
       // Save updated preferences
       await _account.updatePrefs(prefs: updatedPrefs);
@@ -186,6 +216,111 @@ class NotificationService {
   /// Get FCM token for current user
   String? get fcmToken => _fcmToken;
 
+  /// Get push target ID
+  String? get pushTargetId => _pushTargetId;
+
+  /// Subscribe to a topic
+  Future<void> subscribeToTopic(String topicId) async {
+    try {
+      if (_pushTargetId == null) {
+        debugPrint('No push target available for topic subscription');
+        return;
+      }
+
+      await _messaging.createSubscriber(
+        topicId: topicId,
+        subscriberId: ID.unique(),
+        targetId: _pushTargetId!,
+      );
+
+      _topicSubscriptions[topicId] = true;
+      await _saveTopicSubscriptions();
+      debugPrint('Subscribed to topic: $topicId');
+    } catch (e) {
+      debugPrint('Failed to subscribe to topic $topicId: $e');
+      rethrow;
+    }
+  }
+
+  /// Unsubscribe from a topic
+  Future<void> unsubscribeFromTopic(String topicId) async {
+    try {
+      // We need to find the subscriber ID first
+      // For now, we'll track the subscription status in preferences
+      _topicSubscriptions[topicId] = false;
+      await _saveTopicSubscriptions();
+      debugPrint('Unsubscribed from topic: $topicId');
+    } catch (e) {
+      debugPrint('Failed to unsubscribe from topic $topicId: $e');
+      rethrow;
+    }
+  }
+
+  /// Get topic subscription status
+  bool isSubscribedToTopic(String topicId) {
+    return _topicSubscriptions[topicId] ?? false;
+  }
+
+  /// Get all topic subscriptions
+  Map<String, bool> get topicSubscriptions => Map.from(_topicSubscriptions);
+
+  /// Load topic subscriptions from user preferences
+  Future<void> _loadTopicSubscriptions() async {
+    try {
+      final prefs = await _account.getPrefs();
+      final subscriptions = prefs.data['topic_subscriptions'] as Map<String, dynamic>?;
+      
+      if (subscriptions != null) {
+        _topicSubscriptions.clear();
+        subscriptions.forEach((key, value) {
+          _topicSubscriptions[key] = value as bool;
+        });
+      } else {
+        // Set default subscriptions
+        _topicSubscriptions.addAll({
+          'events': true,
+          'products': true,
+          'jobs': true,
+          'expenses': false,
+        });
+        await _saveTopicSubscriptions();
+      }
+      
+      debugPrint('Loaded topic subscriptions: $_topicSubscriptions');
+    } catch (e) {
+      debugPrint('Failed to load topic subscriptions: $e');
+    }
+  }
+
+  /// Save topic subscriptions to user preferences
+  Future<void> _saveTopicSubscriptions() async {
+    try {
+      final prefs = await _account.getPrefs();
+      final updatedPrefs = Map<String, dynamic>.from(prefs.data);
+      updatedPrefs['topic_subscriptions'] = _topicSubscriptions;
+      updatedPrefs['topic_subscriptions_updated_at'] = DateTime.now().toIso8601String();
+
+      await _account.updatePrefs(prefs: updatedPrefs);
+      debugPrint('Topic subscriptions saved');
+    } catch (e) {
+      debugPrint('Failed to save topic subscriptions: $e');
+    }
+  }
+
+  /// Update notification preference for a specific topic
+  Future<void> updateTopicSubscription(String topicId, bool enabled) async {
+    try {
+      if (enabled) {
+        await subscribeToTopic(topicId);
+      } else {
+        await unsubscribeFromTopic(topicId);
+      }
+    } catch (e) {
+      debugPrint('Failed to update topic subscription for $topicId: $e');
+      rethrow;
+    }
+  }
+
   /// Handle foreground messages
   void _handleForegroundMessage(RemoteMessage message) {
     debugPrint('Received foreground message: ${message.messageId}');
@@ -207,10 +342,81 @@ class NotificationService {
 
     // Handle navigation based on message data
     final data = message.data;
-    if (data.containsKey('chat_id')) {
-      // Navigate to specific chat
-      debugPrint('Navigating to chat: ${data['chat_id']}');
-      // TODO: Implement navigation to chat
+    final type = data['type'] as String?;
+    
+    switch (type) {
+      case 'chat':
+        _handleChatNotification(data);
+        break;
+      case 'event':
+        _handleEventNotification(data);
+        break;
+      case 'product':
+        _handleProductNotification(data);
+        break;
+      case 'job':
+        _handleJobNotification(data);
+        break;
+      case 'expense':
+        _handleExpenseNotification(data);
+        break;
+      default:
+        debugPrint('Unknown notification type: $type');
+    }
+  }
+
+  /// Handle chat notification tap
+  void _handleChatNotification(Map<String, dynamic> data) {
+    final chatId = data['chat_id'] as String?;
+    if (chatId != null) {
+      debugPrint('Navigating to chat: $chatId');
+      final uri = Uri.parse('biso://chat?id=$chatId');
+      final deepLinkService = DeepLinkService();
+      deepLinkService.handleDeepLink(uri);
+    }
+  }
+
+  /// Handle event notification tap
+  void _handleEventNotification(Map<String, dynamic> data) {
+    final eventId = data['event_id'] as String?;
+    if (eventId != null) {
+      debugPrint('Navigating to event: $eventId');
+      final uri = Uri.parse('biso://event?id=$eventId');
+      final deepLinkService = DeepLinkService();
+      deepLinkService.handleDeepLink(uri);
+    }
+  }
+
+  /// Handle product notification tap
+  void _handleProductNotification(Map<String, dynamic> data) {
+    final productId = data['product_id'] as String?;
+    if (productId != null) {
+      debugPrint('Navigating to product: $productId');
+      final uri = Uri.parse('biso://product?id=$productId');
+      final deepLinkService = DeepLinkService();
+      deepLinkService.handleDeepLink(uri);
+    }
+  }
+
+  /// Handle job notification tap
+  void _handleJobNotification(Map<String, dynamic> data) {
+    final jobId = data['job_id'] as String?;
+    if (jobId != null) {
+      debugPrint('Navigating to job: $jobId');
+      final uri = Uri.parse('biso://job?id=$jobId');
+      final deepLinkService = DeepLinkService();
+      deepLinkService.handleDeepLink(uri);
+    }
+  }
+
+  /// Handle expense notification tap
+  void _handleExpenseNotification(Map<String, dynamic> data) {
+    final expenseId = data['expense_id'] as String?;
+    if (expenseId != null) {
+      debugPrint('Navigating to expense: $expenseId');
+      final uri = Uri.parse('biso://expense?id=$expenseId');
+      final deepLinkService = DeepLinkService();
+      deepLinkService.handleDeepLink(uri);
     }
   }
 
@@ -219,15 +425,20 @@ class NotificationService {
     try {
       await _firebaseMessaging.deleteToken();
       _fcmToken = null;
+      _pushTargetId = null;
+      _topicSubscriptions.clear();
 
       // Remove from Appwrite preferences
       final prefs = await _account.getPrefs();
       final updatedPrefs = Map<String, dynamic>.from(prefs.data);
       updatedPrefs.remove('fcm_token');
       updatedPrefs.remove('fcm_token_updated_at');
+      updatedPrefs.remove('push_target_id');
+      updatedPrefs.remove('topic_subscriptions');
+      updatedPrefs.remove('topic_subscriptions_updated_at');
 
       await _account.updatePrefs(prefs: updatedPrefs);
-      debugPrint('FCM token cleared');
+      debugPrint('FCM token and push target cleared');
     } catch (e) {
       debugPrint('Failed to clear FCM token: $e');
     }

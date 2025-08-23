@@ -210,7 +210,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final authState = ref.watch(authStateProvider);
 
@@ -312,7 +312,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: l10n.name,
+                  labelText: l10n.nameMessage,
                   prefixIcon: const Icon(Icons.person_outlined),
                 ),
                 validator: (value) {
@@ -329,7 +329,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               TextFormField(
                 controller: _phoneController,
                 decoration: InputDecoration(
-                  labelText: l10n.phone,
+                  labelText: l10n.phoneMessage,
                   prefixIcon: const Icon(Icons.phone_outlined),
                   hintText: '+47 123 45 678',
                 ),
@@ -363,7 +363,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               TextFormField(
                 controller: _addressController,
                 decoration: InputDecoration(
-                  labelText: l10n.address,
+                  labelText: l10n.addressMessage,
                   prefixIcon: const Icon(Icons.home_outlined),
                 ),
                 textInputAction: TextInputAction.next,
@@ -377,7 +377,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     child: TextFormField(
                       controller: _cityController,
                       decoration: InputDecoration(
-                        labelText: l10n.city,
+                        labelText: l10n.cityMessage,
                         prefixIcon: const Icon(Icons.location_city_outlined),
                       ),
                       textInputAction: TextInputAction.next,
@@ -388,7 +388,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     child: TextFormField(
                       controller: _zipController,
                       decoration: InputDecoration(
-                        labelText: l10n.zipCode,
+                        labelText: l10n.zipCodeMessage,
                         prefixIcon: const Icon(
                           Icons.local_post_office_outlined,
                         ),

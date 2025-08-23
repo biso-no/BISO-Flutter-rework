@@ -68,7 +68,7 @@ class _PremiumHomeScreenState extends ConsumerState<PremiumHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authStateProvider);
 
     final pages = [
@@ -78,7 +78,7 @@ class _PremiumHomeScreenState extends ConsumerState<PremiumHomeScreen>
           ? const ProfileScreen()
           : PremiumAuthRequiredPage(
               title: l10n.profile,
-              description: 'Manage your account and preferences',
+              description: l10n.manageYourAccountAndPreferencesMessage,
               icon: Icons.person_outline_rounded,
               navigateToTab: _navigateToTab,
             ),
@@ -181,7 +181,7 @@ class PremiumHomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final campus = ref.watch(filterCampusProvider);
     ref.watch(authStateProvider);
-    AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     final showcaseItems = ref.watch(heroShowcaseItemsProvider);
     final campusId = campus.id;
@@ -214,8 +214,8 @@ class PremiumHomePage extends ConsumerWidget {
 */
         // Latest Events Section
         _buildPremiumContentSection(
-          title: 'Happening at ${campus.name}',
-          subtitle: 'Discover events and opportunities',
+          title: l10n.happeningAtMessage(campus.name),
+          subtitle: l10n.discoverEventsAndOpportunitiesMessage,
           icon: Icons.event_rounded,
           onViewAll: () => context.go('/explore/events'),
           asyncData: eventsAsync,
@@ -224,12 +224,13 @@ class PremiumHomePage extends ConsumerWidget {
               _PremiumEventCarousel(events: items.cast<EventModel>()),
           ref: ref,
           providerFamily: _latestEventsProvider,
+          context: context,
         ),
 
         // Webshop Section
         _buildPremiumContentSection(
-          title: 'BISO Webshop',
-          subtitle: 'Official merchandise and campus gear',
+          title: l10n.bisoWebshopMessage,
+          subtitle: l10n.officialMerchandiseAndCampusGearMessage,
           icon: Icons.storefront_rounded,
           onViewAll: () => context.go('/explore/products'),
           asyncData: webshopProductsAsync,
@@ -238,12 +239,13 @@ class PremiumHomePage extends ConsumerWidget {
               _PremiumWebshopCarousel(products: items.cast<WebshopProduct>()),
           ref: ref,
           providerFamily: _latestWebshopProductsProvider,
+          context: context,
         ),
 
         // Volunteer Opportunities Section
         _buildPremiumContentSection(
-          title: 'Open Positions',
-          subtitle: 'Volunteer opportunities with BISO',
+          title: l10n.openPositionsMessage,
+          subtitle: l10n.volunteerOpportunitiesWithBISO,
           icon: Icons.volunteer_activism_rounded,
           onViewAll: () => context.go('/explore/volunteer'),
           asyncData: jobsAsync,
@@ -252,6 +254,7 @@ class PremiumHomePage extends ConsumerWidget {
               _PremiumJobList(jobs: items.cast<JobModel>()),
           ref: ref,
           providerFamily: _latestJobsProvider,
+          context: context,
         ),
 
         // Bottom spacing for floating nav
@@ -270,13 +273,15 @@ class PremiumHomePage extends ConsumerWidget {
     required Widget Function(List<T>) contentBuilder,
     required WidgetRef ref,
     required dynamic providerFamily,
+    required BuildContext context,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return SliverToBoxAdapter(
       child: PremiumSection(
         title: title,
         subtitle: subtitle,
         icon: icon,
-        actionText: 'View all',
+        actionText: l10n.viewAllMessage,
         onActionTap: onViewAll,
         margin: const EdgeInsets.only(top: 32, bottom: 16),
         child: SizedBox(
@@ -284,7 +289,7 @@ class PremiumHomePage extends ConsumerWidget {
           child: asyncData.when(
             data: (items) => items.isEmpty
                 ? _PremiumEmptyState(
-                    message: 'Nothing here yet. Check back soon!',
+                    message: l10n.nothingHereYetCheckBackSoonMessage,
                   )
                 : contentBuilder(items),
             loading: () => _PremiumLoadingCarousel(),
@@ -308,7 +313,7 @@ class PremiumHomePage extends ConsumerWidget {
           final allCampusesAsync = ref.watch(switcherCampusesProvider);
           return allCampusesAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => const Center(child: Text('Failed to load campuses')),
+                            error: (e, _) => Center(child: Text(AppLocalizations.of(context)!.failedToLoadCampusesMessage)),
             data: (allCampuses) => _CampusSwitcherModal(
               selectedCampus: selectedCampus,
               allCampuses: allCampuses,
@@ -369,7 +374,7 @@ class _CampusSwitcherModal extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  'Select Campus',
+                  AppLocalizations.of(context)!.selectCampusMessage,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -566,12 +571,12 @@ class _PremiumStatsRow extends StatelessWidget {
         const SizedBox(width: 32),
         _PremiumStatItem(
           value: '${campus.eventCount ?? 15}',
-          label: 'Events',
+                          label: l10n.eventsMessage,
         ),
         const SizedBox(width: 32),
         _PremiumStatItem(
           value: '${campus.jobCount ?? 8}',
-          label: 'Opportunities',
+                          label: l10n.volunteerOpportunitiesMessage,
         ),
       ],
     );
@@ -640,29 +645,29 @@ class _PremiumQuickActions extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           _PremiumActionCard(
-            title: l10n.events,
-            subtitle: 'Discover happenings',
+            title: l10n.eventsMessage,
+            subtitle: l10n.discoverHappeningsMessage,
             icon: Icons.event_rounded,
             gradientColors: AppColors.eventGradient,
             onTap: () => context.go('/explore/events'),
           ),
           _PremiumActionCard(
-            title: l10n.marketplace,
-            subtitle: 'Buy & sell items',
+            title: l10n.marketplaceMessage,
+            subtitle: l10n.buyAndSellItemsMessage,
             icon: Icons.shopping_bag_rounded,
             gradientColors: AppColors.marketplaceGradient,
             onTap: () => context.go('/explore/products'),
           ),
           _PremiumActionCard(
-            title: l10n.jobs,
-            subtitle: 'Find opportunities',
+            title: l10n.jobsMessage,
+            subtitle: l10n.findOpportunitiesMessage,
             icon: Icons.volunteer_activism_rounded,
             gradientColors: AppColors.jobsGradient,
             onTap: () => context.go('/explore/volunteer'),
           ),
           _PremiumActionCard(
-            title: l10n.expenses,
-            subtitle: 'Manage reimbursements',
+            title: l10n.expensesMessage,
+            subtitle: l10n.manageReimbursementsMessage,
             icon: Icons.receipt_long_rounded,
             gradientColors: AppColors.expenseGradient,
             trailing: !authState.isAuthenticated
@@ -674,7 +679,7 @@ class _PremiumQuickActions extends StatelessWidget {
                 : null,
             onTap: () {
               if (!authState.isAuthenticated) {
-                _showAuthPrompt(context, 'Expenses');
+                                    _showAuthPrompt(context, l10n.expensesMessage);
               } else {
                 context.go('/explore/expenses');
               }
@@ -988,7 +993,7 @@ class _PremiumEventCard extends StatelessWidget {
                 if (event.organizerName.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
-                    'by ${event.organizerName}',
+                    AppLocalizations.of(context)!.byOrganizerNameMessage(event.organizerName),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: AppColors.biLightBlue,
                       fontWeight: FontWeight.w500,
@@ -1160,8 +1165,8 @@ class _PremiumWebshopProductCard extends StatelessWidget {
                         color: AppColors.error,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Text(
-                        'SALE',
+                      child: Text(
+                        AppLocalizations.of(context)!.saleMessage,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
@@ -1297,7 +1302,7 @@ class _PremiumJobCard extends StatelessWidget {
 
           // Apply button - reduced padding
           PremiumButton(
-            text: 'Learn More',
+            text: AppLocalizations.of(context)!.learnMoreMessage,
             isSecondary: true,
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 10),
@@ -1367,6 +1372,7 @@ class _PremiumErrorState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Center(
       child: Column(
@@ -1375,13 +1381,13 @@ class _PremiumErrorState extends StatelessWidget {
           Icon(Icons.error_outline_rounded, size: 48, color: AppColors.error),
           const SizedBox(height: 16),
           Text(
-            'Failed to load content',
+            l10n.failedToLoadContentMessage,
             style: theme.textTheme.titleMedium?.copyWith(
               color: AppColors.stoneGray,
             ),
           ),
           const SizedBox(height: 16),
-          PremiumButton(text: 'Retry', isSecondary: true, onPressed: onRetry),
+          PremiumButton(text: l10n.retryMessage, isSecondary: true, onPressed: onRetry),
         ],
       ),
     );
@@ -1407,6 +1413,7 @@ class PremiumAuthRequiredPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return PremiumScaffold(
       hasGradientBackground: true,
@@ -1426,7 +1433,7 @@ class PremiumAuthRequiredPage extends ConsumerWidget {
               const SizedBox(height: 32),
 
               Text(
-                'Sign In Required',
+                l10n.signInRequiredMessage,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -1447,7 +1454,7 @@ class PremiumAuthRequiredPage extends ConsumerWidget {
               const SizedBox(height: 40),
 
               PremiumButton(
-                text: 'Sign In',
+                text: l10n.signInMessage,
                 icon: Icons.login_rounded,
                 width: double.infinity,
                 onPressed: () {
@@ -1463,13 +1470,13 @@ class PremiumAuthRequiredPage extends ConsumerWidget {
               const SizedBox(height: 16),
 
               PremiumButton(
-                text: 'Browse as Guest',
+                text: l10n.browseAsGuestMessage,
                 isSecondary: true,
                 width: double.infinity,
                 onPressed: () => navigateToTab?.call(1),
               ),
               PremiumButton(
-                text: 'Clear session',
+                text: l10n.clearSessionMessage,
                 isSecondary: true,
                 onPressed: () =>
                     ref.read(authStateProvider.notifier).clearSession(),
@@ -1493,6 +1500,7 @@ class _PremiumAuthDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -1506,7 +1514,7 @@ class _PremiumAuthDialog extends StatelessWidget {
             const SizedBox(height: 16),
 
             Text(
-              'Sign In Required',
+              l10n.signInRequiredMessage,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -1515,7 +1523,7 @@ class _PremiumAuthDialog extends StatelessWidget {
             const SizedBox(height: 8),
 
             Text(
-              'Please sign in to access $feature and other personalized features.',
+              l10n.pleaseSignInToAccessAndOtherPersonalizedFeaturesMessage.replaceAll('\$feature', feature),
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: AppColors.stoneGray,
               ),
@@ -1528,7 +1536,7 @@ class _PremiumAuthDialog extends StatelessWidget {
               children: [
                 Expanded(
                   child: PremiumButton(
-                    text: 'Cancel',
+                    text: l10n.cancelMessage,
                     isSecondary: true,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
@@ -1536,7 +1544,7 @@ class _PremiumAuthDialog extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: PremiumButton(
-                    text: 'Sign In',
+                    text: l10n.signInMessage,
                     onPressed: () {
                       Navigator.of(context).pop();
                       Navigator.push(

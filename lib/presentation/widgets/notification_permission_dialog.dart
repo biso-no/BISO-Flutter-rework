@@ -39,7 +39,7 @@ class NotificationPermissionDialog extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Get notified when you receive new messages in chat.',
+            'Stay connected with your campus community! Get notified about new messages, events, job opportunities, and marketplace items.',
             style: TextStyle(fontSize: 16, height: 1.4),
           ),
           const SizedBox(height: 16),
@@ -88,17 +88,22 @@ class NotificationPermissionDialog extends ConsumerWidget {
               final granted = await service.requestPermission();
 
               if (granted) {
-                // Enable chat notifications by default
-                await ref
-                    .read(notificationPreferencesProvider.notifier)
-                    .updateChatNotifications(true);
+                // Enable chat notifications and default topic subscriptions
+                final notifier = ref.read(notificationPreferencesProvider.notifier);
+                await notifier.updateChatNotifications(true);
+                
+                // Enable default topic subscriptions
+                await notifier.updateTopicSubscription('events', true);
+                await notifier.updateTopicSubscription('products', true);
+                await notifier.updateTopicSubscription('jobs', true);
 
                 if (context.mounted) {
                   Navigator.of(context).pop(true);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Notifications enabled successfully!'),
+                      content: Text('🎉 Notifications enabled! You\'ll stay updated on everything happening at BI.'),
                       backgroundColor: AppColors.defaultBlue,
+                      duration: Duration(seconds: 4),
                     ),
                   );
                 }

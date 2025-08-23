@@ -1,0 +1,2737 @@
+{
+  "@@locale": "en",
+  "appName": "BISO",
+  "@appName": {
+    "description": "Auto-extracted string"
+  },
+  "aboutMessage": "About BISO",
+  "@aboutMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "aboutThisRoleMessage": "About this role",
+  "@aboutThisRoleMessage": {
+    "description": "Auto-extracted string"
+  },
+  "academicCalendarMessage": "Academic Calendar",
+  "@academicCalendarMessage": {
+    "description": "Auto-extracted string"
+  },
+  "accessToMemberOnlyDiscussionGroupsMessage": "Access to member-only discussion groups",
+  "@accessToMemberOnlyDiscussionGroupsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "accountHolderMessage": "Account Holder",
+  "@accountHolderMessage": {
+    "description": "Auto-extracted string"
+  },
+  "accountMessage": "Account",
+  "@accountMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "accountNumberIsRequiredMessage": "Account number is required",
+  "@accountNumberIsRequiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "accountTypeMessage": "Account Type",
+  "@accountTypeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "addContextOptionalMessage": "Add context (optional)",
+  "@addContextOptionalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "addYourBankAccountInformationToReceiveExpenseReimbursementsFromBISOMessage": "Add your bank account information to receive expense reimbursements from BISO.",
+  "@addYourBankAccountInformationToReceiveExpenseReimbursementsFromBISOMessage": {
+    "description": "Auto-extracted string"
+  },
+  "addedToFavoritesMessage": "Added to favorites",
+  "@addedToFavoritesMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "addressInformationMessage": "Address Information",
+  "@addressInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "addressMessage": "Address",
+  "@addressMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "advancedAppFeaturesAndToolsMessage": "Advanced app features and tools",
+  "@advancedAppFeaturesAndToolsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "aiAssistantMessage": "AI Assistant",
+  "@aiAssistantMessage": {
+    "description": "Auto-extracted string"
+  },
+  "all": "All",
+  "@all": {
+    "description": "Auto-extracted string"
+  },
+  "allAccessPassMessage": "All-Access Pass",
+  "@allAccessPassMessage": {
+    "description": "Auto-extracted string"
+  },
+  "allDepartmentsMessage": "All departments",
+  "@allDepartmentsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "allMessage": "All",
+  "@allMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "amountMessage": "Amount",
+  "@amountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "amountNOKMessage": "Amount (NOK)",
+  "@amountNOKMessage": {
+    "description": "Auto-extracted string"
+  },
+  "appLanguageMessage": "App Language",
+  "@appLanguageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "appVersionMessage": "App Version",
+  "@appVersionMessage": {
+    "description": "Auto-extracted string"
+  },
+  "applyNowMessage": "Apply Now",
+  "@applyNowMessage": {
+    "description": "Auto-extracted string"
+  },
+  "approvedMessage": "Approved",
+  "@approvedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "areYouSureYouWantToDeleteThisChatThisActionCannotBeUndone": "Are you sure you want to delete this chat? This action cannot be undone.",
+  "@areYouSureYouWantToDeleteThisChatThisActionCannotBeUndone": {
+    "description": "Auto-extracted string"
+  },
+  "areYouSureYouWantToRemoveYourStudentIDThisWillRemoveYourVerifiedStatusAndAccessToStudentBenefitsMessage": "Are you sure you want to remove your student ID? This will remove your verified status and access to student benefits.",
+  "@areYouSureYouWantToRemoveYourStudentIDThisWillRemoveYourVerifiedStatusAndAccessToStudentBenefitsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "areYouSureYouWantToSignOutMessage": "Are you sure you want to sign out?",
+  "@areYouSureYouWantToSignOutMessage": {
+    "description": "Auto-extracted string"
+  },
+  "askAIMessage": "Ask AI Assistant",
+  "@askAIMessage": {
+    "description": "Auto-extracted string"
+  },
+  "attachedFilesMessage": "Attached Files",
+  "@attachedFilesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "attachmentsMessage": "Attachments",
+  "@attachmentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "authenticationRequiredPleaseLogInAgainMessage": "Authentication required. Please log in again.",
+  "@authenticationRequiredPleaseLogInAgainMessage": {
+    "description": "Auto-extracted string"
+  },
+  "autoDeleteMessagesMessage": "Auto-delete Messages",
+  "@autoDeleteMessagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "autoDeleteOptionsComingSoonMessage": "Auto-delete options coming soon",
+  "@autoDeleteOptionsComingSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "autoDownloadMediaMessage": "Auto-download Media",
+  "@autoDownloadMediaMessage": {
+    "description": "Auto-extracted string"
+  },
+  "autoDownloadOptionsComingSoonMessage": "Auto-download options coming soon",
+  "@autoDownloadOptionsComingSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "autoFillDateAmountAndDescriptionFromReceiptsMessage": "Auto-fill date, amount and description from receipts",
+  "@autoFillDateAmountAndDescriptionFromReceiptsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "automaticallyDeleteOldMessagesMessage": "Automatically delete old messages",
+  "@automaticallyDeleteOldMessagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "backMessage": "Back",
+  "@backMessage": {
+    "description": "Auto-extracted string"
+  },
+  "bankAccountMessage": "Bank Account",
+  "@bankAccountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "bankAccountNumberIsRequiredMessage": "Bank account number is required",
+  "@bankAccountNumberIsRequiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "bankAccountNumberMessage": "Bank Account Number",
+  "@bankAccountNumberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "biSelectedCampusNameMessage": "BI {selectedCampus}",
+  "@biSelectedCampusNameMessage": {
+    "description": "Auto-extracted string (used in 2 files)",
+    "placeholders": {
+      "selectedCampus": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "bisoCampusNameMessage": "BISO {widget}",
+  "@bisoCampusNameMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "widget": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "bisoMemberMessage": "BISO Member",
+  "@bisoMemberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "bisoMembershipMessage": "BISO Membership",
+  "@bisoMembershipMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "bisoShopMessage": "BISO Shop",
+  "@bisoShopMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "bisoWebshopMessage": "BISO Webshop",
+  "@bisoWebshopMessage": {
+    "description": "Auto-extracted string"
+  },
+  "bookRoomsResourcesMessage": "Book rooms & resources",
+  "@bookRoomsResourcesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "booksMessage": "Books",
+  "@booksMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "brandNewMessage": "Brand New",
+  "@brandNewMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "browseAsGuestMessage": "Browse as Guest",
+  "@browseAsGuestMessage": {
+    "description": "Auto-extracted string"
+  },
+  "build1Message": "1.0.0 (Build 1)",
+  "@build1Message": {
+    "description": "Auto-extracted string"
+  },
+  "busMessage": "Bus",
+  "@busMessage": {
+    "description": "Auto-extracted string"
+  },
+  "buyAndSellItemsMessage": "Buy & sell items",
+  "@buyAndSellItemsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "buyMembershipMessage": "Buy Membership",
+  "@buyMembershipMessage": {
+    "description": "Auto-extracted string"
+  },
+  "buyPassMessage": "Buy Pass",
+  "@buyPassMessage": {
+    "description": "Auto-extracted string"
+  },
+  "buySellItemsMessage": "Buy & sell items",
+  "@buySellItemsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "byOrganizerNameMessage": "by {event}",
+  "@byOrganizerNameMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "event": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "bySubmittingYouConfirmThatAllInformationIsAccurateAndYouHaveAppropriateReceiptsMessage": "By submitting, you confirm that all information is accurate and you have appropriate receipts.",
+  "@bySubmittingYouConfirmThatAllInformationIsAccurateAndYouHaveAppropriateReceiptsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "cacheClearedSuccessfullyMessage": "Cache cleared successfully",
+  "@cacheClearedSuccessfullyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "callMessage": "Call",
+  "@callMessage": {
+    "description": "Auto-extracted string"
+  },
+  "cameraMessage": "Camera",
+  "@cameraMessage": {
+    "description": "Auto-extracted string"
+  },
+  "campusAndDepartmentMessage": "Campus & Department",
+  "@campusAndDepartmentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "campusAndInterestsMessage": "Campus & Interests",
+  "@campusAndInterestsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "campusEventsActivitiesMessage": "Campus events & activities",
+  "@campusEventsActivitiesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "campusInformationMessage": "Campus Information",
+  "@campusInformationMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "campusLeadershipMessage": "Campus Leadership",
+  "@campusLeadershipMessage": {
+    "description": "Auto-extracted string"
+  },
+  "campusMessage": "Campus",
+  "@campusMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Auto-extracted string"
+  },
+  "cancelMessage": "Cancel",
+  "@cancelMessage": {
+    "description": "Auto-extracted string (used in 6 files)"
+  },
+  "cancelledMessage": "Cancelled",
+  "@cancelledMessage": {
+    "description": "Auto-extracted string"
+  },
+  "cardPaymentMessage": "Card Payment",
+  "@cardPaymentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "careerAdvantagesMessage": "Career Advantages",
+  "@careerAdvantagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "categoriesMessage": "Categories",
+  "@categoriesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "categoryMessage": "Category",
+  "@categoryMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "chat": "Chat",
+  "@chat": {
+    "description": "Auto-extracted string"
+  },
+  "chatBehaviorMessage": "Chat Behavior",
+  "@chatBehaviorMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatDeletedSuccessfully": "Chat deleted successfully",
+  "@chatDeletedSuccessfully": {
+    "description": "Auto-extracted string"
+  },
+  "chatInfo": "Chat Info",
+  "@chatInfo": {
+    "description": "Auto-extracted string"
+  },
+  "chatMessage": "Chat",
+  "@chatMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatMessagesMessage": "Chat Messages",
+  "@chatMessagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatMuted": "Chat muted",
+  "@chatMuted": {
+    "description": "Auto-extracted string"
+  },
+  "chatNotificationsMessage": "Chat Notifications",
+  "@chatNotificationsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatPrivacyMessage": "Chat Privacy",
+  "@chatPrivacyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatPrivacySettingsMessage": "Chat Privacy Settings",
+  "@chatPrivacySettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatSettingsApplyToAllConversationsIndividualChatSettingsCanBeChangedFromTheChatInfoScreenMessage": "Chat settings apply to all conversations. Individual chat settings can be changed from the chat info screen.",
+  "@chatSettingsApplyToAllConversationsIndividualChatSettingsCanBeChangedFromTheChatInfoScreenMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatSettingsMessage": "Chat Settings",
+  "@chatSettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatStorageMessage": "Chat Storage",
+  "@chatStorageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chatUnmuted": "Chat unmuted",
+  "@chatUnmuted": {
+    "description": "Auto-extracted string"
+  },
+  "checkBackLaterOrSwitchCampusMessage": "Check back later or switch campus",
+  "@checkBackLaterOrSwitchCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "checkMembershipStatusPurchaseBISOmembershipAccessExclusiveFeaturesExpenseReimbursementsMessage": "• Check membership status\\n• Purchase BISO membership\\n• Access exclusive features\\n• Expense reimbursements",
+  "@checkMembershipStatusPurchaseBISOmembershipAccessExclusiveFeaturesExpenseReimbursementsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "checkingPermissionsMessage": "Checking permissions...",
+  "@checkingPermissionsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chooseHowOthersCanFindAndContactYouMessage": "Choose how others can find and contact you:",
+  "@chooseHowOthersCanFindAndContactYouMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chooseWhatNotificationsYouWantToReceiveMessage": "Choose what notifications you want to receive",
+  "@chooseWhatNotificationsYouWantToReceiveMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chooseYourBICampusLocationMessage": "Choose your BI campus location",
+  "@chooseYourBICampusLocationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chooseYourCampusAndTheDepartmentResponsibleForThisExpenseMessage": "Choose your campus and the department responsible for this expense",
+  "@chooseYourCampusAndTheDepartmentResponsibleForThisExpenseMessage": {
+    "description": "Auto-extracted string"
+  },
+  "chooseYourMembershipPlanMessage": "Choose your membership plan",
+  "@chooseYourMembershipPlanMessage": {
+    "description": "Auto-extracted string"
+  },
+  "cityMessage": "City",
+  "@cityMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "clear": "Clear",
+  "@clear": {
+    "description": "Auto-extracted string"
+  },
+  "clearCacheMessage": "Clear Cache",
+  "@clearCacheMessage": {
+    "description": "Auto-extracted string"
+  },
+  "clearMessage": "Clear",
+  "@clearMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "clearSessionAndTryAgainMessage": "Clear Session & Try Again",
+  "@clearSessionAndTryAgainMessage": {
+    "description": "Auto-extracted string"
+  },
+  "clearSessionMessage": "Clear session",
+  "@clearSessionMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "clothesMessage": "Clothes",
+  "@clothesMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "clubsMessage": "Clubs",
+  "@clubsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "clubsUnitsMessage": "Clubs & Units",
+  "@clubsUnitsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "compensationMessage": "Compensation",
+  "@compensationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "completeProfileMessage": "Complete Profile",
+  "@completeProfileMessage": {
+    "description": "Auto-extracted string"
+  },
+  "completeSetupMessage": "Complete Setup",
+  "@completeSetupMessage": {
+    "description": "Auto-extracted string"
+  },
+  "completeYourProfileMessage": "Complete Your Profile",
+  "@completeYourProfileMessage": {
+    "description": "Auto-extracted string"
+  },
+  "conditionMessage": "Condition",
+  "@conditionMessage": {
+    "description": "Auto-extracted string"
+  },
+  "connectBIAccountMessage": "Connect BI Account",
+  "@connectBIAccountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "connectWithYourBIStudentAccountForInstantVerificationAndAccessToExclusiveMemberFeaturesMessage": "Connect with your BI student account for instant verification and access to exclusive member features.",
+  "@connectWithYourBIStudentAccountForInstantVerificationAndAccessToExclusiveMemberFeaturesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "contactInfoOptionalMessage": "Contact info (optional)",
+  "@contactInfoOptionalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "contactInformationMessage": "Contact Information",
+  "@contactInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "contactMessage": "Contact",
+  "@contactMessage": {
+    "description": "Auto-extracted string"
+  },
+  "contactSellerMessage": "Contact Seller",
+  "@contactSellerMessage": {
+    "description": "Auto-extracted string"
+  },
+  "continueButtonMessage": "Continue",
+  "@continueButtonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "continueMessage": "Continue",
+  "@continueMessage": {
+    "description": "Auto-extracted string"
+  },
+  "continueToLoginMessage": "Continue to login",
+  "@continueToLoginMessage": {
+    "description": "Auto-extracted string"
+  },
+  "copyTokenForTestingMessage": "Copy token for testing",
+  "@copyTokenForTestingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "couldNotOpenMailAppMessage": "Could not open mail app. Please check your email manually.",
+  "@couldNotOpenMailAppMessage": {
+    "description": "Auto-extracted string"
+  },
+  "createdMessage": "Created",
+  "@createdMessage": {
+    "description": "Auto-extracted string"
+  },
+  "currencyIsAutomaticallySetToNOKForBIStudentsMessage": "Currency is automatically set to NOK for BI students",
+  "@currencyIsAutomaticallySetToNOKForBIStudentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "currencyMessage": "Currency",
+  "@currencyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "currentAttendeesMaxAttendeesRegisteredMessage": "{event}/{event} registered",
+  "@currentAttendeesMaxAttendeesRegisteredMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "event": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "currentCampusMessage": "Current Campus",
+  "@currentCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "darkModeMessage": "Dark Mode",
+  "@darkModeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "dataAndStorageMessage": "Data & Storage",
+  "@dataAndStorageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "dateFormatMessage": "Date Format",
+  "@dateFormatMessage": {
+    "description": "Auto-extracted string"
+  },
+  "dateFormatOptionsComingSoonMessage": "Date format options coming soon",
+  "@dateFormatOptionsComingSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "dateMessage": "{date}/{date}/{date}",
+  "@dateMessage": {
+    "description": "Auto-extracted string (used in 2 files)",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "ddMMyyyyNorwegianMessage": "DD/MM/YYYY (Norwegian)",
+  "@ddMMyyyyNorwegianMessage": {
+    "description": "Auto-extracted string"
+  },
+  "deadlineMessage": "Deadline",
+  "@deadlineMessage": {
+    "description": "Auto-extracted string"
+  },
+  "delayedMinutesMessage": "Delayed +{deltaMinutes}m",
+  "@delayedMinutesMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "deltaMinutes": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Auto-extracted string"
+  },
+  "deleteChat": "Delete Chat",
+  "@deleteChat": {
+    "description": "Auto-extracted string"
+  },
+  "departedMinutesAgoMessage": "Departed $minutesTo min ago",
+  "@departedMinutesAgoMessage": {
+    "description": "Auto-extracted string"
+  },
+  "departmentChatMembers": "Department chat • {chat} members",
+  "@departmentChatMembers": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "chat": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "departmentMessage": "Department",
+  "@departmentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "departments": "Departments",
+  "@departments": {
+    "description": "Auto-extracted string"
+  },
+  "departuresMessage": "Departures",
+  "@departuresMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "describeBrieflyWhatTheExpenseIsForMessage": "Describe briefly what the expense is for",
+  "@describeBrieflyWhatTheExpenseIsForMessage": {
+    "description": "Auto-extracted string"
+  },
+  "descriptionMessage": "Description",
+  "@descriptionMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "detailsAndSummaryMessage": "Details & Summary",
+  "@detailsAndSummaryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "detailsMessage": "Details",
+  "@detailsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "deutdeffMessage": "DEUTDEFF",
+  "@deutdeffMessage": {
+    "description": "Auto-extracted string"
+  },
+  "direct": "Direct",
+  "@direct": {
+    "description": "Auto-extracted string"
+  },
+  "directMessage": "Direct message",
+  "@directMessage": {
+    "description": "Auto-extracted string"
+  },
+  "directionsMessage": "Directions",
+  "@directionsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "discardChangesMessage": "Discard changes?",
+  "@discardChangesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "discardMessage": "Discard",
+  "@discardMessage": {
+    "description": "Auto-extracted string"
+  },
+  "discoverEventsAndOpportunitiesMessage": "Discover events and opportunities",
+  "@discoverEventsAndOpportunitiesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "discoverHappeningsMessage": "Discover happenings",
+  "@discoverHappeningsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "discoverStudentDrivenOrganizationsAtMessage": "Discover student-driven organizations at {campus}",
+  "@discoverStudentDrivenOrganizationsAtMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "campus": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "documentStatsMessage": "Document Stats",
+  "@documentStatsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "done": "Done",
+  "@done": {
+    "description": "Auto-extracted string"
+  },
+  "downloadPhotosAndFilesAutomaticallyMessage": "Download photos and files automatically",
+  "@downloadPhotosAndFilesAutomaticallyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "draftMessage": "Draft",
+  "@draftMessage": {
+    "description": "Auto-extracted string"
+  },
+  "draftSavedMessage": "Draft saved",
+  "@draftSavedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "draftYourLocalDraftBeforeSubmissionMessage": "• Draft: Your local draft before submission.\\n",
+  "@draftYourLocalDraftBeforeSubmissionMessage": {
+    "description": "Auto-extracted string"
+  },
+  "earlyMinutesMessage": "Early {deltaMinutes}m",
+  "@earlyMinutesMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "deltaMinutes": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "earlyRegistrationForPopularEventsMessage": "Early registration for popular events",
+  "@earlyRegistrationForPopularEventsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "editMessage": "Edit",
+  "@editMessage": {
+    "description": "Auto-extracted string"
+  },
+  "editProfileMessage": "Edit Profile",
+  "@editProfileMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "egMacBookPro13Message": "e.g., MacBook Pro 13\"",
+  "@egMacBookPro13Message": {
+    "description": "Auto-extracted string"
+  },
+  "electronicsMessage": "Electronics",
+  "@electronicsMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Auto-extracted string"
+  },
+  "emailMessage": "Email",
+  "@emailMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "enableMessage": "Enable",
+  "@enableMessage": {
+    "description": "Auto-extracted string"
+  },
+  "enableNotificationsMessage": "Enable Notifications",
+  "@enableNotificationsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "enableSystemNotificationsFirstMessage": "Enable system notifications first",
+  "@enableSystemNotificationsFirstMessage": {
+    "description": "Auto-extracted string"
+  },
+  "endedMessage": "Ended",
+  "@endedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "enterAValidAmountMessage": "Enter a valid amount",
+  "@enterAValidAmountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "enterEmail": "Enter email",
+  "@enterEmail": {
+    "description": "Auto-extracted string"
+  },
+  "enterValidEmail": "Enter valid email",
+  "@enterValidEmail": {
+    "description": "Auto-extracted string"
+  },
+  "enterYourInternationalAccountNumberMessage": "Enter your international account number",
+  "@enterYourInternationalAccountNumberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorEnablingNotificationsMessage": "Error enabling notifications: $e",
+  "@errorEnablingNotificationsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorLoadingBoardMembersMessage": "Error loading board members",
+  "@errorLoadingBoardMembersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorLoadingExpensesMessage": "Error loading expenses",
+  "@errorLoadingExpensesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorLoadingNotificationSettingsMessage": "Error loading notification settings",
+  "@errorLoadingNotificationSettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorLoadingPrivacySettingsMessage": "Error loading privacy settings",
+  "@errorLoadingPrivacySettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorMessage": "Error occurred",
+  "@errorMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorPickingImageMessage": "Error picking image: $e",
+  "@errorPickingImageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "errorUpdatingProfileMessage": "Error updating profile: $e",
+  "@errorUpdatingProfileMessage": {
+    "description": "Auto-extracted string"
+  },
+  "eventAccessExpenseReimbursementsMarketplaceDiscountsPrioritySupportMessage": "Event access • Expense reimbursements • Marketplace discounts • Priority support",
+  "@eventAccessExpenseReimbursementsMarketplaceDiscountsPrioritySupportMessage": {
+    "description": "Auto-extracted string"
+  },
+  "eventMessage": "Event",
+  "@eventMessage": {
+    "description": "Auto-extracted string"
+  },
+  "eventsAndTicketsMessage": "Events & Tickets",
+  "@eventsAndTicketsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "eventsMessage": "Events",
+  "@eventsMessage": {
+    "description": "Auto-extracted string (used in 8 files)"
+  },
+  "exclusiveChatChannelsMessage": "Exclusive Chat Channels",
+  "@exclusiveChatChannelsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "exclusiveDealsOnMarketplaceItemsMessage": "Exclusive deals on marketplace items",
+  "@exclusiveDealsOnMarketplaceItemsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "expenseDetailsMessage": "Expense Details",
+  "@expenseDetailsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "expenseHistoryMessage": "Expense History",
+  "@expenseHistoryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "expenseReimbursementMessage": "Expense Reimbursement",
+  "@expenseReimbursementMessage": {
+    "description": "Auto-extracted string"
+  },
+  "expenseReimbursementStatusUpdatesMessage": "Expense reimbursement status updates",
+  "@expenseReimbursementStatusUpdatesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "expenseReimbursementsMessage": "Expense reimbursements",
+  "@expenseReimbursementsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "expenseStatusesMessage": "Expense Statuses",
+  "@expenseStatusesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "expenseSubmittedMessage": "Expense submitted",
+  "@expenseSubmittedMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "expensesMessage": "Expenses",
+  "@expensesMessage": {
+    "description": "Auto-extracted string (used in 5 files)"
+  },
+  "expiresInRemainingSecondsMessage": "Expires in {remainingSeconds}s",
+  "@expiresInRemainingSecondsMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "remainingSeconds": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "explore": "Explore",
+  "@explore": {
+    "description": "Auto-extracted string"
+  },
+  "exploreCampusMessage": "Explore Campus",
+  "@exploreCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "exploreMessage": "Explore",
+  "@exploreMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "facebookMessage": "Facebook",
+  "@facebookMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToDeleteChat": "Failed to delete chat: $e",
+  "@failedToDeleteChat": {
+    "description": "Auto-extracted string"
+  },
+  "failedToGenerateVerificationTokenMessage": "Failed to generate verification token.",
+  "@failedToGenerateVerificationTokenMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadBoardMembersMessage": "Failed to load board members",
+  "@failedToLoadBoardMembersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadCampusesMessage": "Failed to load campuses",
+  "@failedToLoadCampusesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadChats": "Failed to load chats",
+  "@failedToLoadChats": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadContentMessage": "Failed to load content",
+  "@failedToLoadContentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadMembershipOptionsMessage": "Failed to load membership options: {e}",
+  "@failedToLoadMembershipOptionsMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "e": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "failedToLoadMessage": "Failed to load",
+  "@failedToLoadMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "failedToLoadProductMessage": "Failed to load product: $e",
+  "@failedToLoadProductMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadSocialsMessage": "Failed to load socials: $e",
+  "@failedToLoadSocialsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToLoadStopPlacesMessage": "Failed to load stop places",
+  "@failedToLoadStopPlacesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToPublishMessage": "Failed to publish: $e",
+  "@failedToPublishMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToResendCodeMessage": "Failed to resend code: $e",
+  "@failedToResendCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToSaveDraftMessage": "Failed to save draft: $e",
+  "@failedToSaveDraftMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToSavePaymentInformationMessage": "Failed to save payment information: $e",
+  "@failedToSavePaymentInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToSendMessageMessage": "Failed to send message: $e",
+  "@failedToSendMessageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToSubmitMessage": "Failed to submit: $e",
+  "@failedToSubmitMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToUpdateFavoriteMessage": "Failed to update favorite: $e",
+  "@failedToUpdateFavoriteMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "failedToUpdatePrivacySetting": "Failed to update privacy setting: $e",
+  "@failedToUpdatePrivacySetting": {
+    "description": "Auto-extracted string"
+  },
+  "failedToUpdatePrivacySettingMessage": "Failed to update privacy setting: $e",
+  "@failedToUpdatePrivacySettingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "failedToUpdateSettingMessage": "Failed to update setting: $e",
+  "@failedToUpdateSettingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "fairMessage": "Fair",
+  "@fairMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "favoritesMessage": "Favorites",
+  "@favoritesMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "featuredEventMessage": "Featured Event",
+  "@featuredEventMessage": {
+    "description": "Auto-extracted string"
+  },
+  "featuredOpportunityMessage": "Featured Opportunity",
+  "@featuredOpportunityMessage": {
+    "description": "Auto-extracted string"
+  },
+  "featuredProductMessage": "Featured Product",
+  "@featuredProductMessage": {
+    "description": "Auto-extracted string"
+  },
+  "fileSAttachedMessage": "{attachedFiles} file(s) attached",
+  "@fileSAttachedMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "attachedFiles": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "filesMessage": "Files",
+  "@filesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "findOpportunitiesMessage": "Find opportunities",
+  "@findOpportunitiesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "findUsOnlineMessage": "Find us online",
+  "@findUsOnlineMessage": {
+    "description": "Auto-extracted string"
+  },
+  "forBusinessMessage": "For Business",
+  "@forBusinessMessage": {
+    "description": "Auto-extracted string"
+  },
+  "forFasterVippsProcessingMessage": "For faster Vipps processing",
+  "@forFasterVippsProcessingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "forPrepaymentsYouCanUploadQuotesOrEstimatesMessage": "For prepayments, you can upload quotes or estimates",
+  "@forPrepaymentsYouCanUploadQuotesOrEstimatesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "forStudentsMessage": "For Students",
+  "@forStudentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "freeUpStorageSpaceMessage": "Free up storage space",
+  "@freeUpStorageSpaceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "fromGalleryMessage": "From Gallery",
+  "@fromGalleryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "furnitureMessage": "Furniture",
+  "@furnitureMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "galleryMessage": "Gallery",
+  "@galleryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "generalMessage": "General",
+  "@generalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "generatingMessage": "Generating...",
+  "@generatingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getACodeInsteadMessage": "Get a Code Instead",
+  "@getACodeInsteadMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getAccessToExclusiveEventsDiscountsAndMoreMessage": "Get access to exclusive events, discounts, and more",
+  "@getAccessToExclusiveEventsDiscountsAndMoreMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getHelpGuidanceMessage": "Get help & guidance",
+  "@getHelpGuidanceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getHelpInformationMessage": "Get help & information",
+  "@getHelpInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getNotifiedAboutNewCampusEventsMessage": "Get notified about new campus events",
+  "@getNotifiedAboutNewCampusEventsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getNotifiedWhenYouReceiveNewMessagesInChatMessage": "Get notified when you receive new messages in chat.",
+  "@getNotifiedWhenYouReceiveNewMessagesInChatMessage": {
+    "description": "Auto-extracted string"
+  },
+  "getTheMostOutOfBISOByCompletingYourProfileWithCampusAndContactInformationMessage": "Get the most out of BISO by completing your profile with campus and contact information.",
+  "@getTheMostOutOfBISOByCompletingYourProfileWithCampusAndContactInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "goodMessage": "Good",
+  "@goodMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "groups": "Groups",
+  "@groups": {
+    "description": "Auto-extracted string"
+  },
+  "guidelinesMessage": "Guidelines",
+  "@guidelinesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "happeningAtMessage": "Happening at {campus}",
+  "@happeningAtMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "campus": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "heartItemsYouLikeToSeeThemHereMessage": "Heart items you like to see them here!",
+  "@heartItemsYouLikeToSeeThemHereMessage": {
+    "description": "Auto-extracted string"
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Auto-extracted string"
+  },
+  "homeMessage": "Home",
+  "@homeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "idVerificationCodeMessage": "ID: $verificationCode",
+  "@idVerificationCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "ifYouLeaveNowYourChangesWillNotBeSavedMessage": "If you leave now, your changes will not be saved.",
+  "@ifYouLeaveNowYourChangesWillNotBeSavedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "image": "📷 Image",
+  "@image": {
+    "description": "Auto-extracted string"
+  },
+  "importantAnnouncementMessage": "Important Announcement",
+  "@importantAnnouncementMessage": {
+    "description": "Auto-extracted string"
+  },
+  "inAppMessageMessage": "In-app message",
+  "@inAppMessageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "inMinutesMessage": "In {diff} min",
+  "@inMinutesMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "diff": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "instagramMessage": "Instagram",
+  "@instagramMessage": {
+    "description": "Auto-extracted string"
+  },
+  "interestsDepartmentsMessage": "Interests & Departments",
+  "@interestsDepartmentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "interestsMessage": "Interests",
+  "@interestsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "internationalAccountNumberMessage": "International Account Number",
+  "@internationalAccountNumberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "internationalBankAccountMessage": "International Bank Account",
+  "@internationalBankAccountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "invalidNorwegianBankAccountNumberMessage": "Invalid Norwegian bank account number",
+  "@invalidNorwegianBankAccountNumberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "invalidOtpCodeMessage": "Invalid OTP code",
+  "@invalidOtpCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "invalidZipCodeMessage": "Invalid zip code",
+  "@invalidZipCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "jobOpportunitiesMessage": "Job Opportunities",
+  "@jobOpportunitiesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "jobsMessage": "Jobs",
+  "@jobsMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "keepEditingMessage": "Keep Editing",
+  "@keepEditingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "keepPrivateMessage": "Keep Private",
+  "@keepPrivateMessage": {
+    "description": "Auto-extracted string"
+  },
+  "languageChangesWillTakeEffectAfterRestartingTheAppMessage": "Language changes will take effect after restarting the app.",
+  "@languageChangesWillTakeEffectAfterRestartingTheAppMessage": {
+    "description": "Auto-extracted string"
+  },
+  "languageMessage": "Language",
+  "@languageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "languageSettingsMessage": "Language Settings",
+  "@languageSettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "lastSeenMessage": "Last Seen",
+  "@lastSeenMessage": {
+    "description": "Auto-extracted string"
+  },
+  "learnMoreMessage": "Learn More",
+  "@learnMoreMessage": {
+    "description": "Auto-extracted string"
+  },
+  "libraryServicesMessage": "Library Services",
+  "@libraryServicesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "likeNewMessage": "Like New",
+  "@likeNewMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "linkedInMessage": "LinkedIn",
+  "@linkedInMessage": {
+    "description": "Auto-extracted string"
+  },
+  "liveMessage": "Live",
+  "@liveMessage": {
+    "description": "Auto-extracted string"
+  },
+  "loadingBoardMembersMessage": "Loading board members...",
+  "@loadingBoardMembersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "loadingNotificationSettingsMessage": "Loading notification settings...",
+  "@loadingNotificationSettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "loadingPrivacySettingsMessage": "Loading privacy settings...",
+  "@loadingPrivacySettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "loadingStudentInformationMessage": "Loading student information...",
+  "@loadingStudentInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "loadingYourProfileMessage": "Loading your profile...",
+  "@loadingYourProfileMessage": {
+    "description": "Auto-extracted string"
+  },
+  "magicLinkSentMessage": "Magic link sent! Check your email and click the link to sign in.",
+  "@magicLinkSentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "makePublicMessage": "Make Public",
+  "@makePublicMessage": {
+    "description": "Auto-extracted string"
+  },
+  "manageAccountAndPreferences": "Manage your account and preferences",
+  "@manageAccountAndPreferences": {
+    "description": "Auto-extracted string"
+  },
+  "manageDownloadedContentMessage": "Manage downloaded content",
+  "@manageDownloadedContentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "manageReimbursementsMessage": "Manage reimbursements",
+  "@manageReimbursementsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "manageYourAccountAndPreferencesMessage": "Manage your account and preferences",
+  "@manageYourAccountAndPreferencesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "marketplaceMessage": "Marketplace",
+  "@marketplaceMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "memberBenefitsActiveMessage": "Member Benefits Active",
+  "@memberBenefitsActiveMessage": {
+    "description": "Auto-extracted string"
+  },
+  "memberDiscountsMessage": "Member Discounts",
+  "@memberDiscountsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "memberMessage": "Member",
+  "@memberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "memberSinceMessage": "Member Since",
+  "@memberSinceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "members": "{chat} members",
+  "@members": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "chat": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "membershipExpiredMessage": "Membership Expired",
+  "@membershipExpiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "membershipPurchaseInitiatedCompletePaymentToActivateMessage": "Membership purchase initiated! Complete payment to activate.",
+  "@membershipPurchaseInitiatedCompletePaymentToActivateMessage": {
+    "description": "Auto-extracted string"
+  },
+  "messageCopiedToClipboardMessage": "Message copied to clipboard",
+  "@messageCopiedToClipboardMessage": {
+    "description": "Auto-extracted string"
+  },
+  "messageSellerMessage": "Message {product}",
+  "@messageSellerMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "product": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "messageSentSuccessfullyMessage": "Message sent successfully!",
+  "@messageSentSuccessfullyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "metroMessage": "Metro",
+  "@metroMessage": {
+    "description": "Auto-extracted string"
+  },
+  "minutes": "{difference}m",
+  "@minutes": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "difference": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "moreDocumentsMessage": "+ {sources} more documents",
+  "@moreDocumentsMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "sources": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "mute": "Mute",
+  "@mute": {
+    "description": "Auto-extracted string"
+  },
+  "muteNotificationsDuringSpecificHoursMessage": "Mute notifications during specific hours",
+  "@muteNotificationsDuringSpecificHoursMessage": {
+    "description": "Auto-extracted string"
+  },
+  "nameCountStopsMessage": "$name ($count stops)",
+  "@nameCountStopsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "nameIsRequiredMessage": "Name is required",
+  "@nameIsRequiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "nameMessage": "Name",
+  "@nameMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "negotiableMessage": "Negotiable",
+  "@negotiableMessage": {
+    "description": "Auto-extracted string"
+  },
+  "networkErrorMessage": "Network error: {e}",
+  "@networkErrorMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "e": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "newExpenseMessage": "New Expense",
+  "@newExpenseMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "newItemsAndDealsInTheMarketplaceMessage": "New items and deals in the marketplace",
+  "@newItemsAndDealsInTheMarketplaceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "newMessagesInYourChatsMessage": "New messages in your chats",
+  "@newMessagesInYourChatsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noActiveMembershipFoundPleasePurchaseABISOMembershipFirstMessage": "No active membership found. Please purchase a BISO membership first.",
+  "@noActiveMembershipFoundPleasePurchaseABISOMembershipFirstMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noActiveUnitsHereYetMessage": "No active units here yet",
+  "@noActiveUnitsHereYetMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noBoardMembersFoundMessage": "No board members found",
+  "@noBoardMembersFoundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noChatsFound": "No chats found",
+  "@noChatsFound": {
+    "description": "Auto-extracted string"
+  },
+  "noConversationsYet": "No conversations yet",
+  "@noConversationsYet": {
+    "description": "Auto-extracted string"
+  },
+  "noDeparturesMessage": "No departures",
+  "@noDeparturesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noEventSelectedMessage": "No event selected",
+  "@noEventSelectedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noEventsFoundMessage": "No Events Found",
+  "@noEventsFoundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noExpensesFoundMessage": "No expenses found",
+  "@noExpensesFoundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noExpensesMatchYourCurrentFilterMessage": "No expenses match your current filter",
+  "@noExpensesMatchYourCurrentFilterMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noExpiryMessage": "No expiry",
+  "@noExpiryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noFavoritesYetMessage": "No favorites yet",
+  "@noFavoritesYetMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noFilesUploadedYetMessage": "No files uploaded yet",
+  "@noFilesUploadedYetMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noItemsFoundMessage": "No items found",
+  "@noItemsFoundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noMembersFoundForDepartmentNameMessage": "No members found for $departmentName",
+  "@noMembersFoundForDepartmentNameMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noMembershipsAvailableMessage": "No memberships available",
+  "@noMembershipsAvailableMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noRecentExpensesMessage": "No recent expenses",
+  "@noRecentExpensesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noSocialLinksYetMessage": "No social links yet",
+  "@noSocialLinksYetMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noStopPlacesConfiguredForThisCampusMessage": "No stop places configured for this campus",
+  "@noStopPlacesConfiguredForThisCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "nokMessage": "NOK {amount}",
+  "@nokMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "nokNorwegianKroneMessage": "NOK (Norwegian Krone)",
+  "@nokNorwegianKroneMessage": {
+    "description": "Auto-extracted string"
+  },
+  "noneMessage": "None",
+  "@noneMessage": {
+    "description": "Auto-extracted string"
+  },
+  "norwegianAccountNumberMessage": "Norwegian Account Number",
+  "@norwegianAccountNumberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "norwegianBankAccountMessage": "Norwegian Bank Account",
+  "@norwegianBankAccountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "norwegianBankAccountMustBe11DigitsMessage": "Norwegian bank account must be 11 digits",
+  "@norwegianBankAccountMustBe11DigitsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "norwegianBusinessSchoolMessage": "Norwegian Business School (BI)",
+  "@norwegianBusinessSchoolMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "notAuthenticatedMessage": "Not authenticated",
+  "@notAuthenticatedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "notFoundMessage": "Not found",
+  "@notFoundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "notNowMessage": "Not Now",
+  "@notNowMessage": {
+    "description": "Auto-extracted string"
+  },
+  "nothingHereYetCheckBackSoonMessage": "Nothing here yet. Check back soon!",
+  "@nothingHereYetCheckBackSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "notificationPreferencesMessage": "Notification Preferences",
+  "@notificationPreferencesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "notificationScheduleMessage": "Notification Schedule",
+  "@notificationScheduleMessage": {
+    "description": "Auto-extracted string"
+  },
+  "notificationsEnabledSuccessfullyMessage": "Notifications enabled successfully!",
+  "@notificationsEnabledSuccessfullyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "notificationsMessage": "Notifications",
+  "@notificationsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "now": "now",
+  "@now": {
+    "description": "Auto-extracted string"
+  },
+  "nowMessage": "Now",
+  "@nowMessage": {
+    "description": "Auto-extracted string"
+  },
+  "officialMerchandiseAndCampusGearMessage": "Official merchandise and campus gear",
+  "@officialMerchandiseAndCampusGearMessage": {
+    "description": "Auto-extracted string"
+  },
+  "offlineDataManagementComingSoonMessage": "Offline data management coming soon",
+  "@offlineDataManagementComingSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "offlineDataMessage": "Offline Data",
+  "@offlineDataMessage": {
+    "description": "Auto-extracted string"
+  },
+  "oneTicketGrantsAccessToAllEventsOnThisCampusMessage": "One ticket grants access to all events on this campus.",
+  "@oneTicketGrantsAccessToAllEventsOnThisCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "openMailApp": "Open mail app",
+  "@openMailApp": {
+    "description": "Auto-extracted string"
+  },
+  "openPositionsMessage": "Open Positions",
+  "@openPositionsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "openTicketPortalMessage": "Open Ticket Portal",
+  "@openTicketPortalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "openValidatorModeMessage": "Open Validator Mode",
+  "@openValidatorModeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "osloCampusMessage": "Oslo Campus",
+  "@osloCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "otherMessage": "Other",
+  "@otherMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "othersCanFindAndMessageYouMessage": "Others can find and message you",
+  "@othersCanFindAndMessageYouMessage": {
+    "description": "Auto-extracted string"
+  },
+  "othersCannotFindYouInSearchMessage": "Others cannot find you in search",
+  "@othersCannotFindYouInSearchMessage": {
+    "description": "Auto-extracted string"
+  },
+  "otpSentTo": "OTP sent to $widget.email",
+  "@otpSentTo": {
+    "description": "Auto-extracted string"
+  },
+  "overallDescriptionAIGeneratedEditableMessage": "Overall description (AI-generated, editable)",
+  "@overallDescriptionAIGeneratedEditableMessage": {
+    "description": "Auto-extracted string"
+  },
+  "overallDescriptionMessage": "Overall description",
+  "@overallDescriptionMessage": {
+    "description": "Auto-extracted string"
+  },
+  "paidMessage": "Paid",
+  "@paidMessage": {
+    "description": "Auto-extracted string"
+  },
+  "paySelectedOptionPriceNokNOKMessage": "Pay {selectedOption} NOK",
+  "@paySelectedOptionPriceNokNOKMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "selectedOption": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "payWithMessage": "Pay with ",
+  "@payWithMessage": {
+    "description": "Auto-extracted string"
+  },
+  "paymentInformationMessage": "Payment Information",
+  "@paymentInformationMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "paymentInformationSavedSuccessfullyMessage": "Payment information saved successfully",
+  "@paymentInformationSavedSuccessfullyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "paymentMethodMessage": "Payment Method",
+  "@paymentMethodMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pendingMessage": "Pending",
+  "@pendingMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "personalInfoMessage": "Personal Info",
+  "@personalInfoMessage": {
+    "description": "Auto-extracted string"
+  },
+  "personalInformationMessage": "Personal Information",
+  "@personalInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "phoneMessage": "Phone",
+  "@phoneMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "phoneNumberOptionalMessage": "Phone Number (Optional)",
+  "@phoneNumberOptionalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "photosMessage": "Photos",
+  "@photosMessage": {
+    "description": "Auto-extracted string"
+  },
+  "playSoundForNewMessagesMessage": "Play sound for new messages",
+  "@playSoundForNewMessagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseAddABitMoreDetailMessage": "Please add a bit more detail",
+  "@pleaseAddABitMoreDetailMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseAddAtLeastOnePhotoMessage": "Please add at least one photo",
+  "@pleaseAddAtLeastOnePhotoMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseCheckYourEmailManuallyMessage": "Please check your email manually.",
+  "@pleaseCheckYourEmailManuallyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseEnableNotificationsInSystemSettingsMessage": "Please enable notifications in system settings",
+  "@pleaseEnableNotificationsInSystemSettingsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "pleaseEnterAValidNorwegianPhoneNumberMessage": "Please enter a valid Norwegian phone number",
+  "@pleaseEnterAValidNorwegianPhoneNumberMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseRegisterYourStudentIDFirstMessage": "Please register your student ID first.",
+  "@pleaseRegisterYourStudentIDFirstMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseReviewAllInformationBeforeSubmittingMessage": "Please review all information before submitting",
+  "@pleaseReviewAllInformationBeforeSubmittingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseSignInToAccessAndOtherPersonalizedFeaturesMessage": "Please sign in to access $feature and other personalized features.",
+  "@pleaseSignInToAccessAndOtherPersonalizedFeaturesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseSignInToContactSellerMessage": "Please sign in to contact seller",
+  "@pleaseSignInToContactSellerMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseSignInToSaveFavoritesMessage": "Please sign in to save favorites",
+  "@pleaseSignInToSaveFavoritesMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "pleaseSignInToSellItemsMessage": "Please sign in to sell items",
+  "@pleaseSignInToSellItemsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pleaseWaitWhileWeVerifyYourMagicLinkMessage": "Please wait while we verify your magic link...",
+  "@pleaseWaitWhileWeVerifyYourMagicLinkMessage": {
+    "description": "Auto-extracted string"
+  },
+  "plus47xxxxxxxMessage": "+47 xxx xx xxx",
+  "@plus47xxxxxxxMessage": {
+    "description": "Auto-extracted string"
+  },
+  "poorMessage": "Poor",
+  "@poorMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "popularMessage": "POPULAR",
+  "@popularMessage": {
+    "description": "Auto-extracted string"
+  },
+  "preferredContactOptionalMessage": "Preferred contact (optional)",
+  "@preferredContactOptionalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "prefersMessage": "Prefers: {contactMethodLabel}",
+  "@prefersMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "contactMethodLabel": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "premiumFeaturesMessage": "Premium Features",
+  "@premiumFeaturesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "prepaymentMessage": "Prepayment",
+  "@prepaymentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "prepaymentRequestMessage": "Prepayment Request",
+  "@prepaymentRequestMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "priceIsNegotiableMessage": "Price is negotiable",
+  "@priceIsNegotiableMessage": {
+    "description": "Auto-extracted string"
+  },
+  "priceNOKMessage": "Price (NOK)",
+  "@priceNOKMessage": {
+    "description": "Auto-extracted string"
+  },
+  "priorityEventAccessMessage": "Priority Event Access",
+  "@priorityEventAccessMessage": {
+    "description": "Auto-extracted string"
+  },
+  "privacyInformationMessage": "Privacy Information",
+  "@privacyInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "privacyMessage": "Privacy",
+  "@privacyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "privacyPolicyMessage": "Privacy Policy",
+  "@privacyPolicyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "privateProfileMessage": "Private Profile",
+  "@privateProfileMessage": {
+    "description": "Auto-extracted string"
+  },
+  "productDetailsMessage": "Product Details",
+  "@productDetailsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "productInformationNotAvailableMessage": "Product information not available",
+  "@productInformationNotAvailableMessage": {
+    "description": "Auto-extracted string"
+  },
+  "productMessage": "🛍️ $productName: {message}",
+  "@productMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "message": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "productNotFoundMessage": "Product not found",
+  "@productNotFoundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "productsMessage": "Products",
+  "@productsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Auto-extracted string"
+  },
+  "profileInformationMessage": "Profile Information",
+  "@profileInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "profileMessage": "Profile",
+  "@profileMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "profileSetToPrivate": "Profile set to private - others cannot find you in search",
+  "@profileSetToPrivate": {
+    "description": "Auto-extracted string"
+  },
+  "profileSetToPublic": "Profile set to public - others can find and message you",
+  "@profileSetToPublic": {
+    "description": "Auto-extracted string"
+  },
+  "profileUpdatedSuccessfullyMessage": "Profile updated successfully",
+  "@profileUpdatedSuccessfullyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "publicProfileCreatedOthersCanFindYouInSearchMessage": "Public profile created - others can find you in search",
+  "@publicProfileCreatedOthersCanFindYouInSearchMessage": {
+    "description": "Auto-extracted string"
+  },
+  "publicProfileMessage": "Public Profile",
+  "@publicProfileMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "publishMessage": "Publish",
+  "@publishMessage": {
+    "description": "Auto-extracted string"
+  },
+  "purchaseFailedMessage": "Purchase failed: {e}",
+  "@purchaseFailedMessage": {
+    "description": "Auto-extracted string (used in 2 files)",
+    "placeholders": {
+      "e": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "purchaseMembershipMessage": "Purchase Membership",
+  "@purchaseMembershipMessage": {
+    "description": "Auto-extracted string"
+  },
+  "pushNotificationsMessage": "Push Notifications",
+  "@pushNotificationsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "qrDataCopiedToClipboardMessage": "QR data copied to clipboard: {qrData}...",
+  "@qrDataCopiedToClipboardMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "qrData": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "qrErrorMessage": "QR Error",
+  "@qrErrorMessage": {
+    "description": "Auto-extracted string"
+  },
+  "queryMessage": "• \"{response}\"",
+  "@queryMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "response": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "quickLinksMessage": "Quick Links",
+  "@quickLinksMessage": {
+    "description": "Auto-extracted string"
+  },
+  "quietHoursFeatureComingSoonMessage": "Quiet hours feature coming soon",
+  "@quietHoursFeatureComingSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "quietHoursMessage": "Quiet Hours",
+  "@quietHoursMessage": {
+    "description": "Auto-extracted string"
+  },
+  "reRunAIMessage": "Re-run AI",
+  "@reRunAIMessage": {
+    "description": "Auto-extracted string"
+  },
+  "readReceiptsMessage": "Read Receipts",
+  "@readReceiptsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "readyToHelpMessage": "Ready to help",
+  "@readyToHelpMessage": {
+    "description": "Auto-extracted string"
+  },
+  "realtimeBusMetroMessage": "Realtime bus & metro",
+  "@realtimeBusMetroMessage": {
+    "description": "Auto-extracted string"
+  },
+  "receiptsAreRequiredForReimbursementMessage": "Receipts are required for reimbursement",
+  "@receiptsAreRequiredForReimbursementMessage": {
+    "description": "Auto-extracted string"
+  },
+  "receiptsDocumentsMessage": "Receipts & Documents",
+  "@receiptsDocumentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "receiptsMessage": "Receipts",
+  "@receiptsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "receiveNotificationsForNewMessagesMessage": "Receive notifications for new messages",
+  "@receiveNotificationsForNewMessagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "recentExpensesMessage": "Recent Expenses",
+  "@recentExpensesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "refreshMessage": "Refresh",
+  "@refreshMessage": {
+    "description": "Auto-extracted string"
+  },
+  "refreshStatusMessage": "Refresh Status",
+  "@refreshStatusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "regionalSettingsMessage": "Regional Settings",
+  "@regionalSettingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "registrationRequiredMessage": "Registration Required",
+  "@registrationRequiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "rejectedMessage": "Rejected",
+  "@rejectedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "relatedEventMessage": "Related Event",
+  "@relatedEventMessage": {
+    "description": "Auto-extracted string"
+  },
+  "relatesToAnEventMessage": "Relates to an event",
+  "@relatesToAnEventMessage": {
+    "description": "Auto-extracted string"
+  },
+  "remainingSecondsMessage": "{remainingSeconds}s",
+  "@remainingSecondsMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "remainingSeconds": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "removeMessage": "Remove",
+  "@removeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "removeStudentIDMessage": "Remove Student ID",
+  "@removeStudentIDMessage": {
+    "description": "Auto-extracted string"
+  },
+  "removedFromFavoritesMessage": "Removed from favorites",
+  "@removedFromFavoritesMessage": {
+    "description": "Auto-extracted string (used in 4 files)"
+  },
+  "renewMembershipMessage": "Renew Membership",
+  "@renewMembershipMessage": {
+    "description": "Auto-extracted string"
+  },
+  "requestPrepaymentMessage": "Request Prepayment",
+  "@requestPrepaymentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "requiredMessage": "Required",
+  "@requiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "requiredSkillsMessage": "Required Skills",
+  "@requiredSkillsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "requiresSWIFTCodeForInternationalTransfersMessage": "Requires SWIFT code for international transfers",
+  "@requiresSWIFTCodeForInternationalTransfersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "resendCode": "Resend code",
+  "@resendCode": {
+    "description": "Auto-extracted string"
+  },
+  "resendCodeInMessage": "Resend code in {resendCountdown}s",
+  "@resendCodeInMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "resendCountdown": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Auto-extracted string"
+  },
+  "retryMessage": "Retry",
+  "@retryMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "reviewAndSubmitMessage": "Review & Submit",
+  "@reviewAndSubmitMessage": {
+    "description": "Auto-extracted string"
+  },
+  "reviewYourExpenseMessage": "Review your expense",
+  "@reviewYourExpenseMessage": {
+    "description": "Auto-extracted string"
+  },
+  "saleMessage": "SALE",
+  "@saleMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "saveAsDraftMessage": "Save as Draft",
+  "@saveAsDraftMessage": {
+    "description": "Auto-extracted string"
+  },
+  "saveMessage": "Save",
+  "@saveMessage": {
+    "description": "Auto-extracted string"
+  },
+  "savePaymentInformationMessage": "Save Payment Information",
+  "@savePaymentInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "scanStudentQRCodesToVerifyMembershipMessage": "Scan student QR codes to verify membership",
+  "@scanStudentQRCodesToVerifyMembershipMessage": {
+    "description": "Auto-extracted string"
+  },
+  "scheduleMessage": "Schedule",
+  "@scheduleMessage": {
+    "description": "Auto-extracted string"
+  },
+  "scheduledTimeMessage": "Scheduled {formatTime}",
+  "@scheduledTimeMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "formatTime": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "searchChats": "Search Chats",
+  "@searchChats": {
+    "description": "Auto-extracted string"
+  },
+  "searchDisabledInFavoritesMessage": "Search disabled in favorites",
+  "@searchDisabledInFavoritesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "searchEventsMessage": "Search events",
+  "@searchEventsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "searchMarketplaceMessage": "Search marketplace",
+  "@searchMarketplaceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "searchMessage": "Search",
+  "@searchMessage": {
+    "description": "Auto-extracted string"
+  },
+  "searchMessages": "Search Messages",
+  "@searchMessages": {
+    "description": "Auto-extracted string"
+  },
+  "searchMessagesAndChatNames": "Search messages and chat names...",
+  "@searchMessagesAndChatNames": {
+    "description": "Auto-extracted string"
+  },
+  "searchMustBeAtLeast2CharactersMessage": "Search must be at least 2 characters",
+  "@searchMustBeAtLeast2CharactersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "searchWebshopMessage": "Search webshop",
+  "@searchWebshopMessage": {
+    "description": "Auto-extracted string"
+  },
+  "securePaymentPoweredByVippsMobilePayMessage": "Secure payment powered by Vipps MobilePay",
+  "@securePaymentPoweredByVippsMobilePayMessage": {
+    "description": "Auto-extracted string"
+  },
+  "secureStorageMessage": "Secure Storage",
+  "@secureStorageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "secureVerificationMessage": "Secure Verification",
+  "@secureVerificationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "selectCampusAndDepartmentToSaveDraftMessage": "Select campus and department to save draft",
+  "@selectCampusAndDepartmentToSaveDraftMessage": {
+    "description": "Auto-extracted string"
+  },
+  "selectCampusMessage": "Select Campus",
+  "@selectCampusMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "selectImageSourceMessage": "Select Image Source",
+  "@selectImageSourceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "selectInterestsMessage": "Select Interests",
+  "@selectInterestsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "selectMessage": "Select",
+  "@selectMessage": {
+    "description": "Auto-extracted string"
+  },
+  "selectYourHomeCampusMessage": "Select your home campus",
+  "@selectYourHomeCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "selectedPlanMessage": "Selected Plan",
+  "@selectedPlanMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sellItemMessage": "Sell Item",
+  "@sellItemMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "sellerInformationMessage": "Seller Information",
+  "@sellerInformationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sendMagicLinkMessage": "Send Magic Link",
+  "@sendMagicLinkMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sendMessage": "Send",
+  "@sendMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sendMessageToSellerMessage": "Send a message to {product}:",
+  "@sendMessageToSellerMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "product": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "sessionClearedMessage": "Session cleared - OTP flow should work now",
+  "@sessionClearedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "settingsMessage": "Settings",
+  "@settingsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sharePointSearchMessage": "SharePoint Search",
+  "@sharePointSearchMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "sharedProduct": "🛍️ Shared $productName",
+  "@sharedProduct": {
+    "description": "Auto-extracted string"
+  },
+  "shopOnBISOnoMessage": "Shop on BISO.no",
+  "@shopOnBISOnoMessage": {
+    "description": "Auto-extracted string"
+  },
+  "showAllProductsMessage": "Show all products",
+  "@showAllProductsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "showFavoritesOnlyMessage": "Show favorites only",
+  "@showFavoritesOnlyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "showLessMessage": "Show Less",
+  "@showLessMessage": {
+    "description": "Auto-extracted string"
+  },
+  "showMoreMessage": "Show {widget} More",
+  "@showMoreMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "widget": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "showThisToValidatorsMessage": "Show this to validators",
+  "@showThisToValidatorsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "showYourLastSeenStatusMessage": "Show your last seen status",
+  "@showYourLastSeenStatusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "signInFailedMessage": "Sign In Failed",
+  "@signInFailedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "signInMessage": "Sign In",
+  "@signInMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "signInRequiredMessage": "Sign In Required",
+  "@signInRequiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "signInToViewYourProfileMessage": "Sign in to view your profile",
+  "@signInToViewYourProfileMessage": {
+    "description": "Auto-extracted string"
+  },
+  "signInWithBIAccountMessage": "Sign In with BI Account",
+  "@signInWithBIAccountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "signOutMessage": "Sign Out",
+  "@signOutMessage": {
+    "description": "Auto-extracted string"
+  },
+  "signingYouInMessage": "Signing You In...",
+  "@signingYouInMessage": {
+    "description": "Auto-extracted string"
+  },
+  "siteListingMessage": "Site Listing",
+  "@siteListingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sitesMessage": "Sites",
+  "@sitesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "somethingWentWrongMessage": "Something went wrong",
+  "@somethingWentWrongMessage": {
+    "description": "Auto-extracted string"
+  },
+  "somethingWentWrongWhileSigningYouInMessage": "Something went wrong while signing you in. Please try again.",
+  "@somethingWentWrongWhileSigningYouInMessage": {
+    "description": "Auto-extracted string"
+  },
+  "soundMessage": "Sound",
+  "@soundMessage": {
+    "description": "Auto-extracted string"
+  },
+  "specialEventMessage": "Special Event",
+  "@specialEventMessage": {
+    "description": "Auto-extracted string"
+  },
+  "sportsMessage": "Sports",
+  "@sportsMessage": {
+    "description": "Auto-extracted string (used in 3 files)"
+  },
+  "standardNorwegianBankAccountWithMOD11ValidationMessage": "Standard Norwegian bank account with MOD11 validation",
+  "@standardNorwegianBankAccountWithMOD11ValidationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "startChat": "Start Chat",
+  "@startChat": {
+    "description": "Auto-extracted string"
+  },
+  "startConversationWithYourTeam": "Start a conversation with your team",
+  "@startConversationWithYourTeam": {
+    "description": "Auto-extracted string"
+  },
+  "statusHistoryMessage": "Status History",
+  "@statusHistoryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "stopPlaceMessage": "Stop Place",
+  "@stopPlaceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "studentIDNotFoundPleaseVerifyYourStudentStatusFirstMessage": "Student ID not found. Please verify your student status first.",
+  "@studentIDNotFoundPleaseVerifyYourStudentStatusFirstMessage": {
+    "description": "Auto-extracted string"
+  },
+  "studentIdMessage": "Student ID",
+  "@studentIdMessage": {
+    "description": "Auto-extracted string"
+  },
+  "studentOrganizationsMessage": "Student organizations",
+  "@studentOrganizationsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "studentSupportMessage": "Student Support",
+  "@studentSupportMessage": {
+    "description": "Auto-extracted string"
+  },
+  "studentVerificationMessage": "Student Verification",
+  "@studentVerificationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "studentsMessage": "Students",
+  "@studentsMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "submitAndTrackYourExpenseClaimsMessage": "Submit and track your expense claims",
+  "@submitAndTrackYourExpenseClaimsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "submitForApprovalMessage": "Submit for Approval",
+  "@submitForApprovalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "submitMessage": "Submit",
+  "@submitMessage": {
+    "description": "Auto-extracted string"
+  },
+  "submittedMessage": "Submitted",
+  "@submittedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "successMessage": "Success",
+  "@successMessage": {
+    "description": "Auto-extracted string"
+  },
+  "swiftBICCodeMessage": "SWIFT/BIC Code",
+  "@swiftBICCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "swiftCodeCanOnlyContainLettersAndNumbersMessage": "SWIFT code can only contain letters and numbers",
+  "@swiftCodeCanOnlyContainLettersAndNumbersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "swiftCodeIsRequiredForInternationalAccountsMessage": "SWIFT code is required for international accounts",
+  "@swiftCodeIsRequiredForInternationalAccountsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "swiftCodeMessage": "SWIFT Code",
+  "@swiftCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "swiftCodeMustBe8Or11CharactersMessage": "SWIFT code must be 8 or 11 characters",
+  "@swiftCodeMustBe8Or11CharactersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "takePhotoMessage": "Take Photo",
+  "@takePhotoMessage": {
+    "description": "Auto-extracted string"
+  },
+  "tapToGenerateMessage": "Tap to Generate",
+  "@tapToGenerateMessage": {
+    "description": "Auto-extracted string"
+  },
+  "teamChatMembers": "Team chat • {chat} members",
+  "@teamChatMembers": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "chat": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "teams": "Teams",
+  "@teams": {
+    "description": "Auto-extracted string"
+  },
+  "termsOfServiceMessage": "Terms of Service",
+  "@termsOfServiceMessage": {
+    "description": "Auto-extracted string"
+  },
+  "thereAreCurrentlyNoActiveMembershipPlansForYourCampusThisMayBeBecauseMembershipSalesAreTemporarilyDisabledOrUndergoingMaintenancePleaseCheckBackLaterMessage": "There are currently no active membership plans for your campus. This may be because membership sales are temporarily disabled or undergoing maintenance. Please check back later.",
+  "@thereAreCurrentlyNoActiveMembershipPlansForYourCampusThisMayBeBecauseMembershipSalesAreTemporarilyDisabledOrUndergoingMaintenancePleaseCheckBackLaterMessage": {
+    "description": "Auto-extracted string"
+  },
+  "thereAreNoEventsMatchingYourCriteriaMessage": "There are no events matching your criteria.",
+  "@thereAreNoEventsMatchingYourCriteriaMessage": {
+    "description": "Auto-extracted string"
+  },
+  "thinkingMessage": "Thinking...",
+  "@thinkingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "thisMagicLinkHasExpiredOrIsInvalidMessage": "This magic link has expired or is invalid. Please request a new one.",
+  "@thisMagicLinkHasExpiredOrIsInvalidMessage": {
+    "description": "Auto-extracted string"
+  },
+  "thisMessageWasDeleted": "This message was deleted",
+  "@thisMessageWasDeleted": {
+    "description": "Auto-extracted string"
+  },
+  "thisWillClearAllCachedImagesAndDataTheAppMayTakeLongerToLoadContentAfterClearingCacheMessage": "This will clear all cached images and data. The app may take longer to load content after clearing cache.",
+  "@thisWillClearAllCachedImagesAndDataTheAppMayTakeLongerToLoadContentAfterClearingCacheMessage": {
+    "description": "Auto-extracted string"
+  },
+  "ticketsMessage": "Tickets",
+  "@ticketsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "tikTokMessage": "TikTok",
+  "@tikTokMessage": {
+    "description": "Auto-extracted string"
+  },
+  "titleIsRequiredMessage": "Title is required",
+  "@titleIsRequiredMessage": {
+    "description": "Auto-extracted string"
+  },
+  "titleMessage": "Title",
+  "@titleMessage": {
+    "description": "Auto-extracted string"
+  },
+  "tokenExpiresInMessage": "Token expires in",
+  "@tokenExpiresInMessage": {
+    "description": "Auto-extracted string"
+  },
+  "totalAmountMessage": "Total Amount",
+  "@totalAmountMessage": {
+    "description": "Auto-extracted string"
+  },
+  "totalMessage": "Total",
+  "@totalMessage": {
+    "description": "Auto-extracted string"
+  },
+  "tryAgainMessage": "Try again",
+  "@tryAgainMessage": {
+    "description": "Auto-extracted string"
+  },
+  "tryChangingYourFilterOrCheckBackLaterMessage": "Try changing your filter or check back later",
+  "@tryChangingYourFilterOrCheckBackLaterMessage": {
+    "description": "Auto-extracted string"
+  },
+  "tryDifferentSearchTerm": "Try a different search term",
+  "@tryDifferentSearchTerm": {
+    "description": "Auto-extracted string"
+  },
+  "typeAtLeast2CharactersMessage": "Type at least 2 characters",
+  "@typeAtLeast2CharactersMessage": {
+    "description": "Auto-extracted string"
+  },
+  "typeYourMessageMessage": "Type your message...",
+  "@typeYourMessageMessage": {
+    "description": "Auto-extracted string"
+  },
+  "typingIndicatorsMessage": "Typing Indicators",
+  "@typingIndicatorsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unableToVerifyMembershipStatusPleaseTryAgainMessage": "Unable to verify membership status. Please try again.",
+  "@unableToVerifyMembershipStatusPleaseTryAgainMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unitsDepartmentsMessage": "Units & Departments",
+  "@unitsDepartmentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unitsMessage": "Units",
+  "@unitsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unknownMessage": "Unknown",
+  "@unknownMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unknownUserMessage": "Unknown User",
+  "@unknownUserMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unlockAfterVerificationMessage": "Unlock After Verification",
+  "@unlockAfterVerificationMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unlockTheseBenefitsMessage": "Unlock These Benefits",
+  "@unlockTheseBenefitsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "unmute": "Unmute",
+  "@unmute": {
+    "description": "Auto-extracted string"
+  },
+  "upcomingMessage": "Upcoming",
+  "@upcomingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "uploadDocumentPDFMessage": "Upload Document (PDF)",
+  "@uploadDocumentPDFMessage": {
+    "description": "Auto-extracted string"
+  },
+  "uploadPhotosOrScansOfYourReceiptsMessage": "Upload photos or scans of your receipts",
+  "@uploadPhotosOrScansOfYourReceiptsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "uploadReceiptsAndDocumentsMessage": "Upload receipts and documents",
+  "@uploadReceiptsAndDocumentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "urgentMessage": "URGENT",
+  "@urgentMessage": {
+    "description": "Auto-extracted string"
+  },
+  "useAIToExtractDetailsMessage": "Use AI to extract details",
+  "@useAIToExtractDetailsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "useDarkThemeThroughoutTheAppMessage": "Use dark theme throughout the app",
+  "@useDarkThemeThroughoutTheAppMessage": {
+    "description": "Auto-extracted string"
+  },
+  "useMagicLinkInsteadMessage": "Use magic link instead",
+  "@useMagicLinkInsteadMessage": {
+    "description": "Auto-extracted string"
+  },
+  "useTheCampusSwitcherOnTheHomeScreenToChangeCampusMessage": "Use the campus switcher on the home screen to change campus",
+  "@useTheCampusSwitcherOnTheHomeScreenToChangeCampusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "useVerificationCodeInsteadMessage": "Use verification code instead",
+  "@useVerificationCodeInsteadMessage": {
+    "description": "Auto-extracted string"
+  },
+  "useYourbiNoEmailForSecureInstantVerificationThisEnsuresYourStudentIDBelongsToYouMessage": "Use your @bi.no email for secure, instant verification. This ensures your student ID belongs to you.",
+  "@useYourbiNoEmailForSecureInstantVerificationThisEnsuresYourStudentIDBelongsToYouMessage": {
+    "description": "Auto-extracted string"
+  },
+  "usingToolMessage": "Using {runningTools}...",
+  "@usingToolMessage": {
+    "description": "Auto-extracted string",
+    "placeholders": {
+      "runningTools": {
+        "type": "String",
+        "example": "example_value"
+      }
+    }
+  },
+  "validUntilMessage": "Valid Until",
+  "@validUntilMessage": {
+    "description": "Auto-extracted string"
+  },
+  "validatorModeMessage": "Validator Mode",
+  "@validatorModeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verificationCodeCopiedMessage": "Verification code copied",
+  "@verificationCodeCopiedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verificationCodeMessage": "Verification Code",
+  "@verificationCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verificationCodeSentSuccessfullyMessage": "Verification code sent successfully",
+  "@verificationCodeSentSuccessfullyMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verificationQRCodeMessage": "Verification QR Code",
+  "@verificationQRCodeMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verifiedMessage": "Verified",
+  "@verifiedMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verifyOtp": "Verify OTP",
+  "@verifyOtp": {
+    "description": "Auto-extracted string"
+  },
+  "verifyYourBIcampusNameStudentStatusAndUnlockExclusiveFeaturesMembershipBenefitsAndCampusWideAccessMessage": "Verify your BI $campusName student status and unlock exclusive features, membership benefits, and campus-wide access.",
+  "@verifyYourBIcampusNameStudentStatusAndUnlockExclusiveFeaturesMembershipBenefitsAndCampusWideAccessMessage": {
+    "description": "Auto-extracted string"
+  },
+  "verifyYourStudentStatusMessage": "Verify Your Student Status",
+  "@verifyYourStudentStatusMessage": {
+    "description": "Auto-extracted string"
+  },
+  "vibrateForNewMessagesMessage": "Vibrate for new messages",
+  "@vibrateForNewMessagesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "vibrateForNotificationsMessage": "Vibrate for notifications",
+  "@vibrateForNotificationsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "vibrationMessage": "Vibration",
+  "@vibrationMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "vibrationSettingsComingSoonMessage": "Vibration settings coming soon",
+  "@vibrationSettingsComingSoonMessage": {
+    "description": "Auto-extracted string"
+  },
+  "viewDetailsMessage": "View Details",
+  "@viewDetailsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "viewHistoryMessage": "View History",
+  "@viewHistoryMessage": {
+    "description": "Auto-extracted string"
+  },
+  "viewImportantDatesMessage": "View important dates",
+  "@viewImportantDatesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "viewOnBisoNoMessage": "View on Biso.no",
+  "@viewOnBisoNoMessage": {
+    "description": "Auto-extracted string"
+  },
+  "vippsMessage": "Vipps",
+  "@vippsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "vippsMobilePayMessage": "Vipps/MobilePay",
+  "@vippsMobilePayMessage": {
+    "description": "Auto-extracted string"
+  },
+  "visitOurWebsiteMessage": "Visit our website",
+  "@visitOurWebsiteMessage": {
+    "description": "Auto-extracted string"
+  },
+  "volunteerAndJobOpportunitiesMessage": "Volunteer and job opportunities",
+  "@volunteerAndJobOpportunitiesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "volunteerMessage": "Volunteer",
+  "@volunteerMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "volunteerOpportunitiesMessage": "Volunteer opportunities",
+  "@volunteerOpportunitiesMessage": {
+    "description": "Auto-extracted string"
+  },
+  "volunteerOpportunitiesWithBISOMessage": "Volunteer opportunities with BISO",
+  "@volunteerOpportunitiesWithBISOMessage": {
+    "description": "Auto-extracted string"
+  },
+  "weatherMessage": "Weather",
+  "@weatherMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "webshopMessage": "Webshop",
+  "@webshopMessage": {
+    "description": "Auto-extracted string"
+  },
+  "websiteMessage": "Website",
+  "@websiteMessage": {
+    "description": "Auto-extracted string"
+  },
+  "welcomeBackMessage": "Welcome Back!",
+  "@welcomeBackMessage": {
+    "description": "Auto-extracted string"
+  },
+  "welcomeToBISOMessage": "Welcome to BISO",
+  "@welcomeToBISOMessage": {
+    "description": "Auto-extracted string"
+  },
+  "welcomeToBiso": "Welcome to BISO",
+  "@welcomeToBiso": {
+    "description": "Auto-extracted string"
+  },
+  "welcomeToMessage": "Welcome to",
+  "@welcomeToMessage": {
+    "description": "Auto-extracted string"
+  },
+  "whatWasThisExpenseForYouCanEditMessage": "What was this expense for? (you can edit)",
+  "@whatWasThisExpenseForYouCanEditMessage": {
+    "description": "Auto-extracted string"
+  },
+  "whatYouGetMessage": "What you get",
+  "@whatYouGetMessage": {
+    "description": "Auto-extracted string"
+  },
+  "xMessage": "X",
+  "@xMessage": {
+    "description": "Auto-extracted string"
+  },
+  "youCanChangeThisSettingAnytimeInYourProfileMessage": "You can change this setting anytime in your profile.",
+  "@youCanChangeThisSettingAnytimeInYourProfileMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "youCannotMessageYourselfMessage": "You cannot message yourself",
+  "@youCannotMessageYourselfMessage": {
+    "description": "Auto-extracted string"
+  },
+  "youMayAlreadyBeSignedInMessage": "You may already be signed in. Try clearing your session and signing in again.",
+  "@youMayAlreadyBeSignedInMessage": {
+    "description": "Auto-extracted string"
+  },
+  "yourItemIsNowLiveMessage": "Your item is now live!",
+  "@yourItemIsNowLiveMessage": {
+    "description": "Auto-extracted string"
+  },
+  "yourMemberBenefitsMessage": "Your Member Benefits",
+  "@yourMemberBenefitsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "yourPaymentInformationIsEncryptedAndStoredSecurelyOnlyBISOAdministratorsCanAccessThisInformationForReimbursementProcessingMessage": "Your payment information is encrypted and stored securely. Only BISO administrators can access this information for reimbursement processing.",
+  "@yourPaymentInformationIsEncryptedAndStoredSecurelyOnlyBISOAdministratorsCanAccessThisInformationForReimbursementProcessingMessage": {
+    "description": "Auto-extracted string"
+  },
+  "zipCodeMessage": "Zip Code",
+  "@zipCodeMessage": {
+    "description": "Auto-extracted string (used in 2 files)"
+  },
+  "connectingStudentsMessage": "Connecting students across Norway's leading business school",
+  "@connectingStudentsMessage": {
+    "description": "Auto-extracted string"
+  },
+  "volunteerOpportunitiesWithBISO": "Volunteer opportunities with BISO",
+  "@volunteerOpportunitiesWithBISO": {
+    "description": "Auto-extracted string"
+  },
+  "viewAllMessage": "View all",
+  "@viewAllMessage": {
+    "description": "Auto-extracted string"
+  },
+  "bisoWebsiteMessage": "BISO.no",
+  "@bisoWebsiteMessage": {
+    "description": "Auto-extracted string"
+  }
+}

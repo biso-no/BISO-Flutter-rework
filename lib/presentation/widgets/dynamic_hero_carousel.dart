@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../generated/l10n/app_localizations.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../data/models/large_event_model.dart';
@@ -290,6 +291,7 @@ class _DynamicHeroCarouselState extends ConsumerState<DynamicHeroCarousel>
   }
 
   Widget _buildDefaultHero(double statusBarHeight, {bool showCampusButton = true}) {
+    final l10n = AppLocalizations.of(context)!;
     // Default campus hero when no showcase items
     return Container(
       decoration: BoxDecoration(
@@ -360,7 +362,7 @@ class _DynamicHeroCarouselState extends ConsumerState<DynamicHeroCarousel>
                         const SizedBox(height: 12),
 
                         Text(
-                          'Connecting students across Norway\'s leading business school',
+                          l10n.connectingStudentsMessage,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: Colors.white.withValues(alpha: 0.9),
                             height: 1.4,
@@ -393,7 +395,7 @@ class _DynamicHeroCarouselState extends ConsumerState<DynamicHeroCarousel>
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      'Explore Campus',
+                                      l10n.exploreCampusMessage,
                                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w600,
@@ -581,7 +583,7 @@ class ShowcaseHeroCard extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        _getShowcaseTypeLabel(),
+                        _getShowcaseTypeLabel(context),
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: Colors.white.withValues(alpha: 0.9),
                           fontWeight: FontWeight.w500,
@@ -648,18 +650,19 @@ class ShowcaseHeroCard extends StatelessWidget {
     );
   }
 
-  String _getShowcaseTypeLabel() {
+  String _getShowcaseTypeLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (item.showcaseType) {
       case ShowcaseType.webshopProduct:
-        return 'Featured Product';
+        return l10n.featuredProductMessage;
       case ShowcaseType.externalEvent:
-        return 'Special Event';
+        return l10n.specialEventMessage;
       case ShowcaseType.jobOpportunity:
-        return 'Featured Opportunity';
+        return l10n.featuredOpportunityMessage;
       case ShowcaseType.announcement:
-        return 'Important Announcement';
+        return l10n.importantAnnouncementMessage;
       case ShowcaseType.largeEvent:
-        return 'Featured Event';
+        return l10n.featuredEventMessage;
     }
   }
 

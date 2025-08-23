@@ -136,13 +136,13 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final campusId = ref.watch(filterCampusProvider).id;
     _ensureInitialLoad(campusId);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.events),
+        title: Text(l10n.eventsMessage),
         leading: NavigationUtils.buildBackButton(context),
         actions: [
           IconButton(

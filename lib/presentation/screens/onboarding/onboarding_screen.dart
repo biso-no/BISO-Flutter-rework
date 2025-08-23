@@ -240,7 +240,7 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Padding(
@@ -251,7 +251,7 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              l10n.personalInfo,
+              l10n.personalInfoMessage,
               style: theme.textTheme.headlineMedium?.copyWith(
                 color: AppColors.strongBlue,
                 fontWeight: FontWeight.bold,
@@ -270,7 +270,7 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
             TextFormField(
               controller: widget.nameController,
               decoration: InputDecoration(
-                labelText: l10n.name,
+                labelText: l10n.nameMessage,
                 prefixIcon: const Icon(Icons.person_outlined),
               ),
               validator: (value) {
@@ -287,7 +287,7 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
             TextFormField(
               controller: widget.phoneController,
               decoration: InputDecoration(
-                labelText: l10n.phone,
+                labelText: l10n.phoneMessage,
                 prefixIcon: const Icon(Icons.phone_outlined),
                 hintText: '+47 123 45 678',
               ),
@@ -300,7 +300,7 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
             TextFormField(
               controller: widget.addressController,
               decoration: InputDecoration(
-                labelText: l10n.address,
+                labelText: l10n.addressMessage,
                 prefixIcon: const Icon(Icons.home_outlined),
               ),
               textInputAction: TextInputAction.next,
@@ -314,7 +314,7 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
                   child: TextFormField(
                     controller: widget.cityController,
                     decoration: InputDecoration(
-                      labelText: l10n.city,
+                      labelText: l10n.cityMessage,
                       prefixIcon: const Icon(Icons.location_city_outlined),
                     ),
                     textInputAction: TextInputAction.next,
@@ -325,7 +325,7 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
                   child: TextFormField(
                     controller: widget.zipController,
                     decoration: InputDecoration(
-                      labelText: l10n.zipCode,
+                      labelText: l10n.zipCodeMessage,
                       prefixIcon: const Icon(Icons.local_post_office_outlined),
                     ),
                     keyboardType: TextInputType.number,
@@ -343,7 +343,7 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
                   widget.onNext();
                 }
               },
-              child: Text(l10n.continueButton),
+              child: Text(l10n.continueButtonMessage),
             ),
           ],
         ),
@@ -367,7 +367,7 @@ class _CampusSelectionStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Padding(
@@ -376,7 +376,7 @@ class _CampusSelectionStep extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            l10n.selectCampus,
+            l10n.selectCampusMessage,
             style: theme.textTheme.headlineMedium?.copyWith(
               color: AppColors.strongBlue,
               fontWeight: FontWeight.bold,
@@ -464,7 +464,7 @@ class _CampusSelectionStep extends StatelessWidget {
 
           ElevatedButton(
             onPressed: selectedCampusId != null ? onNext : null,
-            child: Text(l10n.continueButton),
+            child: Text(l10n.continueButtonMessage),
           ),
         ],
       ),
@@ -487,7 +487,7 @@ class _DepartmentSelectionStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Padding(
@@ -541,7 +541,7 @@ class _DepartmentSelectionStep extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          ElevatedButton(onPressed: onNext, child: Text(l10n.continueButton)),
+          ElevatedButton(onPressed: onNext, child: Text(l10n.continueButtonMessage)),
         ],
       ),
     );
@@ -573,7 +573,7 @@ class _NotificationPreferencesStepState
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Padding(
@@ -582,7 +582,7 @@ class _NotificationPreferencesStepState
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            l10n.notifications,
+            l10n.notificationsMessage,
             style: theme.textTheme.headlineMedium?.copyWith(
               color: AppColors.strongBlue,
               fontWeight: FontWeight.bold,
@@ -602,7 +602,7 @@ class _NotificationPreferencesStepState
             child: Column(
               children: [
                 SwitchListTile(
-                  title: Text(l10n.events),
+                  title: Text(l10n.eventsMessage),
                   subtitle: const Text('Get notified about new campus events'),
                   value: _preferences['events']!,
                   onChanged: (value) =>
@@ -610,7 +610,7 @@ class _NotificationPreferencesStepState
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
-                  title: Text(l10n.marketplace),
+                  title: Text(l10n.marketplaceMessage),
                   subtitle: const Text('New items in the marketplace'),
                   value: _preferences['products']!,
                   onChanged: (value) =>
@@ -618,7 +618,7 @@ class _NotificationPreferencesStepState
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
-                  title: Text(l10n.jobs),
+                  title: Text(l10n.jobsMessage),
                   subtitle: const Text('Volunteer and job opportunities'),
                   value: _preferences['jobs']!,
                   onChanged: (value) =>
@@ -626,7 +626,7 @@ class _NotificationPreferencesStepState
                 ),
                 const Divider(height: 1),
                 SwitchListTile(
-                  title: Text(l10n.expenses),
+                  title: Text(l10n.expensesMessage),
                   subtitle: const Text('Expense reimbursement updates'),
                   value: _preferences['expenses']!,
                   onChanged: (value) =>
