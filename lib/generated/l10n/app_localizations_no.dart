@@ -457,4 +457,179 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String failedToLoadMembershipOptions(String error) => 'Kunne ikke laste medlemskapsalternativer: $error';
+
+  // Tabs and sections
+  @override
+  String get general => 'Generelt';
+  @override
+  String get privacy => 'Personvern';
+  @override
+  String get appLanguage => 'Appspråk';
+  @override
+  String get account => 'Konto';
+  @override
+  String get dataAndStorage => 'Data og lagring';
+  @override
+  String get about => 'Om';
+
+  // Settings/general
+  @override
+  String get currentCampus => 'Nåværende campus';
+  @override
+  String get useCampusSwitcherHint => 'Bruk campusvelgeren på startsiden for å bytte campus';
+  @override
+  String get validatorMode => 'Kontrollørmodus';
+  @override
+  String get openValidatorMode => 'Åpne kontrollørmodus';
+  @override
+  String get scanStudentQRCodes => 'Skann student-QR-koder for å verifisere medlemskap';
+
+  // Notifications tab
+  @override
+  String get pushNotifications => 'Push-varsler';
+  @override
+  String get marketplaceNewItemsDeals => 'Nye varer og tilbud i markedsplassen';
+  @override
+  String get notificationSchedule => 'Varslingstid';
+  @override
+  String get muteNotificationsDuringSpecificHours => 'Demp varsler i bestemte tidsrom';
+  @override
+  String get vibrationSettingsComingSoon => 'Vibrasjonsinnstillinger kommer snart';
+
+  // Privacy tab
+  @override
+  String get privacyInformation => 'Personverninformasjon';
+  @override
+  String get publicProfile => 'Offentlig profil';
+  @override
+  String get othersCanFindAndMessageYou => 'Andre kan finne og sende meldinger til deg';
+  @override
+  String get privateProfile => 'Privat profil';
+  @override
+  String get othersCannotFindYouInSearch => 'Andre kan ikke finne deg i søk';
+  @override
+  String get youCanStillMessageOthers => 'Du kan fortsatt sende meldinger';
+  @override
+  String get onlyYouCanStartNewConversations => 'Bare du kan starte nye samtaler';
+  @override
+  String get existingConversationsRemainActive => 'Eksisterende samtaler fortsetter';
+
+  // Language tab
+  @override
+  String get languageChangeRestartNotice => 'Språkendringer trer i kraft etter at appen startes på nytt.';
+  @override
+  String get regionalSettings => 'Regioninnstillinger';
+  @override
+  String get currencyAutoNokHint => 'Valuta settes automatisk til NOK for BI-studenter';
+
+  // Profile screen
+  @override
+  String get signInToViewProfile => 'Logg inn for å se profilen din';
+  @override
+  String get editProfile => 'Rediger profil';
+  @override
+  String get studentId => 'Student-ID';
+  @override
+  String get profileInformation => 'Profilinformasjon';
+  @override
+  String get campusAndInterests => 'Campus og interesser';
+  @override
+  String get interests => 'Interesser';
+  @override
+  String get expenseHistory => 'Utgiftshistorikk';
+  @override
+  String get notificationPreferences => 'Varslingsinnstillinger';
+  @override
+  String get languageSettings => 'Språkinnstillinger';
+  @override
+  String get unknownUser => 'Ukjent bruker';
+
+  // Sell product
+  @override
+  String get pleaseSignInToSellItems => 'Vennligst logg inn for å selge varer';
+  @override
+  String get titleLabel => 'Tittel';
+  @override
+  String get exampleMacbook => 'f.eks. MacBook Pro 13"';
+  @override
+  String get titleIsRequired => 'Tittel er påkrevd';
+  @override
+  String get descriptionLabel => 'Beskrivelse';
+  @override
+  String get pleaseAddMoreDetail => 'Vennligst legg til litt mer informasjon';
+  @override
+  String get priceNok => 'Pris (NOK)';
+  @override
+  String get requiredField => 'Påkrevd';
+  @override
+  String get enterValidAmount => 'Oppgi et gyldig beløp';
+  @override
+  String get categoryLabel => 'Kategori';
+  @override
+  String get conditionLabel => 'Tilstand';
+  @override
+  String get preferredContactOptional => 'Foretrukket kontakt (valgfritt)';
+  @override
+  String get contactInfoOptional => 'Kontaktinfo (valgfritt)';
+  @override
+  String get photos => 'Bilder';
+  @override
+  String get none => 'Ingen';
+  @override
+  String get inAppMessage => 'Melding i app';
+
+  // Category and condition labels
+  @override
+  String get categoryBooks => 'Bøker';
+  @override
+  String get categoryElectronics => 'Elektronikk';
+  @override
+  String get categoryFurniture => 'Møbler';
+  @override
+  String get categoryClothes => 'Klær';
+  @override
+  String get categorySports => 'Sport';
+  @override
+  String get categoryOther => 'Annet';
+
+  @override
+  String get conditionBrandNew => 'Helt ny';
+  @override
+  String get conditionLikeNew => 'Som ny';
+  @override
+  String get conditionGood => 'God';
+  @override
+  String get conditionFair => 'Brukbar';
+  @override
+  String get conditionPoor => 'Dårlig';
+
+  // Dialog text
+  @override
+  String get unsavedChangesWarning => 'Hvis du går ut nå, vil endringene dine ikke bli lagret.';
+
+  // Membership UI
+  @override
+  String get bisoMembership => 'BISO-medlemskap';
+  @override
+  String get membershipBenefitsBlurb => 'Få tilgang til eksklusive arrangementer, rabatter og mer';
+  @override
+  String get membershipExpired => 'Medlemskapet er utløpt';
+  @override
+  String membershipExpiredOn(String name, String date) => 'Ditt $name-medlemskap utløp $date';
+  @override
+  String membershipExpiredNoDate(String name) => 'Ditt $name-medlemskap er utløpt';
+  @override
+  String get validUntil => 'Gyldig til';
+  @override
+  String get noExpiry => 'Ingen utløpsdato';
+  @override
+  String get memberSince => 'Medlem siden';
+  @override
+  String get unknown => 'Ukjent';
+  @override
+  String get memberBenefitsActive => 'Medlemsfordeler aktiv';
+  @override
+  String get memberBenefitsBullets => 'Tilgang til arrangementer • Utgiftsrefusjoner • Rabatter i markedsplassen • Prioritert støtte';
+  @override
+  String idLabel(String code) => 'ID: $code';
 }

@@ -457,4 +457,179 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String failedToLoadMembershipOptions(String error) => 'Failed to load membership options: $error';
+
+  // Tabs and sections
+  @override
+  String get general => 'General';
+  @override
+  String get privacy => 'Privacy';
+  @override
+  String get appLanguage => 'App Language';
+  @override
+  String get account => 'Account';
+  @override
+  String get dataAndStorage => 'Data & Storage';
+  @override
+  String get about => 'About';
+
+  // Settings/general
+  @override
+  String get currentCampus => 'Current Campus';
+  @override
+  String get useCampusSwitcherHint => 'Use the campus switcher on the home screen to change campus';
+  @override
+  String get validatorMode => 'Validator Mode';
+  @override
+  String get openValidatorMode => 'Open Validator Mode';
+  @override
+  String get scanStudentQRCodes => 'Scan student QR codes to verify membership';
+
+  // Notifications tab
+  @override
+  String get pushNotifications => 'Push Notifications';
+  @override
+  String get marketplaceNewItemsDeals => 'New items and deals in the marketplace';
+  @override
+  String get notificationSchedule => 'Notification Schedule';
+  @override
+  String get muteNotificationsDuringSpecificHours => 'Mute notifications during specific hours';
+  @override
+  String get vibrationSettingsComingSoon => 'Vibration settings coming soon';
+
+  // Privacy tab
+  @override
+  String get privacyInformation => 'Privacy Information';
+  @override
+  String get publicProfile => 'Public Profile';
+  @override
+  String get othersCanFindAndMessageYou => 'Others can find and message you';
+  @override
+  String get privateProfile => 'Private Profile';
+  @override
+  String get othersCannotFindYouInSearch => 'Others cannot find you in search';
+  @override
+  String get youCanStillMessageOthers => 'You can still message others';
+  @override
+  String get onlyYouCanStartNewConversations => 'Only you can start new conversations';
+  @override
+  String get existingConversationsRemainActive => 'Existing conversations remain active';
+
+  // Language tab
+  @override
+  String get languageChangeRestartNotice => 'Language changes will take effect after restarting the app.';
+  @override
+  String get regionalSettings => 'Regional Settings';
+  @override
+  String get currencyAutoNokHint => 'Currency is automatically set to NOK for BI students';
+
+  // Profile screen
+  @override
+  String get signInToViewProfile => 'Sign in to view your profile';
+  @override
+  String get editProfile => 'Edit Profile';
+  @override
+  String get studentId => 'Student ID';
+  @override
+  String get profileInformation => 'Profile Information';
+  @override
+  String get campusAndInterests => 'Campus & Interests';
+  @override
+  String get interests => 'Interests';
+  @override
+  String get expenseHistory => 'Expense History';
+  @override
+  String get notificationPreferences => 'Notification Preferences';
+  @override
+  String get languageSettings => 'Language Settings';
+  @override
+  String get unknownUser => 'Unknown User';
+
+  // Sell product
+  @override
+  String get pleaseSignInToSellItems => 'Please sign in to sell items';
+  @override
+  String get titleLabel => 'Title';
+  @override
+  String get exampleMacbook => 'e.g., MacBook Pro 13"';
+  @override
+  String get titleIsRequired => 'Title is required';
+  @override
+  String get descriptionLabel => 'Description';
+  @override
+  String get pleaseAddMoreDetail => 'Please add a bit more detail';
+  @override
+  String get priceNok => 'Price (NOK)';
+  @override
+  String get requiredField => 'Required';
+  @override
+  String get enterValidAmount => 'Enter a valid amount';
+  @override
+  String get categoryLabel => 'Category';
+  @override
+  String get conditionLabel => 'Condition';
+  @override
+  String get preferredContactOptional => 'Preferred contact (optional)';
+  @override
+  String get contactInfoOptional => 'Contact info (optional)';
+  @override
+  String get photos => 'Photos';
+  @override
+  String get none => 'None';
+  @override
+  String get inAppMessage => 'In-app message';
+
+  // Category and condition labels
+  @override
+  String get categoryBooks => 'Books';
+  @override
+  String get categoryElectronics => 'Electronics';
+  @override
+  String get categoryFurniture => 'Furniture';
+  @override
+  String get categoryClothes => 'Clothes';
+  @override
+  String get categorySports => 'Sports';
+  @override
+  String get categoryOther => 'Other';
+
+  @override
+  String get conditionBrandNew => 'Brand new';
+  @override
+  String get conditionLikeNew => 'Like new';
+  @override
+  String get conditionGood => 'Good';
+  @override
+  String get conditionFair => 'Fair';
+  @override
+  String get conditionPoor => 'Poor';
+
+  // Dialog text
+  @override
+  String get unsavedChangesWarning => 'If you leave now, your changes will not be saved.';
+
+  // Membership UI
+  @override
+  String get bisoMembership => 'BISO Membership';
+  @override
+  String get membershipBenefitsBlurb => 'Get access to exclusive events, discounts, and more';
+  @override
+  String get membershipExpired => 'Membership Expired';
+  @override
+  String membershipExpiredOn(String name, String date) => 'Your $name membership expired on $date';
+  @override
+  String membershipExpiredNoDate(String name) => 'Your $name membership expired';
+  @override
+  String get validUntil => 'Valid Until';
+  @override
+  String get noExpiry => 'No expiry';
+  @override
+  String get memberSince => 'Member Since';
+  @override
+  String get unknown => 'Unknown';
+  @override
+  String get memberBenefitsActive => 'Member Benefits Active';
+  @override
+  String get memberBenefitsBullets => 'Event access • Expense reimbursements • Marketplace discounts • Priority support';
+  @override
+  String idLabel(String code) => 'ID: $code';
 }

@@ -724,6 +724,104 @@ abstract class AppLocalizations {
 
   /// Failed to load membership options with error
   String failedToLoadMembershipOptions(String error);
+
+  // Tabs and sections
+  String get general;
+  String get privacy;
+  String get appLanguage;
+  String get account;
+  String get dataAndStorage;
+  String get about;
+
+  // Settings/general
+  String get currentCampus;
+  String get useCampusSwitcherHint;
+  String get validatorMode;
+  String get openValidatorMode;
+  String get scanStudentQRCodes;
+
+  // Notifications tab
+  String get pushNotifications;
+  String get marketplaceNewItemsDeals;
+  String get notificationSchedule;
+  String get muteNotificationsDuringSpecificHours;
+  String get vibrationSettingsComingSoon;
+
+  // Privacy tab
+  String get privacyInformation;
+  String get publicProfile;
+  String get othersCanFindAndMessageYou;
+  String get privateProfile;
+  String get othersCannotFindYouInSearch;
+  String get youCanStillMessageOthers;
+  String get onlyYouCanStartNewConversations;
+  String get existingConversationsRemainActive;
+
+  // Language tab
+  String get languageChangeRestartNotice;
+  String get regionalSettings;
+  String get currencyAutoNokHint;
+
+  // Profile screen
+  String get signInToViewProfile;
+  String get editProfile;
+  String get studentId;
+  String get profileInformation;
+  String get campusAndInterests;
+  String get interests;
+  String get expenseHistory;
+  String get notificationPreferences;
+  String get languageSettings;
+  String get unknownUser;
+
+  // Sell product
+  String get pleaseSignInToSellItems;
+  String get titleLabel;
+  String get exampleMacbook;
+  String get titleIsRequired;
+  String get descriptionLabel;
+  String get pleaseAddMoreDetail;
+  String get priceNok;
+  String get requiredField;
+  String get enterValidAmount;
+  String get categoryLabel;
+  String get conditionLabel;
+  String get preferredContactOptional;
+  String get contactInfoOptional;
+  String get photos;
+  String get none;
+  String get inAppMessage;
+
+  // Category and condition labels
+  String get categoryBooks;
+  String get categoryElectronics;
+  String get categoryFurniture;
+  String get categoryClothes;
+  String get categorySports;
+  String get categoryOther;
+
+  String get conditionBrandNew;
+  String get conditionLikeNew;
+  String get conditionGood;
+  String get conditionFair;
+  String get conditionPoor;
+
+  // Dialog text
+  String get unsavedChangesWarning;
+
+  // Membership UI
+  String get bisoMembership;
+  String get membershipBenefitsBlurb;
+  String get membershipExpired;
+  String membershipExpiredOn(String name, String date);
+  String membershipExpiredNoDate(String name);
+  String get validUntil;
+  String get noExpiry;
+  String get memberSince;
+  String get unknown;
+  String get memberBenefitsActive;
+  String get memberBenefitsBullets;
+  String idLabel(String code);
 }
 
 class _AppLocalizationsDelegate

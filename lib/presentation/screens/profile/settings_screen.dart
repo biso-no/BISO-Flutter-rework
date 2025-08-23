@@ -10,6 +10,7 @@ import '../../../providers/campus/campus_provider.dart';
 import '../../../providers/privacy/privacy_provider.dart';
 import '../../../data/services/validator_service.dart';
 import 'settings_screen_chat_tab.dart';
+import '../../../generated/l10n/app_localizations.dart';
 
 // Settings providers
 final appSettingsProvider =
@@ -143,10 +144,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   @override
   Widget build(BuildContext context) {
     final selectedCampus = ref.watch(selectedCampusProvider);
-
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(l10n.settings),
         backgroundColor: Colors.transparent,
         elevation: 0,
         bottom: TabBar(
@@ -154,12 +155,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           indicatorColor: _getCampusColor(selectedCampus.id),
           labelColor: _getCampusColor(selectedCampus.id),
           unselectedLabelColor: AppColors.onSurfaceVariant,
-          tabs: const [
-            Tab(text: 'General'),
-            Tab(text: 'Notifications'),
-            Tab(text: 'Privacy'),
-            Tab(text: 'Chat'),
-            Tab(text: 'Language'),
+          tabs: [
+            Tab(text: l10n.general),
+            Tab(text: l10n.notifications),
+            Tab(text: l10n.privacy),
+            Tab(text: l10n.chat),
+            Tab(text: l10n.language),
           ],
         ),
       ),
@@ -198,6 +199,7 @@ class _GeneralSettingsTab extends ConsumerWidget {
     final settingsState = ref.watch(appSettingsProvider);
     final authState = ref.watch(authStateProvider);
     final selectedCampus = ref.watch(selectedCampusProvider);
+    final l10n = AppLocalizations.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -206,7 +208,7 @@ class _GeneralSettingsTab extends ConsumerWidget {
         children: [
           // Account Section
           Text(
-            'Account',
+            l10n.account,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -231,7 +233,7 @@ class _GeneralSettingsTab extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  title: Text(authState.user?.name ?? 'User'),
+                  title: Text(authState.user?.name ?? l10n.unknownUser),
                   subtitle: Text(authState.user?.email ?? ''),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
@@ -242,8 +244,8 @@ class _GeneralSettingsTab extends ConsumerWidget {
                 const Divider(height: 1),
                 SwitchListTile(
                   secondary: const Icon(Icons.dark_mode_outlined),
-                  title: const Text('Dark Mode'),
-                  subtitle: const Text('Use dark theme throughout the app'),
+                  title: Text(l10n.darkMode),
+                  subtitle: Text(l10n.darkModeDescription),
                   value: settingsState.darkMode,
                   onChanged: (value) {
                     ref.read(appSettingsProvider.notifier).setDarkMode(value);
@@ -258,7 +260,7 @@ class _GeneralSettingsTab extends ConsumerWidget {
 
           // Campus Section
           Text(
-            'Campus',
+            l10n.campus,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -278,16 +280,12 @@ class _GeneralSettingsTab extends ConsumerWidget {
                 ),
                 child: Icon(Icons.location_city, color: Colors.white),
               ),
-              title: Text('Current Campus'),
+              title: Text(l10n.currentCampus),
               subtitle: Text('BI ${selectedCampus.name}'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Use the campus switcher on the home screen to change campus',
-                    ),
-                  ),
+                  SnackBar(content: Text(l10n.useCampusSwitcherHint)),
                 );
               },
             ),
@@ -304,7 +302,7 @@ class _GeneralSettingsTab extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Validator Mode',
+                            l10n.validatorMode,
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.bold,
@@ -326,10 +324,8 @@ class _GeneralSettingsTab extends ConsumerWidget {
                                   color: Colors.white,
                                 ),
                               ),
-                              title: const Text('Open Validator Mode'),
-                              subtitle: const Text(
-                                'Scan student QR codes to verify membership',
-                              ),
+                              title: Text(l10n.openValidatorMode),
+                              subtitle: Text(l10n.scanStudentQRCodes),
                               trailing: const Icon(
                                 Icons.arrow_forward_ios,
                                 size: 16,
@@ -349,7 +345,7 @@ class _GeneralSettingsTab extends ConsumerWidget {
 
           // Data Section
           Text(
-            'Data & Storage',
+            l10n.dataAndStorage,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -366,8 +362,8 @@ class _GeneralSettingsTab extends ConsumerWidget {
                     Icons.cached,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Clear Cache'),
-                  subtitle: const Text('Free up storage space'),
+                  title: Text(l10n.clearCache),
+                  subtitle: Text(l10n.clearCacheDescription),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () => _showClearCacheDialog(context),
                 ),
@@ -377,14 +373,12 @@ class _GeneralSettingsTab extends ConsumerWidget {
                     Icons.download,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Offline Data'),
-                  subtitle: const Text('Manage downloaded content'),
+                  title: Text(l10n.offlineData),
+                  subtitle: Text(l10n.offlineDataDescription),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Offline data management coming soon'),
-                      ),
+                      SnackBar(content: Text(l10n.offlineComingSoon)),
                     );
                   },
                 ),
@@ -396,7 +390,7 @@ class _GeneralSettingsTab extends ConsumerWidget {
 
           // About Section
           Text(
-            'About',
+            l10n.about,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -413,7 +407,7 @@ class _GeneralSettingsTab extends ConsumerWidget {
                     Icons.info_outline,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('App Version'),
+                  title: Text(l10n.appVersion),
                   subtitle: const Text('1.0.0 (Build 1)'),
                 ),
                 const Divider(height: 1),
@@ -422,7 +416,7 @@ class _GeneralSettingsTab extends ConsumerWidget {
                     Icons.privacy_tip_outlined,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Privacy Policy'),
+                  title: Text(l10n.privacyPolicy),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     launchUrl(Uri.parse('https://biso.no/privacy'));
@@ -434,7 +428,7 @@ class _GeneralSettingsTab extends ConsumerWidget {
                     Icons.description_outlined,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Terms of Service'),
+                  title: Text(l10n.termsOfService),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     launchUrl(Uri.parse('https://biso.no/terms'));
@@ -464,26 +458,25 @@ class _GeneralSettingsTab extends ConsumerWidget {
   }
 
   void _showClearCacheDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Clear Cache'),
-        content: const Text(
-          'This will clear all cached images and data. The app may take longer to load content after clearing cache.',
-        ),
+        title: Text(l10n.clearCache),
+        content: Text(l10n.clearCacheDialogBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Cache cleared successfully')),
+                SnackBar(content: Text(l10n.cacheClearedSuccessfully)),
               );
             },
-            child: const Text('Clear'),
+            child: Text(l10n.clear),
           ),
         ],
       ),
@@ -497,6 +490,7 @@ class _NotificationSettingsTab extends ConsumerWidget {
     final theme = Theme.of(context);
     final settingsState = ref.watch(appSettingsProvider);
     final selectedCampus = ref.watch(selectedCampusProvider);
+    final l10n = AppLocalizations.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -504,7 +498,7 @@ class _NotificationSettingsTab extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Push Notifications',
+            l10n.pushNotifications,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -521,8 +515,8 @@ class _NotificationSettingsTab extends ConsumerWidget {
                     Icons.event,
                     color: AppColors.accentBlue,
                   ),
-                  title: const Text('Events'),
-                  subtitle: const Text('Get notified about new campus events'),
+                  title: Text(l10n.eventsNotifications),
+                  subtitle: Text(l10n.eventsNotificationsDescription),
                   value: settingsState.notifications['events'] ?? true,
                   onChanged: (value) {
                     ref
@@ -537,10 +531,8 @@ class _NotificationSettingsTab extends ConsumerWidget {
                     Icons.shopping_bag,
                     color: AppColors.green9,
                   ),
-                  title: const Text('Marketplace'),
-                  subtitle: const Text(
-                    'New items and deals in the marketplace',
-                  ),
+                  title: Text(l10n.marketplaceNotifications),
+                  subtitle: Text(l10n.marketplaceNewItemsDeals),
                   value: settingsState.notifications['products'] ?? true,
                   onChanged: (value) {
                     ref
@@ -552,8 +544,8 @@ class _NotificationSettingsTab extends ConsumerWidget {
                 const Divider(height: 1),
                 SwitchListTile(
                   secondary: const Icon(Icons.work, color: AppColors.purple9),
-                  title: const Text('Job Opportunities'),
-                  subtitle: const Text('Volunteer and job opportunities'),
+                  title: Text(l10n.jobOpportunities),
+                  subtitle: Text(l10n.jobOpportunitiesDescription),
                   value: settingsState.notifications['jobs'] ?? true,
                   onChanged: (value) {
                     ref
@@ -568,8 +560,8 @@ class _NotificationSettingsTab extends ConsumerWidget {
                     Icons.receipt,
                     color: AppColors.orange9,
                   ),
-                  title: const Text('Expenses'),
-                  subtitle: const Text('Expense reimbursement status updates'),
+                  title: Text(l10n.expensesNotifications),
+                  subtitle: Text(l10n.expensesNotificationsDescription),
                   value: settingsState.notifications['expenses'] ?? false,
                   onChanged: (value) {
                     ref
@@ -584,8 +576,8 @@ class _NotificationSettingsTab extends ConsumerWidget {
                     Icons.chat,
                     color: AppColors.defaultBlue,
                   ),
-                  title: const Text('Chat Messages'),
-                  subtitle: const Text('New messages in your chats'),
+                  title: Text(l10n.chatMessagesNotifications),
+                  subtitle: Text(l10n.chatMessagesDescription),
                   value: settingsState.notifications['chat'] ?? true,
                   onChanged: (value) {
                     ref
@@ -601,7 +593,7 @@ class _NotificationSettingsTab extends ConsumerWidget {
           const SizedBox(height: 24),
 
           Text(
-            'Notification Schedule',
+            l10n.notificationSchedule,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -618,17 +610,13 @@ class _NotificationSettingsTab extends ConsumerWidget {
                     Icons.schedule,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Quiet Hours'),
-                  subtitle: const Text(
-                    'Mute notifications during specific hours',
-                  ),
+                  title: Text(l10n.quietHours),
+                  subtitle: Text(l10n.muteNotificationsDuringSpecificHours),
                   trailing: Switch(
                     value: false,
                     onChanged: (value) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Quiet hours feature coming soon'),
-                        ),
+                        SnackBar(content: Text(l10n.quietHoursComingSoon)),
                       );
                     },
                     activeColor: _getCampusColor(selectedCampus.id),
@@ -640,15 +628,13 @@ class _NotificationSettingsTab extends ConsumerWidget {
                     Icons.vibration,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Vibration'),
-                  subtitle: const Text('Vibrate for notifications'),
+                  title: Text(l10n.vibration),
+                  subtitle: Text(l10n.vibrationDescription),
                   trailing: Switch(
                     value: true,
                     onChanged: (value) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Vibration settings coming soon'),
-                        ),
+                        SnackBar(content: Text(l10n.vibrationSettingsComingSoon)),
                       );
                     },
                     activeColor: _getCampusColor(selectedCampus.id),
@@ -684,6 +670,7 @@ class _PrivacySettingsTab extends ConsumerWidget {
     final theme = Theme.of(context);
     final authState = ref.watch(authStateProvider);
     final selectedCampus = ref.watch(selectedCampusProvider);
+    final l10n = AppLocalizations.of(context);
 
     if (authState.user == null) {
       return const Center(child: CircularProgressIndicator());
@@ -699,7 +686,7 @@ class _PrivacySettingsTab extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Chat Privacy',
+            l10n.chatPrivacy,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -719,11 +706,11 @@ class _PrivacySettingsTab extends ConsumerWidget {
                           ? AppColors.green9
                           : AppColors.orange9,
                     ),
-                    title: const Text('Public Profile'),
+                    title: Text(l10n.publicProfile),
                     subtitle: Text(
                       isPublic == true
-                          ? 'Others can find and message you'
-                          : 'Others cannot find you in search',
+                          ? l10n.othersCanFindAndMessageYou
+                          : l10n.othersCannotFindYouInSearch,
                     ),
                     value: isPublic == true,
                     onChanged: (value) async {
@@ -738,24 +725,18 @@ class _PrivacySettingsTab extends ConsumerWidget {
                         ref.invalidate(privacyStatusProvider(userId));
 
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                value
-                                    ? 'Public profile created - others can find you in search'
-                                    : 'Public profile removed - you won\'t appear in search',
-                              ),
-                              backgroundColor: AppColors.defaultBlue,
-                            ),
-                          );
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(value
+                                ? l10n.publicProfileCreated
+                                : l10n.publicProfileRemoved),
+                            backgroundColor: AppColors.defaultBlue,
+                          ));
                         }
                       } catch (e) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(
-                                'Failed to update privacy setting: $e',
-                              ),
+                              content: Text(l10n.failedToUpdatePrivacySetting(e.toString())),
                               backgroundColor: AppColors.error,
                             ),
                           );
@@ -773,7 +754,7 @@ class _PrivacySettingsTab extends ConsumerWidget {
                       Icons.error_outline,
                       color: AppColors.error,
                     ),
-                    title: const Text('Error loading privacy settings'),
+                    title: Text(l10n.errorLoadingPrivacySettings),
                     subtitle: Text(error.toString()),
                   ),
                 ),
@@ -813,7 +794,7 @@ class _PrivacySettingsTab extends ConsumerWidget {
           const SizedBox(height: 24),
 
           Text(
-            'Privacy Information',
+            l10n.privacyInformation,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -833,7 +814,7 @@ class _PrivacySettingsTab extends ConsumerWidget {
                       Icon(Icons.public, color: AppColors.green9, size: 20),
                       const SizedBox(width: 8),
                       Text(
-                        'Public Profile',
+                        l10n.publicProfile,
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.green9,
@@ -842,13 +823,7 @@ class _PrivacySettingsTab extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '• Others can find you in user search\n'
-                    '• Students can start conversations with you\n'
-                    '• You appear in recent contacts\n'
-                    '• You can still control who messages you',
-                    style: TextStyle(height: 1.4),
-                  ),
+                  Text(l10n.publicProfileBullets, style: const TextStyle(height: 1.4)),
 
                   const SizedBox(height: 16),
 
@@ -861,7 +836,7 @@ class _PrivacySettingsTab extends ConsumerWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Private Profile',
+                        l10n.privateProfile,
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.orange9,
@@ -870,13 +845,7 @@ class _PrivacySettingsTab extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '• Others cannot find you in search\n'
-                    '• You can still message others\n'
-                    '• Only you can start new conversations\n'
-                    '• Existing conversations remain active',
-                    style: TextStyle(height: 1.4),
-                  ),
+                  Text(l10n.privateProfileBullets, style: const TextStyle(height: 1.4)),
                 ],
               ),
             ),
@@ -913,6 +882,7 @@ class _LanguageSettingsTab extends ConsumerWidget {
     final theme = Theme.of(context);
     final settingsState = ref.watch(appSettingsProvider);
     final selectedCampus = ref.watch(selectedCampusProvider);
+    final l10n = AppLocalizations.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -920,7 +890,7 @@ class _LanguageSettingsTab extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'App Language',
+            l10n.appLanguage,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -962,7 +932,7 @@ class _LanguageSettingsTab extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Language changes will take effect after restarting the app.',
+                    l10n.languageChangeRestartNotice,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppColors.defaultBlue,
                     ),
@@ -975,7 +945,7 @@ class _LanguageSettingsTab extends ConsumerWidget {
           const SizedBox(height: 24),
 
           Text(
-            'Regional Settings',
+            l10n.regionalSettings,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -992,14 +962,12 @@ class _LanguageSettingsTab extends ConsumerWidget {
                     Icons.schedule,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Date Format'),
-                  subtitle: const Text('DD/MM/YYYY (Norwegian)'),
+                  title: Text(l10n.dateFormat),
+                  subtitle: Text(l10n.dateFormatValue),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Date format options coming soon'),
-                      ),
+                      SnackBar(content: Text(l10n.dateFormatOptionsComingSoon)),
                     );
                   },
                 ),
@@ -1009,16 +977,12 @@ class _LanguageSettingsTab extends ConsumerWidget {
                     Icons.attach_money,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Currency'),
-                  subtitle: const Text('NOK (Norwegian Krone)'),
+                  title: Text(l10n.currency),
+                  subtitle: Text(l10n.currencyValue),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Currency is automatically set to NOK for BI students',
-                        ),
-                      ),
+                      SnackBar(content: Text(l10n.currencyAutoNokHint)),
                     );
                   },
                 ),

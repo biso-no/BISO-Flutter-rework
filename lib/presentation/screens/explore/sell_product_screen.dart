@@ -9,6 +9,7 @@ import '../../../data/models/product_model.dart';
 import '../../../data/services/product_service.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
+import '../../../generated/l10n/app_localizations.dart';
 
 class SellProductScreen extends ConsumerStatefulWidget {
   const SellProductScreen({super.key});
@@ -34,6 +35,7 @@ class _PremiumField extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
@@ -183,6 +185,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final auth = ref.watch(authStateProvider);
     final _ = ref.watch(
       filterCampusProvider,
@@ -190,7 +193,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
 
     if (!auth.isAuthenticated || auth.user == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Sell Item')),
+        appBar: AppBar(title: Text(l10n.sellItem)),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -204,13 +207,13 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Please sign in to sell items',
+                  l10n.pleaseSignInToSellItems,
                   style: theme.textTheme.titleMedium,
                 ),
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: () => context.go('/auth/login'),
-                  child: const Text('Sign In'),
+                  child: Text(l10n.login),
                 ),
               ],
             ),
@@ -222,7 +225,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Sell Item'),
+        title: Text(l10n.sellItem),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
@@ -244,7 +247,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
                       width: 18,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Publish'),
+                  : Text(l10n.publish),
             ),
           ),
         ],
@@ -261,20 +264,20 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
 
             _PremiumField(
               controller: _nameController,
-              label: 'Title',
-              hint: 'e.g., MacBook Pro 13"',
+              label: l10n.titleLabel,
+              hint: l10n.exampleMacbook,
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Title is required' : null,
+                  (v == null || v.trim().isEmpty) ? l10n.titleIsRequired : null,
             ),
 
             const SizedBox(height: 12),
 
             _PremiumField(
               controller: _descriptionController,
-              label: 'Description',
+              label: l10n.descriptionLabel,
               maxLines: 5,
               validator: (v) => (v == null || v.trim().length < 10)
-                  ? 'Please add a bit more detail'
+                  ? l10n.pleaseAddMoreDetail
                   : null,
             ),
 
@@ -285,15 +288,15 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
                 Expanded(
                   child: _PremiumField(
                     controller: _priceController,
-                    label: 'Price (NOK)',
+                    label: l10n.priceNok,
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
                     validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Required';
+                      if (v == null || v.trim().isEmpty) return l10n.requiredField;
                       final num? val = num.tryParse(v.replaceAll(',', '.'));
                       if (val == null || val <= 0) {
-                        return 'Enter a valid amount';
+                        return l10n.enterValidAmount;
                       }
                       return null;
                     },
@@ -309,7 +312,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
                 Expanded(
                   child: _PremiumPillSelector(
                     value: _category,
-                    label: 'Category',
+                    label: l10n.categoryLabel,
                     options: _categories,
                     display: _categoryLabel,
                     onChanged: (v) => setState(() => _category = v),
@@ -319,7 +322,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
                 Expanded(
                   child: _PremiumPillSelector(
                     value: _condition,
-                    label: 'Condition',
+                    label: l10n.conditionLabel,
                     options: _conditions,
                     display: _conditionLabel,
                     onChanged: (v) => setState(() => _condition = v),
@@ -334,14 +337,14 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
               contentPadding: EdgeInsets.zero,
               value: _isNegotiable,
               onChanged: (v) => setState(() => _isNegotiable = v),
-              title: const Text('Price is negotiable'),
+              title: Text(l10n.priceNegotiable),
             ),
 
             const Divider(height: 24),
 
             _PremiumPillSelector(
               value: _contactMethod,
-              label: 'Preferred contact (optional)',
+              label: l10n.preferredContactOptional,
               options: _contactMethods,
               display: _contactLabel,
               onChanged: (v) => setState(() => _contactMethod = v),
@@ -352,7 +355,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
 
             _PremiumField(
               controller: _contactInfoController,
-              label: 'Contact info (optional)',
+              label: l10n.contactInfoOptional,
             ),
 
             const SizedBox(height: 32),
@@ -360,7 +363,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
             FilledButton.icon(
               onPressed: _submitting ? null : _submit,
               icon: const Icon(Icons.publish),
-              label: const Text('Publish'),
+              label: Text(l10n.publish),
             ),
           ],
         ),
@@ -369,10 +372,11 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
   }
 
   Widget _buildImagesPicker(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Photos', style: theme.textTheme.titleMedium),
+        Text(l10n.photos, style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -468,22 +472,21 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
   }
 
   Future<bool> _showDiscardDialog() async {
+    final l10n = AppLocalizations.of(context);
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Discard changes?'),
-        content: const Text(
-          'If you leave now, your changes will not be saved.',
-        ),
+        title: Text(l10n.discardChanges),
+        content: Text(l10n.unsavedChangesWarning),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Keep Editing'),
+            child: Text(l10n.keepEditing),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Discard'),
+            child: Text(l10n.discard),
           ),
         ],
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -496,7 +499,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_images.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please add at least one photo')),
+        SnackBar(content: Text(l10n.pleaseAddAtLeastOnePhoto)),
       );
       return;
     }
@@ -541,7 +544,7 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
       // Show success message
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Your item is now live!')));
+      ).showSnackBar(SnackBar(content: Text(l10n.itemNowLive)));
 
       // Navigate directly to the new product details screen
       context.go('/explore/products/${createdProduct.id}');
@@ -550,52 +553,55 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
       setState(() => _submitting = false);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Failed to publish: $e')));
+      ).showSnackBar(SnackBar(content: Text(l10n.failedToPublish(e.toString()))));
     }
   }
 
   String _categoryLabel(String c) {
+    final l10n = AppLocalizations.of(context);
     switch (c) {
       case 'books':
-        return 'Books';
+        return l10n.categoryBooks;
       case 'electronics':
-        return 'Electronics';
+        return l10n.categoryElectronics;
       case 'furniture':
-        return 'Furniture';
+        return l10n.categoryFurniture;
       case 'clothes':
-        return 'Clothes';
+        return l10n.categoryClothes;
       case 'sports':
-        return 'Sports';
+        return l10n.categorySports;
       default:
-        return 'Other';
+        return l10n.categoryOther;
     }
   }
 
   String _conditionLabel(String c) {
+    final l10n = AppLocalizations.of(context);
     switch (c) {
       case 'new':
-        return 'Brand new';
+        return l10n.conditionBrandNew;
       case 'like_new':
-        return 'Like new';
+        return l10n.conditionLikeNew;
       case 'good':
-        return 'Good';
+        return l10n.conditionGood;
       case 'fair':
-        return 'Fair';
+        return l10n.conditionFair;
       case 'poor':
-        return 'Poor';
+        return l10n.conditionPoor;
       default:
         return c;
     }
   }
 
   String _contactLabel(String m) {
+    final l10n = AppLocalizations.of(context);
     switch (m) {
       case 'message':
-        return 'In-app message';
+        return l10n.inAppMessage;
       case 'phone':
-        return 'Phone';
+        return l10n.phone;
       case 'email':
-        return 'Email';
+        return l10n.email;
       default:
         return m;
     }
