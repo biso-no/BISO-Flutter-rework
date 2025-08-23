@@ -190,4 +190,271 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String get contactInformation => 'Kontaktinformasjon';
+
+  @override
+  String get close => 'Lukk';
+
+  @override
+  String get enable => 'Aktiver';
+
+  @override
+  String get details => 'Detaljer';
+
+  @override
+  String get buyMembership => 'Kjøp medlemskap';
+
+  @override
+  String get renewMembership => 'Forny medlemskap';
+
+  @override
+  String get verificationCodeCopied => 'Verifiseringskode kopiert';
+
+  @override
+  String get keepPrivate => 'Hold privat';
+
+  @override
+  String get makePublic => 'Gjør offentlig';
+
+  @override
+  String get failedToLoadCampuses => 'Kunne ikke laste campuser';
+
+  @override
+  String get messageCopied => 'Melding kopiert til utklippstavlen';
+
+  @override
+  String get paymentInformation => 'Betalingsinformasjon';
+
+  @override
+  String get paymentInfoSaved => 'Betalingsinformasjon lagret';
+
+  @override
+  String paymentInfoSaveFailed(String error) => 'Kunne ikke lagre betalingsinformasjon: $error';
+
+  @override
+  String get savePaymentInformation => 'Lagre betalingsinformasjon';
+
+  @override
+  String get chatNotifications => 'Chat-varsler';
+
+  @override
+  String get checkingPermissions => 'Sjekker tillatelser...';
+
+  @override
+  String get receiveMessageNotifications => 'Motta varsler for nye meldinger';
+
+  @override
+  String get loadingNotificationSettings => 'Laster varslingsinnstillinger...';
+
+  @override
+  String get errorLoadingNotificationSettings => 'Feil ved lasting av varslingsinnstillinger';
+
+  @override
+  String get vibration => 'Vibrasjon';
+
+  @override
+  String get vibrationDescription => 'Vibrer for nye meldinger';
+
+  @override
+  String get sound => 'Lyd';
+
+  @override
+  String get soundDescription => 'Spill av lyd for nye meldinger';
+
+  @override
+  String get readReceipts => 'Lese kvitteringer';
+
+  @override
+  String get typingIndicators => 'Skriveindikatorer';
+
+  @override
+  String get lastSeen => 'Sist sett';
+
+  @override
+  String get lastSeenDescription => 'Vis din sist sett-status';
+
+  @override
+  String get autoDeleteMessages => 'Auto-slett meldinger';
+
+  @override
+  String get autoDeleteMessagesDescription => 'Slett gamle meldinger automatisk';
+
+  @override
+  String get never => 'Aldri';
+
+  @override
+  String get autoDeleteOptionsComingSoon => 'Alternativer for auto-slett kommer snart';
+
+  @override
+  String get autoDownloadMedia => 'Auto-last ned media';
+
+  @override
+  String get wifiOnly => 'Kun Wi-Fi';
+
+  @override
+  String get autoDownloadOptionsComingSoon => 'Alternativer for auto-nedlasting kommer snart';
+
+  @override
+  String get loadingYourProfile => 'Laster profilen din...';
+
+  @override
+  String get completeProfile => 'Fullfør profil';
+
+  @override
+  String get signOut => 'Logg ut';
+
+  @override
+  String get areYouSureSignOut => 'Er du sikker på at du vil logge ut?';
+
+  @override
+  String get studentVerification => 'Studentverifisering';
+
+  @override
+  String get pleaseRegisterStudentId => 'Vennligst registrer student-ID først.';
+
+  @override
+  String get removeStudentId => 'Fjern student-ID';
+
+  @override
+  String get remove => 'Fjern';
+
+  @override
+  String get tryAgain => 'Prøv igjen';
+
+  @override
+  String get connectBiAccount => 'Koble til BI-konto';
+
+  @override
+  String get refresh => 'Oppdater';
+
+  @override
+  String get purchaseMembership => 'Kjøp medlemskap';
+
+  @override
+  String get refreshStatus => 'Oppdater status';
+
+  @override
+  String get darkMode => 'Mørk modus';
+
+  @override
+  String get darkModeDescription => 'Bruk mørkt tema i hele appen';
+
+  @override
+  String get clearCache => 'Tøm cache';
+
+  @override
+  String get clearCacheDescription => 'Frigjør lagringsplass';
+
+  @override
+  String get offlineData => 'Frakoblet data';
+
+  @override
+  String get offlineDataDescription => 'Administrer nedlastet innhold';
+
+  @override
+  String get offlineComingSoon => 'Administrasjon av frakoblet data kommer snart';
+
+  @override
+  String get appVersion => 'Appversjon';
+
+  @override
+  String get privacyPolicy => 'Personvernerklæring';
+
+  @override
+  String get termsOfService => 'Vilkår for bruk';
+
+  @override
+  String get cacheClearedSuccessfully => 'Cache tømt';
+
+  @override
+  String get clear => 'Tøm';
+
+  @override
+  String get eventsNotifications => 'Arrangementer';
+
+  @override
+  String get marketplaceNotifications => 'Markedsplass';
+
+  @override
+  String get jobOpportunities => 'Jobbmuligheter';
+
+  @override
+  String get jobOpportunitiesDescription => 'Frivillig- og jobbmuligheter';
+
+  @override
+  String get expensesNotifications => 'Utgifter';
+
+  @override
+  String get expensesNotificationsDescription => 'Oppdateringer om utgiftsrefusjoner';
+
+  @override
+  String get chatMessagesNotifications => 'Chatmeldinger';
+
+  @override
+  String get chatMessagesDescription => 'Nye meldinger i chattene dine';
+
+  @override
+  String get quietHours => 'Stilletid';
+
+  @override
+  String get quietHoursComingSoon => 'Stilletid-funksjon kommer snart';
+
+  @override
+  String get dateFormat => 'Datoformat';
+
+  @override
+  String get dateFormatValue => 'DD/MM/ÅÅÅÅ (Norsk)';
+
+  @override
+  String get dateFormatOptionsComingSoon => 'Alternativer for datoformat kommer snart';
+
+  @override
+  String get currency => 'Valuta';
+
+  @override
+  String get currencyValue => 'NOK (Norsk krone)';
+
+  @override
+  String get sellItem => 'Selg vare';
+
+  @override
+  String get publish => 'Publiser';
+
+  @override
+  String get priceNegotiable => 'Pris kan diskuteres';
+
+  @override
+  String get discardChanges => 'Forkaste endringer?';
+
+  @override
+  String get keepEditing => 'Fortsett å redigere';
+
+  @override
+  String get discard => 'Forkast';
+
+  @override
+  String get pleaseAddAtLeastOnePhoto => 'Vennligst legg til minst ett bilde';
+
+  @override
+  String get itemNowLive => 'Varen din er nå publisert!';
+
+  @override
+  String failedToPublish(String error) => 'Kunne ikke publisere: $error';
+
+  @override
+  String get unitsAndDepartments => 'Enheter og avdelinger';
+
+  @override
+  String failedToLoad(String error) => 'Kunne ikke laste: $error';
+
+  @override
+  String get notificationsEnabled => 'Varsler aktivert!';
+
+  @override
+  String errorEnablingNotifications(String error) => 'Feil ved aktivering av varsler: $error';
+
+  @override
+  String purchaseFailed(String error) => 'Kjøp mislyktes: $error';
+
+  @override
+  String failedToLoadMembershipOptions(String error) => 'Kunne ikke laste medlemskapsalternativer: $error';
 }

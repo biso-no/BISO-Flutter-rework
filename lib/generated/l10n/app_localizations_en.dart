@@ -190,4 +190,271 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contactInformation => 'Contact Information';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get enable => 'Enable';
+
+  @override
+  String get details => 'Details';
+
+  @override
+  String get buyMembership => 'Buy Membership';
+
+  @override
+  String get renewMembership => 'Renew Membership';
+
+  @override
+  String get verificationCodeCopied => 'Verification code copied';
+
+  @override
+  String get keepPrivate => 'Keep Private';
+
+  @override
+  String get makePublic => 'Make Public';
+
+  @override
+  String get failedToLoadCampuses => 'Failed to load campuses';
+
+  @override
+  String get messageCopied => 'Message copied to clipboard';
+
+  @override
+  String get paymentInformation => 'Payment Information';
+
+  @override
+  String get paymentInfoSaved => 'Payment information saved successfully';
+
+  @override
+  String paymentInfoSaveFailed(String error) => 'Failed to save payment information: $error';
+
+  @override
+  String get savePaymentInformation => 'Save Payment Information';
+
+  @override
+  String get chatNotifications => 'Chat Notifications';
+
+  @override
+  String get checkingPermissions => 'Checking permissions...';
+
+  @override
+  String get receiveMessageNotifications => 'Receive notifications for new messages';
+
+  @override
+  String get loadingNotificationSettings => 'Loading notification settings...';
+
+  @override
+  String get errorLoadingNotificationSettings => 'Error loading notification settings';
+
+  @override
+  String get vibration => 'Vibration';
+
+  @override
+  String get vibrationDescription => 'Vibrate for new messages';
+
+  @override
+  String get sound => 'Sound';
+
+  @override
+  String get soundDescription => 'Play sound for new messages';
+
+  @override
+  String get readReceipts => 'Read Receipts';
+
+  @override
+  String get typingIndicators => 'Typing Indicators';
+
+  @override
+  String get lastSeen => 'Last Seen';
+
+  @override
+  String get lastSeenDescription => 'Show your last seen status';
+
+  @override
+  String get autoDeleteMessages => 'Auto-delete Messages';
+
+  @override
+  String get autoDeleteMessagesDescription => 'Automatically delete old messages';
+
+  @override
+  String get never => 'Never';
+
+  @override
+  String get autoDeleteOptionsComingSoon => 'Auto-delete options coming soon';
+
+  @override
+  String get autoDownloadMedia => 'Auto-download Media';
+
+  @override
+  String get wifiOnly => 'Wi-Fi only';
+
+  @override
+  String get autoDownloadOptionsComingSoon => 'Auto-download options coming soon';
+
+  @override
+  String get loadingYourProfile => 'Loading your profile...';
+
+  @override
+  String get completeProfile => 'Complete Profile';
+
+  @override
+  String get signOut => 'Sign Out';
+
+  @override
+  String get areYouSureSignOut => 'Are you sure you want to sign out?';
+
+  @override
+  String get studentVerification => 'Student Verification';
+
+  @override
+  String get pleaseRegisterStudentId => 'Please register your student ID first.';
+
+  @override
+  String get removeStudentId => 'Remove Student ID';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get tryAgain => 'Try again';
+
+  @override
+  String get connectBiAccount => 'Connect BI Account';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String get purchaseMembership => 'Purchase Membership';
+
+  @override
+  String get refreshStatus => 'Refresh Status';
+
+  @override
+  String get darkMode => 'Dark Mode';
+
+  @override
+  String get darkModeDescription => 'Use dark theme throughout the app';
+
+  @override
+  String get clearCache => 'Clear Cache';
+
+  @override
+  String get clearCacheDescription => 'Free up storage space';
+
+  @override
+  String get offlineData => 'Offline Data';
+
+  @override
+  String get offlineDataDescription => 'Manage downloaded content';
+
+  @override
+  String get offlineComingSoon => 'Offline data management coming soon';
+
+  @override
+  String get appVersion => 'App Version';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get termsOfService => 'Terms of Service';
+
+  @override
+  String get cacheClearedSuccessfully => 'Cache cleared successfully';
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String get eventsNotifications => 'Events';
+
+  @override
+  String get marketplaceNotifications => 'Marketplace';
+
+  @override
+  String get jobOpportunities => 'Job Opportunities';
+
+  @override
+  String get jobOpportunitiesDescription => 'Volunteer and job opportunities';
+
+  @override
+  String get expensesNotifications => 'Expenses';
+
+  @override
+  String get expensesNotificationsDescription => 'Expense reimbursement status updates';
+
+  @override
+  String get chatMessagesNotifications => 'Chat Messages';
+
+  @override
+  String get chatMessagesDescription => 'New messages in your chats';
+
+  @override
+  String get quietHours => 'Quiet Hours';
+
+  @override
+  String get quietHoursComingSoon => 'Quiet hours feature coming soon';
+
+  @override
+  String get dateFormat => 'Date Format';
+
+  @override
+  String get dateFormatValue => 'DD/MM/YYYY (Norwegian)';
+
+  @override
+  String get dateFormatOptionsComingSoon => 'Date format options coming soon';
+
+  @override
+  String get currency => 'Currency';
+
+  @override
+  String get currencyValue => 'NOK (Norwegian Krone)';
+
+  @override
+  String get sellItem => 'Sell Item';
+
+  @override
+  String get publish => 'Publish';
+
+  @override
+  String get priceNegotiable => 'Price is negotiable';
+
+  @override
+  String get discardChanges => 'Discard changes?';
+
+  @override
+  String get keepEditing => 'Keep Editing';
+
+  @override
+  String get discard => 'Discard';
+
+  @override
+  String get pleaseAddAtLeastOnePhoto => 'Please add at least one photo';
+
+  @override
+  String get itemNowLive => 'Your item is now live!';
+
+  @override
+  String failedToPublish(String error) => 'Failed to publish: $error';
+
+  @override
+  String get unitsAndDepartments => 'Units & Departments';
+
+  @override
+  String failedToLoad(String error) => 'Failed to load: $error';
+
+  @override
+  String get notificationsEnabled => 'Notifications enabled successfully!';
+
+  @override
+  String errorEnablingNotifications(String error) => 'Error enabling notifications: $error';
+
+  @override
+  String purchaseFailed(String error) => 'Purchase failed: $error';
+
+  @override
+  String failedToLoadMembershipOptions(String error) => 'Failed to load membership options: $error';
 }

@@ -107,7 +107,23 @@ class BisoApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('en'), Locale('no')],
+      supportedLocales: AppLocalizations.supportedLocales,
+      localeListResolutionCallback: (locales, supported) {
+        if (locales != null) {
+          for (final locale in locales) {
+            for (final supportedLocale in supported) {
+              if (supportedLocale.languageCode == locale.languageCode) {
+                return supportedLocale;
+              }
+            }
+            if ((locale.languageCode == 'nb' || locale.languageCode == 'nn') &&
+                supported.any((l) => l.languageCode == 'no')) {
+              return const Locale('no');
+            }
+          }
+        }
+        return const Locale('en');
+      },
       routerConfig: _router,
     );
   }
