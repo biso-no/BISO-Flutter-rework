@@ -21,7 +21,6 @@ import '../../../data/models/event_model.dart';
 import '../../../data/models/job_model.dart';
 import '../../../data/models/webshop_product_model.dart';
 import '../explore/explore_screen.dart';
-import '../chat/chat_list_screen.dart';
 import '../auth/login_screen.dart';
 import '../profile/profile_screen.dart';
 
@@ -76,13 +75,6 @@ class _PremiumHomeScreenState extends ConsumerState<PremiumHomeScreen>
       PremiumHomePage(navigateToTab: _navigateToTab),
       const ExploreScreen(),
       authState.isAuthenticated
-          ? const ChatListScreen()
-          : PremiumAuthRequiredPage(
-              title: l10n.chat,
-              description: 'Connect with students and organizations across BI',
-              icon: Icons.forum_outlined,
-            ),
-      authState.isAuthenticated
           ? const ProfileScreen()
           : PremiumAuthRequiredPage(
               title: l10n.profile,
@@ -120,14 +112,6 @@ class _PremiumHomeScreenState extends ConsumerState<PremiumHomeScreen>
                   icon: Icons.explore_outlined,
                   activeIcon: Icons.explore_rounded,
                   label: l10n.explore,
-                ),
-                PremiumNavItem(
-                  icon: Icons.forum_outlined,
-                  activeIcon: Icons.forum_rounded,
-                  label: l10n.chat,
-                  badge: authState.isAuthenticated
-                      ? null
-                      : const PremiumBadge(showDot: true),
                 ),
                 PremiumNavItem(
                   icon: Icons.person_outline_rounded,

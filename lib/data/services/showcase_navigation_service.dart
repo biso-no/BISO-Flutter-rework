@@ -63,8 +63,13 @@ class ShowcaseNavigationService {
 
   Future<void> _handleJobOpportunity(BuildContext context, LargeEventModel item) async {
     if (item.jobId != null) {
-      // Navigate to specific job detail (if we have such route)
-      context.go('/explore/volunteer'); // TODO: Add specific job detail route
+      // Navigate to volunteer and auto-open the specific job sheet
+      context.go(
+        '/explore/volunteer',
+        extra: {
+          'openJobId': item.jobId,
+        },
+      );
     } else if (item.externalUrl != null) {
       // Open external job URL
       await _launchExternalUrl(item.externalUrl!);

@@ -41,17 +41,104 @@ class EventsScreen extends ConsumerStatefulWidget {
 class _EventsScreenState extends ConsumerState<EventsScreen> {
   final TextEditingController _searchController = TextEditingController();
 
+  // Paging state
+  final ScrollController _scrollController = ScrollController();
+  final List<EventModel> _events = [];
+  bool _isLoading = true;
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
+  int _currentPage = 1;
+  static const int _pageSize = 20;
+  String? _loadedForCampusId;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_hasMore || _isLoadingMore || _isLoading) return;
+    if (!_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      _loadMore();
+    }
+  }
+
+  Future<void> _ensureInitialLoad(String? campusId) async {
+    if (_loadedForCampusId == campusId && _events.isNotEmpty) return;
+    _loadedForCampusId = campusId;
+    _isLoading = true;
+    _events.clear();
+    _currentPage = 1;
+    _hasMore = true;
+    if (mounted) setState(() {});
+    await _fetchPage(page: 1, replace: true);
+  }
+
+  Future<void> _fetchPage({required int page, bool replace = false}) async {
+    final campusId = ref.read(filterCampusProvider).id;
+    final service = ref.read(eventServiceProvider);
+    final searchTerm = ref.read(eventsSearchTermProvider);
+    try {
+      final items = await service.getFunctionEvents(
+        campusId: campusId,
+        limit: _pageSize,
+        page: page,
+        includePast: false,
+        search: searchTerm,
+      );
+      if (mounted) {
+        setState(() {
+          if (replace) {
+            _events
+              ..clear()
+              ..addAll(items);
+            _isLoading = false;
+          } else {
+            _events.addAll(items);
+            _isLoadingMore = false;
+          }
+          _hasMore = items.length >= _pageSize;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _isLoadingMore = false;
+          _hasMore = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _reload() async {
+    await _fetchPage(page: 1, replace: true);
+    _currentPage = 1;
+  }
+
+  Future<void> _loadMore() async {
+    if (!_hasMore || _isLoadingMore) return;
+    setState(() => _isLoadingMore = true);
+    _currentPage += 1;
+    await _fetchPage(page: _currentPage);
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final campusId = ref.watch(filterCampusProvider).id;
-    final eventsAsync = ref.watch(eventsProvider(campusId));
+    _ensureInitialLoad(campusId);
 
     return Scaffold(
       appBar: AppBar(
@@ -72,45 +159,44 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
 
           // Events List
           Expanded(
-            child: eventsAsync.when(
-              data: (events) {
-                final filteredEvents = _applyClientSearch(events);
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Builder(builder: (context) {
+                    final filteredEvents = _applyClientSearch(_events);
 
-                if (filteredEvents.isEmpty) {
-                  return _EmptyState(
-                    icon: Icons.event_busy,
-                    title: 'No Events Found',
-                    subtitle: 'There are no events matching your criteria.',
-                  );
-                }
-
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    ref.invalidate(eventsProvider(campusId));
-                  },
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filteredEvents.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final event = filteredEvents[index];
-                      return _EventCard(
-                        event: event,
-                        onTap: () {
-                          _showEventDetails(context, event);
-                        },
+                    if (filteredEvents.isEmpty) {
+                      return _EmptyState(
+                        icon: Icons.event_busy,
+                        title: 'No Events Found',
+                        subtitle: 'There are no events matching your criteria.',
                       );
-                    },
-                  ),
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => _ErrorState(
-                error: error.toString(),
-                onRetry: () => ref.invalidate(eventsProvider),
-              ),
-            ),
+                    }
+
+                    return RefreshIndicator(
+                      onRefresh: _reload,
+                      child: ListView.separated(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.all(16),
+                        itemCount: filteredEvents.length + (_isLoadingMore ? 1 : 0),
+                        separatorBuilder: (context, index) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          if (index >= filteredEvents.length) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: Center(child: CircularProgressIndicator()),
+                            );
+                          }
+                          final event = filteredEvents[index];
+                          return _EventCard(
+                            event: event,
+                            onTap: () {
+                              _showEventDetails(context, event);
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  }),
           ),
         ],
       ),
@@ -199,8 +285,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
     }
 
     // reload with new search param
-    final campusId = ref.read(filterCampusProvider).id;
-    ref.invalidate(eventsProvider(campusId));
+    await _reload();
   }
 }
 
@@ -631,46 +716,4 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-class _ErrorState extends StatelessWidget {
-  final String error;
-  final VoidCallback onRetry;
-
-  const _ErrorState({required this.error, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 64, color: AppColors.error),
-            const SizedBox(height: 16),
-            Text(
-              'Something went wrong',
-              style: theme.textTheme.titleLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Try Again'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// Removed old _ErrorState (not used with widget-managed pagination)

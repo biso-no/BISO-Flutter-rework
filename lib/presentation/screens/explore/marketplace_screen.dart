@@ -59,7 +59,8 @@ final webshopProductsProvider = FutureProvider.autoDispose
   final products = await service.listWebshopProducts(
     campusName: query.campusName,
     departmentId: query.departmentId,
-    limit: 100,
+    limit: 20,
+    page: 1,
   );
   if (query.search == null || query.search!.isEmpty) return products;
   final q = query.search!.toLowerCase();
@@ -83,6 +84,14 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   Timer? _debounceTimer;
   final TextEditingController _searchController = TextEditingController();
 
+  // Paging state (marketplace mode uses Appwrite with offset; webshop uses page)
+  final ScrollController _scrollController = ScrollController();
+  int _currentPage = 1;
+  static const int _pageSize = 20;
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
+  final List<WebshopProduct> _webshopAccumulated = [];
+
   final List<String> _categories = [
     'all',
     'books',
@@ -97,6 +106,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   void dispose() {
     _debounceTimer?.cancel();
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -105,8 +115,59 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
       setState(() {
         _search = value.trim().isEmpty ? null : value.trim();
+        // Reset webshop paging when search changes
+        _resetWebshopPaging();
       });
     });
+  }
+
+  void _resetWebshopPaging() {
+    _currentPage = 1;
+    _hasMore = true;
+    _webshopAccumulated.clear();
+  }
+
+  void _onScroll() async {
+    if (_mode != _ShopMode.webshop) return;
+    if (_isLoadingMore || !_hasMore) return;
+    if (!_scrollController.hasClients) return;
+    final pos = _scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent - 200) {
+      await _loadMoreWebshop();
+    }
+  }
+
+  Future<void> _loadMoreWebshop() async {
+    setState(() => _isLoadingMore = true);
+    _currentPage += 1;
+    try {
+      final service = ref.read(_webshopServiceProvider);
+      final campus = ref.read(filterCampusProvider);
+      final next = await service.listWebshopProducts(
+        campusName: campus.name,
+        departmentId: null,
+        limit: _pageSize,
+        page: _currentPage,
+      );
+      setState(() {
+        _webshopAccumulated.addAll(next);
+        _isLoadingMore = false;
+        _hasMore = next.length >= _pageSize;
+      });
+    } catch (_) {
+      setState(() {
+        _isLoadingMore = false;
+        _hasMore = false;
+      });
+    }
+  }
+
+  List<WebshopProduct> _computeWebshopList(List<WebshopProduct> firstPage) {
+    if (_webshopAccumulated.isEmpty) {
+      // initialize with first page
+      _webshopAccumulated.addAll(firstPage);
+    }
+    return _webshopAccumulated;
   }
 
   @override
@@ -157,6 +218,10 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
       search: _search,
     );
     final webshopAsync = ref.watch(webshopProductsProvider(webshopQuery));
+
+    // attach scroll listener for webshop infinite scroll
+    _scrollController.removeListener(_onScroll);
+    _scrollController.addListener(_onScroll);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -226,6 +291,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                         _mode = _ShopMode.webshop;
                         _showFavorites = false;
                         _selectedCategory = 'all';
+                        _resetWebshopPaging();
                       }),
                     ),
                   ],
@@ -341,7 +407,10 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                     ? productsAsync
                     : webshopAsync)
                 .when(
-              data: (products) => products.isEmpty
+              data: (products) => (effectiveMode == _ShopMode.webshop
+                      ? _computeWebshopList(products as List<WebshopProduct>)
+                      : products)
+                  .isEmpty
                   ? Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -382,15 +451,25 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                             mainAxisSpacing: 14,
                             childAspectRatio: 0.72,
                           ),
-                      itemCount: products.length,
+                      controller: _scrollController,
+                      itemCount: (effectiveMode == _ShopMode.webshop)
+                          ? _computeWebshopList(products as List<WebshopProduct>).length + (_isLoadingMore ? 1 : 0)
+                          : products.length,
                       itemBuilder: (context, index) {
                         if (effectiveMode == _ShopMode.marketplace) {
                           return _PremiumProductCard(
                             product: products[index] as ProductModel,
                           );
                         } else {
+                          final list = _computeWebshopList(products as List<WebshopProduct>);
+                          if (index >= list.length) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: Center(child: CircularProgressIndicator()),
+                            );
+                          }
                           return _WebshopProductCard(
-                            product: products[index] as WebshopProduct,
+                            product: list[index],
                           );
                         }
                       },

@@ -31,7 +31,6 @@ import 'presentation/screens/explore/units_overview_screen.dart';
 import 'presentation/screens/explore/unit_detail_screen.dart';
 import 'presentation/screens/explore/departures_screen.dart';
 import 'presentation/screens/explore/campus_detail_screen.dart';
-import 'presentation/screens/chat/chat_list_screen.dart';
 import 'presentation/screens/ai_chat/ai_chat_screen.dart';
 import 'presentation/screens/profile/profile_screen.dart';
 import 'providers/auth/auth_provider.dart';
@@ -243,7 +242,11 @@ final _router = GoRouter(
             GoRoute(
               path: '/volunteer',
               name: 'volunteer',
-              builder: (context, state) => const JobsScreen(),
+              builder: (context, state) {
+                final extra = state.extra as Map<String, dynamic>?;
+                final openJobId = extra != null ? extra['openJobId'] as String? : null;
+                return JobsScreen(openJobId: openJobId);
+              },
             ),
             GoRoute(
               path: '/ai-chat',
@@ -260,12 +263,7 @@ final _router = GoRouter(
             ),
           ],
         ),
-        GoRoute(
-          path: '/chat',
-          name: 'chat',
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: _ChatPage()),
-        ),
+        // Chat route temporarily removed from main tabs during launch
         GoRoute(
           path: '/profile',
           name: 'profile',
@@ -324,9 +322,6 @@ class _AppShellState extends ConsumerState<_AppShell> {
         context.go('/explore');
         break;
       case 2:
-        context.go('/chat');
-        break;
-      case 3:
         context.go('/profile');
         break;
     }
@@ -341,17 +336,14 @@ class _AppShellState extends ConsumerState<_AppShell> {
       _selectedIndex = 0;
     } else if (location.startsWith('/explore')) {
       _selectedIndex = 1;
-    } else if (location.startsWith('/chat')) {
-      _selectedIndex = 2;
     } else if (location.startsWith('/profile')) {
-      _selectedIndex = 3;
+      _selectedIndex = 2;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final authState = ref.watch(authStateProvider);
 
     return Scaffold(
       body: widget.child,
@@ -384,28 +376,6 @@ class _AppShellState extends ConsumerState<_AppShell> {
               label: l10n.explore,
             ),
             BottomNavigationBarItem(
-              icon: Stack(
-                children: [
-                  const Icon(Icons.forum_outlined),
-                  if (!authState.isAuthenticated)
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: AppColors.defaultBlue,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              activeIcon: const Icon(Icons.forum_rounded),
-              label: l10n.chat,
-            ),
-            BottomNavigationBarItem(
               icon: const Icon(Icons.person_outline_rounded),
               activeIcon: const Icon(Icons.person_rounded),
               label: l10n.profile,
@@ -430,9 +400,6 @@ class _HomePage extends StatelessWidget {
             context.go('/explore');
             break;
           case 2:
-            context.go('/chat');
-            break;
-          case 3:
             context.go('/profile');
             break;
           default:
@@ -453,25 +420,7 @@ class _ExplorePage extends StatelessWidget {
   }
 }
 
-class _ChatPage extends ConsumerWidget {
-  const _ChatPage();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authStateProvider);
-    final l10n = AppLocalizations.of(context);
-
-    if (authState.isAuthenticated) {
-      return const ChatListScreen();
-    } else {
-      return PremiumAuthRequiredPage(
-        title: l10n.chat,
-        description: 'Connect with students and organizations across BI',
-        icon: Icons.forum_outlined,
-      );
-    }
-  }
-}
+// class _ChatPage removed during launch (chat disabled in bottom nav)
 
 class _ProfilePage extends ConsumerWidget {
   const _ProfilePage();

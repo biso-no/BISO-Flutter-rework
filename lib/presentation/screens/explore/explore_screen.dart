@@ -58,7 +58,6 @@ class ExploreScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.explore),
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.search))],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

@@ -13,21 +13,11 @@ import '../../widgets/premium/premium_html_renderer.dart';
 
 // Providers
 final _jobServiceProvider = Provider<JobService>((ref) => JobService());
-final jobsProvider = FutureProvider.family<List<JobModel>, String?>( (
-  ref,
-  campusId,
-) {
-  final service = ref.watch(_jobServiceProvider);
-  return service.getLatestJobs(
-    campusId: campusId,
-    limit: 50,
-    page: 1,
-    includeExpired: false,
-  );
-});
+// NOTE: Replaced one-shot provider with widget-managed pagination
 
 class JobsScreen extends ConsumerStatefulWidget {
-  const JobsScreen({super.key});
+  final String? openJobId;
+  const JobsScreen({super.key, this.openJobId});
 
   @override
   ConsumerState<JobsScreen> createState() => _JobsScreenState();
@@ -35,15 +25,118 @@ class JobsScreen extends ConsumerStatefulWidget {
 
 class _JobsScreenState extends ConsumerState<JobsScreen> {
   String _selectedType = 'all';
+  bool _pendingAutoOpen = true;
+
+  // Paging state
+  final ScrollController _scrollController = ScrollController();
+  final List<JobModel> _jobs = [];
+  bool _isLoading = true;
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
+  int _currentPage = 1;
+  static const int _pageSize = 20;
+  String? _loadedForCampusId;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_hasMore || _isLoadingMore || _isLoading) return;
+    if (!_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      _loadMore();
+    }
+  }
+
+  Future<void> _ensureInitialLoad(String? campusId) async {
+    if (_loadedForCampusId == campusId && _jobs.isNotEmpty) return;
+    _loadedForCampusId = campusId;
+    _isLoading = true;
+    _jobs.clear();
+    _currentPage = 1;
+    _hasMore = true;
+    if (mounted) setState(() {});
+    await _fetchPage(page: 1, replace: true);
+  }
+
+  Future<void> _fetchPage({required int page, bool replace = false}) async {
+    final campusId = ref.read(filterCampusProvider).id;
+    final service = ref.read(_jobServiceProvider);
+    try {
+      final items = await service.getLatestJobs(
+        campusId: campusId,
+        limit: _pageSize,
+        page: page,
+        includeExpired: false,
+      );
+      if (mounted) {
+        setState(() {
+          if (replace) {
+            _jobs
+              ..clear()
+              ..addAll(items);
+            _isLoading = false;
+          } else {
+            _jobs.addAll(items);
+            _isLoadingMore = false;
+          }
+          _hasMore = items.length >= _pageSize;
+        });
+      }
+      // Auto-open after first batch
+      if (_pendingAutoOpen && widget.openJobId != null && _jobs.isNotEmpty) {
+        final matches = _jobs
+            .where((j) => j.id.toString() == widget.openJobId)
+            .toList(growable: false);
+        if (matches.isNotEmpty) {
+          _pendingAutoOpen = false;
+          final jobToOpen = matches.first;
+          Future.microtask(() => _showJobDetails(context, jobToOpen));
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _isLoadingMore = false;
+          _hasMore = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _reload() async {
+    _pendingAutoOpen = true;
+    await _fetchPage(page: 1, replace: true);
+    _currentPage = 1;
+  }
+
+  Future<void> _loadMore() async {
+    if (!_hasMore || _isLoadingMore) return;
+    setState(() => _isLoadingMore = true);
+    _currentPage += 1;
+    await _fetchPage(page: _currentPage);
+  }
 
   final List<String> _jobTypes = ['all', 'volunteer', 'paid'];
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final campusId = ref.watch(filterCampusProvider).id;
-    final jobsAsync = ref.watch(jobsProvider(campusId));
+    // Ensure initial load for current campus
+    _ensureInitialLoad(campusId);
 
     return Scaffold(
       appBar: AppBar(
@@ -60,8 +153,8 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
           icon: const Icon(Icons.arrow_back),
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.bookmark_border)),
+          // IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
+          // IconButton(onPressed: () {}, icon: const Icon(Icons.bookmark_border)),
         ],
       ),
       body: Column(
@@ -112,96 +205,41 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
 
           // Jobs List
           Expanded(
-            child: jobsAsync.when(
-              data: (jobs) {
-                // Filter by type
-                final filtered = _selectedType == 'all'
-                    ? jobs
-                    : jobs.where((j) => j.type == _selectedType).toList();
-
-                if (filtered.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.work_outline,
-                          size: 64,
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No opportunities found',
-                          style: theme.textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Try changing your filter or check back later',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: AppColors.onSurfaceVariant,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : RefreshIndicator(
+                    onRefresh: _reload,
+                    child: ListView.separated(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: (_selectedType == 'all'
+                              ? _jobs
+                              : _jobs
+                                  .where((j) => j.type == _selectedType)
+                                  .toList())
+                          .length + (_isLoadingMore ? 1 : 0),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final filtered = _selectedType == 'all'
+                            ? _jobs
+                            : _jobs
+                                .where((j) => j.type == _selectedType)
+                                .toList();
+                        if (index >= filtered.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+                        final job = filtered[index];
+                        return _JobCard(
+                          job: job,
+                          onTap: () => _showJobDetails(context, job),
+                        );
+                      },
                     ),
-                  );
-                }
-
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    ref.invalidate(jobsProvider(campusId));
-                  },
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filtered.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final job = filtered[index];
-                      return _JobCard(
-                        job: job,
-                        onTap: () => _showJobDetails(context, job),
-                      );
-                    },
                   ),
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, st) => Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: AppColors.error,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Failed to load jobs',
-                        style: theme.textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        e.toString(),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        onPressed: () => ref.invalidate(jobsProvider(campusId)),
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Try Again'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           ),
         ],
       ),
@@ -529,14 +567,14 @@ class _JobDetailSheet extends StatelessWidget {
                 // Job Info Cards
                 Row(
                   children: [
-                    Expanded(
-                      child: _InfoCard(
-                        icon: Icons.access_time,
-                        label: 'Time Commitment',
-                        value: job.timeCommitment ?? '—',
-                      ),
-                    ),
-                    const SizedBox(width: 12),
+                    // Expanded(
+                    //   child: _InfoCard(
+                    //     icon: Icons.access_time,
+                    //     label: 'Time Commitment',
+                    //     value: job.timeCommitment ?? '—',
+                    //   ),
+                    // ),
+                    // const SizedBox(width: 12),
                     Expanded(
                       child: _InfoCard(
                         icon: Icons.schedule,
@@ -554,14 +592,14 @@ class _JobDetailSheet extends StatelessWidget {
                 // Action Buttons - Below time commitment and deadline
                 Row(
                   children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.bookmark_border),
-                        label: const Text('Save'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
+                    // Expanded(
+                    //   child: OutlinedButton.icon(
+                    //     onPressed: () {},
+                    //     icon: const Icon(Icons.bookmark_border),
+                    //     label: const Text('Save'),
+                    //   ),
+                    // ),
+                    // const SizedBox(width: 12),
                     Expanded(
                       flex: 2,
                       child: ElevatedButton.icon(
