@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../providers/campus/campus_provider.dart';
 import '../../../providers/notification/notification_provider.dart';
 import 'settings_screen.dart';
+import '../../../generated/l10n/app_localizations.dart';
 
 class ChatSettingsTab extends ConsumerWidget {
   const ChatSettingsTab({super.key});
@@ -12,6 +13,7 @@ class ChatSettingsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final settingsState = ref.watch(appSettingsProvider);
     final selectedCampus = ref.watch(selectedCampusProvider);
     final notificationPrefs = ref.watch(notificationPreferencesProvider);
@@ -23,7 +25,7 @@ class ChatSettingsTab extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Chat Settings',
+            l10n.chat,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -42,16 +44,15 @@ class ChatSettingsTab extends ConsumerWidget {
                       Icons.notifications,
                       color: AppColors.onSurfaceVariant,
                     ),
-                    title: const Text('Chat Notifications'),
+                    title: Text(l10n.chatNotifications),
                     subtitle: notificationStatus.when(
                       data: (enabled) => Text(
                         enabled
-                            ? 'Receive notifications for new messages'
-                            : 'Enable system notifications first',
+                            ? l10n.receiveMessageNotifications
+                            : l10n.error,
                       ),
-                      loading: () => const Text('Checking permissions...'),
-                      error: (_, _) =>
-                          const Text('Receive notifications for new messages'),
+                      loading: () => Text(l10n.checkingPermissions),
+                      error: (_, _) => Text(l10n.receiveMessageNotifications),
                     ),
                     value: prefs['chat_notifications'] ?? true,
                     onChanged: notificationStatus.when(
@@ -67,9 +68,7 @@ class ChatSettingsTab extends ConsumerWidget {
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(
-                                        'Failed to update setting: $e',
-                                      ),
+                                      content: Text(l10n.somethingWentWrong),
                                       backgroundColor: AppColors.error,
                                     ),
                                   );
@@ -92,10 +91,8 @@ class ChatSettingsTab extends ConsumerWidget {
                                 ref.invalidate(notificationStatusProvider);
                               } else if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Please enable notifications in system settings',
-                                    ),
+                                  SnackBar(
+                                    content: Text(l10n.error),
                                     backgroundColor: AppColors.error,
                                   ),
                                 );
@@ -106,16 +103,16 @@ class ChatSettingsTab extends ConsumerWidget {
                     ),
                     activeColor: _getCampusColor(selectedCampus.id),
                   ),
-                  loading: () => const ListTile(
+                  loading: () => ListTile(
                     leading: CircularProgressIndicator(),
-                    title: Text('Loading notification settings...'),
+                    title: Text(l10n.loadingNotificationSettings),
                   ),
                   error: (error, _) => ListTile(
                     leading: const Icon(
                       Icons.error_outline,
                       color: AppColors.error,
                     ),
-                    title: const Text('Error loading notification settings'),
+                    title: Text(l10n.errorLoadingNotificationSettings),
                     subtitle: Text(error.toString()),
                   ),
                 ),
@@ -125,8 +122,8 @@ class ChatSettingsTab extends ConsumerWidget {
                     Icons.vibration,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Vibration'),
-                  subtitle: const Text('Vibrate for new messages'),
+                  title: Text(l10n.vibration),
+                  subtitle: Text(l10n.vibrationDescription),
                   value: settingsState.notifications['chat_vibration'] ?? true,
                   onChanged: (value) {
                     ref
@@ -141,8 +138,8 @@ class ChatSettingsTab extends ConsumerWidget {
                     Icons.volume_up,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Sound'),
-                  subtitle: const Text('Play sound for new messages'),
+                  title: Text(l10n.sound),
+                  subtitle: Text(l10n.soundDescription),
                   value: settingsState.notifications['chat_sound'] ?? true,
                   onChanged: (value) {
                     ref
@@ -158,7 +155,7 @@ class ChatSettingsTab extends ConsumerWidget {
           const SizedBox(height: 24),
 
           Text(
-            'Chat Behavior',
+            l10n.chat,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -175,10 +172,8 @@ class ChatSettingsTab extends ConsumerWidget {
                     Icons.visibility,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Read Receipts'),
-                  subtitle: const Text(
-                    'Let others know when you\'ve read their messages',
-                  ),
+                  title: Text(l10n.readReceipts),
+                  subtitle: Text(l10n.readReceipts),
                   value: settingsState.notifications['read_receipts'] ?? true,
                   onChanged: (value) {
                     ref
@@ -193,8 +188,8 @@ class ChatSettingsTab extends ConsumerWidget {
                     Icons.edit,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Typing Indicators'),
-                  subtitle: const Text('Show when you\'re typing'),
+                  title: Text(l10n.typingIndicators),
+                  subtitle: Text(l10n.typingIndicators),
                   value:
                       settingsState.notifications['typing_indicators'] ?? true,
                   onChanged: (value) {
@@ -210,8 +205,8 @@ class ChatSettingsTab extends ConsumerWidget {
                     Icons.access_time,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Last Seen'),
-                  subtitle: const Text('Show your last seen status'),
+                  title: Text(l10n.lastSeen),
+                  subtitle: Text(l10n.lastSeenDescription),
                   value: settingsState.notifications['last_seen'] ?? true,
                   onChanged: (value) {
                     ref
@@ -227,7 +222,7 @@ class ChatSettingsTab extends ConsumerWidget {
           const SizedBox(height: 24),
 
           Text(
-            'Chat Storage',
+            l10n.chat,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.strongBlue,
@@ -244,14 +239,12 @@ class ChatSettingsTab extends ConsumerWidget {
                     Icons.auto_delete,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Auto-delete Messages'),
-                  subtitle: const Text('Automatically delete old messages'),
-                  trailing: const Text('Never'),
+                  title: Text(l10n.autoDeleteMessages),
+                  subtitle: Text(l10n.autoDeleteMessagesDescription),
+                  trailing: Text(l10n.never),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Auto-delete options coming soon'),
-                      ),
+                      SnackBar(content: Text(l10n.autoDeleteOptionsComingSoon)),
                     );
                   },
                 ),
@@ -261,16 +254,12 @@ class ChatSettingsTab extends ConsumerWidget {
                     Icons.download,
                     color: AppColors.onSurfaceVariant,
                   ),
-                  title: const Text('Auto-download Media'),
-                  subtitle: const Text(
-                    'Download photos and files automatically',
-                  ),
-                  trailing: const Text('Wi-Fi only'),
+                  title: Text(l10n.autoDownloadMedia),
+                  subtitle: Text(l10n.autoDownloadMedia),
+                  trailing: Text(l10n.wifiOnly),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Auto-download options coming soon'),
-                      ),
+                      SnackBar(content: Text(l10n.autoDownloadOptionsComingSoon)),
                     );
                   },
                 ),
@@ -292,7 +281,7 @@ class ChatSettingsTab extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Chat settings apply to all conversations. Individual chat settings can be changed from the chat info screen.',
+                    l10n.chat,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppColors.defaultBlue,
                     ),

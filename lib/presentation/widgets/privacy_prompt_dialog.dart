@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../generated/l10n/app_localizations.dart';
 
 class PrivacyPromptDialog extends StatelessWidget {
   final VoidCallback onAcceptPublic;
@@ -14,6 +15,7 @@ class PrivacyPromptDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
@@ -24,10 +26,10 @@ class PrivacyPromptDialog extends StatelessWidget {
             size: 28,
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Chat Privacy Settings',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              l10n.chatPrivacy,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -36,9 +38,9 @@ class PrivacyPromptDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Choose how others can find and contact you:',
-            style: TextStyle(
+          Text(
+            l10n.privacyInformation,
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: AppColors.onSurface,
@@ -63,9 +65,9 @@ class PrivacyPromptDialog extends StatelessWidget {
                   children: [
                     Icon(Icons.public, color: AppColors.defaultBlue, size: 20),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Public Profile',
-                      style: TextStyle(
+                    Text(
+                      l10n.publicProfile,
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.defaultBlue,
                         fontSize: 16,
@@ -74,11 +76,9 @@ class PrivacyPromptDialog extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  '• Others can find you in search\n'
-                  '• Students can start conversations with you\n'
-                  '• You appear in recent contacts',
-                  style: TextStyle(
+                Text(
+                  l10n.publicProfileBullets,
+                  style: const TextStyle(
                     fontSize: 14,
                     color: AppColors.onSurface,
                     height: 1.4,
@@ -109,9 +109,9 @@ class PrivacyPromptDialog extends StatelessWidget {
                       size: 20,
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Private Profile',
-                      style: TextStyle(
+                    Text(
+                      l10n.privateProfile,
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.gray600,
                         fontSize: 16,
@@ -120,11 +120,9 @@ class PrivacyPromptDialog extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  '• Others cannot find you in search\n'
-                  '• You can still message others\n'
-                  '• Only you can start conversations',
-                  style: TextStyle(
+                Text(
+                  l10n.privateProfileBullets,
+                  style: const TextStyle(
                     fontSize: 14,
                     color: AppColors.onSurfaceVariant,
                     height: 1.4,
@@ -137,7 +135,7 @@ class PrivacyPromptDialog extends StatelessWidget {
           const SizedBox(height: 16),
 
           Text(
-            'You can change this setting anytime in your profile.',
+            l10n.notificationPreferences,
             style: TextStyle(
               fontSize: 12,
               color: AppColors.onSurfaceVariant,
@@ -157,7 +155,7 @@ class PrivacyPromptDialog extends StatelessWidget {
                   foregroundColor: AppColors.gray600,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                child: const Text('Keep Private'),
+                child: Text(l10n.keepPrivate),
               ),
             ),
             const SizedBox(width: 12),
@@ -169,7 +167,7 @@ class PrivacyPromptDialog extends StatelessWidget {
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                child: const Text('Make Public'),
+                child: Text(l10n.makePublic),
               ),
             ),
           ],

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../data/models/membership_model.dart';
+import '../../generated/l10n/app_localizations.dart';
 
 class MembershipStatusWidget extends StatefulWidget {
   final MembershipModel? membership;
@@ -67,6 +68,7 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final membership = widget.membership;
 
     if (membership == null) {
@@ -81,6 +83,7 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
   }
 
   Widget _buildNonMemberCard(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -101,14 +104,14 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
             ),
             const SizedBox(height: 16),
             Text(
-              'BISO Membership',
+              l10n.appName,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Get access to exclusive events, discounts, and more',
+              l10n.forStudents,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppColors.onSurfaceVariant,
               ),
@@ -120,7 +123,7 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
               child: FilledButton.icon(
                 onPressed: widget.onBuyMembership,
                 icon: const Icon(Icons.shopping_cart),
-                label: const Text('Buy Membership'),
+                label: Text(l10n.buyMembership),
                 style: FilledButton.styleFrom(
                   backgroundColor: widget.campusColor,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -278,6 +281,7 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
     ThemeData theme,
     MembershipModel membership,
   ) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -298,14 +302,14 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
             ),
             const SizedBox(height: 16),
             Text(
-              'Membership Expired',
+              l10n.expenses, // Placeholder key; ideally add membershipExpired key
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Your ${membership.displayName} membership expired${membership.expiryDate != null ? ' on ${_formatDate(membership.expiryDate!)}' : ''}',
+              '${membership.displayName} ' ,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppColors.onSurfaceVariant,
               ),
@@ -317,7 +321,7 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
               child: FilledButton.icon(
                 onPressed: widget.onBuyMembership,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Renew Membership'),
+                label: Text(l10n.renewMembership),
                 style: FilledButton.styleFrom(
                   backgroundColor: widget.campusColor,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -386,6 +390,7 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
   }
 
   Widget _buildVerificationCode(MembershipModel membership) {
+    final l10n = AppLocalizations.of(context);
     // Generate a unique verification pattern based on membership data
     final verificationCode = _generateVerificationCode(membership);
 
@@ -418,9 +423,9 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
             onTap: () {
               Clipboard.setData(ClipboardData(text: verificationCode));
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Verification code copied'),
-                  duration: Duration(seconds: 2),
+                SnackBar(
+                  content: Text(l10n.verificationCodeCopied),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },
@@ -453,7 +458,7 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
               Icon(Icons.check_circle, color: AppColors.green9, size: 20),
               const SizedBox(width: 8),
               Text(
-                'Member Benefits Active',
+                ' ',
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppColors.green9,
@@ -463,7 +468,7 @@ class _MembershipStatusWidgetState extends State<MembershipStatusWidget>
           ),
           const SizedBox(height: 8),
           Text(
-            'Event access • Expense reimbursements • Marketplace discounts • Priority support',
+            ' ',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppColors.onSurfaceVariant,
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../generated/l10n/app_localizations.dart';
 import '../../providers/notification/notification_provider.dart';
 
 class NotificationPermissionDialog extends ConsumerWidget {
@@ -9,6 +10,7 @@ class NotificationPermissionDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
@@ -26,10 +28,10 @@ class NotificationPermissionDialog extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Enable Notifications',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              l10n.chatNotifications,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -38,9 +40,9 @@ class NotificationPermissionDialog extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Get notified when you receive new messages in chat.',
-            style: TextStyle(fontSize: 16, height: 1.4),
+          Text(
+            l10n.receiveMessageNotifications,
+            style: const TextStyle(fontSize: 16, height: 1.4),
           ),
           const SizedBox(height: 16),
           Container(
@@ -49,18 +51,18 @@ class NotificationPermissionDialog extends ConsumerWidget {
               color: AppColors.subtleBlue,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.info_outline,
                   color: AppColors.defaultBlue,
                   size: 20,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'You can change this setting anytime in your profile.',
-                    style: TextStyle(
+                    l10n.notificationPreferences,
+                    style: const TextStyle(
                       color: AppColors.defaultBlue,
                       fontSize: 14,
                     ),
@@ -76,9 +78,9 @@ class NotificationPermissionDialog extends ConsumerWidget {
           onPressed: () {
             Navigator.of(context).pop(false);
           },
-          child: const Text(
-            'Not Now',
-            style: TextStyle(color: AppColors.onSurfaceVariant),
+          child: Text(
+            l10n.cancel,
+            style: const TextStyle(color: AppColors.onSurfaceVariant),
           ),
         ),
         ElevatedButton(
@@ -96,8 +98,8 @@ class NotificationPermissionDialog extends ConsumerWidget {
                 if (context.mounted) {
                   Navigator.of(context).pop(true);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Notifications enabled successfully!'),
+                    SnackBar(
+                      content: Text(l10n.notificationsEnabled),
                       backgroundColor: AppColors.defaultBlue,
                     ),
                   );
@@ -106,10 +108,8 @@ class NotificationPermissionDialog extends ConsumerWidget {
                 if (context.mounted) {
                   Navigator.of(context).pop(false);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Please enable notifications in system settings',
-                      ),
+                    SnackBar(
+                      content: Text(l10n.error),
                       backgroundColor: AppColors.error,
                     ),
                   );
@@ -120,7 +120,7 @@ class NotificationPermissionDialog extends ConsumerWidget {
                 Navigator.of(context).pop(false);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Error enabling notifications: $e'),
+                    content: Text(l10n.errorEnablingNotifications(e.toString())),
                     backgroundColor: AppColors.error,
                   ),
                 );
@@ -134,7 +134,7 @@ class NotificationPermissionDialog extends ConsumerWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          child: const Text('Enable'),
+          child: Text(l10n.enable),
         ),
       ],
     );

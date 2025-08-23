@@ -27,13 +27,13 @@ class ProfileScreen extends ConsumerWidget {
     if (authState.isLoading) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.profile)),
-        body: const Center(
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Loading your profile...'),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(l10n.loadingYourProfile),
             ],
           ),
         ),
@@ -54,13 +54,13 @@ class ProfileScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Sign in to view your profile',
+                l10n.signInToViewProfile,
                 style: theme.textTheme.titleLarge,
               ),
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: () => context.push('/login'),
-                child: const Text('Sign In'),
+                child: Text(l10n.login),
               ),
             ],
           ),
@@ -120,7 +120,7 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                       // Name
                       Text(
-                        user?.name ?? 'Unknown User',
+                        user?.name ?? l10n.unknownUser,
                         style: theme.textTheme.headlineSmall?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -251,23 +251,23 @@ class ProfileScreen extends ConsumerWidget {
 
                   // Profile Information Section
                   _ProfileSection(
-                    title: 'Profile Information',
+                    title: l10n.profileInformation,
                     children: [
                       _ProfileInfoTile(
                         icon: Icons.email_outlined,
-                        label: 'Email',
+                        label: l10n.email,
                         value: authState.user?.email ?? '',
                       ),
                       if (profile?.phone != null)
                         _ProfileInfoTile(
                           icon: Icons.phone_outlined,
-                          label: 'Phone',
+                          label: l10n.phone,
                           value: profile!.phone!,
                         ),
                       if (profile?.address != null)
                         _ProfileInfoTile(
                           icon: Icons.home_outlined,
-                          label: 'Address',
+                          label: l10n.address,
                           value: _formatAddress(profile!),
                         ),
                     ],
@@ -277,11 +277,11 @@ class ProfileScreen extends ConsumerWidget {
 
                   // Campus & Departments Section
                   _ProfileSection(
-                    title: 'Campus & Interests',
+                    title: l10n.campusAndInterests,
                     children: [
                       _ProfileInfoTile(
                         icon: Icons.location_city_outlined,
-                        label: 'Campus',
+                        label: l10n.campus,
                         value: 'BI ${selectedCampus.name}',
                         trailing: Container(
                           width: 12,
@@ -295,7 +295,7 @@ class ProfileScreen extends ConsumerWidget {
                       if (profile?.departments.isNotEmpty == true)
                         _ProfileInfoTile(
                           icon: Icons.interests_outlined,
-                          label: 'Interests',
+                          label: l10n.interests,
                           value: profile!.departments.join(', '),
                         ),
                     ],
@@ -305,16 +305,16 @@ class ProfileScreen extends ConsumerWidget {
 
                   // Account Actions Section
                   _ProfileSection(
-                    title: 'Account',
+                    title: l10n.account,
                     children: [
                       _ProfileActionTile(
                         icon: Icons.receipt_long_outlined,
-                        label: 'Expense History',
+                        label: l10n.expenseHistory,
                         onTap: () => context.push('/explore/expenses'),
                       ),
                       _ProfileActionTile(
                         icon: Icons.payment_outlined,
-                        label: 'Payment Information',
+                        label: l10n.paymentInformation,
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -325,7 +325,7 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                       _ProfileActionTile(
                         icon: Icons.notifications_outlined,
-                        label: 'Notification Preferences',
+                        label: l10n.notificationPreferences,
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -336,7 +336,7 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                       _ProfileActionTile(
                         icon: Icons.language_outlined,
-                        label: 'Language Settings',
+                        label: l10n.languageSettings,
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -354,10 +354,8 @@ class ProfileScreen extends ConsumerWidget {
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.logout, color: AppColors.error),
-                      title: const Text(
-                        'Sign Out',
-                        style: TextStyle(color: AppColors.error),
-                      ),
+                      title: Text(l10n.signOut,
+                          style: const TextStyle(color: AppColors.error)),
                       onTap: () => _showSignOutDialog(context, ref),
                     ),
                   ),
@@ -400,12 +398,12 @@ class ProfileScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
+        title: Text(l10n.signOut),
+        content: Text(l10n.areYouSureSignOut),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () async {
@@ -418,7 +416,7 @@ class ProfileScreen extends ConsumerWidget {
               }
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Sign Out'),
+            child: Text(l10n.signOut),
           ),
         ],
       ),

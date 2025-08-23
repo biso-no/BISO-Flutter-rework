@@ -457,6 +457,371 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Contact Information'**
   String get contactInformation;
+
+  /// Close button
+  String get close;
+
+  /// Enable button
+  String get enable;
+
+  /// Details label
+  String get details;
+
+  /// Buy membership button
+  String get buyMembership;
+
+  /// Renew membership button
+  String get renewMembership;
+
+  /// Verification code copied message
+  String get verificationCodeCopied;
+
+  /// Keep private button
+  String get keepPrivate;
+
+  /// Make public button
+  String get makePublic;
+
+  /// Failed to load campuses message
+  String get failedToLoadCampuses;
+
+  /// Message copied snackbar
+  String get messageCopied;
+
+  /// Payment information title
+  String get paymentInformation;
+
+  /// Payment info saved
+  String get paymentInfoSaved;
+
+  /// Payment info save failed
+  String paymentInfoSaveFailed(String error);
+
+  /// Save payment info button
+  String get savePaymentInformation;
+
+  /// Chat notifications title
+  String get chatNotifications;
+
+  /// Checking permissions text
+  String get checkingPermissions;
+
+  /// Receive notifications description
+  String get receiveMessageNotifications;
+
+  /// Loading notification settings
+  String get loadingNotificationSettings;
+
+  /// Error loading notification settings
+  String get errorLoadingNotificationSettings;
+
+  /// Vibration setting
+  String get vibration;
+
+  /// Vibration description
+  String get vibrationDescription;
+
+  /// Sound setting
+  String get sound;
+
+  /// Sound description
+  String get soundDescription;
+
+  /// Read receipts setting
+  String get readReceipts;
+
+  /// Typing indicators setting
+  String get typingIndicators;
+
+  /// Last seen setting
+  String get lastSeen;
+
+  /// Last seen description
+  String get lastSeenDescription;
+
+  /// Auto-delete messages setting
+  String get autoDeleteMessages;
+
+  /// Auto-delete messages description
+  String get autoDeleteMessagesDescription;
+
+  /// Never option
+  String get never;
+
+  /// Auto-delete options coming soon
+  String get autoDeleteOptionsComingSoon;
+
+  /// Auto-download media setting
+  String get autoDownloadMedia;
+
+  /// Wi-Fi only option
+  String get wifiOnly;
+
+  /// Auto-download options coming soon
+  String get autoDownloadOptionsComingSoon;
+
+  /// Loading your profile
+  String get loadingYourProfile;
+
+  /// Complete Profile button
+  String get completeProfile;
+
+  /// Sign Out button
+  String get signOut;
+
+  /// Sign out confirmation
+  String get areYouSureSignOut;
+
+  /// Student verification title
+  String get studentVerification;
+
+  /// Register student ID first
+  String get pleaseRegisterStudentId;
+
+  /// Remove student ID title
+  String get removeStudentId;
+
+  /// Remove button
+  String get remove;
+
+  /// Try again button
+  String get tryAgain;
+
+  /// Connect BI account button
+  String get connectBiAccount;
+
+  /// Refresh button
+  String get refresh;
+
+  /// Purchase membership button
+  String get purchaseMembership;
+
+  /// Refresh status button
+  String get refreshStatus;
+
+  /// Dark mode setting
+  String get darkMode;
+
+  /// Dark mode description
+  String get darkModeDescription;
+
+  /// Clear cache setting
+  String get clearCache;
+
+  /// Clear cache description
+  String get clearCacheDescription;
+
+  /// Offline data setting
+  String get offlineData;
+
+  /// Offline data description
+  String get offlineDataDescription;
+
+  /// Offline coming soon
+  String get offlineComingSoon;
+
+  /// App Version
+  String get appVersion;
+
+  /// Privacy Policy
+  String get privacyPolicy;
+
+  /// Terms of Service
+  String get termsOfService;
+
+  /// Cache cleared successfully
+  String get cacheClearedSuccessfully;
+
+  /// Clear button
+  String get clear;
+
+  /// Events notifications
+  String get eventsNotifications;
+
+  /// Marketplace notifications
+  String get marketplaceNotifications;
+
+  /// Job opportunities
+  String get jobOpportunities;
+
+  /// Job opportunities description
+  String get jobOpportunitiesDescription;
+
+  /// Expenses notifications
+  String get expensesNotifications;
+
+  /// Expenses notifications description
+  String get expensesNotificationsDescription;
+
+  /// Chat messages notifications
+  String get chatMessagesNotifications;
+
+  /// Chat messages description
+  String get chatMessagesDescription;
+
+  /// Quiet hours
+  String get quietHours;
+
+  /// Quiet hours coming soon
+  String get quietHoursComingSoon;
+
+  /// Date format
+  String get dateFormat;
+
+  /// Date format value
+  String get dateFormatValue;
+
+  /// Date format options coming soon
+  String get dateFormatOptionsComingSoon;
+
+  /// Currency
+  String get currency;
+
+  /// Currency value
+  String get currencyValue;
+
+  /// Sell item
+  String get sellItem;
+
+  /// Publish
+  String get publish;
+
+  /// Price negotiable
+  String get priceNegotiable;
+
+  /// Discard changes title
+  String get discardChanges;
+
+  /// Keep editing
+  String get keepEditing;
+
+  /// Discard button
+  String get discard;
+
+  /// Please add at least one photo
+  String get pleaseAddAtLeastOnePhoto;
+
+  /// Item now live
+  String get itemNowLive;
+
+  /// Failed to publish with error
+  String failedToPublish(String error);
+
+  /// Units & Departments
+  String get unitsAndDepartments;
+
+  /// Generic failed to load with error
+  String failedToLoad(String error);
+
+  /// Notifications enabled
+  String get notificationsEnabled;
+
+  /// Error enabling notifications with error
+  String errorEnablingNotifications(String error);
+
+  /// Purchase failed with error
+  String purchaseFailed(String error);
+
+  /// Failed to load membership options with error
+  String failedToLoadMembershipOptions(String error);
+
+  // Tabs and sections
+  String get general;
+  String get privacy;
+  String get appLanguage;
+  String get account;
+  String get dataAndStorage;
+  String get about;
+
+  // Settings/general
+  String get currentCampus;
+  String get useCampusSwitcherHint;
+  String get validatorMode;
+  String get openValidatorMode;
+  String get scanStudentQRCodes;
+
+  // Notifications tab
+  String get pushNotifications;
+  String get marketplaceNewItemsDeals;
+  String get notificationSchedule;
+  String get muteNotificationsDuringSpecificHours;
+  String get vibrationSettingsComingSoon;
+
+  // Privacy tab
+  String get privacyInformation;
+  String get publicProfile;
+  String get othersCanFindAndMessageYou;
+  String get privateProfile;
+  String get othersCannotFindYouInSearch;
+  String get youCanStillMessageOthers;
+  String get onlyYouCanStartNewConversations;
+  String get existingConversationsRemainActive;
+
+  // Language tab
+  String get languageChangeRestartNotice;
+  String get regionalSettings;
+  String get currencyAutoNokHint;
+
+  // Profile screen
+  String get signInToViewProfile;
+  String get editProfile;
+  String get studentId;
+  String get profileInformation;
+  String get campusAndInterests;
+  String get interests;
+  String get expenseHistory;
+  String get notificationPreferences;
+  String get languageSettings;
+  String get unknownUser;
+
+  // Sell product
+  String get pleaseSignInToSellItems;
+  String get titleLabel;
+  String get exampleMacbook;
+  String get titleIsRequired;
+  String get descriptionLabel;
+  String get pleaseAddMoreDetail;
+  String get priceNok;
+  String get requiredField;
+  String get enterValidAmount;
+  String get categoryLabel;
+  String get conditionLabel;
+  String get preferredContactOptional;
+  String get contactInfoOptional;
+  String get photos;
+  String get none;
+  String get inAppMessage;
+
+  // Category and condition labels
+  String get categoryBooks;
+  String get categoryElectronics;
+  String get categoryFurniture;
+  String get categoryClothes;
+  String get categorySports;
+  String get categoryOther;
+
+  String get conditionBrandNew;
+  String get conditionLikeNew;
+  String get conditionGood;
+  String get conditionFair;
+  String get conditionPoor;
+
+  // Dialog text
+  String get unsavedChangesWarning;
+
+  // Membership UI
+  String get bisoMembership;
+  String get membershipBenefitsBlurb;
+  String get membershipExpired;
+  String membershipExpiredOn(String name, String date);
+  String membershipExpiredNoDate(String name);
+  String get validUntil;
+  String get noExpiry;
+  String get memberSince;
+  String get unknown;
+  String get memberBenefitsActive;
+  String get memberBenefitsBullets;
+  String idLabel(String code);
 }
 
 class _AppLocalizationsDelegate
