@@ -43,7 +43,8 @@ platform :ios do
       
       # Add authentication method
       if ENV["MATCH_SSH_KEY"]
-        match_params[:git_private_key] = ENV["MATCH_SSH_KEY"]
+        # Use SSH key file path instead of raw key content
+        match_params[:git_private_key] = "~/.ssh/id_ed25519"
       elsif ENV["MATCH_GIT_BASIC_AUTHORIZATION"]
         match_params[:git_basic_authorization] = ENV["MATCH_GIT_BASIC_AUTHORIZATION"]
       end
