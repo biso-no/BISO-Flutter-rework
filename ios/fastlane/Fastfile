@@ -281,18 +281,36 @@ platform :ios do
     
     # Generate certificates and profiles with API key
     UI.message("Generating App Store certificates and profiles...")
-    match(
+    
+    # Set up authentication parameters
+    match_params = {
       type: "appstore", 
       force: true,
       api_key: api_key
-    )
+    }
+    
+    # Add GitHub authentication if available
+    if ENV["MATCH_GIT_BASIC_AUTHORIZATION"]
+      # Handle both raw GitHub tokens and pre-encoded base64 strings
+      auth_token = ENV["MATCH_GIT_BASIC_AUTHORIZATION"]
+      if auth_token.start_with?("ghp_") || auth_token.start_with?("github_pat_")
+        # Convert raw GitHub token to base64 format
+        require 'base64'
+        encoded_auth = Base64.strict_encode64("token:#{auth_token}")
+        match_params[:git_basic_authorization] = encoded_auth
+        UI.message("🔑 Using GitHub token authentication")
+      else
+        # Assume it's already base64 encoded
+        match_params[:git_basic_authorization] = auth_token
+        UI.message("🔑 Using base64 encoded authentication")
+      end
+    end
+    
+    match(match_params)
     
     UI.message("Generating Development certificates and profiles...")
-    match(
-      type: "development", 
-      force: true,
-      api_key: api_key
-    )
+    match_params[:type] = "development"
+    match(match_params)
     
     UI.success("✅ Match setup complete!")
     UI.important("Now you can run: bundle exec fastlane beta")

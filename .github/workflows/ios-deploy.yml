@@ -132,10 +132,15 @@ jobs:
             echo "✅ Repository access verified"
             
             # Check if repository has any commits/content
-            COMMIT_COUNT=$(curl -s -H "Authorization: token ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}" \
-              "https://api.github.com/repos/biso-no/ios-certificates/commits" | jq length 2>/dev/null || echo "0")
+            echo "Checking repository content..."
+            COMMITS_RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}" \
+              "https://api.github.com/repos/biso-no/ios-certificates/commits")
+            echo "Commits API response: $COMMITS_RESPONSE"
             
-            if [ "$COMMIT_COUNT" = "0" ] || [ "$COMMIT_COUNT" = "null" ]; then
+            # Check if the response contains an empty array or error message
+            if echo "$COMMITS_RESPONSE" | grep -q "Git Repository is empty" || \
+               echo "$COMMITS_RESPONSE" | grep -q '\[\]' || \
+               echo "$COMMITS_RESPONSE" | grep -q "No commits found"; then
               echo "ℹ️ Repository appears to be empty - certificates will need to be generated"
               echo "repo_is_empty=true" >> $GITHUB_OUTPUT
             else
@@ -166,6 +171,7 @@ jobs:
         run: |
           echo "🔐 Generating certificates for empty repository..."
           echo "This is a one-time setup to create initial certificates and provisioning profiles."
+          echo "Repository was detected as empty: ${{ steps.validate.outputs.repo_is_empty }}"
           
           # Use the setup_match lane which is designed for this purpose
           bundle exec fastlane setup_match
