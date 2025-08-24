@@ -205,6 +205,8 @@ jobs:
         APPLE_API_PRIVATE_KEY: ${{ secrets.APPLE_API_PRIVATE_KEY }}
         APPLE_ID: ${{ secrets.APPLE_ID }}
         APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
+        PROVISIONING_PROFILE_NAME: ${{ steps.setup-signing.outputs.pp_name }}
+        PROVISIONING_PROFILE_SPECIFIER: ${{ steps.setup-signing.outputs.pp_uuid }}
       run: |
         bundle exec fastlane beta
 
