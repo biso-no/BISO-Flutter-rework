@@ -425,8 +425,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       state = state.copyWith(isLoading: false);
     } catch (e) {
-      state = state.copyWith(error: e.toString(), isLoading: false);
-      rethrow;
+      final message = e.toString();
+      // Treat user cancellation as a benign outcome
+      if (message.contains('User cancelled flow') ||
+          message.contains('USER_CANCELLED') ||
+          message.contains('FlutterAppAuthUserCancelledException')) {
+        state = state.copyWith(isLoading: false);
+        return;
+      }
+      state = state.copyWith(error: message, isLoading: false);
     }
   }
 

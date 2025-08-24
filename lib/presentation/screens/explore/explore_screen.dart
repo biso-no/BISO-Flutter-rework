@@ -92,7 +92,7 @@ class ExploreScreen extends ConsumerWidget {
                     l10n.explore,
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.strongBlue,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                   const Spacer(),
@@ -234,7 +234,7 @@ class ExploreScreen extends ConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
-                      childAspectRatio: 1.2,
+                      childAspectRatio: 1.05,
                       children: gridChildren,
                     );
                   },
@@ -244,7 +244,7 @@ class ExploreScreen extends ConsumerWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 1.2,
+                    childAspectRatio: 1.05,
                     children: [
                       _CategoryCard(
                         icon: Icons.event,
@@ -296,7 +296,7 @@ class ExploreScreen extends ConsumerWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 1.2,
+                    childAspectRatio: 1.05,
                     children: [
                       _CategoryCard(
                         icon: Icons.event,
@@ -684,11 +684,12 @@ class _CategoryCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 2), // Reduced from 4 to 2
-              Expanded(
+              Flexible(
                 child: Text(
                   subtitle,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppColors.onSurfaceVariant,
+                    height: 1.2,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -797,10 +798,15 @@ class _LanguageSwitcherState extends State<_LanguageSwitcher> {
         child: SizedBox(
           width: 24,
           height: 24,
-          child: Icon(
-            Icons.language,
-            size: 24,
-            color: AppColors.defaultBlue,
+          child: Center(
+            child: Transform.translate(
+              offset: const Offset(0, -5),
+              child: Icon(
+                Icons.language,
+                size: 24,
+                color: AppColors.defaultBlue,
+              ),
+            ),
           ),
         ),
       ),

@@ -1064,7 +1064,7 @@ class AppLocalizationsNo extends AppLocalizations {
   String get nameIsRequiredMessage => 'Navn er påkrevd';
 
   @override
-  String get nameMessage => 'Navn';
+  String get nameMessage => 'Fullt navn';
 
   @override
   String get negotiableMessage => 'Til forhandling';

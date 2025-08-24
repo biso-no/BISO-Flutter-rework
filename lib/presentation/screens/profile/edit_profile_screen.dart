@@ -303,7 +303,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 'Personal Information',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.strongBlue,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
 
@@ -354,7 +354,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 'Address Information',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.strongBlue,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
 
@@ -411,13 +411,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               ),
 
               const SizedBox(height: 24),
-
+/*
               // Interests/Departments (from DB)
               Text(
                 'Interests & Departments',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.strongBlue,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
 
@@ -430,9 +430,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     setState(() => _selectedDepartments = ids),
                 onToggleFavorite: _toggleFavorite,
               ),
-
+*/
               const SizedBox(height: 32),
-
+/*
               // Campus Information (from DB)
               Text(
                 'Campus Information',
@@ -537,7 +537,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   ),
                 ),
               ),
-
+*/
               const SizedBox(height: 32),
             ],
           ),
@@ -660,15 +660,6 @@ class _DepartmentPickerState extends State<_DepartmentPicker> {
           _buildWrap(theme, favoriteItems),
           const SizedBox(height: 16),
         ],
-
-        Text(
-          'All departments',
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 8),
-        _buildWrap(theme, otherItems),
       ],
     );
   }

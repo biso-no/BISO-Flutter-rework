@@ -2005,7 +2005,7 @@ abstract class AppLocalizations {
   /// Auto-extracted string (used in 2 files)
   ///
   /// In en, this message translates to:
-  /// **'Name'**
+  /// **'Full Name'**
   String get nameMessage;
 
   /// Auto-extracted string

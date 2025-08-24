@@ -27,7 +27,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _zipController = TextEditingController();
 
   String? _selectedCampusId;
-  List<String> _selectedDepartments = [];
+  // Department selection removed
 
   final List<CampusModel> _campuses = const [
     CampusModel(
@@ -68,16 +68,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     ),
   ];
 
-  final List<String> _availableDepartments = [
-    'Business Administration',
-    'Economics',
-    'Marketing',
-    'Finance',
-    'International Business',
-    'Technology Management',
-    'HR Management',
-    'Strategy & Leadership',
-  ];
+  // Department selection removed
 
   @override
   void dispose() {
@@ -91,7 +82,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   void _nextStep() {
-    if (_currentStep < 3) {
+    if (_currentStep < 2) {
       setState(() => _currentStep++);
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -127,7 +118,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ? _zipController.text
                 : null,
             campusId: _selectedCampusId,
-            departments: _selectedDepartments,
           );
 
       if (mounted) {
@@ -157,14 +147,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 icon: const Icon(Icons.arrow_back),
               )
             : null,
-        title: Text('${_currentStep + 1} / 4'),
+        title: Text('${_currentStep + 1} / 3'),
         centerTitle: true,
       ),
       body: Column(
         children: [
           // Progress indicator
           LinearProgressIndicator(
-            value: (_currentStep + 1) / 4,
+            value: (_currentStep + 1) / 3,
             backgroundColor: AppColors.gray200,
             valueColor: const AlwaysStoppedAnimation<Color>(
               AppColors.defaultBlue,
@@ -190,14 +180,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   selectedCampusId: _selectedCampusId,
                   onCampusSelected: (campusId) {
                     setState(() => _selectedCampusId = campusId);
-                  },
-                  onNext: _nextStep,
-                ),
-                _DepartmentSelectionStep(
-                  departments: _availableDepartments,
-                  selectedDepartments: _selectedDepartments,
-                  onDepartmentsChanged: (departments) {
-                    setState(() => _selectedDepartments = departments);
                   },
                   onNext: _nextStep,
                 ),
@@ -289,7 +271,7 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
               decoration: InputDecoration(
                 labelText: l10n.phoneMessage,
                 prefixIcon: const Icon(Icons.phone_outlined),
-                hintText: '+47 123 45 678',
+                hintText: '123 45 678',
               ),
               keyboardType: TextInputType.phone,
               textInputAction: TextInputAction.next,
@@ -466,82 +448,6 @@ class _CampusSelectionStep extends StatelessWidget {
             onPressed: selectedCampusId != null ? onNext : null,
             child: Text(l10n.continueButtonMessage),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DepartmentSelectionStep extends StatelessWidget {
-  final List<String> departments;
-  final List<String> selectedDepartments;
-  final Function(List<String>) onDepartmentsChanged;
-  final VoidCallback onNext;
-
-  const _DepartmentSelectionStep({
-    required this.departments,
-    required this.selectedDepartments,
-    required this.onDepartmentsChanged,
-    required this.onNext,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Select Interests',
-            style: theme.textTheme.headlineMedium?.copyWith(
-              color: AppColors.strongBlue,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Choose departments or areas you\'re interested in',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: AppColors.onSurfaceVariant,
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          Expanded(
-            child: ListView.builder(
-              itemCount: departments.length,
-              itemBuilder: (context, index) {
-                final department = departments[index];
-                final isSelected = selectedDepartments.contains(department);
-
-                return CheckboxListTile(
-                  title: Text(department),
-                  value: isSelected,
-                  onChanged: (bool? selected) {
-                    List<String> updated = List.from(selectedDepartments);
-                    if (selected == true) {
-                      updated.add(department);
-                    } else {
-                      updated.remove(department);
-                    }
-                    onDepartmentsChanged(updated);
-                  },
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          ElevatedButton(onPressed: onNext, child: Text(l10n.continueButtonMessage)),
         ],
       ),
     );

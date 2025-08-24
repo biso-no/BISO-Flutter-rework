@@ -19,13 +19,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   bool _isLoading = false;
-  late bool _useMagicLink;
+  // Magic link disabled; keep no state for it
 
   @override
   void initState() {
     super.initState();
-    // Use fallback mode if specified, otherwise default to magic link
-    _useMagicLink = !widget.useFallback;
+    // No-op
   }
 
   @override
@@ -55,26 +54,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      if (_useMagicLink) {
-        await ref.read(authStateProvider.notifier).sendMagicLink(_emailController.text);
-        
-        if (mounted) {
-          // Show success message and instructions
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Magic link sent! Check your email and click the link to sign in.'),
-              backgroundColor: AppColors.success,
-              duration: Duration(seconds: 5),
-            ),
-          );
-        }
-      } else {
-        await ref.read(authStateProvider.notifier).sendOtp(_emailController.text);
+      await ref.read(authStateProvider.notifier).sendOtp(_emailController.text);
 
-        if (mounted) {
-          // Navigate to OTP verification
-          context.go('/auth/verify-otp', extra: _emailController.text);
-        }
+      if (mounted) {
+        // Navigate to OTP verification
+        context.go('/auth/verify-otp', extra: _emailController.text);
       }
     } catch (e) {
       if (mounted) {
@@ -168,27 +152,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                         )
-                      : Text(_useMagicLink ? 'Send Magic Link' : l10n.continueButtonMessage),
+                      : Text(l10n.continueButtonMessage),
                 ),
 
                 const SizedBox(height: 16),
 
-                // Toggle between magic link and OTP
-                if (!widget.useFallback)
-                  TextButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        _useMagicLink = !_useMagicLink;
-                      });
-                    },
-                    icon: Icon(_useMagicLink ? Icons.mail_outline : Icons.link),
-                    label: Text(_useMagicLink 
-                        ? 'Use verification code instead' 
-                        : 'Use magic link instead'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppColors.defaultBlue,
-                    ),
-                  ),
+                // Toggle removed: OTP-only flow
 
                 const SizedBox(height: 24),
 

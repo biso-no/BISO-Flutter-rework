@@ -1372,7 +1372,7 @@
   "@nameIsRequiredMessage": {
     "description": "Auto-extracted string"
   },
-  "nameMessage": "Navn",
+  "nameMessage": "Fullt navn",
   "@nameMessage": {
     "description": "Auto-extracted string (used in 2 files)"
   },

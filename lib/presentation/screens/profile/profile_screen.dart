@@ -514,7 +514,7 @@ class _ProfileSection extends StatelessWidget {
           title,
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppColors.strongBlue,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 12),

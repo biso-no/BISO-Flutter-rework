@@ -24,20 +24,21 @@ class StudentService {
       // Microsoft Azure configuration for BI tenant
       const String clientId = '09d8bb72-2cef-4b98-a1d3-2414a7a40873';
       const String tenantId = 'adee44b2-91fc-40f1-abdd-9cc29351b5fd';
-      const String discoveryUrl =
-          'https://login.microsoftonline.com/$tenantId/v2.0';
+      const String issuer = 'https://login.microsoftonline.com/$tenantId/v2.0';
       const String redirectUrl = 'com.biso.no://oauth/callback';
 
       // OAuth2 request configuration
       final AuthorizationTokenRequest request = AuthorizationTokenRequest(
         clientId,
         redirectUrl,
-        discoveryUrl: discoveryUrl,
-        scopes: ['openid', 'email', 'profile'],
-        additionalParameters: {
-          'prompt': 'select_account',
-          'response_mode': 'query',
-        },
+        issuer: issuer,
+        scopes: [
+          'openid',
+          'email',
+          'profile',
+          'https://graph.microsoft.com/User.Read',
+        ],
+        promptValues: ['select_account'],
       );
 
       AppLogger.info('Initiating OAuth flow with Microsoft Azure');
@@ -71,11 +72,8 @@ class StudentService {
         );
       }
 
-      // Extract student number from email
-      final String studentNumber = email.replaceAll(
-        RegExp(r'@(bi\.no|biso\.no)$'),
-        '',
-      );
+      // Extract student number from email: take local-part as-is
+      final String studentNumber = email.split('@').first;
 
       AppLogger.info(
         'Student number extracted from email',

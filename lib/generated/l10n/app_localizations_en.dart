@@ -1059,7 +1059,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nameIsRequiredMessage => 'Name is required';
 
   @override
-  String get nameMessage => 'Name';
+  String get nameMessage => 'Full Name';
 
   @override
   String get negotiableMessage => 'Negotiable';

@@ -14,7 +14,6 @@ import 'core/constants/app_colors.dart';
 import 'generated/l10n/app_localizations.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/otp_verification_screen.dart';
-import 'presentation/screens/auth/magic_link_verify_screen.dart';
 import 'presentation/screens/onboarding/onboarding_screen.dart';
 import 'presentation/screens/home/premium_home_screen.dart';
 import 'presentation/screens/explore/explore_screen.dart';
@@ -142,16 +141,7 @@ final _router = GoRouter(
       builder: (context, state) =>
           OtpVerificationScreen(email: state.extra as String? ?? ''),
     ),
-    GoRoute(
-      path: '/auth/verify',
-      name: 'magic-link-verify',
-      builder: (context, state) {
-        final extra = state.extra as Map<String, dynamic>?;
-        final userId = extra?['userId'] as String? ?? '';
-        final secret = extra?['secret'] as String? ?? '';
-        return MagicLinkVerifyScreen(userId: userId, secret: secret);
-      },
-    ),
+    // Magic link route removed: OTP-only flow
     GoRoute(
       path: '/onboarding',
       name: 'onboarding',

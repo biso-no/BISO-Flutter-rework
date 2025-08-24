@@ -1372,7 +1372,7 @@
   "@nameIsRequiredMessage": {
     "description": "Auto-extracted string"
   },
-  "nameMessage": "Name",
+  "nameMessage": "Full Name",
   "@nameMessage": {
     "description": "Auto-extracted string (used in 2 files)"
   },
