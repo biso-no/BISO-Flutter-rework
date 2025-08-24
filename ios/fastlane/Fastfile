@@ -36,9 +36,10 @@ platform :ios do
       
       match_params = {
         type: "appstore",
-        readonly: is_ci,
+        readonly: false,  # Allow certificate creation on first run
         verbose: true,
-        api_key: api_key
+        api_key: api_key,
+        force: true  # Force creation if certificates don't exist
       }
       
       # Add authentication method
