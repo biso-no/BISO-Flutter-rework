@@ -78,15 +78,7 @@ jobs:
           pod repo update
           pod install
 
-      - name: Setup SSH for Match
-        if: ${{ env.MATCH_SSH_KEY != '' }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.MATCH_SSH_KEY }}" | base64 -d > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          # Test SSH connection
-          ssh -T git@github.com || true
+      # SSH setup removed - using HTTPS with PAT for better reliability
 
       - name: Determine deployment lane
         id: deployment
