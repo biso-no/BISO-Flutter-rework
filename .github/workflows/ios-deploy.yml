@@ -51,7 +51,7 @@ jobs:
           working-directory: ios
 
       - name: Cache Flutter dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.pub-cache
@@ -62,7 +62,7 @@ jobs:
             ${{ runner.os }}-flutter-
 
       - name: Cache CocoaPods
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
@@ -118,7 +118,7 @@ jobs:
           bundle exec fastlane ${{ steps.deployment.outputs.lane }}
 
       - name: Upload IPA artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ios-build-${{ github.run_number }}
