@@ -36,10 +36,10 @@ jobs:
         with:
           fetch-depth: 0  # Full history for version tags
 
-      - name: Select Xcode 15.4
+      - name: Select Xcode 16.4
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '15.4'
+          xcode-version: '16.4'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
