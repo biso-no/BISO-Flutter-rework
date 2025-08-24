@@ -8,7 +8,7 @@ on:
     branches: [ main ]
 
 env:
-  FLUTTER_VERSION: '3.32.8'  # Use latest stable Flutter version
+  FLUTTER_VERSION: '3.32.8'  # Your actual Flutter version
   APP_VERSION: '2.0.0'
   BUILD_NUMBER: '60'
 
@@ -121,12 +121,10 @@ jobs:
         p12-password: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
     
     - name: Install Provisioning Profile
-      uses: apple-actions/download-provisioning-profiles@v3
-      with:
-        bundle-id: com.biso.no
-        issuer-id: ${{ secrets.APPLE_API_ISSUER_ID }}
-        api-key-id: ${{ secrets.APPLE_API_KEY_ID }}
-        api-private-key: ${{ secrets.APPLE_API_PRIVATE_KEY }}
+      run: |
+        echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/profile.mobileprovision
+        mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles/
+        cp ~/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
     
     - name: Build iOS Archive
       run: |
