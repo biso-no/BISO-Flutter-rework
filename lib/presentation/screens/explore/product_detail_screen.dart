@@ -355,16 +355,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
     final product = _product!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
       body: CustomScrollView(
         slivers: [
           // Image gallery app bar
           SliverAppBar(
             expandedHeight: 400,
             pinned: true,
-            backgroundColor: Colors.white,
+            backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
             leading: IconButton(
               icon: Container(
                 width: 40,
@@ -439,6 +440,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                               product.name,
                               style: theme.textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
+                                color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
                               ),
                             ),
                           ],
@@ -446,19 +448,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       ),
                       if (product.isNegotiable)
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.accentGold.withValues(alpha: 0.2),
+                            color: AppColors.warning.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.defaultGold),
+                            border: Border.all(color: AppColors.warning),
                           ),
                           child: Text(
                             'Negotiable',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: AppColors.strongGold,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.warning,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -468,18 +467,41 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
                   const SizedBox(height: 16),
 
-                  // Category and condition chips
+                  // Category and condition
                   Row(
                     children: [
-                      _buildChip(
-                        _categoryLabel(product.category),
-                        AppColors.subtleBlue,
-                      ),
-                      const SizedBox(width: 8),
-                      _buildChip(
-                        _conditionLabel(product.condition),
-                        AppColors.gray100,
-                      ),
+                      if (product.category.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariant,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            product.category,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariant,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      if (product.category.isNotEmpty && product.condition.isNotEmpty)
+                        const SizedBox(width: 8),
+                      if (product.condition.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariant,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            product.condition,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariant,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
 
@@ -490,12 +512,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     'Description',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     product.description,
-                    style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      height: 1.5,
+                      color: isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariant,
+                    ),
                   ),
 
                   const SizedBox(height: 24),
@@ -515,7 +541,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -601,22 +627,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
-  Widget _buildChip(String label, Color backgroundColor) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.outlineVariant),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(
-          context,
-        ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w500),
-      ),
-    );
-  }
 
   Widget _buildSellerInfo(ProductModel product, ThemeData theme) {
     return Container(
@@ -685,39 +695,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
-  String _categoryLabel(String category) {
-    switch (category) {
-      case 'books':
-        return 'Books';
-      case 'electronics':
-        return 'Electronics';
-      case 'furniture':
-        return 'Furniture';
-      case 'clothes':
-        return 'Clothes';
-      case 'sports':
-        return 'Sports';
-      default:
-        return 'Other';
-    }
-  }
-
-  String _conditionLabel(String condition) {
-    switch (condition) {
-      case 'new':
-        return 'Brand New';
-      case 'like_new':
-        return 'Like New';
-      case 'good':
-        return 'Good';
-      case 'fair':
-        return 'Fair';
-      case 'poor':
-        return 'Poor';
-      default:
-        return condition;
-    }
-  }
 
   String _contactMethodLabel(String method) {
     switch (method) {

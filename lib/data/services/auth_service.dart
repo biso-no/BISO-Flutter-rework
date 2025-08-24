@@ -37,7 +37,7 @@ class AuthService {
       final userId = ID.unique();
 
       // Create magic URL with custom scheme
-      const magicLinkUrl = 'biso://auth/magic-link';
+      const magicLinkUrl = 'https://biso.no/auth/verify';
 
       final token = await _account.createMagicURLToken(
         userId: userId,

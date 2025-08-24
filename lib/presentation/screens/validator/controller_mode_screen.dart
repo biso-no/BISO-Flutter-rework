@@ -443,8 +443,8 @@ class _ControllerModeScreenState extends ConsumerState<ControllerModeScreen>
 
   String? _extractTokenFromQR(String qrData) {
     // Handle both app link and direct token formats
-    if (qrData.startsWith('bisoapp://verify?token=')) {
-      return qrData.substring('bisoapp://verify?token='.length);
+    if (qrData.startsWith('biso://verify?token=')) {
+      return qrData.substring('biso://verify?token='.length);
     } else if (qrData.startsWith('https://app.biso.no/verify?token=')) {
       return qrData.substring('https://app.biso.no/verify?token='.length);
     } else if (qrData.contains('token=')) {

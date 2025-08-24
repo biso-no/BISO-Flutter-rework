@@ -140,7 +140,7 @@ final _router = GoRouter(
           OtpVerificationScreen(email: state.extra as String? ?? ''),
     ),
     GoRoute(
-      path: '/auth/magic-link-verify',
+      path: '/auth/verify',
       name: 'magic-link-verify',
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>?;

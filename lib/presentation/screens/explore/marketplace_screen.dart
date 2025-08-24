@@ -182,12 +182,12 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
     // Show loading state before deciding mode
     if (flagAsync.isLoading) {
       return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
           title: Text(l10n.marketplaceMessage),
           centerTitle: true,
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: theme.appBarTheme.backgroundColor,
           leading: IconButton(
             onPressed: () =>
                 context.canPop() ? context.pop() : context.go('/home'),
@@ -224,12 +224,12 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
     _scrollController.addListener(_onScroll);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(effectiveMode == _ShopMode.marketplace ? l10n.marketplaceMessage : l10n.webshopMessage),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor,
         leading: IconButton(
           onPressed: () =>
               context.canPop() ? context.pop() : context.go('/home'),
@@ -268,7 +268,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.gray50,
+                  color: theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.outlineVariant),
                 ),
@@ -371,7 +371,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: selected ? AppColors.subtleBlue : Colors.white,
+                        color: selected ? AppColors.subtleBlue : theme.colorScheme.surface,
                         border: Border.all(
                           color: selected
                               ? AppColors.defaultBlue
@@ -568,7 +568,7 @@ class _ModeChip extends StatelessWidget {
           duration: const Duration(milliseconds: 160),
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: selected ? Colors.white : Colors.transparent,
+            color: selected ? Theme.of(context).colorScheme.surface : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             boxShadow: selected
                 ? const [
@@ -617,7 +617,7 @@ class _WebshopProductCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
             BoxShadow(
@@ -887,7 +887,7 @@ class _PremiumProductCardState extends ConsumerState<_PremiumProductCard> {
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
             BoxShadow(

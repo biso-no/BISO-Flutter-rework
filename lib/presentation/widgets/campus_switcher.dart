@@ -266,11 +266,14 @@ class _CampusSwitcherModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         children: [
@@ -294,15 +297,19 @@ class _CampusSwitcherModal extends StatelessWidget {
                   'Select Campus',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
                   ),
                 ),
                 const Spacer(),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
+                  icon: Icon(
+                    Icons.close,
+                    color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
+                  ),
                   style: IconButton.styleFrom(
-                    backgroundColor: AppColors.gray100,
-                    foregroundColor: AppColors.onSurfaceVariant,
+                    backgroundColor: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariant,
+                    foregroundColor: isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -351,6 +358,7 @@ class _CampusCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Card(
+      color: Theme.of(context).colorScheme.surface,
       margin: const EdgeInsets.only(bottom: 16),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -531,6 +539,7 @@ class _CampusModalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return InkWell(
       onTap: onTap,
@@ -538,7 +547,9 @@ class _CampusModalCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.subtleBlue : AppColors.gray50,
+          color: isSelected 
+            ? (isDark ? AppColors.subtleBlue.withValues(alpha: 0.2) : AppColors.subtleBlue)
+            : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? AppColors.defaultBlue : Colors.transparent,
@@ -574,84 +585,30 @@ class _CampusModalCard extends StatelessWidget {
                 children: [
                   Text(
                     campus.name,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: isSelected ? AppColors.defaultBlue : null,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _extractAddress(campus.location),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.onSurfaceVariant,
+                  if (campus.location.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      campus.location,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Text(
-                        '${(campus.stats.studentCount / 1000).toStringAsFixed(1)}k students',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        '${campus.stats.activeEvents} events',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
+                  ],
                 ],
               ),
             ),
 
-            Column(
-              children: [
-                Consumer(
-                  builder: (context, ref, _) {
-                    final weatherAsync = ref.watch(campusWeatherProvider(campus.name));
-                    return weatherAsync.when(
-                      data: (w) => w == null
-                          ? const SizedBox.shrink()
-                          : Column(
-                              children: [
-                                Text(w.icon, style: const TextStyle(fontSize: 24)),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${w.temperature.round()}°',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                      loading: () => const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                      error: (err, st) => const SizedBox.shrink(),
-                    );
-                  },
-                ),
-                const SizedBox(height: 8),
-                if (isSelected)
-                  const Icon(
-                    Icons.check_circle,
-                    color: AppColors.defaultBlue,
-                    size: 24,
-                  )
-                else
-                  const Icon(
-                    Icons.radio_button_unchecked,
-                    color: AppColors.onSurfaceVariant,
-                    size: 24,
-                  ),
-              ],
-            ),
+            if (isSelected)
+              Icon(
+                Icons.check_circle,
+                color: AppColors.defaultBlue,
+                size: 24,
+              ),
           ],
         ),
       ),

@@ -4,7 +4,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/navigation_utils.dart';
 import '../../../data/models/webshop_product_model.dart';
-import '../../../generated/l10n/app_localizations.dart';
 
 class WebshopProductDetailScreen extends StatefulWidget {
   final WebshopProduct product;
@@ -24,19 +23,19 @@ class _WebshopProductDetailScreenState extends State<WebshopProductDetailScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
     final product = widget.product;
     final hasSale = product.hasSale;
     final regularPrice = double.tryParse(product.price) ?? 0.0;
     final salePrice = double.tryParse(product.salePrice) ?? 0.0;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
       body: CustomScrollView(
         slivers: [
           // App Bar
           SliverAppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
             elevation: 0,
             pinned: true,
             expandedHeight: 0,
@@ -46,7 +45,7 @@ class _WebshopProductDetailScreenState extends State<WebshopProductDetailScreen>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariant,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -56,9 +55,9 @@ class _WebshopProductDetailScreenState extends State<WebshopProductDetailScreen>
                     ),
                   ],
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back,
-                  color: AppColors.charcoalBlack,
+                  color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
                   size: 20,
                 ),
               ),
@@ -67,7 +66,7 @@ class _WebshopProductDetailScreenState extends State<WebshopProductDetailScreen>
               'BISO Shop',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppColors.charcoalBlack,
+                color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
               ),
             ),
             centerTitle: true,

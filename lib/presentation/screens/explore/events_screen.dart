@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/navigation_utils.dart';
@@ -278,9 +277,11 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
       ref.read(eventsSearchTermProvider.notifier).state = trimmed;
       _searchController.text = trimmed; // keep local for client-side refine
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Search must be at least 2 characters')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(this.context).showSnackBar(
+          const SnackBar(content: Text('Search must be at least 2 characters')),
+        );
+      }
       return;
     }
 
@@ -508,14 +509,54 @@ class _EventDetailSheet extends StatelessWidget {
     required this.scrollController,
   });
 
+  String _formatEventDate(DateTime startDate, DateTime? endDate) {
+    final formatter = DateFormat('EEEE, MMM dd, yyyy • HH:mm');
+    final formattedStartDate = formatter.format(startDate);
+    if (endDate != null && startDate.day == endDate.day && startDate.month == endDate.month && startDate.year == endDate.year) {
+      return '$formattedStartDate - ${DateFormat('HH:mm').format(endDate)}';
+    }
+    return formattedStartDate;
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'upcoming':
+        return AppColors.accentBlue;
+      case 'ongoing':
+        return AppColors.success;
+      case 'completed':
+        return AppColors.gray400;
+      case 'cancelled':
+        return AppColors.error;
+      default:
+        return AppColors.onSurfaceVariant;
+    }
+  }
+
+  String _getStatusText(String status) {
+    switch (status) {
+      case 'upcoming':
+        return 'Upcoming';
+      case 'ongoing':
+        return 'Live';
+      case 'completed':
+        return 'Ended';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         children: [
@@ -539,6 +580,7 @@ class _EventDetailSheet extends StatelessWidget {
                   event.title,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
                   ),
                 ),
 
@@ -548,16 +590,16 @@ class _EventDetailSheet extends StatelessWidget {
                 Row(
                   children: [
                     Icon(
-                      Icons.schedule,
+                      Icons.calendar_today,
                       size: 20,
-                      color: AppColors.onSurfaceVariant,
+                      color: isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariant,
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      DateFormat(
-                        'EEEE, MMM dd, yyyy • HH:mm',
-                      ).format(event.startDate),
-                      style: theme.textTheme.bodyLarge,
+                      _formatEventDate(event.startDate, event.endDate),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -569,100 +611,70 @@ class _EventDetailSheet extends StatelessWidget {
                     Icon(
                       Icons.location_on,
                       size: 20,
-                      color: AppColors.onSurfaceVariant,
+                      color: isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariant,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         event.venue,
-                        style: theme.textTheme.bodyLarge,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariant,
+                        ),
                       ),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
 
-                Row(
-                  children: [
-                    Icon(
-                      Icons.group,
-                      size: 20,
-                      color: AppColors.onSurfaceVariant,
+                // Status Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(event.status).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: _getStatusColor(event.status),
+                      width: 1,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Organized by ${event.organizerName}',
-                      style: theme.textTheme.bodyLarge,
+                  ),
+                  child: Text(
+                    _getStatusText(event.status),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: _getStatusColor(event.status),
+                      fontWeight: FontWeight.w600,
                     ),
-                  ],
+                  ),
                 ),
 
                 const SizedBox(height: 24),
 
                 // Description
-                Text(
-                  'About',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(event.description, style: theme.textTheme.bodyMedium),
-
-                const SizedBox(height: 24),
-
-                // Registration Info
-                if (event.requiresRegistration) ...[
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.subtleBlue,
-                      borderRadius: BorderRadius.circular(12),
+                if (event.description.isNotEmpty) ...[
+                  Text(
+                    'Description',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Registration Required',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.defaultBlue,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        if (event.maxAttendees > 0)
-                          Text(
-                            '${event.currentAttendees}/${event.maxAttendees} registered',
-                            style: theme.textTheme.bodySmall,
-                          ),
-                        if (event.registrationDeadline != null)
-                          Text(
-                            'Deadline: ${DateFormat('MMM dd, yyyy').format(event.registrationDeadline!)}',
-                            style: theme.textTheme.bodySmall,
-                          ),
-                      ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    event.description,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      height: 1.5,
+                      color: isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 24),
                 ],
 
-                // Action Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          final url = event.registrationUrl;
-                          if (url != null && url.isNotEmpty) {
-                            launchUrl(Uri.parse(url));
-                          }
-                        },
-                        icon: const Icon(Icons.web),
-                        label: const Text('View on Biso.no'),
-                      ),
-                    ),
-                  ],
+                // Organizer Info
+                Text(
+                  'Organized by ${event.organizerName}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),

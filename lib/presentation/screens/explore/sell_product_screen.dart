@@ -219,13 +219,14 @@ class _SellProductScreenState extends ConsumerState<SellProductScreen> {
       );
     }
 
+    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
       appBar: AppBar(
         title: const Text('Sell Item'),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: _handleCancel,

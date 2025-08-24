@@ -368,7 +368,7 @@ class _StudentIdScreenState extends ConsumerState<StudentIdScreen>
 
   void _copyTokenToClipboard() {
     if (_currentToken != null) {
-      final qrData = 'bisoapp://verify?token=$_currentToken';
+      final qrData = 'biso://verify?token=$_currentToken';
       Clipboard.setData(ClipboardData(text: qrData));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1384,7 +1384,7 @@ class _AnimatedStudentIdCard extends StatelessWidget {
       return Stack(
         children: [
           _QRCodePlaceholder(
-            qrData: 'bisoapp://verify?token=$currentToken',
+            qrData: 'biso://verify?token=$currentToken',
             campusColor: campusColor,
           ),
           // Enhanced shimmer effect
@@ -1511,7 +1511,7 @@ class _AnimatedStudentIdCard extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: _QRCodePlaceholder(
-                            qrData: 'bisoapp://verify?token=$currentToken',
+                            qrData: 'biso://verify?token=$currentToken',
                             campusColor: campusColor,
                           ),
                         ),

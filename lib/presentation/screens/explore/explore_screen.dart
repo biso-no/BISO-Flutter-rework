@@ -290,7 +290,7 @@ class ExploreScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  error: (_, __) => GridView.count(
+                  error: (_, _) => GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -453,7 +453,7 @@ class ExploreScreen extends ConsumerWidget {
                     final campusName = campus.name.isNotEmpty ? campus.name : 'Campus';
                     
                     // Only show the card if we have valid data
-                    if (campusData?.location?.address?.isNotEmpty == true) {
+                    if (campusData?.location?.address.isNotEmpty == true) {
                       return Card(
                         child: Padding(
                           padding: const EdgeInsets.all(16),
@@ -770,20 +770,9 @@ class _LanguageSwitcher extends StatefulWidget {
 }
 
 class _LanguageSwitcherState extends State<_LanguageSwitcher> {
-  String _getCurrentLanguageName(String languageCode) {
-    switch (languageCode) {
-      case 'en':
-        return 'EN';
-      case 'no':
-        return 'NO';
-      default:
-        return 'EN';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () => _showLanguageMenu(context),

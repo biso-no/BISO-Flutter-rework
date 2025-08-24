@@ -349,11 +349,14 @@ class _CampusSwitcherModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         children: [
@@ -374,18 +377,22 @@ class _CampusSwitcherModal extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  AppLocalizations.of(context)!.selectCampusMessage,
+                  'Select Campus',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
                   ),
                 ),
                 const Spacer(),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
+                  icon: Icon(
+                    Icons.close,
+                    color: isDark ? AppColors.onSurfaceDark : AppColors.onSurface,
+                  ),
                   style: IconButton.styleFrom(
-                    backgroundColor: AppColors.gray100,
-                    foregroundColor: AppColors.onSurfaceVariant,
+                    backgroundColor: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariant,
+                    foregroundColor: isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariant,
                   ),
                 ),
               ],

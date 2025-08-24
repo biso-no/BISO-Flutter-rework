@@ -205,7 +205,7 @@ type VerifyPassTokenResponse = VerifyPassTokenSuccess | VerifyPassTokenError;
 **QR payload** (recommended):
 
 ```
-bisoapp://verify?token=<JWT>
+biso://verify?token=<JWT>
 ```
 
 * For web fallback at gates without controller app, you can also support:
@@ -397,7 +397,7 @@ export default async ({ req, res, log, error }) => {
 > **Flutter (Member app):**
 >
 > * Call `issue_pass_token` every 30s (with jitter).
-> * Render QR of `bisoapp://verify?token=<JWT>`.
+> * Render QR of `biso://verify?token=<JWT>`.
 > * Animated BISO gradient background, moving watermark, radial countdown ring.
 > * Show user `displayName`, avatar, membership name.
 >
