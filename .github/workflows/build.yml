@@ -160,6 +160,18 @@ jobs:
         echo "pp_uuid=$PP_UUID" >> $GITHUB_OUTPUT
         echo "pp_name=$PP_NAME" >> $GITHUB_OUTPUT
 
+    - name: Inject codesign settings into Release.xcconfig
+      run: |
+        echo "Setting codesign settings in ios/Flutter/Release.xcconfig" 
+        {
+          echo "CODE_SIGN_STYLE = Manual"
+          echo "DEVELOPMENT_TEAM = 4JQ6VWVRGY"
+          echo "CODE_SIGN_IDENTITY = Apple Distribution"
+          echo "PROVISIONING_PROFILE_SPECIFIER = ${{ steps.setup-signing.outputs.pp_uuid }}"
+          echo "PROVISIONING_PROFILE = ${{ steps.setup-signing.outputs.pp_uuid }}"
+          echo "OTHER_CODE_SIGN_FLAGS = --keychain $RUNNER_TEMP/app-signing.keychain-db"
+        } >> ios/Flutter/Release.xcconfig
+
     - name: Create ExportOptions.plist
       run: |
         cat > $RUNNER_TEMP/ExportOptions.plist <<'EOF'
@@ -189,10 +201,24 @@ jobs:
         </dict>
         </plist>
         EOF
+
+    - name: Debug signing assets
+      run: |
+        echo "=== Codesigning identities ==="
+        security find-identity -v -p codesigning $RUNNER_TEMP/app-signing.keychain-db || true
+        echo "=== Provisioning profile details ==="
+        PP_PLIST=$RUNNER_TEMP/profile.plist
+        security cms -D -i $RUNNER_TEMP/build_pp.mobileprovision > $PP_PLIST
+        /usr/libexec/PlistBuddy -c 'Print :Name' $PP_PLIST || true
+        /usr/libexec/PlistBuddy -c 'Print :UUID' $PP_PLIST || true
+        /usr/libexec/PlistBuddy -c 'Print :TeamIdentifier:0' $PP_PLIST || true
+        /usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' $PP_PLIST || true
+        /usr/libexec/PlistBuddy -c 'Print :Entitlements:aps-environment' $PP_PLIST || true
+        /usr/libexec/PlistBuddy -c 'Print :ProvisionsAllDevices' $PP_PLIST || true
     
     - name: Build iOS Archive
       env:
-        PROVISIONING_PROFILE_SPECIFIER: ${{ steps.setup-signing.outputs.pp_name }}
+        PROVISIONING_PROFILE_SPECIFIER: ${{ steps.setup-signing.outputs.pp_uuid }}
         DEVELOPMENT_TEAM: 4JQ6VWVRGY
         CODE_SIGN_STYLE: Manual
         CODE_SIGN_IDENTITY: Apple Distribution
