@@ -8,7 +8,10 @@ cd $CI_PRIMARY_REPOSITORY_PATH # change working directory to the root of your cl
 
 # Install Flutter using git
 echo "📱 Installing Flutter..."
-git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter
+# Pin Flutter to your local version by default; override via FLUTTER_VERSION env var in CI
+FLUTTER_VERSION="${FLUTTER_VERSION:-3.32.8}"
+echo "🔧 Using Flutter ${FLUTTER_VERSION}"
+git clone https://github.com/flutter/flutter.git --depth 1 -b "$FLUTTER_VERSION" "$HOME/flutter"
 export PATH="$PATH:$HOME/flutter/bin"
 
 # Disable analytics and crash reporting on the CI server
@@ -29,7 +32,15 @@ flutter pub get
 # Clean and build iOS pods
 echo "🧹 Cleaning and installing iOS pods..."
 cd ios
-pod install --clean-install
+echo "🔧 Installing CocoaPods dependencies..."
+if command -v pod >/dev/null 2>&1; then
+  pod install --repo-update
+else
+  echo "⚠️ CocoaPods not found. Installing locally for this user..."
+  gem install --user-install cocoapods --no-document
+  export PATH="$PATH:$(ruby -e 'print Gem.user_dir')/bin"
+  pod install --repo-update
+fi
 cd ..
 
 echo "✅ Flutter setup complete!"
