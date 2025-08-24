@@ -69,8 +69,27 @@ platform :ios do
       
       match(match_params)
       
-      # Build IPA using Flutter with automatic signing
-      sh "cd ../.. && flutter build ipa --release --build-name=#{app_version} --build-number=#{build_number}"
+      # Build IPA using Flutter with code signing from match
+      # Get the certificate name and provisioning profile from match environment variables
+      certificate_name = ENV["sigh_com.biso.no_appstore_certificate-name"]
+      provisioning_profile = ENV["sigh_com.biso.no_appstore_profile-name"]
+      team_id = ENV["sigh_com.biso.no_appstore_team-id"]
+      
+      UI.message("Using certificate: #{certificate_name}")
+      UI.message("Using provisioning profile: #{provisioning_profile}")
+      UI.message("Using team ID: #{team_id}")
+      
+      # Update Xcode project to use automatic signing with the team ID
+      update_code_signing_settings(
+        use_automatic_signing: true,
+        team_id: team_id,
+        targets: ["Runner"],  # Your main app target
+        code_sign_identity: "Apple Distribution",  # Use distribution identity for app store
+        profile_name: provisioning_profile
+      )
+      
+      # Build with explicit code signing
+      sh "cd ../.. && flutter build ipa --release --build-name=#{app_version} --build-number=#{build_number} --export-method=app-store"
       
     else
       # Fallback to manual signing (existing approach)
