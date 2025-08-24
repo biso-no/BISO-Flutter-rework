@@ -93,6 +93,34 @@ jobs:
             echo "lane=beta" >> $GITHUB_OUTPUT
           fi
 
+      - name: Validate secrets and repository access
+        run: |
+          echo "Checking required secrets..."
+          if [ -z "${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}" ]; then
+            echo "❌ MATCH_GIT_BASIC_AUTHORIZATION is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.MATCH_PASSWORD }}" ]; then
+            echo "❌ MATCH_PASSWORD is not set"  
+            exit 1
+          fi
+          if [ -z "${{ secrets.APPLE_API_KEY_ID }}" ]; then
+            echo "❌ APPLE_API_KEY_ID is not set"
+            exit 1
+          fi
+          echo "✅ All required secrets are present"
+          
+          # Test repository access
+          echo "Testing repository access..."
+          git ls-remote -h https://github.com/biso-no/ios-certificates.git || {
+            echo "❌ Cannot access ios-certificates repository. Check if:"
+            echo "1. Repository exists: https://github.com/biso-no/ios-certificates"
+            echo "2. MATCH_GIT_BASIC_AUTHORIZATION token has access to this repo"
+            echo "3. Token format is: base64(username:token)"
+            exit 1
+          }
+          echo "✅ Repository access verified"
+
       - name: Run Fastlane
         working-directory: ios
         env:
@@ -108,7 +136,10 @@ jobs:
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
           APPLE_API_PRIVATE_KEY: ${{ secrets.APPLE_API_PRIVATE_KEY }}
+          CI: true
+          GITHUB_ACTIONS: true
         run: |
+          echo "🚀 Starting fastlane lane: ${{ steps.deployment.outputs.lane }}"
           bundle exec fastlane ${{ steps.deployment.outputs.lane }}
 
       - name: Upload IPA artifact
