@@ -1508,7 +1508,7 @@
   "@norwegianBankAccountMustBe11DigitsMessage": {
     "description": "Auto-extracted string"
   },
-  "norwegianBusinessSchoolMessage": "Norwegian Business School (BI)",
+  "norwegianBusinessSchoolMessage": "BI Student Organisation",
   "@norwegianBusinessSchoolMessage": {
     "description": "Auto-extracted string (used in 2 files)"
   },

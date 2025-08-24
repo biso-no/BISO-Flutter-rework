@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:appwrite/appwrite.dart';
-import 'package:bisoflutter/core/logging/migration_helper.dart';
+import 'package:biso/core/logging/migration_helper.dart';
+
 import '../models/validation_result_model.dart';
 import 'appwrite_service.dart';
 

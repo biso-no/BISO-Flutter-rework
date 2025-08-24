@@ -60,8 +60,8 @@ class AppConstants {
   static const Duration otpTimeout = Duration(minutes: 10);
 
   // Campus IDs
-  static const String osloId = 'oslo';
-  static const String bergenId = 'bergen';
-  static const String trondheimId = 'trondheim';
-  static const String stavangerId = 'stavanger';
+  static const String osloId = '1';
+  static const String bergenId = '2';
+  static const String trondheimId = '3';
+  static const String stavangerId = '4';
 }

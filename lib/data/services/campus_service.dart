@@ -61,6 +61,17 @@ class CampusService {
 
       final built = await Future.wait(futures);
       final campuses = built.whereType<CampusModel>().toList(growable: false);
+      
+      // Sort campuses: campus with ID '5' should always be last, others alphabetically
+      campuses.sort((a, b) {
+        // If campus '5' is involved, handle special ordering
+        if (a.id == '5') return 1; // Campus '5' goes to the end
+        if (b.id == '5') return -1; // Campus '5' goes to the end
+        
+        // For all other campuses, maintain alphabetical order
+        return a.name.compareTo(b.name);
+      });
+      
       buildStart.stop();
       logInfo('CampusService.getAllCampuses: all campus builds completed', context: {
         'elapsed_ms': buildStart.elapsedMilliseconds,
@@ -154,6 +165,17 @@ class CampusService {
       final campuses = (await Future.wait(futures))
           .whereType<CampusModel>()
           .toList(growable: false);
+      
+      // Sort campuses: campus with ID '5' should always be last, others alphabetically
+      campuses.sort((a, b) {
+        // If campus '5' is involved, handle special ordering
+        if (a.id == '5') return 1; // Campus '5' goes to the end
+        if (b.id == '5') return -1; // Campus '5' goes to the end
+        
+        // For all other campuses, maintain alphabetical order
+        return a.name.compareTo(b.name);
+      });
+      
       stopwatch.stop();
       logInfo('CampusService.getSwitcherCampuses: completed', context: {
         'total_elapsed_ms': stopwatch.elapsedMilliseconds,
@@ -729,6 +751,17 @@ class CampusService {
           .whereType<Map<String, dynamic>>()
           .map((m) => CampusModel.fromMap(m))
           .toList(growable: false);
+      
+      // Sort campuses: campus with ID '5' should always be last, others alphabetically
+      result.sort((a, b) {
+        // If campus '5' is involved, handle special ordering
+        if (a.id == '5') return 1; // Campus '5' goes to the end
+        if (b.id == '5') return -1; // Campus '5' goes to the end
+        
+        // For all other campuses, maintain alphabetical order
+        return a.name.compareTo(b.name);
+      });
+      
       stopwatch.stop();
       logInfo('CampusService._readCachedCampuses: completed', context: {
         'elapsed_ms': stopwatch.elapsedMilliseconds,

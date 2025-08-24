@@ -448,7 +448,7 @@ class _CampusModalCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.subtleBlue : AppColors.gray50,
+          color: isSelected ? Theme.of(context).colorScheme.surfaceBright : Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? AppColors.defaultBlue : Colors.transparent,
@@ -460,6 +460,7 @@ class _CampusModalCard extends StatelessWidget {
             Container(
               width: 48,
               height: 48,
+              
               decoration: BoxDecoration(
                 color: _getCampusColor(campus.id),
                 shape: BoxShape.circle,
@@ -467,8 +468,8 @@ class _CampusModalCard extends StatelessWidget {
               child: Center(
                 child: Text(
                   campus.name[0],
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -1475,20 +1476,6 @@ class PremiumAuthRequiredPage extends ConsumerWidget {
               ),
 
               const SizedBox(height: 16),
-
-              PremiumButton(
-                text: l10n.browseAsGuestMessage,
-                isSecondary: true,
-                width: double.infinity,
-                onPressed: () => navigateToTab?.call(1),
-              ),
-              PremiumButton(
-                text: l10n.clearSessionMessage,
-                isSecondary: true,
-                onPressed: () =>
-                    ref.read(authStateProvider.notifier).clearSession(),
-                width: double.infinity,
-              ),
             ],
           ),
         ),

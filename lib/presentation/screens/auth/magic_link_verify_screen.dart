@@ -216,7 +216,7 @@ class _MagicLinkVerifyScreenState extends ConsumerState<MagicLinkVerifyScreen> {
 
               // Footer
               Text(
-                'Norwegian Business School (BI)',
+                'BI Student Organisation',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppColors.onSurfaceVariant,
                 ),

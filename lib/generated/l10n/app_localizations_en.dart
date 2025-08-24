@@ -1162,7 +1162,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Norwegian bank account must be 11 digits';
 
   @override
-  String get norwegianBusinessSchoolMessage => 'Norwegian Business School (BI)';
+  String get norwegianBusinessSchoolMessage => 'BI Student Organisation';
 
   @override
   String get notAuthenticatedMessage => 'Not authenticated';

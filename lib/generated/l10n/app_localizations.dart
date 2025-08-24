@@ -2191,7 +2191,7 @@ abstract class AppLocalizations {
   /// Auto-extracted string (used in 2 files)
   ///
   /// In en, this message translates to:
-  /// **'Norwegian Business School (BI)'**
+  /// **'BI Student Organisation'**
   String get norwegianBusinessSchoolMessage;
 
   /// Auto-extracted string

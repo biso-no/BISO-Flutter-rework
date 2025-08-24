@@ -41,6 +41,7 @@ import 'data/models/large_event_model.dart';
 import 'data/services/large_event_service.dart';
 import 'data/services/notification_service.dart';
 import 'data/services/deep_link_service.dart';
+import 'providers/campus/campus_provider.dart';
 
 // Background message handler for Firebase
 @pragma('vm:entry-point')
@@ -92,6 +93,8 @@ class BisoApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch auth state and initialize user data when authenticated
     ref.watch(authStateProvider);
+    // Ensure campus is initialized before rendering content on first launch
+    final _ = ref.watch(campusInitializedProvider);
     
     // Watch locale changes to update the app language
     final currentLocale = ref.watch(localeProvider);

@@ -1,10 +1,13 @@
-import 'package:bisoflutter/core/logging/migration_helper.dart';
+import 'package:biso/core/logging/migration_helper.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/models/campus_model.dart';
 import '../../data/services/campus_service.dart';
 import '../auth/auth_provider.dart';
+import '../../core/constants/app_constants.dart';
 
 // Filter campus provider - used for filtering content display
 final filterCampusStateProvider =
@@ -118,12 +121,112 @@ class FilterCampusNotifier extends StateNotifier<CampusState> {
           logPrint('✅ FilterCampusNotifier: Updated campus data: ${campus.name}');
           state = state.copyWith(campus: campus);
         }
+      } else {
+        // No campus set yet: attempt auto-detection once
+        logPrint('📍 No campus set. Attempting to auto-detect based on location...');
+        await _autoDetectAndSetCampus();
       }
     } catch (e) {
       logPrint('❌ FilterCampusNotifier: Error loading campus: $e');
       // If loading fails, keep current state
     } finally {
       state = state.copyWith(isInitialized: true);
+    }
+  }
+
+  Future<void> _autoDetectAndSetCampus() async {
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        logPrint('⚠️ Location services are disabled. Falling back to default campus.');
+        await _selectDefaultCampusOslo();
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        logPrint('🚫 Location permission denied. Falling back to default campus.');
+        await _selectDefaultCampusOslo();
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+        ),
+      );
+
+      final placemarks = await geocoding.placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      String city = placemarks.isNotEmpty
+          ? (placemarks.first.locality ?? placemarks.first.administrativeArea ?? '').trim()
+          : '';
+
+      city = city.toLowerCase();
+      logPrint('📍 Detected city: $city');
+
+      String matchedCampusId = AppConstants.osloId; // default
+      if (city.contains('oslo')) {
+        matchedCampusId = AppConstants.osloId;
+      } else if (city.contains('bergen')) {
+        matchedCampusId = AppConstants.bergenId;
+      } else if (city.contains('trondheim')) {
+        matchedCampusId = AppConstants.trondheimId;
+      } else if (city.contains('stavanger')) {
+        matchedCampusId = AppConstants.stavangerId;
+      }
+
+      await _selectCampusById(matchedCampusId);
+    } catch (e) {
+      logPrint('❌ Auto-detect campus failed: $e');
+      await _selectDefaultCampusOslo();
+    }
+  }
+
+  Future<void> _selectDefaultCampusOslo() async {
+    await _selectCampusById(AppConstants.osloId);
+  }
+
+  Future<void> _selectCampusById(String campusId) async {
+    try {
+      final campus = await _campusService.getCampusByIdLite(campusId, includeWeather: false)
+          ?? await _campusService.getCampusById(campusId)
+          ?? CampusModel(
+            id: campusId,
+            name: _displayNameForCampusId(campusId),
+            description: '',
+            location: '',
+            imageUrl: '',
+            heroImageUrl: '',
+            stats: const CampusStats(),
+          );
+      await selectFilterCampus(campus);
+      logPrint('✅ Auto-selected campus: ${campus.name} (${campus.id})');
+    } catch (e) {
+      logPrint('❌ Failed to select campus by id $campusId: $e');
+    }
+  }
+
+  String _displayNameForCampusId(String campusId) {
+    switch (campusId) {
+      case AppConstants.osloId:
+        return 'Oslo';
+      case AppConstants.bergenId:
+        return 'Bergen';
+      case AppConstants.trondheimId:
+        return 'Trondheim';
+      case AppConstants.stavangerId:
+        return 'Stavanger';
+      default:
+        return campusId;
     }
   }
 

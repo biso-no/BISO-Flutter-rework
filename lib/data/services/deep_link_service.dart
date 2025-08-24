@@ -64,6 +64,29 @@ class DeepLinkService {
         default:
           logPrint('🔴 Unknown deep link host: ${uri.host}');
       }
+    } else if (uri.scheme == 'https' || uri.scheme == 'http') {
+      // Support universal/app links for biso.no
+      final host = uri.host;
+      final path = uri.path;
+      if ((host == 'biso.no' || host == 'www.biso.no') && path == '/auth/verify') {
+        final userId = uri.queryParameters['userId'];
+        final secret = uri.queryParameters['secret'];
+        if (userId != null && secret != null) {
+          final context = navigatorKey.currentContext;
+          if (context != null) {
+            context.go('/auth/verify', extra: {
+              'userId': userId,
+              'secret': secret,
+            });
+          } else {
+            logPrint('🔴 No navigation context available');
+          }
+        } else {
+          logPrint('🔴 Missing magic link parameters in https link');
+        }
+      } else {
+        logPrint('🔴 Unsupported https link: ${uri.toString()}');
+      }
     } else {
       logPrint('🔴 Unknown deep link scheme: ${uri.scheme}');
     }
@@ -76,7 +99,7 @@ class DeepLinkService {
     logPrint('🔗 Auth deep link path: $path');
     logPrint('🔗 Auth deep link params: $queryParams');
 
-    if (path == '/magic-link') {
+    if (path == '/magic-link' || path == '/verify') {
       final userId = queryParams['userId'];
       final secret = queryParams['secret'];
       
@@ -86,7 +109,7 @@ class DeepLinkService {
         // Navigate to magic link verification screen
         final context = navigatorKey.currentContext;
         if (context != null) {
-          context.go('/auth/magic-link-verify', extra: {
+          context.go('/auth/verify', extra: {
             'userId': userId,
             'secret': secret,
           });

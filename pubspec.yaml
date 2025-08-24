@@ -1,7 +1,7 @@
-name: bisoflutter
+name: biso
 description: "A new Flutter project."
 publish_to: 'none'
-version: 0.1.0+1
+version: 2.0.0+60
 
 environment:
   sdk: ^3.8.1
@@ -45,6 +45,8 @@ dependencies:
   talker_dio_logger: ^5.0.0
   flutter_html: ^3.0.0
   permission_handler: ^12.0.1
+  geolocator: ^13.0.2
+  geocoding: ^3.0.0
   mobile_scanner: ^7.0.1
   qr_flutter: ^4.1.0
   flutter_appauth: ^9.0.1
@@ -56,7 +58,26 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
   build_runner: ^2.6.0
+  flutter_launcher_icons: ^0.14.4
 
+
+
+flutter_icons:
+  android: true
+  ios: true
+  web:
+    generate: true
+    image_path: "assets/logo.png"
+  windows:
+    generate: true
+    image_path: "assets/logo.png"
+  macos:
+    generate: true
+    image_path: "assets/logo.png"
+  linux:
+    generate: true
+    image_path: "assets/logo.png"
+  image_path: "assets/logo.png"
   
 flutter_intl:
   enabled: true
