@@ -110,16 +110,34 @@ jobs:
           fi
           echo "✅ All required secrets are present"
           
-          # Test repository access
+          # Test repository access with proper authentication
           echo "Testing repository access..."
-          git ls-remote -h https://github.com/biso-no/ios-certificates.git || {
+          
+          # Check if token looks like a GitHub PAT (starts with ghp_ or github_pat_)
+          if [[ "${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}" =~ ^(ghp_|github_pat_) ]]; then
+            echo "ℹ️ Detected raw GitHub token, converting to base64 format..."
+            # For GitHub tokens, username can be anything, but we'll use 'token'
+            ENCODED_AUTH=$(echo -n "token:${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}" | base64)
+            echo "Using converted authentication format"
+          else
+            echo "ℹ️ Using provided base64 authentication"
+            ENCODED_AUTH="${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}"
+          fi
+          
+          # Test access with authentication (handle empty repositories gracefully)
+          echo "Testing repository access with authentication..."
+          if curl -s -f -H "Authorization: token ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}" \
+             "https://api.github.com/repos/biso-no/ios-certificates" > /dev/null; then
+            echo "✅ Repository access verified"
+            echo "ℹ️ Repository is ready for fastlane match (empty repositories are expected)"
+          else
             echo "❌ Cannot access ios-certificates repository. Check if:"
             echo "1. Repository exists: https://github.com/biso-no/ios-certificates"
-            echo "2. MATCH_GIT_BASIC_AUTHORIZATION token has access to this repo"
-            echo "3. Token format is: base64(username:token)"
+            echo "2. GitHub token has access to this private repo"
+            echo "3. Token has 'Contents' read/write permissions"
+            echo "4. Repository is private and token has access to private repos"
             exit 1
-          }
-          echo "✅ Repository access verified"
+          fi
 
       - name: Run Fastlane
         working-directory: ios

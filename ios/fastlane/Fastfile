@@ -43,10 +43,23 @@ platform :ios do
       
       # Add authentication method - prefer HTTPS over SSH for reliability
       if ENV["MATCH_GIT_BASIC_AUTHORIZATION"]
-        match_params[:git_basic_authorization] = ENV["MATCH_GIT_BASIC_AUTHORIZATION"]
+        # Handle both raw GitHub tokens and pre-encoded base64 strings
+        auth_token = ENV["MATCH_GIT_BASIC_AUTHORIZATION"]
+        if auth_token.start_with?("ghp_") || auth_token.start_with?("github_pat_")
+          # Convert raw GitHub token to base64 format
+          require 'base64'
+          encoded_auth = Base64.strict_encode64("token:#{auth_token}")
+          match_params[:git_basic_authorization] = encoded_auth
+          UI.message("🔑 Using GitHub token authentication")
+        else
+          # Assume it's already base64 encoded
+          match_params[:git_basic_authorization] = auth_token
+          UI.message("🔑 Using base64 encoded authentication")
+        end
       elsif ENV["MATCH_SSH_KEY"]
         # Use SSH key file path instead of raw key content
         match_params[:git_private_key] = "~/.ssh/id_ed25519"
+        UI.message("🔑 Using SSH key authentication")
       end
       
       # Only force creation if not in CI and we have proper authentication
@@ -174,9 +187,22 @@ platform :ios do
       
       # Add authentication method
       if ENV["MATCH_GIT_BASIC_AUTHORIZATION"]
-        match_params[:git_basic_authorization] = ENV["MATCH_GIT_BASIC_AUTHORIZATION"]
+        # Handle both raw GitHub tokens and pre-encoded base64 strings
+        auth_token = ENV["MATCH_GIT_BASIC_AUTHORIZATION"]
+        if auth_token.start_with?("ghp_") || auth_token.start_with?("github_pat_")
+          # Convert raw GitHub token to base64 format
+          require 'base64'
+          encoded_auth = Base64.strict_encode64("token:#{auth_token}")
+          match_params[:git_basic_authorization] = encoded_auth
+          UI.message("🔑 Using GitHub token authentication")
+        else
+          # Assume it's already base64 encoded
+          match_params[:git_basic_authorization] = auth_token
+          UI.message("🔑 Using base64 encoded authentication")
+        end
       elsif ENV["MATCH_SSH_KEY"]
         match_params[:git_private_key] = "~/.ssh/id_ed25519"
+        UI.message("🔑 Using SSH key authentication")
       end
       
       match(match_params)
