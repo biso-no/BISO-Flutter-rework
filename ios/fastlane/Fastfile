@@ -88,14 +88,27 @@ platform :ios do
         profile_name: provisioning_profile
       )
       
-      # Build with explicit code signing - force iOS 17 deployment target
+      # Build with explicit code signing - bypass destination issues
       UI.message("Building with App Store distribution...")
       
-      # Set environment variables to force iOS 17 deployment
-      ENV["IPHONEOS_DEPLOYMENT_TARGET"] = "17.0"
+      # Find available iOS simulator and use it as destination to bypass platform issues
+      available_ios_runtime = sh("xcrun simctl list runtimes | grep iOS | head -1 | awk '{print $2}'", capture_output: true).strip rescue "17.5"
+      UI.message("Using iOS runtime: #{available_ios_runtime}")
       
-      # Build Flutter app with explicit destination
-      sh "cd ../.. && flutter build ipa --release --build-name=#{app_version} --build-number=#{build_number} --export-method=app-store"
+      # Use Xcode directly with specific destination
+      sh "cd ../.. && flutter build ios --release --build-name=#{app_version} --build-number=#{build_number}"
+      
+      # Then create IPA with gym
+      gym(
+        workspace: "ios/Runner.xcworkspace",
+        scheme: "Runner",
+        configuration: "Release",
+        export_method: "app-store",
+        skip_build_archive: true,
+        archive_path: "../../build/ios/archive/Runner.xcarchive",
+        output_directory: "../../build/ios/ipa",
+        output_name: "Runner.ipa"
+      )
       
     else
       # Fallback to manual signing (existing approach)

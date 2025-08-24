@@ -43,12 +43,21 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: List available iOS platforms
+      - name: Install iOS 17 runtime and list platforms
         run: |
-          echo "Available iOS platforms:"
+          echo "Available iOS platforms before:"
           xcodebuild -showsdks | grep iphoneos
-          echo "Available destinations:"
-          xcodebuild -showdestinations -scheme Runner -project ios/Runner.xcodeproj || true
+          
+          # Install iOS 17.5 simulator runtime
+          echo "Installing iOS 17.5 runtime..."
+          sudo xcrun simctl runtime install "iOS 17.5" || echo "iOS 17.5 already installed or unavailable"
+          
+          # List available runtimes
+          echo "Available runtimes:"
+          xcrun simctl runtime list
+          
+          echo "Available iOS platforms after:"
+          xcodebuild -showsdks | grep iphoneos
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
