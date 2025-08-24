@@ -99,10 +99,11 @@ platform :ios do
         workspace: "Runner.xcworkspace",
         scheme: "Runner",
         configuration: "Release",
-        xcargs: "DEVELOPMENT_TEAM=#{team_id} CODE_SIGN_STYLE=Automatic",
+        xcargs: "-allowProvisioningUpdates DEVELOPMENT_TEAM=#{team_id} CODE_SIGN_STYLE=Automatic CODE_SIGN_IDENTITY=\"Apple Distribution\" PROVISIONING_PROFILE_SPECIFIER= PROVISIONING_PROFILE=",
         export_method: "app-store",
         output_directory: "../build/ios/ipa",
         output_name: "Runner.ipa",
+        skip_profile_detection: true,
         export_options: {
           method: "app-store",
           teamID: team_id,
