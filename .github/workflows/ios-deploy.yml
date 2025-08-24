@@ -43,6 +43,13 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: List available iOS platforms
+        run: |
+          echo "Available iOS platforms:"
+          xcodebuild -showsdks | grep iphoneos
+          echo "Available destinations:"
+          xcodebuild -showdestinations -scheme Runner -project ios/Runner.xcodeproj || true
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
