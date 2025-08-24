@@ -88,14 +88,15 @@ platform :ios do
         profile_name: provisioning_profile
       )
       
-      # Build with explicit code signing - use xcodebuild directly with generic destination
+      # Build with explicit code signing - completely bypass Flutter and use only xcodebuild
       UI.message("Building with App Store distribution...")
       
-      # Build iOS app using xcodebuild directly with generic destination to bypass iOS version issues
-      sh "cd ../.. && flutter build ios --release --build-name=#{app_version} --build-number=#{build_number} --no-pub"
+      # Skip Flutter completely - just prepare Flutter dependencies
+      sh "cd ../.. && flutter pub get"
+      sh "cd ios && pod install"
       
-      # Use xcodebuild to archive with generic destination
-      sh "cd ios && xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -destination 'generic/platform=iOS' -archivePath ../build/ios/archive/Runner.xcarchive archive CODE_SIGNING_ALLOWED=NO"
+      # Use xcodebuild directly to build and archive without any destination issues
+      sh "cd ios && xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release clean archive -archivePath ../build/ios/archive/Runner.xcarchive -allowProvisioningUpdates"
       
       # Create IPA with gym using the archive
       gym(
