@@ -10,7 +10,7 @@ on:
 env:
   FLUTTER_VERSION: '3.32.8'  # Your actual Flutter version
   APP_VERSION: '2.0.0'
-  BUILD_NUMBER: '60'
+  BUILD_NUMBER: '80'
 
 jobs:
   build-and-deploy-android:

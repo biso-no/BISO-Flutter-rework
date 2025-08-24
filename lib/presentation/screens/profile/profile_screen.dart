@@ -9,7 +9,6 @@ import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
 import '../../../data/services/feature_flag_service.dart';
 import 'edit_profile_screen.dart';
-import 'student_id_screen.dart';
 import 'settings_screen.dart';
 import 'payment_information_screen.dart';
 
@@ -225,32 +224,47 @@ class ProfileScreen extends ConsumerWidget {
 
                   // Quick Actions
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: _ActionCard(
-                          icon: Icons.edit,
-                          label: 'Edit Profile',
-                          color: AppColors.defaultBlue,
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const EditProfileScreen(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _ActionCard(
+                              icon: Icons.edit,
+                              label: 'Edit Profile',
+                              color: AppColors.defaultBlue,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const EditProfileScreen(),
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _ActionCard(
-                          icon: Icons.school,
-                          label: 'Student ID',
-                          color: AppColors.green9,
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const StudentIdScreen(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _ActionCard(
+                              icon: Icons.school,
+                              label: 'Student ID',
+                              color: AppColors.green9,
+                              disabled: true,
+                              onTap: () {},
                             ),
-                          ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'We’re improving Student ID. Thanks for your patience.',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -454,21 +468,29 @@ class _ActionCard extends StatelessWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
+  final bool disabled;
 
   const _ActionCard({
     required this.icon,
     required this.label,
     required this.color,
     required this.onTap,
+    this.disabled = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final Color iconColor = disabled
+        ? color.withValues(alpha: 0.5)
+        : color;
+    final Color iconBackground = disabled
+        ? color.withValues(alpha: 0.06)
+        : color.withValues(alpha: 0.1);
 
     return Card(
       child: InkWell(
-        onTap: onTap,
+        onTap: disabled ? null : onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -478,15 +500,19 @@ class _ActionCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
+                  color: iconBackground,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: color, size: 24),
+                child: Icon(icon, color: iconColor, size: 24),
               ),
               const SizedBox(height: 8),
               Text(
                 label,
-                style: theme.textTheme.bodySmall,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: disabled
+                      ? theme.colorScheme.onSurface.withValues(alpha: 0.6)
+                      : theme.colorScheme.onSurface,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],

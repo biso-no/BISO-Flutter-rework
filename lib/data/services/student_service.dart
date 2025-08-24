@@ -24,21 +24,26 @@ class StudentService {
       // Microsoft Azure configuration for BI tenant
       const String clientId = '09d8bb72-2cef-4b98-a1d3-2414a7a40873';
       const String tenantId = 'adee44b2-91fc-40f1-abdd-9cc29351b5fd';
-      const String issuer = 'https://login.microsoftonline.com/$tenantId/v2.0';
       const String redirectUrl = 'com.biso.no://oauth/callback';
 
       // OAuth2 request configuration
       final AuthorizationTokenRequest request = AuthorizationTokenRequest(
         clientId,
         redirectUrl,
-        issuer: issuer,
-        scopes: [
+        // Avoid discovery hangs by providing explicit Azure endpoints
+        serviceConfiguration: const AuthorizationServiceConfiguration(
+          authorizationEndpoint:
+              'https://login.microsoftonline.com/adee44b2-91fc-40f1-abdd-9cc29351b5fd/oauth2/v2.0/authorize',
+          tokenEndpoint:
+              'https://login.microsoftonline.com/adee44b2-91fc-40f1-abdd-9cc29351b5fd/oauth2/v2.0/token',
+        ),
+        scopes: const [
           'openid',
           'email',
           'profile',
           'https://graph.microsoft.com/User.Read',
         ],
-        promptValues: ['select_account'],
+        promptValues: const ['select_account'],
       );
 
       AppLogger.info('Initiating OAuth flow with Microsoft Azure');
