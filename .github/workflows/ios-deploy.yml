@@ -36,6 +36,11 @@ jobs:
         with:
           fetch-depth: 0  # Full history for version tags
 
+      - name: Select Xcode 15.4
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.4'
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -43,20 +48,11 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Install iOS 17 runtime and list platforms
+      - name: Show selected Xcode and SDKs
         run: |
-          echo "Available iOS platforms before:"
-          xcodebuild -showsdks | grep iphoneos
-          
-          # Install iOS 17.5 simulator runtime
-          echo "Installing iOS 17.5 runtime..."
-          sudo xcrun simctl runtime install "iOS 17.5" || echo "iOS 17.5 already installed or unavailable"
-          
-          # List available runtimes
-          echo "Available runtimes:"
-          xcrun simctl runtime list
-          
-          echo "Available iOS platforms after:"
+          xcodebuild -version
+          xcode-select -p
+          echo "Available iOS SDKs:"
           xcodebuild -showsdks | grep iphoneos
 
       - name: Setup Ruby

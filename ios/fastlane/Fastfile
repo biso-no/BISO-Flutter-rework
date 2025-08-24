@@ -91,20 +91,18 @@ platform :ios do
       # Build with explicit code signing - completely bypass Flutter and use only xcodebuild
       UI.message("Building with App Store distribution...")
       
-      # Skip Flutter completely - just prepare Flutter dependencies
-      sh "cd ../.. && flutter pub get"
-      sh "cd .. && pod install"
-      
-      # Use xcodebuild directly to build and archive without any destination issues
-      sh "cd .. && mkdir -p ../build/ios/archive ../build/ios/ipa"
-      sh "cd .. && xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' archive -archivePath ../build/ios/archive/Runner.xcarchive -allowProvisioningUpdates"
-      
-      # Create IPA with gym using the archive
+      # Prepare dependencies
+      sh "cd .. && flutter pub get"
+      sh "pod install"
+
+      # Build and export IPA using gym (reliable, avoids manual SDK/destination)
+      sh "mkdir -p ../build/ios/ipa"
       gym(
-        skip_build_archive: true,
-        archive_path: "../../build/ios/archive/Runner.xcarchive",
+        workspace: "Runner.xcworkspace",
+        scheme: "Runner",
+        configuration: "Release",
         export_method: "app-store",
-        output_directory: "../../build/ios/ipa",
+        output_directory: "../build/ios/ipa",
         output_name: "Runner.ipa",
         export_options: {
           method: "app-store",
