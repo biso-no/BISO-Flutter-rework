@@ -1,0 +1,5 @@
+Bundle ID: com.biso.no
+Team ID: 4JQ6VWVRGY
+Apple ID: markus@biso.no
+App Store Connect Team ID: 4JQ6VWVRGY
+Current App Name: BISO

@@ -1,5 +1,8 @@
 source "https://rubygems.org"
 
+# Require Ruby 3.3 for fastlane compatibility
+ruby "~> 3.3.0"
+
 gem "fastlane"
 gem "cocoapods"
 
