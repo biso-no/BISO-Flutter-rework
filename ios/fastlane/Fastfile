@@ -88,26 +88,30 @@ platform :ios do
         profile_name: provisioning_profile
       )
       
-      # Build with explicit code signing - bypass destination issues
+      # Build with explicit code signing - use xcodebuild directly with generic destination
       UI.message("Building with App Store distribution...")
       
-      # Find available iOS simulator and use it as destination to bypass platform issues
-      available_ios_runtime = sh("xcrun simctl list runtimes | grep iOS | head -1 | awk '{print $2}'", capture_output: true).strip rescue "17.5"
-      UI.message("Using iOS runtime: #{available_ios_runtime}")
+      # Build iOS app using xcodebuild directly with generic destination to bypass iOS version issues
+      sh "cd ../.. && flutter build ios --release --build-name=#{app_version} --build-number=#{build_number} --no-pub"
       
-      # Use Xcode directly with specific destination
-      sh "cd ../.. && flutter build ios --release --build-name=#{app_version} --build-number=#{build_number}"
+      # Use xcodebuild to archive with generic destination
+      sh "cd ios && xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -destination 'generic/platform=iOS' -archivePath ../build/ios/archive/Runner.xcarchive archive CODE_SIGNING_ALLOWED=NO"
       
-      # Then create IPA with gym
+      # Create IPA with gym using the archive
       gym(
-        workspace: "ios/Runner.xcworkspace",
-        scheme: "Runner",
-        configuration: "Release",
-        export_method: "app-store",
         skip_build_archive: true,
-        archive_path: "../../build/ios/archive/Runner.xcarchive",
-        output_directory: "../../build/ios/ipa",
-        output_name: "Runner.ipa"
+        archive_path: "../build/ios/archive/Runner.xcarchive",
+        export_method: "app-store",
+        output_directory: "../build/ios/ipa",
+        output_name: "Runner.ipa",
+        export_options: {
+          method: "app-store",
+          teamID: team_id,
+          signingStyle: "automatic",
+          provisioningProfiles: {
+            "com.biso.no" => provisioning_profile
+          }
+        }
       )
       
     else
