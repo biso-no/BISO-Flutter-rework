@@ -83,9 +83,7 @@ platform :ios do
       update_code_signing_settings(
         use_automatic_signing: true,
         team_id: team_id,
-        targets: ["Runner"],  # Your main app target
-        code_sign_identity: "Apple Distribution",  # Use distribution identity for app store
-        profile_name: provisioning_profile
+        targets: ["Runner"]
       )
       
       # Build with explicit code signing - completely bypass Flutter and use only xcodebuild
@@ -101,16 +99,14 @@ platform :ios do
         workspace: "Runner.xcworkspace",
         scheme: "Runner",
         configuration: "Release",
+        xcargs: "DEVELOPMENT_TEAM=#{team_id} CODE_SIGN_STYLE=Automatic",
         export_method: "app-store",
         output_directory: "../build/ios/ipa",
         output_name: "Runner.ipa",
         export_options: {
           method: "app-store",
           teamID: team_id,
-          signingStyle: "automatic",
-          provisioningProfiles: {
-            "com.biso.no" => provisioning_profile
-          }
+          signingStyle: "automatic"
         }
       )
       
