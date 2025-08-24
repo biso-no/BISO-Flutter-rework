@@ -286,6 +286,7 @@ platform :ios do
     match_params = {
       type: "appstore", 
       force: true,
+      readonly: false,  # OVERRIDE Matchfile readonly setting for certificate generation
       api_key: api_key
     }
     
