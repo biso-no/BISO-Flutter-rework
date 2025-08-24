@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
-# Require Ruby 3.3 for fastlane compatibility
-ruby "~> 3.3.0"
+# Support Ruby 3.2+ for GitHub Actions compatibility
+ruby ">= 3.2.0"
 
 gem "fastlane"
 gem "cocoapods"
