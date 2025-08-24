@@ -88,11 +88,13 @@ platform :ios do
         profile_name: provisioning_profile
       )
       
-      # Build with explicit code signing - use available iOS SDK
-      # First check what iOS SDKs are available
-      available_sdks = sh("xcodebuild -showsdks | grep iphoneos | tail -1 | awk '{print $NF}'", capture_output: true).strip
-      UI.message("Using iOS SDK: #{available_sdks}")
+      # Build with explicit code signing - force iOS 17 deployment target
+      UI.message("Building with App Store distribution...")
       
+      # Set environment variables to force iOS 17 deployment
+      ENV["IPHONEOS_DEPLOYMENT_TARGET"] = "17.0"
+      
+      # Build Flutter app with explicit destination
       sh "cd ../.. && flutter build ipa --release --build-name=#{app_version} --build-number=#{build_number} --export-method=app-store"
       
     else
