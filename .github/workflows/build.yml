@@ -115,6 +115,7 @@ jobs:
     
     # Setup iOS signing certificates and provisioning profiles
     - name: Install Certificate and Provisioning Profile
+      id: setup-signing
       env:
         BUILD_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_P12_BASE64 }}
         P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
@@ -137,33 +138,86 @@ jobs:
         
         # import certificate to keychain
         security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-        security list-keychain -d user -s $KEYCHAIN_PATH
+        # ensure codesign can access the key non-interactively
+        security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+        # make temp keychain default for this session
+        security default-keychain -s $KEYCHAIN_PATH
+        # add temp keychain to the search list alongside login keychain
+        security list-keychain -d user -s $KEYCHAIN_PATH ~/Library/Keychains/login.keychain-db
         
         # install provisioning profile with correct UUID
         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-        # Get the UUID from the provisioning profile
+        # Get the UUID and Name from the provisioning profile
         PP_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i $PP_PATH))
+        PP_NAME=$(/usr/libexec/PlistBuddy -c 'Print :Name' /dev/stdin <<< $(security cms -D -i $PP_PATH))
         cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision
         
         # verify installation
         security find-identity -v -p codesigning $KEYCHAIN_PATH
-        echo "Installed provisioning profile: $PP_UUID"
+        echo "Installed provisioning profile: $PP_UUID ($PP_NAME)"
+
+        # expose outputs for later steps
+        echo "pp_uuid=$PP_UUID" >> $GITHUB_OUTPUT
+        echo "pp_name=$PP_NAME" >> $GITHUB_OUTPUT
+
+    - name: Create ExportOptions.plist
+      run: |
+        cat > $RUNNER_TEMP/ExportOptions.plist <<'EOF'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+          <key>method</key>
+          <string>app-store</string>
+          <key>signingStyle</key>
+          <string>manual</string>
+          <key>provisioningProfiles</key>
+          <dict>
+            <key>com.biso.no</key>
+            <string>${{ steps.setup-signing.outputs.pp_name }}</string>
+          </dict>
+          <key>destination</key>
+          <string>export</string>
+          <key>uploadBitcode</key>
+          <false/>
+          <key>uploadSymbols</key>
+          <true/>
+          <key>compileBitcode</key>
+          <false/>
+          <key>stripSwiftSymbols</key>
+          <true/>
+        </dict>
+        </plist>
+        EOF
     
     - name: Build iOS Archive
+      env:
+        PROVISIONING_PROFILE_SPECIFIER: ${{ steps.setup-signing.outputs.pp_name }}
+        DEVELOPMENT_TEAM: 4JQ6VWVRGY
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: Apple Distribution
+        PRODUCT_BUNDLE_IDENTIFIER: com.biso.no
       run: |
-        flutter build ipa --release --build-name=${{ env.APP_VERSION }} --build-number=${{ env.BUILD_NUMBER }}
+        flutter build ipa --release --build-name=${{ env.APP_VERSION }} --build-number=${{ env.BUILD_NUMBER }} --export-options-plist=$RUNNER_TEMP/ExportOptions.plist
+
+    - name: Find IPA path
+      id: find-ipa
+      run: |
+        IPA_PATH=$(ls -1 build/ios/ipa/*.ipa | head -n 1)
+        if [ -z "$IPA_PATH" ]; then echo "No IPA found" && exit 1; fi
+        echo "ipa_path=$IPA_PATH" >> $GITHUB_OUTPUT
     
     - name: Upload IPA artifact
       uses: actions/upload-artifact@v4
       with:
         name: biso-ios-ipa-v${{ env.APP_VERSION }}
-        path: build/ios/ipa/biso.ipa
+        path: build/ios/ipa/*.ipa
     
     # Deploy to App Store Connect
     - name: Deploy to App Store Connect
       uses: apple-actions/upload-testflight-build@v1
       with:
-        app-path: build/ios/ipa/biso.ipa
+        app-path: ${{ steps.find-ipa.outputs.ipa_path }}
         issuer-id: ${{ secrets.APPLE_API_ISSUER_ID }}
         api-key-id: ${{ secrets.APPLE_API_KEY_ID }}
         api-private-key: ${{ secrets.APPLE_API_PRIVATE_KEY }}
