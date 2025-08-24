@@ -93,17 +93,18 @@ platform :ios do
       
       # Skip Flutter completely - just prepare Flutter dependencies
       sh "cd ../.. && flutter pub get"
-      sh "cd ios && pod install"
+      sh "cd .. && pod install"
       
       # Use xcodebuild directly to build and archive without any destination issues
-      sh "cd ios && xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release clean archive -archivePath ../build/ios/archive/Runner.xcarchive -allowProvisioningUpdates"
+      sh "cd .. && mkdir -p ../build/ios/archive ../build/ios/ipa"
+      sh "cd .. && xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release clean archive -archivePath ../build/ios/archive/Runner.xcarchive -allowProvisioningUpdates"
       
       # Create IPA with gym using the archive
       gym(
         skip_build_archive: true,
-        archive_path: "../build/ios/archive/Runner.xcarchive",
+        archive_path: "../../build/ios/archive/Runner.xcarchive",
         export_method: "app-store",
-        output_directory: "../build/ios/ipa",
+        output_directory: "../../build/ios/ipa",
         output_name: "Runner.ipa",
         export_options: {
           method: "app-store",
