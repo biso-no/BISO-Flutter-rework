@@ -51,6 +51,8 @@
 	<string>We use your photo library to select images for receipts and your profile.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location once to set your closest BI campus and show relevant content.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We use your location once to set your closest BI campus and show relevant content.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
