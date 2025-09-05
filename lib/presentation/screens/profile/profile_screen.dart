@@ -1,3 +1,4 @@
+import 'package:biso/presentation/screens/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -237,7 +238,7 @@ class ProfileScreen extends ConsumerWidget {
                               onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const EditProfileScreen(),
+                                  builder: (context) => const OnboardingScreen(),
                                 ),
                               ),
                             ),
