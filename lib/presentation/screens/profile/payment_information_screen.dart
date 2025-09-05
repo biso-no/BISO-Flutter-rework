@@ -6,6 +6,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/navigation_utils.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../providers/campus/campus_provider.dart';
+import '../../../data/models/user_model.dart';
 
 class PaymentInformationScreen extends ConsumerStatefulWidget {
   const PaymentInformationScreen({super.key});
@@ -23,6 +24,7 @@ class _PaymentInformationScreenState
 
   bool _isInternational = false;
   bool _isLoading = false;
+  bool _didPrefillFromUser = false;
 
   @override
   void initState() {
@@ -33,10 +35,8 @@ class _PaymentInformationScreenState
   void _loadCurrentData() {
     final user = ref.read(authStateProvider).user;
     if (user != null) {
-      _bankAccountController.text = user.bankAccount ?? '';
-      _swiftController.text = user.swift ?? '';
-      // Set international toggle to true if SWIFT exists or if the account looks international
-      _isInternational = user.swift?.isNotEmpty == true;
+      _applyUser(user);
+      _didPrefillFromUser = true;
     }
   }
 
@@ -149,6 +149,19 @@ class _PaymentInformationScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final selectedCampus = ref.watch(selectedCampusProvider);
+
+    // Prefill when auth state updates and user becomes available
+    ref.listen(authStateProvider, (previous, next) {
+      final user = next.user;
+      if (!_didPrefillFromUser && user != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _applyUser(user);
+            _didPrefillFromUser = true;
+          }
+        });
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -403,6 +416,18 @@ class _PaymentInformationScreenState
         ),
       ),
     );
+  }
+
+  void _applyUser(UserModel user) {
+    if (_bankAccountController.text.isEmpty) {
+      _bankAccountController.text = user.bankAccount ?? '';
+    }
+    if (_swiftController.text.isEmpty) {
+      _swiftController.text = user.swift ?? '';
+    }
+    setState(() {
+      _isInternational = user.swift?.isNotEmpty == true;
+    });
   }
 
   Color _getCampusColor(String campusId) {

@@ -195,7 +195,7 @@ class _CampusParallaxHeaderState extends State<CampusParallaxHeader>
                     
                     // Campus Name
                     Text(
-                      widget.campus.name,
+                      'BISO ${widget.campus.name}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 48,

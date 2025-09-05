@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../data/models/user_model.dart';
 import '../../../generated/l10n/app_localizations.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../data/services/expense_service_v2.dart';
@@ -24,11 +26,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
   final _zipController = TextEditingController();
+  final _zipFocusNode = FocusNode();
 
   List<String> _selectedDepartments = [];
   String? _selectedCampusId;
   XFile? _selectedImage;
   bool _isLoading = false;
+  bool _didPrefillFromUser = false;
+  bool _zipFieldFocused = false;
 
   // Fetched from Appwrite
   final ExpenseServiceV2 _expenseService = ExpenseServiceV2();
@@ -38,21 +43,45 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _zipFocusNode.addListener(() {
+      setState(() => _zipFieldFocused = _zipFocusNode.hasFocus);
+    });
     _initializeData();
   }
 
   void _initializeData() {
     final user = ref.read(authStateProvider).user;
     if (user != null) {
-      _nameController.text = user.name;
-      _phoneController.text = user.phone ?? '';
-      _addressController.text = user.address ?? '';
-      _cityController.text = user.city ?? '';
-      _zipController.text = user.zipCode ?? '';
-      _selectedDepartments = List.from(user.departments);
-      _selectedCampusId = user.campusId;
+      _applyUser(user);
+      _didPrefillFromUser = true;
     }
     _loadCampusesAndDeps();
+  }
+
+  void _applyUser(UserModel user) {
+    // Only prefill empty fields to avoid overriding user edits
+    if (_nameController.text.isEmpty) _nameController.text = user.name;
+    if (_phoneController.text.isEmpty) {
+      _phoneController.text = user.phone ?? '';
+    }
+    if (_addressController.text.isEmpty) {
+      _addressController.text = user.address ?? '';
+    }
+    if (_cityController.text.isEmpty) {
+      _cityController.text = user.city ?? '';
+    }
+    if (_zipController.text.isEmpty) {
+      _zipController.text = user.zipCode ?? '';
+    }
+
+    setState(() {
+      _selectedDepartments = List.from(user.departments);
+      _selectedCampusId = user.campusId;
+    });
+
+    if (_selectedCampusId != null && _selectedCampusId!.isNotEmpty) {
+      _loadDepartments(_selectedCampusId!);
+    }
   }
 
   Future<void> _loadCampusesAndDeps() async {
@@ -102,6 +131,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _addressController.dispose();
     _cityController.dispose();
     _zipController.dispose();
+    _zipFocusNode.dispose();
     super.dispose();
   }
 
@@ -214,6 +244,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final theme = Theme.of(context);
     final authState = ref.watch(authStateProvider);
 
+    // Listen for auth state changes and prefill once when user becomes available
+    ref.listen(authStateProvider, (previous, next) {
+      final user = next.user;
+      if (!_didPrefillFromUser && user != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _applyUser(user);
+            _didPrefillFromUser = true;
+          }
+        });
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
@@ -233,6 +276,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
+          keyboardDismissBehavior: Platform.isIOS
+              ? ScrollViewKeyboardDismissBehavior.manual
+              : ScrollViewKeyboardDismissBehavior.onDrag,
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -385,26 +431,56 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: TextFormField(
-                      controller: _zipController,
-                      decoration: InputDecoration(
-                        labelText: l10n.zipCodeMessage,
-                        prefixIcon: const Icon(
-                          Icons.local_post_office_outlined,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _zipController,
+                          focusNode: _zipFocusNode,
+                          decoration: InputDecoration(
+                            labelText: l10n.zipCodeMessage,
+                            prefixIcon: const Icon(
+                              Icons.local_post_office_outlined,
+                            ),
+                          ),
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.done,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(4),
+                          ],
+                          validator: (value) {
+                            if (value != null && value.isNotEmpty) {
+                              // Norwegian postal code validation (4 digits)
+                              if (value.length != 4 ||
+                                  !RegExp(r'^\d{4}$').hasMatch(value)) {
+                                return 'Invalid zip code';
+                              }
+                            }
+                            return null;
+                          },
                         ),
-                      ),
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.done,
-                      validator: (value) {
-                        if (value != null && value.isNotEmpty) {
-                          // Norwegian postal code validation (4 digits)
-                          if (value.length != 4 ||
-                              !RegExp(r'^\d{4}$').hasMatch(value)) {
-                            return 'Invalid zip code';
-                          }
-                        }
-                        return null;
-                      },
+                        if (Platform.isIOS && _zipFieldFocused)
+                          Container(
+                            width: double.infinity,
+                            height: 40,
+                            color: AppColors.gray100,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton(
+                                  onPressed: () => FocusScope.of(context).unfocus(),
+                                  child: const Text(
+                                    'Done',
+                                    style: TextStyle(
+                                      color: AppColors.defaultBlue,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ],

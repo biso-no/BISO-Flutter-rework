@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -150,47 +153,57 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         title: Text('${_currentStep + 1} / 3'),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          // Progress indicator
-          LinearProgressIndicator(
-            value: (_currentStep + 1) / 3,
-            backgroundColor: AppColors.gray200,
-            valueColor: const AlwaysStoppedAnimation<Color>(
-              AppColors.defaultBlue,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Progress indicator
+            LinearProgressIndicator(
+              value: (_currentStep + 1) / 3,
+              backgroundColor: AppColors.gray200,
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.defaultBlue,
+              ),
             ),
-          ),
 
-          // Content
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) => setState(() => _currentStep = index),
-              children: [
-                _PersonalInfoStep(
-                  nameController: _nameController,
-                  phoneController: _phoneController,
-                  addressController: _addressController,
-                  cityController: _cityController,
-                  zipController: _zipController,
-                  onNext: _nextStep,
+            // Content
+            Expanded(
+              child: SingleChildScrollView(
+                keyboardDismissBehavior: Platform.isIOS
+                    ? ScrollViewKeyboardDismissBehavior.manual
+                    : ScrollViewKeyboardDismissBehavior.onDrag,
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height - 200, // Account for app bar and progress bar
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: (index) => setState(() => _currentStep = index),
+                    children: [
+                      _PersonalInfoStep(
+                        nameController: _nameController,
+                        phoneController: _phoneController,
+                        addressController: _addressController,
+                        cityController: _cityController,
+                        zipController: _zipController,
+                        onNext: _nextStep,
+                      ),
+                      _CampusSelectionStep(
+                        campuses: _campuses,
+                        selectedCampusId: _selectedCampusId,
+                        onCampusSelected: (campusId) {
+                          setState(() => _selectedCampusId = campusId);
+                        },
+                        onNext: _nextStep,
+                      ),
+                      _NotificationPreferencesStep(
+                        onComplete: _completeOnboarding,
+                        isLoading: authState.isLoading,
+                      ),
+                    ],
+                  ),
                 ),
-                _CampusSelectionStep(
-                  campuses: _campuses,
-                  selectedCampusId: _selectedCampusId,
-                  onCampusSelected: (campusId) {
-                    setState(() => _selectedCampusId = campusId);
-                  },
-                  onNext: _nextStep,
-                ),
-                _NotificationPreferencesStep(
-                  onComplete: _completeOnboarding,
-                  isLoading: authState.isLoading,
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -219,6 +232,28 @@ class _PersonalInfoStep extends StatefulWidget {
 
 class _PersonalInfoStepState extends State<_PersonalInfoStep> {
   final _formKey = GlobalKey<FormState>();
+  final FocusNode _zipFocusNode = FocusNode();
+  final FocusNode _phoneFocusNode = FocusNode();
+  bool _zipFieldFocused = false;
+  bool _phoneFieldFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _zipFocusNode.addListener(() {
+      setState(() => _zipFieldFocused = _zipFocusNode.hasFocus);
+    });
+    _phoneFocusNode.addListener(() {
+      setState(() => _phoneFieldFocused = _phoneFocusNode.hasFocus);
+    });
+  }
+
+  @override
+  void dispose() {
+    _zipFocusNode.dispose();
+    _phoneFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -232,6 +267,7 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const SizedBox(height: 20), // Extra space at top for better UX
             Text(
               l10n.personalInfoMessage,
               style: theme.textTheme.headlineMedium?.copyWith(
@@ -266,15 +302,41 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
 
             const SizedBox(height: 16),
 
-            TextFormField(
-              controller: widget.phoneController,
-              decoration: InputDecoration(
-                labelText: l10n.phoneMessage,
-                prefixIcon: const Icon(Icons.phone_outlined),
-                hintText: '123 45 678',
-              ),
-              keyboardType: TextInputType.phone,
-              textInputAction: TextInputAction.next,
+            Column(
+              children: [
+                TextFormField(
+                  controller: widget.phoneController,
+                  focusNode: _phoneFocusNode,
+                  decoration: InputDecoration(
+                    labelText: l10n.phoneMessage,
+                    prefixIcon: const Icon(Icons.phone_outlined),
+                    hintText: '123 45 678',
+                  ),
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.next,
+                ),
+                if (Platform.isIOS && _phoneFieldFocused)
+                  Container(
+                    width: double.infinity,
+                    height: 40,
+                    color: AppColors.gray100,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => FocusScope.of(context).unfocus(),
+                          child: const Text(
+                            'Done',
+                            style: TextStyle(
+                              color: AppColors.defaultBlue,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
             ),
 
             const SizedBox(height: 16),
@@ -304,14 +366,44 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: TextFormField(
-                    controller: widget.zipController,
-                    decoration: InputDecoration(
-                      labelText: l10n.zipCodeMessage,
-                      prefixIcon: const Icon(Icons.local_post_office_outlined),
-                    ),
-                    keyboardType: TextInputType.number,
-                    textInputAction: TextInputAction.done,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: widget.zipController,
+                        focusNode: _zipFocusNode,
+                        decoration: InputDecoration(
+                          labelText: l10n.zipCodeMessage,
+                          prefixIcon: const Icon(Icons.local_post_office_outlined),
+                        ),
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.done,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(4),
+                        ],
+                      ),
+                      if (Platform.isIOS && _zipFieldFocused)
+                        Container(
+                          width: double.infinity,
+                          height: 40,
+                          color: AppColors.gray100,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () => FocusScope.of(context).unfocus(),
+                                child: const Text(
+                                  'Done',
+                                  style: TextStyle(
+                                    color: AppColors.defaultBlue,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],
@@ -319,13 +411,16 @@ class _PersonalInfoStepState extends State<_PersonalInfoStep> {
 
             const Spacer(),
 
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  widget.onNext();
-                }
-              },
-              child: Text(l10n.continueButtonMessage),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20), // Extra padding for keyboard
+              child: ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    widget.onNext();
+                  }
+                },
+                child: Text(l10n.continueButtonMessage),
+              ),
             ),
           ],
         ),
@@ -444,9 +539,12 @@ class _CampusSelectionStep extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          ElevatedButton(
-            onPressed: selectedCampusId != null ? onNext : null,
-            child: Text(l10n.continueButtonMessage),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20), // Extra padding for keyboard
+            child: ElevatedButton(
+              onPressed: selectedCampusId != null ? onNext : null,
+              child: Text(l10n.continueButtonMessage),
+            ),
           ),
         ],
       ),
@@ -544,18 +642,21 @@ class _NotificationPreferencesStepState
 
           const Spacer(),
 
-          ElevatedButton(
-            onPressed: widget.isLoading ? null : widget.onComplete,
-            child: widget.isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : const Text('Complete Setup'),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20), // Extra padding for keyboard
+            child: ElevatedButton(
+              onPressed: widget.isLoading ? null : widget.onComplete,
+              child: widget.isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Text('Complete Setup'),
+            ),
           ),
         ],
       ),
